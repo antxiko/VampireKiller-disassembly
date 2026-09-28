@@ -1119,22 +1119,26 @@ L_A852:
 	ld (ix+001h),002h		;a856   ; el paso en que va la cosa = 0x02
 	scf			;a85a
 	ret			;a85b
-L_A85C:
-	ld b,(ix+005h)		;a85c   ; lee la x de la cosa
+
+; ----------------------------------------------------------------------
+; LA PANTERA (el tipo 5; por su dibujo y porque espera y salta). Quieta mirando a Simon hasta que lo tiene a menos de 0x40 en horizontal; entonces corre a 0x400 hacia el; al acabarse el suelo salta (-0x108) y al caer vuelve a correr hacia Simon. Se borra al salir por la izquierda (x < 0x18). Pasos en 0xA88B.
+; ----------------------------------------------------------------------
+nace_la_pantera:
+	ld b,(ix+005h)		;a85c   ; mirando a Simon: 0x43 a la derecha...
 	ld a,(0c427h)		;a85f   ; lee la X de Simon
 	cp b			;a862
 	ld a,043h		;a863
 	jr nc,L_A869		;a865
-	ld a,03fh		;a867
+	ld a,03fh		;a867   ; ... o 0x3F a la izquierda
 L_A869:
 	ld (ix+00bh),a		;a869   ; guarda el dibujo de la cosa
 	ld (ix+006h),001h		;a86c   ; la cosa se mueve
 	ld (ix+00ch),000h		;a870   ; la cuenta de cuadros del paso = 0x00
-	ld de,00000h		;a874
+	ld de,00000h		;a874   ; quieta
 	call pon_velocidad_x		;a877   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	jp pon_velocidad_y		;a87a   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_A87D:
-	ld a,(ix+005h)		;a87d   ; lee la x de la cosa
+mueve_la_pantera:
+	ld a,(ix+005h)		;a87d   ; por la izquierda, fuera
 	cp 018h		;a880
 	jp c,099f6h		;a882   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld a,(ix+001h)		;a885   ; lee el paso en que va la cosa
@@ -1154,28 +1158,28 @@ DATA_tabla_A88B:
 ; ======================================================================
 
 
-L_A891:
-	ld a,(0c427h)		;a891   ; lee la X de Simon
+pantera_al_acecho:
+	ld a,(0c427h)		;a891   ; la distancia a Simon...
 	sub (ix+005h)		;a894   ; le resta la x de la cosa
-	ld de,00400h		;a897
+	ld de,00400h		;a897   ; ... y la velocidad hacia el
 	jr nc,L_A8A1		;a89a
 	neg		;a89c
 	ld de,0fc00h		;a89e
 L_A8A1:
-	cp 040h		;a8a1
+	cp 040h		;a8a1   ; a 0x40 o mas: sigue esperando
 	ret nc			;a8a3
-	call pon_velocidad_x		;a8a4   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	call pon_velocidad_x		;a8a4   ; a correr
 	ld (ix+001h),001h		;a8a7   ; el paso en que va la cosa = 0x01
 	ret			;a8ab
-L_A8AC:
-	call L_A909		;a8ac
+pantera_corriendo:
+	call pantera_corre		;a8ac
 	ld e,(ix+003h)		;a8af   ; lee la y de la cosa
 	ld d,(ix+005h)		;a8b2   ; lee la x de la cosa
-	call 07b98h		;a8b5   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+	call 07b98h		;a8b5   ; le queda suelo?
 	ret c			;a8b8
-	ld de,0fef8h		;a8b9
+	ld de,0fef8h		;a8b9   ; no: salta...
 	call pon_velocidad_y		;a8bc   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld a,(ix+00ah)		;a8bf   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld a,(ix+00ah)		;a8bf   ; ... con el dibujo de saltar, segun el lado
 	bit 7,a		;a8c2
 	ld a,046h		;a8c4
 	jr z,L_A8CA		;a8c6
@@ -1184,14 +1188,14 @@ L_A8CA:
 	ld (ix+00bh),a		;a8ca   ; guarda el dibujo de la cosa
 	ld (ix+001h),002h		;a8cd   ; el paso en que va la cosa = 0x02
 	ret			;a8d1
-L_A8D2:
-	ld de,000a0h		;a8d2
+pantera_saltando:
+	ld de,000a0h		;a8d2   ; la gravedad
 	call suma_a_la_velocidad_y		;a8d5   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 	ld e,(ix+003h)		;a8d8   ; lee la y de la cosa
 	ld d,(ix+005h)		;a8db   ; lee la x de la cosa
-	call 07b98h		;a8de   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+	call 07b98h		;a8de   ; ha caido?
 	ret nc			;a8e1
-	ld b,(ix+005h)		;a8e2   ; lee la x de la cosa
+	ld b,(ix+005h)		;a8e2   ; si: a correr otra vez hacia Simon
 	ld a,(0c427h)		;a8e5   ; lee la X de Simon
 	cp b			;a8e8
 	ld de,00400h		;a8e9
@@ -1201,47 +1205,51 @@ L_A8F1:
 	call pon_velocidad_x		;a8f1   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+00ch),000h		;a8f4   ; la cuenta de cuadros del paso = 0x00
 	ld (ix+001h),001h		;a8f8   ; el paso en que va la cosa = 0x01
-	ld (ix+002h),000h		;a8fc   ; la fraccion de la y de la cosa = 0x00
-	call L_A9A2		;a900
+	ld (ix+002h),000h		;a8fc   ; la y, en la celda
+	call y_en_la_celda		;a900
 	ld de,00000h		;a903
 	jp pon_velocidad_y		;a906   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_A909:
-	ld a,(ix+00ch)		;a909   ; lee la cuenta de cuadros del paso
+pantera_corre:
+	ld a,(ix+00ch)		;a909   ; una cuenta de 1 a 12
 	inc a			;a90c
 	cp 00dh		;a90d
 	jr c,L_A913		;a90f
 	ld a,001h		;a911
 L_A913:
 	ld (ix+00ch),a		;a913   ; guarda la cuenta de cuadros del paso
-	bit 7,(ix+00ah)		;a916   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
+	bit 7,(ix+00ah)		;a916   ; los dibujos 0x40-0x42 a la izquierda...
 	ld a,(ix+00ch)		;a91a   ; lee la cuenta de cuadros del paso
 	jr z,L_A923		;a91d
 	ld b,041h		;a91f
 	jr L_A925		;a921
 L_A923:
-	ld b,045h		;a923
+	ld b,045h		;a923   ; ... o 0x44-0x46 a la derecha
 L_A925:
-	cp 004h		;a925
+	cp 004h		;a925   ; los cuadros 1-3, B; de 4 a 9, B + 1...
 	jr c,L_A930		;a927
 	inc b			;a929
 	cp 00ah		;a92a
 	jr c,L_A930		;a92c
-	dec b			;a92e
+	dec b			;a92e   ; ... y de 10 a 12, B - 1
 	dec b			;a92f
 L_A930:
 	ld (ix+00bh),b		;a930   ; guarda el dibujo de la cosa
 	ret			;a933
-L_A934:
+
+; ----------------------------------------------------------------------
+; EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por VUELTA) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
+; ----------------------------------------------------------------------
+nace_el_tipo_1:
 	ld (ix+006h),001h		;a934   ; la cosa se mueve
-	ld a,(ix+005h)		;a938   ; lee la x de la cosa
+	ld a,(ix+005h)		;a938   ; nacio a la izquierda: a la derecha, dibujo 0x3D...
 	cp 080h		;a93b
 	ld de,00220h		;a93d
 	ld bc,03d00h		;a940
 	jr c,L_A94B		;a943
-	ld de,0fde0h		;a945
+	ld de,0fde0h		;a945   ; ... y si no, a la izquierda, dibujo 0x3B
 	ld bc,03b01h		;a948
 L_A94B:
-	ld (ix+011h),e		;a94b
+	ld (ix+011h),e		;a94b   ; la velocidad, guardada para despues de caer
 	ld (ix+012h),d		;a94e
 	call velocidad_x_con_la_vuelta		;a951
 	ld (ix+00bh),b		;a954   ; guarda el dibujo de la cosa
@@ -1249,10 +1257,10 @@ L_A94B:
 	ld (ix+010h),c		;a95b
 	ld de,00000h		;a95e
 	jp pon_velocidad_y		;a961   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_A964:
-	dec (ix+00ch)		;a964   ; baja la cuenta de cuadros del paso
+mueve_el_tipo_1:
+	dec (ix+00ch)		;a964   ; cada cuatro cuadros...
 	jr nz,L_A984		;a967
-	ld a,(ix+010h)		;a969
+	ld a,(ix+010h)		;a969   ; ... el otro dibujo de su lado
 	or a			;a96c
 	ld bc,03d3eh		;a96d
 	jr z,L_A975		;a970
@@ -1267,25 +1275,25 @@ L_A97D:
 	ld (ix+00bh),a		;a97d   ; guarda el dibujo de la cosa
 	ld (ix+00ch),004h		;a980   ; la cuenta de cuadros del paso = 0x04
 L_A984:
-	ld d,(ix+005h)		;a984   ; lee la x de la cosa
+	ld d,(ix+005h)		;a984   ; le queda suelo?
 	ld e,(ix+003h)		;a987   ; lee la y de la cosa
 	call 07b98h		;a98a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jr nc,L_A9AB		;a98d
-	ld de,00000h		;a98f
+	jr nc,cae_el_tipo_1		;a98d
+	ld de,00000h		;a98f   ; si: sin caer y a su velocidad
 	call pon_velocidad_y		;a992   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld e,(ix+011h)		;a995
 	ld d,(ix+012h)		;a998
 	call velocidad_x_con_la_vuelta		;a99b
 	ld (ix+006h),001h		;a99e   ; la cosa se mueve
-L_A9A2:
-	ld a,(ix+003h)		;a9a2   ; lee la y de la cosa
+y_en_la_celda:
+	ld a,(ix+003h)		;a9a2   ; la y, a multiplo de 8
 	and 0f8h		;a9a5
 	ld (ix+003h),a		;a9a7   ; guarda la y de la cosa
 	ret			;a9aa
-L_A9AB:
-	ld de,00000h		;a9ab
+cae_el_tipo_1:
+	ld de,00000h		;a9ab   ; sin avanzar...
 	call pon_velocidad_x		;a9ae   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld de,00060h		;a9b1
+	ld de,00060h		;a9b1   ; ... y con la gravedad
 	jp suma_a_la_velocidad_y		;a9b4   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 mueve_el_dragon_de_huesos:
 	ld hl,0a9c7h		;a9b7
@@ -2500,7 +2508,7 @@ L_B268:
 L_B276:
 	inc (ix+001h)		;b276   ; sube el paso en que va la cosa
 L_B279:
-	call L_A9A2		;b279
+	call y_en_la_celda		;b279
 	ld (ix+006h),000h		;b27c   ; la cosa se queda quieta
 	ld (ix+00ch),002h		;b280   ; la cuenta de cuadros del paso = 0x02
 	ret			;b284
@@ -2769,7 +2777,7 @@ L_B490:
 	xor a			;b499
 	ld (ix+001h),a		;b49a   ; guarda el paso en que va la cosa
 	ld (ix+002h),a		;b49d   ; guarda la fraccion de la y de la cosa
-	call L_A9A2		;b4a0
+	call y_en_la_celda		;b4a0
 	ld de,00000h		;b4a3
 	jp pon_velocidad_y		;b4a6   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_B4A9:

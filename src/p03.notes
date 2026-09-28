@@ -205,6 +205,48 @@ C 0xA83C subiendo: el techo, en y = 0x20
 C 0xA840 hacia la derecha: hasta x = 0xE8
 C 0xA84F hacia la izquierda: hasta x = 0x10
 C 0xA852 en un borde: quieto 0x18 cuadros, con carry
+B 0xA85C LA PANTERA (el tipo 5; por su dibujo y porque espera y salta). Quieta mirando a Simon hasta que lo tiene a menos de 0x40 en horizontal; entonces corre a 0x400 hacia el; al acabarse el suelo salta (-0x108) y al caer vuelve a correr hacia Simon. Se borra al salir por la izquierda (x < 0x18). Pasos en 0xA88B.
+L 0xA85C nace_la_pantera
+C 0xA85C mirando a Simon: 0x43 a la derecha...
+C 0xA867 ... o 0x3F a la izquierda
+C 0xA874 quieta
+L 0xA87D mueve_la_pantera
+C 0xA87D por la izquierda, fuera
+L 0xA891 pantera_al_acecho
+C 0xA891 la distancia a Simon...
+C 0xA897 ... y la velocidad hacia el
+C 0xA8A1 a 0x40 o mas: sigue esperando
+C 0xA8A4 a correr
+L 0xA8AC pantera_corriendo
+C 0xA8B5 le queda suelo?
+C 0xA8B9 no: salta...
+C 0xA8BF ... con el dibujo de saltar, segun el lado
+L 0xA8D2 pantera_saltando
+C 0xA8D2 la gravedad
+C 0xA8DE ha caido?
+C 0xA8E2 si: a correr otra vez hacia Simon
+C 0xA8FC la y, en la celda
+L 0xA909 pantera_corre
+C 0xA909 una cuenta de 1 a 12
+C 0xA916 los dibujos 0x40-0x42 a la izquierda...
+C 0xA923 ... o 0x44-0x46 a la derecha
+C 0xA925 los cuadros 1-3, B; de 4 a 9, B + 1...
+C 0xA92E ... y de 10 a 12, B - 1
+B 0xA934 EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por VUELTA) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
+L 0xA934 nace_el_tipo_1
+C 0xA938 nacio a la izquierda: a la derecha, dibujo 0x3D...
+C 0xA945 ... y si no, a la izquierda, dibujo 0x3B
+C 0xA94B la velocidad, guardada para despues de caer
+L 0xA964 mueve_el_tipo_1
+C 0xA964 cada cuatro cuadros...
+C 0xA969 ... el otro dibujo de su lado
+C 0xA984 le queda suelo?
+C 0xA98F si: sin caer y a su velocidad
+L 0xA9A2 y_en_la_celda
+C 0xA9A2 la y, a multiplo de 8
+L 0xA9AB cae_el_tipo_1
+C 0xA9AB sin avanzar...
+C 0xA9B1 ... y con la gravedad
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -560,59 +602,44 @@ C 0xA825 hl_mas_a: HL += A
 C 0xA830 mira el bit 7 de la velocidad vertical
 C 0xA843 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA856 el paso en que va la cosa = 0x02
-C 0xA85C lee la x de la cosa
 C 0xA85F lee la X de Simon
 C 0xA869 guarda el dibujo de la cosa
 C 0xA86C la cosa se mueve
 C 0xA870 la cuenta de cuadros del paso = 0x00
 C 0xA877 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA87A pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xA87D lee la x de la cosa
 C 0xA882 borra_la_cosa: tipo a cero y sus sprites libres
 C 0xA885 lee el paso en que va la cosa
 C 0xA888 despacha: salta a la entrada A de la tabla que va detras del call
-C 0xA891 lee la X de Simon
 C 0xA894 le resta la x de la cosa
-C 0xA8A4 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA8A7 el paso en que va la cosa = 0x01
 C 0xA8AF lee la y de la cosa
 C 0xA8B2 lee la x de la cosa
-C 0xA8B5 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 C 0xA8BC pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xA8BF lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA8CA guarda el dibujo de la cosa
 C 0xA8CD el paso en que va la cosa = 0x02
 C 0xA8D5 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 C 0xA8D8 lee la y de la cosa
 C 0xA8DB lee la x de la cosa
-C 0xA8DE choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0xA8E2 lee la x de la cosa
 C 0xA8E5 lee la X de Simon
 C 0xA8F1 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA8F4 la cuenta de cuadros del paso = 0x00
 C 0xA8F8 el paso en que va la cosa = 0x01
-C 0xA8FC la fraccion de la y de la cosa = 0x00
 C 0xA906 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xA909 lee la cuenta de cuadros del paso
 C 0xA913 guarda la cuenta de cuadros del paso
-C 0xA916 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA91A lee la cuenta de cuadros del paso
 C 0xA930 guarda el dibujo de la cosa
 C 0xA934 la cosa se mueve
-C 0xA938 lee la x de la cosa
 C 0xA954 guarda el dibujo de la cosa
 C 0xA957 la cuenta de cuadros del paso = 0x08
 C 0xA961 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xA964 baja la cuenta de cuadros del paso
 C 0xA975 lee el dibujo de la cosa
 C 0xA97D guarda el dibujo de la cosa
 C 0xA980 la cuenta de cuadros del paso = 0x04
-C 0xA984 lee la x de la cosa
 C 0xA987 lee la y de la cosa
 C 0xA98A choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 C 0xA992 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA99E la cosa se mueve
-C 0xA9A2 lee la y de la cosa
 C 0xA9A7 guarda la y de la cosa
 C 0xA9AE pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA9B4 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
