@@ -1924,7 +1924,11 @@ cuerpo_del_dibujo:
 	ret nc			;add9
 	ld (0ce0eh),a		;adda   ; lo pinta 0xAD93 en el cuadro
 	ret			;addd
-L_ADDE:
+
+; ----------------------------------------------------------------------
+; EL TIPO 0x10. Cae hasta el suelo y anda a 0x140 guardando la distancia con Simon: si se le acerca a menos de 0x2E se aparta, y a 0x5C o mas va a por el; se para al borde del suelo, contra una pared o en el borde de la pantalla. Lanza (0x9F61: el tipo 9 de la lista de 0xD700, a 0x400 hacia Simon, y apunta en 0xCFFC quien lo lanzo) cuando Simon esta a menos de 0x2A viniendo de cerca o a 0x60 o mas viniendo de lejos, y espera 0x3C cuadros para volver a lanzar (bit 1 del paso).
+; ----------------------------------------------------------------------
+nace_el_tipo_0x10:
 	ld (ix+006h),001h		;adde   ; la cosa se mueve
 	ld de,00000h		;ade2
 	call pon_velocidad_y		;ade5   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
@@ -1933,138 +1937,138 @@ L_ADDE:
 	ld (ix+010h),000h		;adef
 	ld (ix+011h),03ch		;adf3
 	ret			;adf7
-L_ADF8:
+mueve_el_tipo_0x10:
 	bit 0,(ix+001h)		;adf8   ; mira el bit 0 de el paso en que va la cosa
 	jr nz,L_AE36		;adfc
 	ld d,(ix+005h)		;adfe   ; lee la x de la cosa
 	ld e,(ix+003h)		;ae01   ; lee la y de la cosa
 	call 07b98h		;ae04   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jr c,L_AE0C		;ae07
-	jp L_B33E		;ae09
+	jr c,L_AE0C		;ae07   ; cae hasta tocar suelo...
+	jp L_B33E		;ae09   ; ... con la gravedad de 0xB33E
 L_AE0C:
 	ld a,(ix+003h)		;ae0c   ; lee la y de la cosa
-	and 0f0h		;ae0f
+	and 0f0h		;ae0f   ; en el suelo: la y, a la celda de 16
 	ld (ix+003h),a		;ae11   ; guarda la y de la cosa
 	inc (ix+001h)		;ae14   ; sube el paso en que va la cosa
-	ld de,00140h		;ae17
+	ld de,00140h		;ae17   ; a 0x140 hacia Simon...
 	ld (ix+00bh),061h		;ae1a   ; el dibujo de la cosa = 0x61
 	ld a,(0c427h)		;ae1e   ; lee la X de Simon
 	cp (ix+005h)		;ae21   ; compara con la x de la cosa
-	jr nc,L_AE2D		;ae24
-	ld de,0fec0h		;ae26
+	jr nc,L_AE2D		;ae24   ; ... a la derecha...
+	ld de,0fec0h		;ae26   ; ... o a la izquierda
 	ld (ix+00bh),05fh		;ae29   ; el dibujo de la cosa = 0x5F
 L_AE2D:
-	call velocidad_x_con_la_vuelta		;ae2d
-	ld de,00000h		;ae30
+	call velocidad_x_con_la_vuelta		;ae2d   ; mas lo de la vuelta
+	ld de,00000h		;ae30   ; sin caer
 	jp pon_velocidad_y		;ae33   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_AE36:
-	call L_AF18		;ae36
-	ld a,010h		;ae39
+	call dibujo_del_tipo_0x10		;ae36   ; el dibujo, mirando a Simon
+	ld a,010h		;ae39   ; la celda de delante: x + 0x10...
 	bit 7,(ix+00ah)		;ae3b   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	jr z,L_AE43		;ae3f
+	jr z,L_AE43		;ae3f   ; ... o x - 8 hacia la izquierda
 	ld a,0f8h		;ae41
 L_AE43:
 	add a,(ix+005h)		;ae43   ; le suma la x de la cosa
-	ld d,a			;ae46
+	ld d,a			;ae46   ; D = esa x
 	ld e,(ix+003h)		;ae47   ; lee la y de la cosa
 	call 07b98h		;ae4a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jp nc,L_AEF6		;ae4d
+	jp nc,L_AEF6		;ae4d   ; sin suelo delante: se para
 	ld d,(ix+005h)		;ae50   ; lee la x de la cosa
-	ld bc,00808h		;ae53
+	ld bc,00808h		;ae53   ; una pared delante?
 	bit 7,(ix+00ah)		;ae56   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	jr nz,L_AE61		;ae5a
-	call 07bbeh		;ae5c
+	jr nz,L_AE61		;ae5a   ; hacia la izquierda...
+	call 07bbeh		;ae5c   ; ... o hacia la derecha
 	jr L_AE64		;ae5f
 L_AE61:
-	call 07c1ah		;ae61
+	call 07c1ah		;ae61   ; la de la izquierda
 L_AE64:
-	jp c,L_AEF6		;ae64
+	jp c,L_AEF6		;ae64   ; pared: se para
 	ld (ix+006h),001h		;ae67   ; la cosa se mueve
 	call distancia_horizontal		;ae6b   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 02eh		;ae6e
-	jr nc,L_AE89		;ae70
-	ld de,00140h		;ae72
+	cp 02eh		;ae6e   ; a menos de 0x2E de Simon?
+	jr nc,L_AE89		;ae70   ; no: mira si esta lejos
+	ld de,00140h		;ae72   ; si: se aparta, 0x140...
 	ld a,(0c427h)		;ae75   ; lee la X de Simon
 	cp (ix+005h)		;ae78   ; compara con la x de la cosa
-	jr c,L_AE80		;ae7b
-	ld de,0fec0h		;ae7d
+	jr c,L_AE80		;ae7b   ; ... hacia el lado contrario de Simon
+	ld de,0fec0h		;ae7d   ; (Simon a su derecha: a la izquierda)
 L_AE80:
-	call velocidad_x_con_la_vuelta		;ae80
-	ld (ix+010h),001h		;ae83
-	jr L_AEA2		;ae87
+	call velocidad_x_con_la_vuelta		;ae80   ; mas lo de la vuelta
+	ld (ix+010h),001h		;ae83   ; viene de cerca
+	jr L_AEA2		;ae87   ; a mirar si lanza
 L_AE89:
-	cp 05ch		;ae89
-	jr c,L_AEA2		;ae8b
-	ld de,00140h		;ae8d
+	cp 05ch		;ae89   ; a 0x5C o mas?
+	jr c,L_AEA2		;ae8b   ; entre medias: como iba
+	ld de,00140h		;ae8d   ; lejos: a 0x140 hacia Simon...
 	ld a,(0c427h)		;ae90   ; lee la X de Simon
 	cp (ix+005h)		;ae93   ; compara con la x de la cosa
-	jr nc,L_AE9B		;ae96
-	ld de,0fec0h		;ae98
+	jr nc,L_AE9B		;ae96   ; ... a la derecha...
+	ld de,0fec0h		;ae98   ; ... o a la izquierda
 L_AE9B:
-	call velocidad_x_con_la_vuelta		;ae9b
-	ld (ix+010h),000h		;ae9e
+	call velocidad_x_con_la_vuelta		;ae9b   ; mas lo de la vuelta
+	ld (ix+010h),000h		;ae9e   ; viene de lejos
 L_AEA2:
 	ld a,(ix+005h)		;aea2   ; lee la x de la cosa
-	cp 0f0h		;aea5
-	call nc,L_AF2C		;aea7
-	cp 00fh		;aeaa
-	call c,L_AF36		;aeac
+	cp 0f0h		;aea5   ; en el borde derecho, se para si va a la derecha
+	call nc,para_en_el_borde_derecho		;aea7
+	cp 00fh		;aeaa   ; en el borde izquierdo, si va a la izquierda
+	call c,para_en_el_borde_izquierdo		;aeac
 L_AEAF:
 	bit 1,(ix+001h)		;aeaf   ; mira el bit 1 de el paso en que va la cosa
-	jr nz,L_AEE9		;aeb3
+	jr nz,L_AEE9		;aeb3   ; acaba de lanzar: espera
 	call distancia_horizontal		;aeb5   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 02ah		;aeb8
-	jr nc,L_AEDF		;aeba
-	bit 0,(ix+010h)		;aebc
-	ret z			;aec0
+	cp 02ah		;aeb8   ; Simon a menos de 0x2A?
+	jr nc,L_AEDF		;aeba   ; no: mira si esta a 0x60 o mas
+	bit 0,(ix+010h)		;aebc   ; si, y viene de cerca?
+	ret z			;aec0   ; no: nada
 L_AEC1:
 	set 1,(ix+001h)		;aec1   ; pone a uno el bit 1 de el paso en que va la cosa
-	push ix		;aec5
+	push ix		;aec5   ; quien lanza, en 0xCFFC...
 	pop hl			;aec7
 	ld (0cffch),hl		;aec8
-	ld hl,00000h		;aecb
-	ld de,00400h		;aece
+	ld hl,00000h		;aecb   ; ... sin velocidad vertical...
+	ld de,00400h		;aece   ; ... y 0x400 a la derecha...
 	ld a,(0c427h)		;aed1   ; lee la X de Simon
 	cp (ix+005h)		;aed4   ; compara con la x de la cosa
-	jr nc,L_AEDC		;aed7
-	ld de,0fc00h		;aed9
+	jr nc,L_AEDC		;aed7   ; (Simon a la derecha)
+	ld de,0fc00h		;aed9   ; ... o a la izquierda
 L_AEDC:
-	jp 09f61h		;aedc
+	jp 09f61h		;aedc   ; lanza su tipo: 0xA08E + 0x10, el 9 de la lista de 0xD700
 L_AEDF:
-	cp 060h		;aedf
-	ret c			;aee1
-	bit 0,(ix+010h)		;aee2
-	ret nz			;aee6
-	jr L_AEC1		;aee7
+	cp 060h		;aedf   ; a 0x60 o mas?
+	ret c			;aee1   ; no: nada
+	bit 0,(ix+010h)		;aee2   ; si, y viene de lejos?
+	ret nz			;aee6   ; no: nada
+	jr L_AEC1		;aee7   ; si: lanza
 L_AEE9:
-	dec (ix+011h)		;aee9
+	dec (ix+011h)		;aee9   ; tras lanzar, 0x3C cuadros...
 	ret nz			;aeec
-	ld (ix+011h),03ch		;aeed
+	ld (ix+011h),03ch		;aeed   ; ... y otra vez la cuenta
 	res 1,(ix+001h)		;aef1   ; pone a cero el bit 1 de el paso en que va la cosa
-	ret			;aef5
+	ret			;aef5   ; puede volver a lanzar
 L_AEF6:
-	ld (ix+006h),000h		;aef6   ; la cosa se queda quieta
+	ld (ix+006h),000h		;aef6   ; parado en el borde o contra la pared
 	call distancia_horizontal		;aefa   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 03eh		;aefd
-	jr c,L_AF0C		;aeff
-	cp 04ch		;af01
-	jr nc,L_AF12		;af03
+	cp 03eh		;aefd   ; a menos de 0x3E de Simon?
+	jr c,L_AF0C		;aeff   ; si: viene de cerca
+	cp 04ch		;af01   ; a 0x4C o mas?
+	jr nc,L_AF12		;af03   ; si: viene de lejos
 	ld (ix+006h),001h		;af05   ; la cosa se mueve
-	jp media_vuelta		;af09
+	jp media_vuelta		;af09   ; entre medias: media vuelta
 L_AF0C:
-	ld (ix+010h),001h		;af0c
-	jr L_AEAF		;af10
+	ld (ix+010h),001h		;af0c   ; cerca
+	jr L_AEAF		;af10   ; a mirar si lanza
 L_AF12:
-	ld (ix+010h),000h		;af12
-	jr L_AEAF		;af16
-L_AF18:
-	ld c,000h		;af18
+	ld (ix+010h),000h		;af12   ; lejos
+	jr L_AEAF		;af16   ; a mirar si lanza
+dibujo_del_tipo_0x10:
+	ld c,000h		;af18   ; uno de dos, cada ocho cuadros...
 	ld a,(0c003h)		;af1a   ; lee el contador de cuadros
-	and 008h		;af1d
+	and 008h		;af1d   ; (el bit 3 del contador de cuadros)
 	jr z,L_AF22		;af1f
 	inc c			;af21
 L_AF22:
-	ld hl,0af28h		;af22
+	ld hl,0af28h		;af22   ; ... de 0xAF28, mirando a Simon
 	jp dibujo_segun_simon		;af25   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 
 ; ----------------------------------------------------------------------
@@ -2078,32 +2082,36 @@ DATA_dibujos_AF28:
 ; ======================================================================
 
 
-L_AF2C:
+para_en_el_borde_derecho:
 	bit 7,(ix+00ah)		;af2c   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	ret nz			;af30
+	ret nz			;af30   ; va a la izquierda: sigue
 	ld (ix+006h),000h		;af31   ; la cosa se queda quieta
-	ret			;af35
-L_AF36:
+	ret			;af35   ; va a la derecha: se para
+para_en_el_borde_izquierdo:
 	bit 7,(ix+00ah)		;af36   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	ret z			;af3a
+	ret z			;af3a   ; va a la derecha: sigue
 	ld (ix+006h),000h		;af3b   ; la cosa se queda quieta
-	ret			;af3f
+	ret			;af3f   ; va a la izquierda: se para
 distancia_horizontal:
 	ld a,(0c427h)		;af40   ; lee la X de Simon
 	sub (ix+005h)		;af43   ; le resta la x de la cosa
-	ret nc			;af46
-	neg		;af47
-	ret			;af49
-L_AF4A:
-	ld de,00000h		;af4a
+	ret nc			;af46   ; Simon a la derecha: la resta ya es la distancia
+	neg		;af47   ; a la izquierda: en positivo
+	ret			;af49   ; A = la distancia horizontal a Simon
+
+; ----------------------------------------------------------------------
+; EL TIPO 9 (por su dibujo, un esqueleto que se levanta del suelo). Nace hundido: 0x30 cuadros con el dibujo 0x26 (0x25 los doce ultimos) y los sprites 2 y 3 escondidos; se levanta y anda a 0x220 hacia Simon (mas lo de la vuelta), da la vuelta contra una pared, al borde del suelo o de la pantalla, y cada 16 cuadros se para cuatro y vuelve a encarar a Simon. 0xB048 lo vuelve a hundir, 0x40 cuadros. Pasos en 0xAF65.
+; ----------------------------------------------------------------------
+nace_el_tipo_9:
+	ld de,00000h		;af4a   ; quieto
 	call pon_velocidad_y		;af4d   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld (ix+011h),030h		;af50
-	xor a			;af54
+	ld (ix+011h),030h		;af50   ; hundido 0x30 cuadros
+	xor a			;af54   ; los sprites 2 y 3, escondidos
 	ld (ix+02fh),a		;af55
 	ld (ix+034h),a		;af58
-	ld (ix+00eh),a		;af5b
+	ld (ix+00eh),a		;af5b   ; sin parpadeo
 	ret			;af5e
-L_AF5F:
+mueve_el_tipo_9:
 	ld a,(ix+001h)		;af5f   ; lee el paso en que va la cosa
 	call 0406bh		;af62   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2121,164 +2129,168 @@ DATA_tabla_AF65:
 ; ======================================================================
 
 
-L_AF6B:
-	dec (ix+011h)		;af6b
-	jr z,L_AF7E		;af6e
-	ld c,026h		;af70
+tipo_9_hundido:
+	dec (ix+011h)		;af6b   ; se acaba la espera?
+	jr z,L_AF7E		;af6e   ; si: se levanta
+	ld c,026h		;af70   ; hundido: el dibujo 0x26...
 	ld a,(ix+011h)		;af72
-	cp 00ch		;af75
+	cp 00ch		;af75   ; ... y los doce ultimos cuadros...
 	jr nc,L_AF7A		;af77
-	dec c			;af79
+	dec c			;af79   ; ... el 0x25
 L_AF7A:
 	ld (ix+00bh),c		;af7a   ; guarda el dibujo de la cosa
 	ret			;af7d
 L_AF7E:
-	ld (ix+00eh),007h		;af7e
-	ld a,(ix+025h)		;af82
+	ld (ix+00eh),007h		;af7e   ; se levanta
+	ld a,(ix+025h)		;af82   ; el sprite 2, del color del 0...
 	ld (ix+02fh),a		;af85
-	ld (ix+034h),045h		;af88
-	call L_AF9B		;af8c
+	ld (ix+034h),045h		;af88   ; ... y el 3, del 5 con CC
+	call encara_a_simon		;af8c   ; hacia Simon
 	ld (ix+00ch),010h		;af8f   ; la cuenta de cuadros del paso = 0x10
 	inc (ix+001h)		;af93   ; sube el paso en que va la cosa
 	ld (ix+006h),001h		;af96   ; la cosa se mueve
 	ret			;af9a
-L_AF9B:
+encara_a_simon:
 	ld a,(0c427h)		;af9b   ; lee la X de Simon
 	sub (ix+005h)		;af9e   ; le resta la x de la cosa
-	jr c,L_AFB0		;afa1
-	ld (ix+012h),000h		;afa3
+	jr c,L_AFB0		;afa1   ; Simon a la izquierda?
+	ld (ix+012h),000h		;afa3   ; a la derecha: mirando a la derecha...
 	ld (ix+00bh),021h		;afa7   ; el dibujo de la cosa = 0x21
-	ld de,00220h		;afab
+	ld de,00220h		;afab   ; ... a 0x220
 	jr L_AFBB		;afae
 L_AFB0:
-	ld (ix+012h),001h		;afb0
+	ld (ix+012h),001h		;afb0   ; a la izquierda: mirando a la izquierda...
 	ld (ix+00bh),023h		;afb4   ; el dibujo de la cosa = 0x23
-	ld de,0fde0h		;afb8
+	ld de,0fde0h		;afb8   ; ... a -0x220
 L_AFBB:
-	jp velocidad_x_con_la_vuelta		;afbb
-L_AFBE:
+	jp velocidad_x_con_la_vuelta		;afbb   ; mas lo de la vuelta
+tipo_9_andando:
 	ld a,(ix+005h)		;afbe   ; lee la x de la cosa
 	bit 7,(ix+00ah)		;afc1   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	ld c,010h		;afc5
+	ld c,010h		;afc5   ; la celda de delante: x + 0x10...
 	jr z,L_AFCB		;afc7
-	ld c,0f0h		;afc9
+	ld c,0f0h		;afc9   ; ... o x - 0x10
 L_AFCB:
 	add a,c			;afcb
-	ld d,a			;afcc
+	ld d,a			;afcc   ; D = esa x
 	ld e,(ix+003h)		;afcd   ; lee la y de la cosa
 	call 07b98h		;afd0   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jr nc,L_AFFD		;afd3
+	jr nc,L_AFFD		;afd3   ; pared: media vuelta
 	ld d,(ix+005h)		;afd5   ; lee la x de la cosa
 	ld e,(ix+003h)		;afd8   ; lee la y de la cosa
-	ld b,008h		;afdb
+	ld b,008h		;afdb   ; suelo delante, en un cuadro de 8 x 8
 	ld c,008h		;afdd
-	ld a,(ix+012h)		;afdf
-	and a			;afe2
-	jr nz,L_AFF1		;afe3
+	ld a,(ix+012h)		;afdf   ; hacia la derecha?
+	and a			;afe2   ; (0: a la derecha)
+	jr nz,L_AFF1		;afe3   ; no: a mirar a la izquierda
 	ld a,(ix+005h)		;afe5   ; lee la x de la cosa
-	cp 0f0h		;afe8
-	jr nc,L_AFFD		;afea
-	call 07bbeh		;afec
+	cp 0f0h		;afe8   ; en el borde derecho de la pantalla?
+	jr nc,L_AFFD		;afea   ; si: media vuelta
+	call 07bbeh		;afec   ; suelo a la derecha?
 	jr L_AFFB		;afef
 L_AFF1:
 	ld a,(ix+005h)		;aff1   ; lee la x de la cosa
-	cp 010h		;aff4
-	jr c,L_AFFD		;aff6
-	call 07c1ah		;aff8
+	cp 010h		;aff4   ; en el borde izquierdo?
+	jr c,L_AFFD		;aff6   ; si: media vuelta
+	call 07c1ah		;aff8   ; suelo a la izquierda?
 L_AFFB:
-	jr nc,L_B011		;affb
+	jr nc,L_B011		;affb   ; lo hay: sigue
 L_AFFD:
-	ld a,(ix+012h)		;affd
-	xor 001h		;b000
+	ld a,(ix+012h)		;affd   ; media vuelta: el lado...
+	xor 001h		;b000   ; ... del reves...
 	ld (ix+012h),a		;b002
 	ld e,(ix+009h)		;b005   ; lee la velocidad horizontal (parte baja)
 	ld d,(ix+00ah)		;b008   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	call niega_de		;b00b   ; niega_de: DE = -DE
-	call velocidad_x_con_la_vuelta		;b00e
+	call velocidad_x_con_la_vuelta		;b00e   ; ... y la velocidad, del reves, con lo de la vuelta
 L_B011:
 	bit 2,(ix+00ch)		;b011   ; mira el bit 2 de la cuenta de cuadros del paso
-	ld c,021h		;b015
-	jr z,L_B01A		;b017
-	inc c			;b019
+	ld c,021h		;b015   ; el dibujo: 0x21...
+	jr z,L_B01A		;b017   ; (cada cuatro cuadros...)
+	inc c			;b019   ; ... o 0x22
 L_B01A:
-	ld a,(ix+012h)		;b01a
-	and a			;b01d
-	jr nz,L_B022		;b01e
-	inc c			;b020
-	inc c			;b021
+	ld a,(ix+012h)		;b01a   ; mirando a la derecha?
+	and a			;b01d   ; (0: a la derecha)
+	jr nz,L_B022		;b01e   ; no: asi
+	inc c			;b020   ; si: dos mas
+	inc c			;b021   ; (0x23-0x24)
 L_B022:
 	ld (ix+00bh),c		;b022   ; guarda el dibujo de la cosa
 	dec (ix+00ch)		;b025   ; baja la cuenta de cuadros del paso
-	ret nz			;b028
+	ret nz			;b028   ; 16 cuadros andando
 	ld (ix+006h),000h		;b029   ; la cosa se queda quieta
 	ld (ix+00ch),004h		;b02d   ; la cuenta de cuadros del paso = 0x04
 	inc (ix+001h)		;b031   ; sube el paso en que va la cosa
-	ret			;b034
-L_B035:
+	ret			;b034   ; y se para cuatro
+tipo_9_parado:
 	dec (ix+00ch)		;b035   ; baja la cuenta de cuadros del paso
 	ret nz			;b038
-	call L_AF9B		;b039
+	call encara_a_simon		;b039   ; otra vez hacia Simon
 	ld (ix+00ch),030h		;b03c   ; la cuenta de cuadros del paso = 0x30
 	ld (ix+006h),001h		;b040   ; la cosa se mueve
 	dec (ix+001h)		;b044   ; baja el paso en que va la cosa
-	ret			;b047
-L_B048:
-	ld (ix+011h),040h		;b048
-	xor a			;b04c
+	ret			;b047   ; y a andar 0x30 cuadros
+hunde_el_tipo_9:
+	ld (ix+011h),040h		;b048   ; hundido 0x40 cuadros
+	xor a			;b04c   ; quieto...
 	ld (ix+006h),a		;b04d   ; guarda si la cosa se mueve
-	ld (ix+00eh),a		;b050
-	ld (ix+02fh),a		;b053
+	ld (ix+00eh),a		;b050   ; ... sin parpadeo...
+	ld (ix+02fh),a		;b053   ; ... con los sprites 2 y 3 escondidos
 	ld (ix+034h),a		;b056
 	ld (ix+00bh),026h		;b059   ; el dibujo de la cosa = 0x26
 	ld (ix+001h),a		;b05d   ; guarda el paso en que va la cosa
-	ret			;b060
-L_B061:
+	ret			;b060   ; (al paso 0)
+
+; ----------------------------------------------------------------------
+; EL TIPO 7. Vuela hacia Simon: a 0x120 en horizontal y, en vertical, a 0x100 hacia su altura (quieto si esta de y - 0x17 a y); lo recalcula cada 16 cuadros. Dibujos 0x16-0x17 a la izquierda y 0x18-0x19 a la derecha.
+; ----------------------------------------------------------------------
+nace_el_tipo_7:
 	ld (ix+006h),001h		;b061   ; la cosa se mueve
 	ld (ix+010h),000h		;b065
 	ld (ix+00ch),001h		;b069   ; la cuenta de cuadros del paso = 0x01
 	bit 7,(ix+00ah)		;b06d   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	ld c,016h		;b071
+	ld c,016h		;b071   ; el dibujo 0x16 a la izquierda...
 	jr nz,L_B076		;b073
-	inc c			;b075
+	inc c			;b075   ; ... o 0x17
 L_B076:
 	ld (ix+00bh),c		;b076   ; guarda el dibujo de la cosa
-	jr L_B086		;b079
-L_B07B:
-	call L_B0B5		;b07b
+	jr L_B086		;b079   ; y a por Simon
+mueve_el_tipo_7:
+	call dibujo_del_tipo_7		;b07b   ; el dibujo
 	dec (ix+00ch)		;b07e   ; baja la cuenta de cuadros del paso
-	ret nz			;b081
+	ret nz			;b081   ; cada 16 cuadros...
 	ld (ix+00ch),010h		;b082   ; la cuenta de cuadros del paso = 0x10
 L_B086:
 	ld a,(0c425h)		;b086   ; lee la Y de Simon
-	ld de,0ff00h		;b089
-	inc a			;b08c
+	ld de,0ff00h		;b089   ; ... hacia arriba si Simon esta mas arriba...
+	inc a			;b08c   ; (su y mas uno)
 	cp (ix+003h)		;b08d   ; compara con la y de la cosa
 	jr c,L_B09F		;b090
-	ld de,00100h		;b092
-	sub 018h		;b095
+	ld de,00100h		;b092   ; ... hacia abajo si esta mas de 0x17 por debajo...
+	sub 018h		;b095   ; (su y - 0x17)
 	cp (ix+003h)		;b097   ; compara con la y de la cosa
 	jr nc,L_B09F		;b09a
-	ld de,00000h		;b09c
+	ld de,00000h		;b09c   ; ... y si no, a su altura
 L_B09F:
 	call pon_velocidad_y		;b09f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld de,0fee0h		;b0a2
+	ld de,0fee0h		;b0a2   ; a la izquierda...
 	ld hl,0c427h		;b0a5   ; apunta a la X de Simon
 	ld a,(ix+005h)		;b0a8   ; lee la x de la cosa
-	sub (hl)			;b0ab
-	jr nc,L_B0B1		;b0ac
-	ld de,00120h		;b0ae
+	sub (hl)			;b0ab   ; (Simon a la izquierda?)
+	jr nc,L_B0B1		;b0ac   ; si: asi
+	ld de,00120h		;b0ae   ; no: a la derecha
 L_B0B1:
 	call pon_velocidad_x		;b0b1   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ret			;b0b4
-L_B0B5:
-	ld a,016h		;b0b5
+dibujo_del_tipo_7:
+	ld a,016h		;b0b5   ; 0x16...
 	bit 2,(ix+00ch)		;b0b7   ; mira el bit 2 de la cuenta de cuadros del paso
-	jr z,L_B0BE		;b0bb
-	inc a			;b0bd
+	jr z,L_B0BE		;b0bb   ; (cada cuatro cuadros...)
+	inc a			;b0bd   ; ... o 0x17
 L_B0BE:
 	bit 7,(ix+00ah)		;b0be   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	jr nz,L_B0C6		;b0c2
-	add a,002h		;b0c4
+	jr nz,L_B0C6		;b0c2   ; a la izquierda: asi
+	add a,002h		;b0c4   ; a la derecha: dos mas
 L_B0C6:
 	ld (ix+00bh),a		;b0c6   ; guarda el dibujo de la cosa
 	ret			;b0c9

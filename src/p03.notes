@@ -247,6 +247,171 @@ C 0xA9A2 la y, a multiplo de 8
 L 0xA9AB cae_el_tipo_1
 C 0xA9AB sin avanzar...
 C 0xA9B1 ... y con la gravedad
+B 0xADDE EL TIPO 0x10. Cae hasta el suelo y anda a 0x140 guardando la distancia con Simon: si se le acerca a menos de 0x2E se aparta, y a 0x5C o mas va a por el; se para al borde del suelo, contra una pared o en el borde de la pantalla. Lanza (0x9F61: el tipo 9 de la lista de 0xD700, a 0x400 hacia Simon, y apunta en 0xCFFC quien lo lanzo) cuando Simon esta a menos de 0x2A viniendo de cerca o a 0x60 o mas viniendo de lejos, y espera 0x3C cuadros para volver a lanzar (bit 1 del paso).
+L 0xADDE nace_el_tipo_0x10
+L 0xADF8 mueve_el_tipo_0x10
+C 0xAE07 cae hasta tocar suelo...
+C 0xAE09 ... con la gravedad de 0xB33E
+C 0xAE0F en el suelo: la y, a la celda de 16
+C 0xAE17 a 0x140 hacia Simon...
+C 0xAE24 ... a la derecha...
+C 0xAE26 ... o a la izquierda
+C 0xAE2D mas lo de la vuelta
+C 0xAE30 sin caer
+C 0xAE36 el dibujo, mirando a Simon
+C 0xAE39 la celda de delante: x + 0x10...
+C 0xAE3F ... o x - 8 hacia la izquierda
+C 0xAE46 D = esa x
+C 0xAE4D sin suelo delante: se para
+C 0xAE53 una pared delante?
+C 0xAE5A hacia la izquierda...
+C 0xAE5C ... o hacia la derecha
+C 0xAE61 la de la izquierda
+C 0xAE64 pared: se para
+C 0xAE6E a menos de 0x2E de Simon?
+C 0xAE70 no: mira si esta lejos
+C 0xAE72 si: se aparta, 0x140...
+C 0xAE7B ... hacia el lado contrario de Simon
+C 0xAE7D (Simon a su derecha: a la izquierda)
+C 0xAE80 mas lo de la vuelta
+C 0xAE83 viene de cerca
+C 0xAE87 a mirar si lanza
+C 0xAE89 a 0x5C o mas?
+C 0xAE8B entre medias: como iba
+C 0xAE8D lejos: a 0x140 hacia Simon...
+C 0xAE96 ... a la derecha...
+C 0xAE98 ... o a la izquierda
+C 0xAE9B mas lo de la vuelta
+C 0xAE9E viene de lejos
+C 0xAEA5 en el borde derecho, se para si va a la derecha
+C 0xAEAA en el borde izquierdo, si va a la izquierda
+C 0xAEB3 acaba de lanzar: espera
+C 0xAEB8 Simon a menos de 0x2A?
+C 0xAEBA no: mira si esta a 0x60 o mas
+C 0xAEBC si, y viene de cerca?
+C 0xAEC0 no: nada
+C 0xAEC5 quien lanza, en 0xCFFC...
+C 0xAECB ... sin velocidad vertical...
+C 0xAECE ... y 0x400 a la derecha...
+C 0xAED7 (Simon a la derecha)
+C 0xAED9 ... o a la izquierda
+C 0xAEDC lanza su tipo: 0xA08E + 0x10, el 9 de la lista de 0xD700
+C 0xAEDF a 0x60 o mas?
+C 0xAEE1 no: nada
+C 0xAEE2 si, y viene de lejos?
+C 0xAEE6 no: nada
+C 0xAEE7 si: lanza
+C 0xAEE9 tras lanzar, 0x3C cuadros...
+C 0xAEED ... y otra vez la cuenta
+C 0xAEF5 puede volver a lanzar
+C 0xAEF6 parado en el borde o contra la pared
+C 0xAEFD a menos de 0x3E de Simon?
+C 0xAEFF si: viene de cerca
+C 0xAF01 a 0x4C o mas?
+C 0xAF03 si: viene de lejos
+C 0xAF09 entre medias: media vuelta
+C 0xAF0C cerca
+C 0xAF10 a mirar si lanza
+C 0xAF12 lejos
+C 0xAF16 a mirar si lanza
+L 0xAF18 dibujo_del_tipo_0x10
+C 0xAF18 uno de dos, cada ocho cuadros...
+C 0xAF1D (el bit 3 del contador de cuadros)
+C 0xAF22 ... de 0xAF28, mirando a Simon
+L 0xAF2C para_en_el_borde_derecho
+C 0xAF30 va a la izquierda: sigue
+C 0xAF35 va a la derecha: se para
+L 0xAF36 para_en_el_borde_izquierdo
+C 0xAF3A va a la derecha: sigue
+C 0xAF3F va a la izquierda: se para
+C 0xAF46 Simon a la derecha: la resta ya es la distancia
+C 0xAF47 a la izquierda: en positivo
+C 0xAF49 A = la distancia horizontal a Simon
+B 0xAF4A EL TIPO 9 (por su dibujo, un esqueleto que se levanta del suelo). Nace hundido: 0x30 cuadros con el dibujo 0x26 (0x25 los doce ultimos) y los sprites 2 y 3 escondidos; se levanta y anda a 0x220 hacia Simon (mas lo de la vuelta), da la vuelta contra una pared, al borde del suelo o de la pantalla, y cada 16 cuadros se para cuatro y vuelve a encarar a Simon. 0xB048 lo vuelve a hundir, 0x40 cuadros. Pasos en 0xAF65.
+L 0xAF4A nace_el_tipo_9
+C 0xAF4A quieto
+C 0xAF50 hundido 0x30 cuadros
+C 0xAF54 los sprites 2 y 3, escondidos
+C 0xAF5B sin parpadeo
+L 0xAF5F mueve_el_tipo_9
+L 0xAF6B tipo_9_hundido
+C 0xAF6B se acaba la espera?
+C 0xAF6E si: se levanta
+C 0xAF70 hundido: el dibujo 0x26...
+C 0xAF75 ... y los doce ultimos cuadros...
+C 0xAF79 ... el 0x25
+C 0xAF7E se levanta
+C 0xAF82 el sprite 2, del color del 0...
+C 0xAF88 ... y el 3, del 5 con CC
+C 0xAF8C hacia Simon
+L 0xAF9B encara_a_simon
+C 0xAFA1 Simon a la izquierda?
+C 0xAFA3 a la derecha: mirando a la derecha...
+C 0xAFAB ... a 0x220
+C 0xAFB0 a la izquierda: mirando a la izquierda...
+C 0xAFB8 ... a -0x220
+C 0xAFBB mas lo de la vuelta
+L 0xAFBE tipo_9_andando
+C 0xAFC5 la celda de delante: x + 0x10...
+C 0xAFC9 ... o x - 0x10
+C 0xAFCC D = esa x
+C 0xAFD3 pared: media vuelta
+C 0xAFDB suelo delante, en un cuadro de 8 x 8
+C 0xAFDF hacia la derecha?
+C 0xAFE2 (0: a la derecha)
+C 0xAFE3 no: a mirar a la izquierda
+C 0xAFE8 en el borde derecho de la pantalla?
+C 0xAFEA si: media vuelta
+C 0xAFEC suelo a la derecha?
+C 0xAFF4 en el borde izquierdo?
+C 0xAFF6 si: media vuelta
+C 0xAFF8 suelo a la izquierda?
+C 0xAFFB lo hay: sigue
+C 0xAFFD media vuelta: el lado...
+C 0xB000 ... del reves...
+C 0xB00E ... y la velocidad, del reves, con lo de la vuelta
+C 0xB015 el dibujo: 0x21...
+C 0xB017 (cada cuatro cuadros...)
+C 0xB019 ... o 0x22
+C 0xB01A mirando a la derecha?
+C 0xB01D (0: a la derecha)
+C 0xB01E no: asi
+C 0xB020 si: dos mas
+C 0xB021 (0x23-0x24)
+C 0xB028 16 cuadros andando
+C 0xB034 y se para cuatro
+L 0xB035 tipo_9_parado
+C 0xB039 otra vez hacia Simon
+C 0xB047 y a andar 0x30 cuadros
+L 0xB048 hunde_el_tipo_9
+C 0xB048 hundido 0x40 cuadros
+C 0xB04C quieto...
+C 0xB050 ... sin parpadeo...
+C 0xB053 ... con los sprites 2 y 3 escondidos
+C 0xB060 (al paso 0)
+B 0xB061 EL TIPO 7. Vuela hacia Simon: a 0x120 en horizontal y, en vertical, a 0x100 hacia su altura (quieto si esta de y - 0x17 a y); lo recalcula cada 16 cuadros. Dibujos 0x16-0x17 a la izquierda y 0x18-0x19 a la derecha.
+L 0xB061 nace_el_tipo_7
+C 0xB071 el dibujo 0x16 a la izquierda...
+C 0xB075 ... o 0x17
+C 0xB079 y a por Simon
+L 0xB07B mueve_el_tipo_7
+C 0xB07B el dibujo
+C 0xB081 cada 16 cuadros...
+C 0xB089 ... hacia arriba si Simon esta mas arriba...
+C 0xB08C (su y mas uno)
+C 0xB092 ... hacia abajo si esta mas de 0x17 por debajo...
+C 0xB095 (su y - 0x17)
+C 0xB09C ... y si no, a su altura
+C 0xB0A2 a la izquierda...
+C 0xB0AB (Simon a la izquierda?)
+C 0xB0AC si: asi
+C 0xB0AE no: a la derecha
+L 0xB0B5 dibujo_del_tipo_7
+C 0xB0B5 0x16...
+C 0xB0BB (cada cuatro cuadros...)
+C 0xB0BD ... o 0x17
+C 0xB0C2 a la izquierda: asi
+C 0xB0C4 a la derecha: dos mas
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -769,7 +934,6 @@ C 0xAEC1 pone a uno el bit 1 de el paso en que va la cosa
 C 0xAED1 lee la X de Simon
 C 0xAED4 compara con la x de la cosa
 C 0xAEF1 pone a cero el bit 1 de el paso en que va la cosa
-C 0xAEF6 la cosa se queda quieta
 C 0xAEFA distancia_horizontal: A = |x de Simon - x de la cosa|
 C 0xAF05 la cosa se mueve
 C 0xAF1A lee el contador de cuadros
