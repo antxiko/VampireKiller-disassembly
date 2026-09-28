@@ -11,8 +11,10 @@ p01:6321 encienda la pantalla).
                 Las velas se turnan entre dos dibujos: se admiten los dos.
 
   mapa          la rejilla y las salidas de las 19 fases (tools/mapa.py).
+  titulo        el logotipo de Konami y el titulo, europeo y japones, contra
+                work/titulo (tools/lanza_titulo.sh).
 
-Uso:  coteja.py [habitaciones] [mapa] [-v]
+Uso:  coteja.py [habitaciones] [mapa] [titulo] [-v]
 """
 import glob
 import os
@@ -110,7 +112,38 @@ def mapa(cart, detalle=False):
     return malas == 0
 
 
-PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa}
+def titulo(cart, detalle=False):
+    """Las dos pantallas del principio (tools/titulo.py) contra los volcados
+    de tools/omsx_titulo.tcl con la BIOS europea y la japonesa: la pagina 0,
+    lo que el montaje toca del resto de la VRAM (dibujos, letras, sprites) y
+    la paleta en los colores que salen en pantalla; los demas los deja la
+    BIOS."""
+    from titulo import konami, titulo as pantalla_del_titulo, sprites_del_titulo, COLORES
+    malos = vistos = 0
+    for nombre, hazla in (("EU_telon", konami), ("JP_telon", konami),
+                          ("EU_titulo", pantalla_del_titulo),
+                          ("JP_titulo", lambda c: pantalla_del_titulo(c, True))):
+        ruta = os.path.join(WORK, "titulo", nombre + ".vram")
+        if not os.path.exists(ruta):
+            continue
+        vistos += 1
+        v, d = hazla(cart), _lee(ruta)
+        pal = _lee(ruta[:-5] + ".pal")
+        paleta = [((pal[2 * k] >> 4) & 7, pal[2 * k + 1] & 7, pal[2 * k] & 7) for k in range(16)]
+        usados = {v.punto(0, x, y) for y in range(212) for x in range(256)}
+        if nombre == "JP_titulo":
+            usados |= {v.v[COLORES + 16 * s] & 15 for s in range(22)}
+        dp = sum(1 for k in usados if paleta[k] != v.paleta[k])
+        d0 = sum(1 for a in range(212 * ANCHO_DE_LINEA) if v.v[a] != d[a])
+        d1 = sum(1 for a in range(212 * ANCHO_DE_LINEA, 0x20000) if v.tocado[a] and v.v[a] != d[a])
+        if dp or d0 or d1:
+            malos += 1
+        print("  %-9s paleta %d de %d, pantalla %d, resto %d" % (nombre, dp, len(usados), d0, d1))
+    print("titulo: %d volcados, %d con diferencias" % (vistos, malos))
+    return vistos == 4 and malos == 0
+
+
+PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa, "titulo": titulo}
 
 
 def main():
