@@ -173,7 +173,7 @@ C 0x66CB sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x66EC apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x6719 guarda la cuenta del texto del final
 C 0x671C guarda el renglon del final que toca
-C 0x672C pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x672C pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x6738 lee el contador de cuadros
 C 0x673E apunta a la cuenta del texto del final
 C 0x6746 el mapper: pone en 0xA000 el banco de A
@@ -191,8 +191,8 @@ C 0x6788 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x678B bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x67E4 apunta a la cuenta del destello
 C 0x67F2 hl_mas_a: HL += A
-C 0x67FA pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
-C 0x6815 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x67FA pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
+C 0x6815 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x682A lee la cuenta del texto del final
 C 0x6846 lee la cuenta del texto del final
 C 0x6867 crea_una_cosa: crea una cosa del tipo C en la posicion DE
@@ -220,7 +220,7 @@ C 0x69D7 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x69DE pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x69E1 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x6A1A hl_mas_a: HL += A
-C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x6A44 la cosa se queda quieta
 C 0x6A4F lee el contador de cuadros
 C 0x6A5A crea_una_cosa: crea una cosa del tipo C en la posicion DE
@@ -548,8 +548,8 @@ C 0x7965 lee la FASE (0 el patio, 1-18)
 C 0x796B hl_mas_a: HL += A
 C 0x796F sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7ADA rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-C 0x7AEC pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
-C 0x7B2C pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x7AEC pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
+C 0x7B2C pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x7B68 lee la Y de Simon
 C 0x7B6E lee la X de Simon
 C 0x7B72 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion

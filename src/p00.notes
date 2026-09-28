@@ -1,5 +1,302 @@
 # Notas del banco 00: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+B 0x4028 LA INTERRUPCION (H.TIMI). INIT deja el Z80 en un `jr $` y todo el juego corre desde aqui, una vez por cuadro: primero la pausa, luego el sonido con los bancos 14 y 15, y despues, si no se esta ya dentro (semaforo de 0xC005), la maquina de estados.
+C 0x4028 sin interrupciones mientras se cambian bancos
+C 0x402C cero: no se puede pausar
+C 0x402D se puede pausar: a mirar STOP
+C 0x4030 el sonido: bancos 14 y 15 sin tocar la copia de 0xF0F2/0xF0F3
+C 0x4031 el banco 14 (el reproductor)
+C 0x4036 el banco 15 (las partituras)
+C 0x403B reproductor: un cuadro de sonido
+C 0x403E y se devuelven los bancos que habia, leyendo la copia
+C 0x404E ya estamos dentro (un cuadro que no acabo a tiempo)?
+C 0x4050 si: no se entra dos veces
+C 0x4053 el semaforo, puesto
+C 0x4054 ya se pueden anidar interrupciones: el sonido no se para
+C 0x4055 lee los mandos
+C 0x405B el semaforo, quitado
+C 0x4061 suma A a L
+C 0x4063 sin acarreo, listo
+C 0x4064 con acarreo, sube H
+C 0x4066 suma A a E
+C 0x4068 sin acarreo, listo
+C 0x4069 con acarreo, sube D
+B 0x406B EL DESPACHADOR DE KONAMI. La tabla de destinos va pegada detras del `call`: la direccion de vuelta que se saca de la pila es la base de la tabla, y A el indice.
+C 0x406B HL = la vuelta, o sea la tabla
+C 0x406C dos bytes por entrada
+C 0x4070 el destino, en DE
+C 0x4073 a HL
+C 0x4074 y alla que va (sin volver aqui)
+C 0x4075 INIT: sin interrupciones
+C 0x4076 la pila justo debajo de la copia del mapper
+C 0x407C los dos bits de la pagina 1 (donde esta el cartucho)
+C 0x4080 C = la ranura primaria del cartucho
+C 0x4083 EXPTBL: si esa ranura esta expandida
+C 0x4088 el bit de expandida
+C 0x408C SLTTBL de esa ranura (0xFCC5 + ranura)
+C 0x4091 los bits de la subranura de la pagina 1
+C 0x4093 A = el identificador de ranura del cartucho
+C 0x4094 y se pone tambien en la pagina 2 (0x8000-0xBFFF)
+C 0x409F borra 0xC000-0xF0EF: toda la RAM del juego
+C 0x40A2 el primer byte a cero, y ldir lo arrastra
+C 0x40A9 inicia el sonido
+C 0x40AF inicia el VDP
+C 0x40B2 y se engancha la interrupcion:
+C 0x40B3 un `jp`
+C 0x40B5 en H.TIMI
+C 0x40B8 a la interrupcion de 0x4028
+C 0x40BE CLIKSW a cero: sin el clic de las teclas
+C 0x40C3 y aqui se queda para siempre: el juego va por interrupcion
+B 0x40C5 LA PAUSA. STOP (fila 7, bit 4) pone y quita la pausa; con el juego pausado, la tecla de la fila 1, bit 7 (el ';' del teclado internacional) avanza UN cuadro: devuelve los volumenes, corre el sonido y el juego una vez y sigue en pausa. Solo cuenta la pulsacion nueva (0xE610 guarda las teclas del cuadro anterior).
+C 0x40C5 fila 7 del teclado
+C 0x40CA a uno lo pulsado
+C 0x40CB STOP
+C 0x40CE fila 1
+C 0x40D4 el bit 7: avanzar un cuadro
+C 0x40D6 las dos teclas juntas en A
+C 0x40D7 las del cuadro anterior
+C 0x40DB guarda las de ahora
+C 0x40DC C = solo las que se acaban de pulsar
+C 0x40DF la pausa puesta?
+C 0x40E4 si: a ver que se pulsa
+C 0x40E6 no hay pausa: se ha pulsado STOP?
+C 0x40EB se pone la pausa (0xE601 distinto de cero)
+C 0x40EC guarda los volumenes y calla el PSG
+C 0x40EF y este cuadro no corre el juego
+C 0x40F1 en pausa: se pide avanzar un cuadro?
+C 0x40F3 si: un cuadro sin quitar la pausa
+C 0x40F6 STOP otra vez?
+C 0x40F8 no: sigue en pausa y callado
+C 0x40FA si: se quita la pausa
+C 0x40FC devuelve los volumenes
+C 0x4102 en pausa: el PSG callado
+C 0x4107 guarda el volumen del canal A (registro 8)
+C 0x410C en 0xE611
+C 0x410F el del canal B (registro 9)
+C 0x4114 en 0xE612
+C 0x4117 el del canal C (registro 10)
+C 0x411C en 0xE613
+C 0x411F y los tres volumenes a cero
+C 0x4126 registro 9
+C 0x412C registro 10
+C 0x4132 devuelve el volumen del canal A
+C 0x413B el del canal B
+C 0x4144 el del canal C
+C 0x4150 un cuadro mas
+C 0x4155 los estados 0, 1 y 2 (la presentacion)
+C 0x415A vuelven a 0x4391 en vez de aqui
+C 0x415D (la vuelta, metida en la pila)
+B 0x4814 PON UN COLOR: el color A de la paleta pasa a valer D (rojo y azul) y E (verde). Se escribe en el V9938 por el registro 16 y el puerto 0x9A, y en la copia que se guarda en la VRAM, en 0xF680 (dos bytes por color).
+C 0x4816 B = el color
+C 0x4817 el puerto de escritura del VDP (0x98 en un MSX2) sale de la BIOS
+C 0x481A +1: el de registros
+C 0x481D el numero de color
+C 0x481F al registro 16 (0x80 + 16): el puntero de la paleta
+C 0x4823 +1: el puerto de la paleta
+C 0x4824 rojo y azul
+C 0x4826 una pausa para el VDP
+C 0x4828 verde
+C 0x482A vuelve al puerto de registros
+C 0x482F dos bytes por color
+C 0x483E el color
+C 0x4840 0xFF acaba
+C 0x4843 rojo y azul
+C 0x4845 verde
+C 0x484A y el siguiente
+C 0x484C el registro de estado 2
+C 0x4851 el bit 0 (CE): el VDP aun esta con la orden
+C 0x4852 pues a esperar
+C 0x4857 los dos puertos de la BIOS, en H y L
+C 0x485A H = el de registros
+C 0x485B L = el de estado (lectura)
+C 0x485E el numero de registro de estado
+C 0x4860 al registro 15
+C 0x4865 lee ese registro de estado
+C 0x4868 y deja el 15 como estaba, en el 0
+C 0x486C (el que usa la BIOS)
+B 0x4875 UNA RAYA HORIZONTAL: orden LINE (0x70) del V9938 desde (H, L), de B - 1 puntos, del color C. 0x48A8 es la misma con ARG = 1: vertical.
+C 0x4879 el puerto de registros
+C 0x487E desde el registro 36 (DX)
+C 0x4885 al 17, con autoincremento: se escriben seguidos
+C 0x4887 +2: el puerto de registros indirectos (0x9B)
+C 0x4889 DX = H
+C 0x488E DY = L
+C 0x48AC el puerto de registros
+C 0x48B1 desde el registro 36 (DX)
+C 0x48B8 al 17, con autoincremento: se escriben seguidos
+C 0x48BA +2: el puerto de registros indirectos (0x9B)
+C 0x48BC DX = H
+C 0x48C1 DY = L
+C 0x4892 H = B, L = C
+C 0x4893 NX = B - 1: el largo
+C 0x4899 NY = 0
+C 0x489E el color
+C 0x48A0 ARG = 0: horizontal
+C 0x48A2 LINE
+C 0x48A4 arranca la orden
+C 0x48C5 H = B, L = C
+C 0x48C6 NX = B - 1: el largo
+C 0x48D1 el color
+C 0x48D3 ARG = 1: vertical
+C 0x48D6 LINE
+C 0x48D8 arranca la orden
+B 0x48DC UN MARCO: cuatro rayas, desde (H, L), de D de ancho y E de alto (los recuadros del marcador).
+C 0x48F9 vertical, sin tocar registros
+C 0x4903 horizontal, sin tocar registros
+B 0x490A RELLENA UN RECTANGULO: orden HMMV (0xC0) del V9938 en (H, L) de la pagina D, de B x C puntos (0 es 256), con el byte de A.
+C 0x490A el color, a guardar
+C 0x4914 desde el registro 36 (DX)
+C 0x491B al 17, con autoincremento
+C 0x491F DX = H
+C 0x4924 DY = L
+C 0x4926 la pagina (DY alta)
+C 0x4928 H = B, L = C
+C 0x4929 NX
+C 0x492B cero?
+C 0x492E es 256
+C 0x4932 NY
+C 0x4937 es 256
+C 0x493A el color
+C 0x493D ARG = 0
+C 0x4940 HMMV
+C 0x4942 arranca la orden
+B 0x4946 COPIA UN RECTANGULO de VRAM a VRAM: orden HMMM (0xD0) desde (H, L) a (D, E), de B x C puntos; A lleva las dos paginas, la de origen en los bits 0-1 y la de destino en los 2-3.
+C 0x4946 las paginas, a guardar
+C 0x4950 desde el registro 32 (SX)
+C 0x4955 al 17, con autoincremento
+C 0x495B SX = H
+C 0x4960 SY = L
+C 0x4964 la pagina de origen
+C 0x4968 DX = D
+C 0x496D DY = E
+C 0x4970 la pagina de destino
+C 0x4976 H = B, L = C
+C 0x4977 NX
+C 0x497C NY
+C 0x4980 el color no cuenta
+C 0x4982 ARG = 0
+C 0x4984 HMMM
+C 0x4986 arranca la orden
+B 0x498A HMMC: B x C puntos que van de la CPU a la VRAM en (D, E), pagina A. El primer byte va con la orden (registro 44); los demas, uno a uno por el mismo registro cuando el VDP levanta TR (bit 7 de S#2), hasta que acaba (CE, bit 0, a cero).
+C 0x498A la pagina, a guardar
+C 0x4994 desde el registro 36 (DX)
+C 0x499B al 17, con autoincremento
+C 0x499F DX = D
+C 0x49A4 DY = E
+C 0x49A7 la pagina
+C 0x49A9 D = B, E = C
+C 0x49AA NX
+C 0x49AF NY
+C 0x49B3 el primer byte
+C 0x49B5 va en el 44 (CLR)
+C 0x49B7 ARG = 0
+C 0x49BA HMMC
+C 0x49BC arranca la orden
+C 0x49C0 el registro 44, sin autoincremento (0x80 | 44)
+C 0x49C6 al 17
+C 0x49CA lee S#2
+C 0x49CF CE: sigue la orden?
+C 0x49D0 no: acabo
+C 0x49D1 TR, el bit 7, al acarreo
+C 0x49D3 no pide byte todavia
+C 0x49D5 el siguiente byte
+C 0x49D7 al registro 44
+C 0x482B la copia de la paleta en la VRAM, en 0xF680
+C 0x4832 vram_para_escribir: a esa direccion de la copia
+C 0x4835 el puerto de datos (0x98)
+C 0x4836 rojo y azul, a la copia en VRAM
+C 0x4838 verde, a la copia en VRAM
+C 0x48DC el alto
+C 0x48DD la raya de la izquierda (vertical)
+C 0x48E0 el ancho
+C 0x48E1 la de arriba (horizontal)
+C 0x48E5 L + E - 1: la fila de abajo
+C 0x48E9 el ancho
+C 0x48EA la de abajo
+C 0x48EE H + D - 1: la columna de la derecha
+C 0x48F2 el alto
+C 0x48F3 y la de la derecha
+B 0x49DB COPIA CON OPERACION LOGICA: orden LMMM (0x90 + la operacion) de (H, L) a (D, E), de B x C puntos. A lleva empaquetadas la pagina de origen (bits 6-7), la de destino (bits 4-5) y la operacion logica (bits 0-3; con 8, TIMP, el color 0 no se copia y hace de transparente).
+C 0x49DB lo empaquetado, a guardar
+C 0x49E5 desde el registro 32 (SX)
+C 0x49EA al 17, con autoincremento
+C 0x49F0 SX = H
+C 0x49F5 SY = L
+C 0x49F8 los bits 6-7 abajo
+C 0x49FB la pagina de origen
+C 0x49FF DX = D
+C 0x4A04 DY = E
+C 0x4A08 los bits 4-5 abajo
+C 0x4A0A la pagina de destino
+C 0x4A0E H = B, L = C
+C 0x4A0F NX
+C 0x4A14 NY
+C 0x4A1A ARG = 0
+C 0x4A1D la operacion logica
+C 0x4A21 LMMM
+C 0x4A23 arranca la orden
+C 0x4A2A la siguiente posicion
+C 0x4A2D B caracteres
+C 0x4A33 la posicion, a guardar
+C 0x4A34 el caracter, de 1 bit a 4 bits en 0xC110
+C 0x4A38 D es la x y E la y: se cambian
+C 0x4A3B (y * 256 + x) / 2 = y * 128 + x / 2
+C 0x4A40 en la pagina 1 (0x8000)
+C 0x4A43 el caracter ya coloreado
+C 0x4A4A el siguiente caracter de la fuente
+C 0x4A52 ocho filas
+C 0x4A55 de cuatro bytes (ocho puntos)
+C 0x4A5C la fila siguiente de la VRAM, 128 bytes mas alla
+C 0x4A62 ocho filas
+C 0x4A6A cuatro bytes (ocho puntos) a la derecha
+C 0x4A6D se llego al borde (128 bytes por linea)?
+C 0x4A71 si: ocho lineas mas abajo (0x400)
+C 0x4A75 y desde la izquierda
+C 0x4A78 B dibujos
+C 0x4A7C dieciseis filas
+C 0x4A7F de ocho bytes (dieciseis puntos)
+C 0x4A86 la fila siguiente, 128 bytes mas alla
+C 0x4A8C dieciseis filas
+C 0x4A94 ocho bytes (dieciseis puntos) a la derecha
+C 0x4A97 se llego al borde?
+C 0x4A9B si: dieciseis lineas mas abajo (0x800)
+C 0x4A9F y desde la izquierda
+C 0x4AA2 B dibujos
+C 0x4AA5 ocho filas
+C 0x4AA7 al bufer de 0xC110
+C 0x4AAD la fila, de 1 bit por punto
+C 0x4AAF cuatro bytes de salida (dos puntos cada uno)
+C 0x4AB1 el color
+C 0x4AB2 el punto de la izquierda
+C 0x4AB6 apagado: color 0
+C 0x4AB7 entra en el nibble alto... 
+C 0x4AB9 el color
+C 0x4ABA el punto de la derecha
+C 0x4ABE apagado: color 0
+C 0x4ABF ... y el byte queda con los dos puntos
+C 0x4AC2 cuatro bytes por fila
+C 0x4AC6 la fila siguiente del caracter
+C 0x4AC8 ocho filas
+C 0x4ACB C = 0xFF: se pinta
+C 0x4ACF C = 0: se borra (todo sale como el caracter 0)
+C 0x4AD1 la x
+C 0x4AD3 la y
+C 0x4AD5 el caracter
+C 0x4AD8 0xFF acaba
+C 0x4ADA 0xFE: otra posicion... 
+C 0x4ADB ...y vuelve a pintar: tras un 0xFE, borra_rotulo PINTA
+C 0x4ADD al borrar, el caracter 0
+C 0x4ADE pinta el caracter en (D, E)
+C 0x4AE1 ocho puntos a la derecha
+C 0x4AEA el 0 es el espacio
+C 0x4AEB H = 0 para el espacio
+C 0x4AEE la columna del caracter en la fuente
+C 0x4AF1 y su fila: la fuente empieza en la linea 0x38
+C 0x4AF4 8 x 8 puntos
+C 0x4AF7 de la pagina 1 a la 0
+C 0x4AF9 copia la letra de la fuente a la pantalla
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
 F 0x44E9 16
@@ -136,7 +433,7 @@ L 0x539E bancos_4_5_6
 L 0x564C sube_los_dibujos_de_la_fase
 L 0x582D dibujo_de_32_filas
 L 0x5F1D crea_una_cosa
-C 0x4029 lee la PAUSA
+C 0x4029 lee si se puede pausar (partida en marcha)
 C 0x4033 el mapper: pone en 0x8000 el banco de A
 C 0x4038 el mapper: pone en 0xA000 el banco de A
 C 0x403F lee la copia del banco de 0x8000
@@ -184,11 +481,11 @@ C 0x4291 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera e
 C 0x4294 apunta a las vidas
 C 0x42A8 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x42AD sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x42B4 lee la PAUSA
+C 0x42B4 lee si se puede pausar (partida en marcha)
 C 0x42C4 apunta a la espera del estado, en cuadros
 C 0x42D5 guarda las vidas
 C 0x42E9 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-C 0x42EC lee la PAUSA
+C 0x42EC lee si se puede pausar (partida en marcha)
 C 0x42F5 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x4326 apunta a el bloque de tres fases (0-5)
 C 0x4332 guarda la FASE (0 el patio, 1-18)
@@ -201,7 +498,7 @@ C 0x437C cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera e
 C 0x4384 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x439C apunta a la espera del estado, en cuadros
 C 0x43A1 apunta a el ESTADO del juego
-C 0x43AF lee la PAUSA
+C 0x43AF lee si se puede pausar (partida en marcha)
 C 0x43BE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x43CA guarda la fase del marcador que da el Game Master
 C 0x43CD guarda la fase que da el Game Master
@@ -247,8 +544,7 @@ C 0x4779 copia_a_la_vram: BC bytes de HL a la VRAM de DE
 C 0x4795 de_mas_a: DE += A
 C 0x47C0 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x47E6 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-C 0x4832 vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-C 0x4847 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x4847 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x484E lee_estado_del_vdp: lee el registro de estado A del V9938
 C 0x4875 espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x48A8 espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
@@ -262,7 +558,6 @@ C 0x4A46 sube_un_dibujo: un dibujo de 8x8 a 4 bits (32 bytes) de HL a la VRAM de
 C 0x4A58 copia_a_la_vram: BC bytes de HL a la VRAM de DE
 C 0x4A67 sube_un_dibujo: un dibujo de 8x8 a 4 bits (32 bytes) de HL a la VRAM de DE
 C 0x4A82 copia_a_la_vram: BC bytes de HL a la VRAM de DE
-C 0x4AF9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x4B16 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x4B3A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x4B64 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
@@ -272,8 +567,8 @@ C 0x4B7A espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4B92 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 C 0x4D47 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x4D4D espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
-C 0x4D5A pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
-C 0x4D79 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x4D5A pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
+C 0x4D79 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x4D8F rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x4DAB rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
 C 0x4DB4 rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
@@ -577,7 +872,7 @@ C 0x5BCF lee la HABITACION dentro de la fase
 C 0x5BDA lee la FASE (0 el patio, 1-18)
 C 0x5BE4 hl_mas_a: HL += A
 C 0x5C59 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x5CAF guarda la PAUSA
+C 0x5CAF guarda si se puede pausar (partida en marcha)
 C 0x5CFA rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x5D08 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x5D67 apunta a la fase del marcador que da el Game Master

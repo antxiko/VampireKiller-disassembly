@@ -983,7 +983,7 @@ L_6712:
 	ld a,00eh		;6726
 	ld d,0ffh		;6728
 	ld e,00fh		;672a
-	jp 04814h		;672c   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	jp 04814h		;672c   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 L_672F:
 	call L_6738		;672f
 	call L_6743		;6732
@@ -1102,7 +1102,7 @@ L_67EE:
 	ld d,(hl)			;67f5
 	ld e,005h		;67f6
 	ld a,006h		;67f8
-	jp 04814h		;67fa   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	jp 04814h		;67fa   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 
 ; ----------------------------------------------------------------------
 ; DATOS destello: 19 valores que p01:67EF va poniendo, uno por cuadro, en el
@@ -1121,7 +1121,7 @@ DATA_destello:
 L_6810:
 	ld de,00000h		;6810
 	ld a,006h		;6813
-	jp 04814h		;6815   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	jp 04814h		;6815   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 L_6818:
 	ld hl,0ce38h		;6818
 	inc (hl)			;681b
@@ -1408,7 +1408,7 @@ L_6A34:
 	inc hl			;6a35
 	ld e,a			;6a36
 	ld a,c			;6a37
-	call 04814h		;6a38   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	call 04814h		;6a38   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 	ld a,(0ce13h)		;6a3b
 	and a			;6a3e
 	ret			;6a3f
@@ -3750,7 +3750,7 @@ L_7AD1:
 L_7AE7:
 	ld a,002h		;7ae7
 	ld de,01101h		;7ae9
-	jp 04814h		;7aec   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	jp 04814h		;7aec   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 L_7AEF:
 	ld de,0d600h		;7aef
 	ld hl,07b52h		;7af2
@@ -3792,7 +3792,7 @@ L_7B1F:
 	jr nz,L_7B16		;7b25
 	ld a,002h		;7b27
 	ld de,00000h		;7b29
-	call 04814h		;7b2c   ; pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+	call 04814h		;7b2c   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 	jp L_65A4		;7b2f
 rotulo_por_filas:
 	push de			;7b32
