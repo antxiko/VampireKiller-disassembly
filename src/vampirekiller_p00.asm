@@ -64,7 +64,7 @@ sonido_del_cuadro:
 	jp nz,L_405F		;4050   ; si: no se entra dos veces
 	inc (hl)			;4053   ; el semaforo, puesto
 	ei			;4054   ; ya se pueden anidar interrupciones: el sonido no se para
-	call L_4B9D		;4055   ; lee los mandos
+	call lee_los_mandos		;4055   ; lee los mandos
 	call maquina_de_estados		;4058   ; maquina_de_estados: sube el contador de cuadros y despacha por el estado de 0xC000
 	xor a			;405b   ; el semaforo, quitado
 	ld (0c005h),a		;405c   ; guarda el semaforo de la interrupcion
@@ -128,7 +128,7 @@ init:
 	call bancos_1_2_3		;40a6   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 	call L_5C92		;40a9   ; inicia el sonido
 	call bancos_1_2_3		;40ac   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-	call L_4B59		;40af   ; inicia el VDP
+	call prepara_la_pantalla		;40af   ; inicia el VDP
 	di			;40b2   ; y se engancha la interrupcion:
 	ld a,0c3h		;40b3   ; un `jp`
 	ld (0fd9fh),a		;40b5   ; en H.TIMI
@@ -276,7 +276,7 @@ presentacion_espera:
 	xor a			;4194   ; ... y al estado 1, sin espera
 	jp L_424B		;4195
 presentacion_empieza:
-	call L_47B9		;4198   ; subestado 0: pantalla en negro...
+	call pantalla_en_negro		;4198   ; subestado 0: pantalla en negro...
 	call 06202h		;419b   ; ... y empieza la presentacion
 	jr al_subestado_siguiente		;419e
 estado_1_el_titulo:
@@ -299,7 +299,7 @@ cambia_de_estado:
 	ld (0c004h),a		;41bb   ; guarda la espera del estado, en cuadros
 	jp subestado_0		;41be   ; y subestado 0
 empieza_la_demostracion:
-	call L_47B9		;41c1   ; subestado 0: pantalla en negro...
+	call pantalla_en_negro		;41c1   ; subestado 0: pantalla en negro...
 	call L_4DE7		;41c4   ; ... y la demostracion
 	ld a,020h		;41c7   ; 0x20 cuadros
 espera_y_al_subestado_siguiente:
@@ -337,7 +337,7 @@ estado_3_mueve_las_cosas:
 	ret c			;4207
 	dec (hl)			;4208   ; ... la espera baja
 	ret nz			;4209
-	call L_47F0		;420a   ; al acabar: sin sprites...
+	call esconde_los_sprites		;420a   ; al acabar: sin sprites...
 	xor a			;420d
 	ld (0c41ah),a		;420e   ; ... fuera la habitacion especial...
 	call 062d0h		;4211   ; ... lo de 0x62D0...
@@ -361,7 +361,7 @@ estado_4_empieza_una_vida:
 	daa			;4232
 	ld (hl),a			;4233
 	call apaga_la_pantalla		;4234   ; pantalla apagada
-	call L_4513		;4237   ; el marcador
+	call pinta_el_marcador		;4237   ; el marcador
 	call 062e6h		;423a   ; la habitacion
 	ld hl,0c413h		;423d   ; la vida en marcha
 	ld (hl),001h		;4240
@@ -453,7 +453,7 @@ continua:
 	ld (0c407h),a		;42de
 	jr otra_vida		;42e1   ; y otra vida
 pinta_el_game_over:
-	call L_47B9		;42e3   ; subestado 0: pantalla en negro...
+	call pantalla_en_negro		;42e3   ; subestado 0: pantalla en negro...
 	ld hl,04d3ah		;42e6   ; ... GAME OVER...
 	call rotulo		;42e9   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 	ld a,(0e600h)		;42ec   ; ... y con un Game Master...
@@ -462,7 +462,7 @@ pinta_el_game_over:
 	ld hl,04300h		;42f2   ; ... F5 CONTINUE
 	call rotulo		;42f5   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 L_42F8:
-	call L_4513		;42f8   ; el marcador
+	call pinta_el_marcador		;42f8   ; el marcador
 	ld a,078h		;42fb   ; 0x78 cuadros
 	jp espera_y_al_subestado_siguiente		;42fd
 
@@ -545,7 +545,7 @@ DATA_codigo_sin_llamar_4369:
 
 
 bloque_acabado_empieza:
-	call L_47B9		;4370   ; subestado 0: pantalla en negro
+	call pantalla_en_negro		;4370   ; subestado 0: pantalla en negro
 	xor a			;4373
 	jp espera_y_al_subestado_siguiente		;4374
 estado_9_cambio_de_habitacion:
@@ -562,9 +562,9 @@ estado_10_fase_acabada:
 	ld (hl),a			;438d
 	jp fase_siguiente		;438e   ; ... y a la fase siguiente
 teclas_del_titulo:
-	call L_4BBB		;4391   ; los mandos...
+	call el_mando_y_el_teclado		;4391   ; los mandos...
 	ld hl,0c401h		;4394   ; ... los de 0xC401
-	call L_4BB4		;4397
+	call recien_pulsado		;4397
 	or a			;439a
 	ret z			;439b   ; ninguno: nada
 	ld hl,0c004h		;439c   ; sin espera
@@ -781,160 +781,168 @@ L_44EE:
 	adc a,c			;4501
 	daa			;4502   ; 
 	ld (hl),a			;4503   ; 
-	jr nc,L_4531		;4504   ; sin desbordar: listo
+	jr nc,pinta_los_puntos		;4504   ; sin desbordar: listo
 	ld bc,09999h		;4506   ; se paso de 999999: se queda ahi
 	ld (0c402h),bc		;4509
 	ld (0c403h),bc		;450d
-	jr L_4531		;4511
-L_4513:
+	jr pinta_los_puntos		;4511
+
+; ----------------------------------------------------------------------
+; EL MARCADOR ENTERO (la franja de arriba, y de 0 a 0x1F): los rotulos de 0x4C00, la fase, los corazones, las vidas, las dos barras de vida, los tres recuadros (el arma, las llaves y lo que lleva) y lo de dentro, y los puntos.
+; ----------------------------------------------------------------------
+pinta_el_marcador:
 	ld hl,04c00h		;4513   ; el marcador de arriba: SCORE-, PLAYER, ENEMY, corazones, P- y STAGE-
 	call rotulo		;4516   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-	call L_453B		;4519
-	call L_4566		;451c
-	call L_456E		;451f
-	call L_45B0		;4522
-	call L_4545		;4525
-	call 08e9ah		;4528
-	call 08eb4h		;452b
-	call 08ee6h		;452e
-L_4531:
-	ld hl,0c407h		;4531
-	ld de,03800h		;4534
+	call pinta_la_fase		;4519   ; la fase
+	call pinta_los_corazones		;451c   ; los corazones
+	call pinta_las_vidas		;451f   ; las vidas
+	call pinta_las_dos_barras		;4522   ; las dos barras de vida
+	call pinta_los_recuadros		;4525   ; los tres recuadros
+	call 08e9ah		;4528   ; el arma
+	call 08eb4h		;452b   ; la llave
+	call 08ee6h		;452e   ; lo que lleva
+pinta_los_puntos:
+	ld hl,0c407h		;4531   ; los puntos, tres bytes BCD desde el alto...
+	ld de,03800h		;4534   ; ... en (0x38, 0)
 	ld b,003h		;4537
-	jr L_4578		;4539
-L_453B:
-	ld de,09c00h		;453b
-	ld hl,0c411h		;453e   ; apunta a la fase en BCD, la del marcador
+	jr pinta_en_bcd		;4539
+pinta_la_fase:
+	ld de,09c00h		;453b   ; en (0x9C, 0)...
+	ld hl,0c411h		;453e   ; ... un byte BCD
 	ld b,001h		;4541
-	jr L_4578		;4543
-L_4545:
-	ld hl,07f0bh		;4545
-	ld de,01212h		;4548
-	ld c,008h		;454b
-	call L_48DC		;454d
-	ld hl,0930bh		;4550
+	jr pinta_en_bcd		;4543
+pinta_los_recuadros:
+	ld hl,07f0bh		;4545   ; el del arma, en (0x7F, 0x0B)...
+	ld de,01212h		;4548   ; ... de 0x12 x 0x12...
+	ld c,008h		;454b   ; ... del color 8
+	call un_marco		;454d
+	ld hl,0930bh		;4550   ; el de las llaves, en (0x93, 0x0B), 0x22 x 0x12...
 	ld de,02212h		;4553
-	ld c,00eh		;4556
-	call L_48DC		;4558
-	ld hl,0b70bh		;455b
+	ld c,00eh		;4556   ; ... del color 0x0E
+	call un_marco		;4558
+	ld hl,0b70bh		;455b   ; el de lo que lleva, en (0xB7, 0x0B), 0x42 x 0x12...
 	ld de,04212h		;455e
-	ld c,00eh		;4561
-	jp L_48DC		;4563
-L_4566:
+	ld c,00eh		;4561   ; ... del color 0x0E
+	jp un_marco		;4563
+pinta_los_corazones:
 	ld hl,0c417h		;4566   ; apunta a los corazones, en BCD
-	ld de,0c000h		;4569   ; apunta a el ESTADO del juego
+	ld de,0c000h		;4569   ; en (0xC0, 0)
 	jr L_4574		;456c
-L_456E:
+pinta_las_vidas:
 	ld hl,0c410h		;456e   ; apunta a las vidas
-	ld de,0e400h		;4571
+	ld de,0e400h		;4571   ; en (0xE4, 0)
 L_4574:
-	ld b,001h		;4574
-	jr L_4578		;4576
-L_4578:
-	ld a,(hl)			;4578
+	ld b,001h		;4574   ; un byte BCD
+	jr pinta_en_bcd		;4576
+
+; ----------------------------------------------------------------------
+; PINTA B BYTES BCD, desde HL hacia atras, dos cifras cada uno, en (D, E): cada cifra es la letra 0x20 + cifra, de 8 en 8 puntos.
+; ----------------------------------------------------------------------
+pinta_en_bcd:
+	ld a,(hl)			;4578   ; la cifra alta...
 	rra			;4579
 	rra			;457a
 	rra			;457b
 	rra			;457c
-	call L_4588		;457d
-	ld a,(hl)			;4580
-	call L_4588		;4581
-	dec hl			;4584
-	djnz L_4578		;4585
+	call pinta_una_cifra		;457d
+	ld a,(hl)			;4580   ; ... y la baja
+	call pinta_una_cifra		;4581
+	dec hl			;4584   ; el byte anterior
+	djnz pinta_en_bcd		;4585
 	ret			;4587
-L_4588:
-	and 00fh		;4588
-	add a,020h		;458a
-	call L_4AE7		;458c
-	ld a,d			;458f
+pinta_una_cifra:
+	and 00fh		;4588   ; la cifra...
+	add a,020h		;458a   ; ... es la letra 0x20 + cifra
+	call pinta_una_letra		;458c
+	ld a,d			;458f   ; la x, 8 mas
 	add a,008h		;4590
 	ld d,a			;4592
 	ret			;4593
-L_4594:
-	ld hl,0c417h		;4594   ; apunta a los corazones, en BCD
+mas_corazones:
+	ld hl,0c417h		;4594   ; B corazones mas...
 	ld a,(hl)			;4597
 	add a,b			;4598
 	daa			;4599
-	jr nc,L_459E		;459a
+	jr nc,L_459E		;459a   ; ... hasta 99
 	ld a,099h		;459c
 L_459E:
-	jr L_45A9		;459e
-L_45A0:
-	ld hl,0c417h		;45a0   ; apunta a los corazones, en BCD
+	jr corazones_y_repinta		;459e
+menos_corazones:
+	ld hl,0c417h		;45a0   ; B corazones menos...
 	ld a,(hl)			;45a3
-	cp b			;45a4
-	jr c,L_45AD		;45a5
+	cp b			;45a4   ; ... si hay...
+	jr c,sin_corazones		;45a5
 	sub b			;45a7
 	daa			;45a8
-L_45A9:
-	ld (hl),a			;45a9
-	jp L_4566		;45aa
-L_45AD:
-	xor a			;45ad
-	jr L_45A9		;45ae
-L_45B0:
-	call L_45B9		;45b0
-L_45B3:
-	call L_45BF		;45b3
-	jp L_45E5		;45b6
-L_45B9:
-	call L_45C8		;45b9
-	jp L_45D1		;45bc
-L_45BF:
-	ld hl,03b16h		;45bf
-	ld bc,04206h		;45c2
+corazones_y_repinta:
+	ld (hl),a			;45a9   ; se guardan y se pintan
+	jp pinta_los_corazones		;45aa
+sin_corazones:
+	xor a			;45ad   ; si no, cero
+	jr corazones_y_repinta		;45ae
+pinta_las_dos_barras:
+	call pinta_la_barra_de_simon		;45b0   ; la de Simon...
+pinta_la_barra_del_enemigo:
+	call borra_la_barra_del_enemigo		;45b3   ; la del enemigo: se borra...
+	jp la_vida_del_enemigo		;45b6   ; ... y se pinta
+pinta_la_barra_de_simon:
+	call borra_la_barra_de_simon		;45b9   ; se borra...
+	jp la_vida_de_simon		;45bc   ; ... y se pinta
+borra_la_barra_del_enemigo:
+	ld hl,03b16h		;45bf   ; desde (0x3B, 0x16)...
+	ld bc,04206h		;45c2   ; ... 0x42 x 6
 L_45C5:
 	jp L_5D0E		;45c5
-L_45C8:
-	ld hl,03b0dh		;45c8
+borra_la_barra_de_simon:
+	ld hl,03b0dh		;45c8   ; desde (0x3B, 0x0D), 0x42 x 6
 	ld bc,04206h		;45cb
 	jp L_45C5		;45ce
-L_45D1:
+la_vida_de_simon:
 	ld hl,0c415h		;45d1   ; apunta a la vida de Simon
 	ld a,(hl)			;45d4
-	ld hl,03c0eh		;45d5
-	add a,a			;45d8
+	ld hl,03c0eh		;45d5   ; desde (0x3C, 0x0E)...
+	add a,a			;45d8   ; ... dos puntos por punto de vida
 	or a			;45d9
-	ret z			;45da
+	ret z			;45da   ; ninguno: nada
 	ld b,a			;45db
-	ld c,004h		;45dc
+	ld c,004h		;45dc   ; ... 4 de alto...
 	ld d,000h		;45de
-	ld a,011h		;45e0
+	ld a,011h		;45e0   ; ... del color 1
 	jp rellena_rectangulo		;45e2   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-L_45E5:
+la_vida_del_enemigo:
 	ld hl,0c418h		;45e5   ; apunta a la vida del enemigo (barra ENEMY)
 	ld a,(hl)			;45e8
-	ld hl,03c17h		;45e9
+	ld hl,03c17h		;45e9   ; desde (0x3C, 0x17)...
 	ld b,a			;45ec
-	and 003h		;45ed
+	and 003h		;45ed   ; ... lo que sobra de cuatro...
 	ld c,a			;45ef
 	ld a,b			;45f0
-	and 0fch		;45f1
+	and 0fch		;45f1   ; ... y medio punto por cada punto de vida
 	rrca			;45f3
 	or a			;45f4
-	jr nz,L_45FB		;45f5
-	or c			;45f7
+	jr nz,pinta_la_barra		;45f5   ; algo?
+	or c			;45f7   ; solo lo que sobra...
 	ret z			;45f8
-	ld a,002h		;45f9
-L_45FB:
-	ld b,a			;45fb
-	ld c,004h		;45fc
+	ld a,002h		;45f9   ; ... se pinta como 2
+pinta_la_barra:
+	ld b,a			;45fb   ; B de ancho...
+	ld c,004h		;45fc   ; ... 4 de alto...
 	ld d,000h		;45fe
-	ld a,088h		;4600
+	ld a,088h		;4600   ; ... del color 8
 	jp rellena_rectangulo		;4602   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-L_4605:
-	ld hl,0c415h		;4605   ; apunta a la vida de Simon
+mas_vida:
+	ld hl,0c415h		;4605   ; B de vida mas...
 	ld a,(hl)			;4608
 	add a,b			;4609
-	cp 021h		;460a
-	jr c,L_4614		;460c
-	ld a,020h		;460e
+	cp 021h		;460a   ; ... hasta 0x20
+	jr c,vida_y_repinta		;460c
+	ld a,020h		;460e   ; (B, lo que de verdad sube)
 	sub (hl)			;4610
 	ld b,a			;4611
 	ld a,020h		;4612
-L_4614:
-	ld (hl),a			;4614
-	jp L_45B9		;4615
+vida_y_repinta:
+	ld (hl),a			;4614   ; se guarda y se pinta
+	jp pinta_la_barra_de_simon		;4615
 
 ; ----------------------------------------------------------------------
 ; DATOS codigo_sin_llamar_4618: instrucciones a las que no llega nadie (`ld
@@ -951,34 +959,34 @@ DATA_codigo_sin_llamar_4618:
 ; ======================================================================
 
 
-L_462B:
-	ld hl,0c415h		;462b   ; apunta a la vida de Simon
+menos_vida:
+	ld hl,0c415h		;462b   ; B de vida menos...
 	ld a,(hl)			;462e
-	cp b			;462f
-	jr nc,L_4633		;4630
+	cp b			;462f   ; ... no mas de la que hay
+	jr nc,quita_b_de_vida		;4630
 	ld b,a			;4632
-L_4633:
-	ld a,b			;4633
+quita_b_de_vida:
+	ld a,b			;4633   ; nada que quitar: nada
 	or a			;4634
 	ret z			;4635
-	ld a,(hl)			;4636
+	ld a,(hl)			;4636   ; la vida menos B...
 	sub b			;4637
 	ld (hl),a			;4638
-	jp L_45B9		;4639
-L_463C:
-	ld hl,0c418h		;463c   ; apunta a la vida del enemigo (barra ENEMY)
+	jp pinta_la_barra_de_simon		;4639   ; ... y se pinta
+menos_vida_del_enemigo:
+	ld hl,0c418h		;463c   ; B de vida menos al enemigo...
 	ld a,(hl)			;463f
-	cp b			;4640
-	jr nc,L_4644		;4641
+	cp b			;4640   ; ... no mas de la que hay
+	jr nc,quita_b_al_enemigo		;4641
 	ld b,a			;4643
-L_4644:
-	ld a,b			;4644
+quita_b_al_enemigo:
+	ld a,b			;4644   ; nada que quitar: nada
 	or a			;4645
 	ret z			;4646
-	ld a,(hl)			;4647
+	ld a,(hl)			;4647   ; la vida menos B...
 	sub b			;4648
 	ld (hl),a			;4649
-	jp L_45B3		;464a
+	jp pinta_la_barra_del_enemigo		;464a   ; ... y se pinta
 
 ; ----------------------------------------------------------------------
 ; DATOS codigo_sin_llamar_464D: instrucciones que no alcanza nadie:
@@ -993,9 +1001,9 @@ DATA_codigo_sin_llamar_464D:
 ; ======================================================================
 
 
-L_4651:
+un_punto_de_vida_mas:
 	ld b,001h		;4651
-	jp L_4605		;4653
+	jp mas_vida		;4653
 
 ; ----------------------------------------------------------------------
 ; DATOS codigo_sin_llamar_4656: instrucciones que no alcanza nadie:
@@ -1010,59 +1018,71 @@ DATA_codigo_sin_llamar_4656:
 ; ======================================================================
 
 
-L_465A:
+
+; ----------------------------------------------------------------------
+; LEE DE LA VRAM: BC bytes de HL a DE (la RAM), por el puerto de lectura del VDP.
+; ----------------------------------------------------------------------
+lee_de_la_vram:
 	call vram_para_leer		;465a   ; vram_para_leer: prepara el V9938 para leer de la direccion HL
-	call L_466D		;465d
+	call cuenta_para_otir		;465d   ; B y A, las vueltas
 	ex af,af'			;4660
-	ld a,(00006h)		;4661
+	ld a,(00006h)		;4661   ; el puerto de datos del VDP (0x0006)
 	ld c,a			;4664
 	ex af,af'			;4665
-L_4666:
-	inir		;4666
-	dec a			;4668
-	jr nz,L_4666		;4669
+lee_bloques:
+	inir		;4666   ; B bytes...
+	dec a			;4668   ; ... A veces
+	jr nz,lee_bloques		;4669
 	ex de,hl			;466b
 	ret			;466c
-L_466D:
-	ex de,hl			;466d
+
+; ----------------------------------------------------------------------
+; DE BC A DOS CONTADORES para OTIR/INIR: B = C (0 son 256) y A = las vueltas de 256 (B + 1 si C no es cero).
+; ----------------------------------------------------------------------
+cuenta_para_otir:
+	ex de,hl			;466d   ; (y HL y DE cambiados)
 	ld a,c			;466e
 	or a			;466f
 	ld a,b			;4670
-	ld b,c			;4671
-	ret z			;4672
-	inc a			;4673
+	ld b,c			;4671   ; B = los bytes de la primera vuelta
+	ret z			;4672   ; sin resto: B vueltas
+	inc a			;4673   ; con resto: una mas
 	ret			;4674
 copia_a_la_vram:
-	ex de,hl			;4675
+	ex de,hl			;4675   ; COPIA A LA VRAM: BC bytes de HL a DE
 	call vram_para_escribir		;4676   ; vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-	call L_466D		;4679
+	call cuenta_para_otir		;4679
 	ex af,af'			;467c
-	ld a,(00007h)		;467d
+	ld a,(00007h)		;467d   ; el puerto de datos (0x0007)
 	ld c,a			;4680
 	ex af,af'			;4681
-L_4682:
-	otir		;4682
-	dec a			;4684
-	jr nz,L_4682		;4685
+escribe_bloques:
+	otir		;4682   ; B bytes...
+	dec a			;4684   ; ... A veces
+	jr nz,escribe_bloques		;4685
 	ret			;4687
-L_4688:
+
+; ----------------------------------------------------------------------
+; RELLENA LA VRAM: BC bytes desde HL con el byte A.
+; ----------------------------------------------------------------------
+rellena_la_vram:
 	push de			;4688
 	push af			;4689
 	call vram_para_escribir		;468a   ; vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-	ld d,c			;468d
+	ld d,c			;468d   ; D = los de la primera vuelta
 	ld a,c			;468e
 	or a			;468f
-	jr z,L_4693		;4690
-	inc b			;4692
+	jr z,L_4693		;4690   ; sin resto...
+	inc b			;4692   ; ... con resto, una vuelta mas
 L_4693:
-	ld a,(00007h)		;4693
+	ld a,(00007h)		;4693   ; el puerto de datos
 	ld c,a			;4696
 	pop af			;4697
-L_4698:
-	out (c),a		;4698
-	dec d			;469a
-	jr nz,L_4698		;469b
-	djnz L_4698		;469d
+rellena_bloques:
+	out (c),a		;4698   ; el byte...
+	dec d			;469a   ; ... D veces...
+	jr nz,rellena_bloques		;469b
+	djnz rellena_bloques		;469d   ; ... B vueltas (D a 0 da 256)
 	pop de			;469f
 	ret			;46a0
 
@@ -1080,21 +1100,21 @@ DATA_codigo_sin_llamar_46A1:
 
 
 vram_para_escribir:
-	push bc			;46af
+	push bc			;46af   ; VRAM PARA ESCRIBIR: el puerto de registros (0x0007 + 1)
 	ld a,(00007h)		;46b0
 	inc a			;46b3
 	ld c,a			;46b4
-	ld a,h			;46b5
+	ld a,h			;46b5   ; los bits 14-16 de la direccion...
 	rlca			;46b6
 	rlca			;46b7
 	and 003h		;46b8
 	di			;46ba
-	out (c),a		;46bb
+	out (c),a		;46bb   ; ... al registro 14
 	ld a,08eh		;46bd
 	out (c),a		;46bf
-	ld a,l			;46c1
+	ld a,l			;46c1   ; los ocho de abajo...
 	out (c),a		;46c2
-	ld a,h			;46c4
+	ld a,h			;46c4   ; ... y los seis de arriba, con el bit 6: escribir
 	and 03fh		;46c5
 	or 040h		;46c7
 	out (c),a		;46c9
@@ -1102,7 +1122,7 @@ vram_para_escribir:
 	ei			;46cc
 	ret			;46cd
 vram_para_leer:
-	push bc			;46ce
+	push bc			;46ce   ; VRAM PARA LEER: lo mismo...
 	ld a,(00007h)		;46cf
 	inc a			;46d2
 	ld c,a			;46d3
@@ -1116,88 +1136,88 @@ vram_para_leer:
 	out (c),a		;46de
 	ld a,l			;46e0
 	out (c),a		;46e1
-	ld a,h			;46e3
+	ld a,h			;46e3   ; ... sin el bit 6: leer
 	and 03fh		;46e4
 	out (c),a		;46e6
 	pop bc			;46e8
 	ei			;46e9
 	ret			;46ea
 rle_con_destino:
-	ex de,hl			;46eb
+	ex de,hl			;46eb   ; RLE CON EL DESTINO DELANTE: los dos primeros bytes...
 	ld e,(hl)			;46ec
 	inc hl			;46ed
 	ld d,(hl)			;46ee
 	inc hl			;46ef
-	ex de,hl			;46f0
+	ex de,hl			;46f0   ; ... son el destino
 rle_a_la_vram:
-	call vram_para_escribir		;46f1   ; vram_para_escribir: prepara el V9938 para escribir en la direccion HL
+	call vram_para_escribir		;46f1   ; RLE A LA VRAM de HL desde DE
 	ld a,(00007h)		;46f4
 	ld c,a			;46f7
-L_46F8:
-	ld a,(de)			;46f8
+rle_mando:
+	ld a,(de)			;46f8   ; el mando...
 	and a			;46f9
-	ret z			;46fa
+	ret z			;46fa   ; ... 0: acaba
 	inc de			;46fb
-	ld b,a			;46fc
+	ld b,a			;46fc   ; bit 7 puesto?
 	and 07fh		;46fd
 	cp b			;46ff
-	jr z,L_470C		;4700
-	and a			;4702
+	jr z,rle_repite		;4700   ; no: se repite el siguiente
+	and a			;4702   ; 0x80: otro destino
 	jr z,rle_con_destino		;4703
-	ex de,hl			;4705
+	ex de,hl			;4705   ; si: los siete de abajo...
 	ld b,a			;4706
-	otir		;4707
+	otir		;4707   ; ... tal cual
 	ex de,hl			;4709
-	jr L_46F8		;470a
-L_470C:
-	ld a,(de)			;470c
+	jr rle_mando		;470a
+rle_repite:
+	ld a,(de)			;470c   ; el byte...
 	inc de			;470d
-L_470E:
-	out (c),a		;470e
-	djnz L_470E		;4710
-	jr L_46F8		;4712
+rle_otra_vez:
+	out (c),a		;470e   ; ... B veces
+	djnz rle_otra_vez		;4710
+	jr rle_mando		;4712
 guion_de_carga:
-	ld a,(hl)			;4714
+	ld a,(hl)			;4714   ; EL GUION DE CARGA: el mando...
 	inc hl			;4715
-	inc a			;4716
+	inc a			;4716   ; ... 0xFF acaba
 	ret z			;4717
 	dec a			;4718
-	or a			;4719
-	jr z,L_4724		;471a
-	dec a			;471c
-	jr z,L_4729		;471d
-	call L_476B		;471f
+	or a			;4719   ; 0: un rle aparte
+	jr z,guion_rle		;471a
+	dec a			;471c   ; 1: dar la vuelta a dibujos
+	jr z,guion_voltea		;471d
+	call copia_del_guion		;471f   ; lo demas: una copia en crudo
 	jr guion_de_carga		;4722
-L_4724:
-	call L_472E		;4724
+guion_rle:
+	call rle_del_guion		;4724
 	jr guion_de_carga		;4727
-L_4729:
+guion_voltea:
 	call voltea_dibujos		;4729   ; voltea_dibujos: da la vuelta a dibujos que ya estan en la VRAM
 	jr guion_de_carga		;472c
-L_472E:
-	ld e,(hl)			;472e
+rle_del_guion:
+	ld e,(hl)			;472e   ; DE = la fuente...
 	inc hl			;472f
 	ld d,(hl)			;4730
 	inc hl			;4731
-	ld a,(hl)			;4732
+	ld a,(hl)			;4732   ; ... HL = el destino...
 	inc hl			;4733
 	ld b,(hl)			;4734
 	inc hl			;4735
 	push hl			;4736
 	ld l,a			;4737
 	ld h,b			;4738
-	call rle_a_la_vram		;4739   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
+	call rle_a_la_vram		;4739   ; ... y se descomprime
 	pop hl			;473c
 	ret			;473d
 voltea_dibujos:
-	ld e,(hl)			;473e
+	ld e,(hl)			;473e   ; VOLTEA DIBUJOS: DE = donde estan...
 	inc hl			;473f
 	ld d,(hl)			;4740
 	inc hl			;4741
-	ld a,(hl)			;4742
+	ld a,(hl)			;4742   ; ... A = cuantos...
 	inc hl			;4743
 	push hl			;4744
-	ld l,a			;4745
+	ld l,a			;4745   ; ... de 32 bytes: BC = A * 32
 	ld h,000h		;4746
 	add hl,hl			;4748
 	add hl,hl			;4749
@@ -1209,13 +1229,13 @@ voltea_dibujos:
 	ex de,hl			;474f
 	push bc			;4750
 	push af			;4751
-	ld de,0e800h		;4752
-	call L_465A		;4755
+	ld de,0e800h		;4752   ; a 0xE800
+	call lee_de_la_vram		;4755
 	pop af			;4758
-	call L_477F		;4759
+	call voltea_patrones		;4759   ; volteados a 0xEC00
 	pop bc			;475c
 	pop hl			;475d
-	ld e,(hl)			;475e
+	ld e,(hl)			;475e   ; y al destino, DE
 	inc hl			;475f
 	ld d,(hl)			;4760
 	inc hl			;4761
@@ -1224,108 +1244,112 @@ voltea_dibujos:
 	call copia_a_la_vram		;4766   ; copia_a_la_vram: BC bytes de HL a la VRAM de DE
 	pop hl			;4769
 	ret			;476a
-L_476B:
-	ld e,(hl)			;476b
+copia_del_guion:
+	ld e,(hl)			;476b   ; DE = la fuente...
 	inc hl			;476c
 	ld d,(hl)			;476d
 	inc hl			;476e
-	ld c,(hl)			;476f
+	ld c,(hl)			;476f   ; ... BC = cuantos...
 	inc hl			;4770
 	ld b,(hl)			;4771
 	inc hl			;4772
-	ld a,(hl)			;4773
+	ld a,(hl)			;4773   ; ... HL = el destino...
 	inc hl			;4774
 	push hl			;4775
 	ld h,(hl)			;4776
 	ld l,a			;4777
 	ex de,hl			;4778
-	call copia_a_la_vram		;4779   ; copia_a_la_vram: BC bytes de HL a la VRAM de DE
+	call copia_a_la_vram		;4779   ; ... en crudo
 	pop hl			;477c
 	inc hl			;477d
 	ret			;477e
-L_477F:
-	ld hl,0e800h		;477f
-	ld de,0ec10h		;4782
+
+; ----------------------------------------------------------------------
+; DA LA VUELTA A A PATRONES DE SPRITE de 16 x 16 (de 0xE800 a 0xEC00): cada byte con los bits al reves y las dos mitades de 16 bytes cambiadas.
+; ----------------------------------------------------------------------
+voltea_patrones:
+	ld hl,0e800h		;477f   ; de 0xE800...
+	ld de,0ec10h		;4782   ; ... a la mitad derecha de 0xEC00
 	ld c,a			;4785
-L_4786:
-	call L_479D		;4786
-	ld a,0e0h		;4789
+voltea_un_patron:
+	call voltea_16_bytes		;4786   ; la mitad izquierda, a la derecha
+	ld a,0e0h		;4789   ; 0x20 bytes atras...
 	add a,e			;478b
 	ld e,a			;478c
 	jr c,L_4790		;478d
 	dec d			;478f
 L_4790:
-	call L_479D		;4790
-	ld a,020h		;4793
+	call voltea_16_bytes		;4790   ; ... la derecha, a la izquierda
+	ld a,020h		;4793   ; el patron siguiente
 	call de_mas_a		;4795   ; de_mas_a: DE += A
 	dec c			;4798
-	jp nz,L_4786		;4799
+	jp nz,voltea_un_patron		;4799
 	ret			;479c
-L_479D:
-	ld b,010h		;479d
+voltea_16_bytes:
+	ld b,010h		;479d   ; dieciseis
 L_479F:
 	ld a,(hl)			;479f
 	inc hl			;47a0
 	exx			;47a1
 	ld c,a			;47a2
-	ld a,001h		;47a3
-L_47A5:
-	rr c		;47a5
-	rla			;47a7
-	jp nc,L_47A5		;47a8
+	ld a,001h		;47a3   ; A = 1: la marca
+bits_al_reves:
+	rr c		;47a5   ; un bit de C...
+	rla			;47a7   ; ... entra por la derecha de A...
+	jp nc,bits_al_reves		;47a8   ; ... hasta que sale la marca
 	exx			;47ab
 	ld (de),a			;47ac
 	inc de			;47ad
 	djnz L_479F		;47ae
 	ret			;47b0
-L_47B1:
-	call L_47F0		;47b1
+pantalla_en_negro_entera:
+	call esconde_los_sprites		;47b1   ; sin sprites y todas las lineas
 	ld bc,00000h		;47b4
-	jr L_47BF		;47b7
-L_47B9:
-	call L_47F0		;47b9
-	ld bc,000d4h		;47bc
-L_47BF:
+	jr borra_con_la_pantalla_apagada		;47b7
+pantalla_en_negro:
+	call esconde_los_sprites		;47b9   ; sin sprites...
+	ld bc,000d4h		;47bc   ; ... 0xD4 lineas
+borra_con_la_pantalla_apagada:
 	push bc			;47bf
 	call apaga_la_pantalla		;47c0   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 	pop bc			;47c3
-	call L_47E1		;47c4
+	call borra_c_lineas		;47c4   ; se borran
 enciende_la_pantalla:
-	ld a,(0f3e0h)		;47c7
+	ld a,(0f3e0h)		;47c7   ; ENCIENDE LA PANTALLA: el bit 6 del registro 1
 	or 040h		;47ca
 	ld b,a			;47cc
 	ld c,001h		;47cd
 	call 00047h		;47cf   ; BIOS WRTVDP - Writes data in the VDP-register
-	jr L_4809		;47d2
+	jr enciende_los_sprites		;47d2
 apaga_la_pantalla:
-	ld a,(0f3e0h)		;47d4
+	ld a,(0f3e0h)		;47d4   ; APAGA LA PANTALLA
 	and 0bfh		;47d7
 	ld b,a			;47d9
 	ld c,001h		;47da
 	call 00047h		;47dc   ; BIOS WRTVDP - Writes data in the VDP-register
-	jr L_47FE		;47df
-L_47E1:
-	ld hl,00000h		;47e1
+	jr apaga_los_sprites		;47df
+borra_c_lineas:
+	ld hl,00000h		;47e1   ; desde (0, 0), C lineas enteras del color 0
 	xor a			;47e4
 	ld d,a			;47e5
 	call rellena_rectangulo		;47e6   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	ld b,000h		;47e9
+	ld b,000h		;47e9   ; y el desplazamiento vertical (registro 23) a 0
 	ld c,017h		;47eb
 	jp 00047h		;47ed   ; BIOS WRTVDP - Writes data in the VDP-register
-L_47F0:
-	ld hl,0f600h		;47f0
-	ld a,0e0h		;47f3
+esconde_los_sprites:
+	ld hl,0f600h		;47f0   ; la tabla de atributos de sprites (VRAM 0xF600)...
+	ld a,0e0h		;47f3   ; ... 0x80 bytes con 0xE0
 	ld bc,00080h		;47f5
-	call L_4688		;47f8
-	jp 063c5h		;47fb
-L_47FE:
-	ld a,(0ffe7h)		;47fe
-	or 002h		;4801
+	call rellena_la_vram		;47f8
+	jp 063c5h		;47fb   ; y lo de 0x63C5
+apaga_los_sprites:
+	ld a,(0ffe7h)		;47fe   ; el registro 8...
+	or 002h		;4801   ; ... con el bit 1 (SPD): sin sprites
 	ld b,a			;4803
 	ld c,008h		;4804
 	jp 00047h		;4806   ; BIOS WRTVDP - Writes data in the VDP-register
-L_4809:
-	ld a,(0ffe7h)		;4809
+enciende_los_sprites:
+	ld a,(0ffe7h)		;4809   ; el registro 8 sin el bit 1
 	and 0fdh		;480c
 	ld b,a			;480e
 	ld c,008h		;480f
@@ -1410,7 +1434,7 @@ lee_estado_del_vdp:
 ; ----------------------------------------------------------------------
 ; UNA RAYA HORIZONTAL: orden LINE (0x70) del V9938 desde (H, L), de B - 1 puntos, del color C. 0x48A8 es la misma con ARG = 1: vertical.
 ; ----------------------------------------------------------------------
-L_4875:
+raya_horizontal:
 	call espera_al_vdp		;4875   ; espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 	push bc			;4878
 	ld a,(00007h)		;4879   ; el puerto de registros
@@ -1442,7 +1466,7 @@ L_4875:
 	out (c),a		;48a4   ; arranca la orden
 	ei			;48a6
 	ret			;48a7
-L_48A8:
+raya_vertical:
 	call espera_al_vdp		;48a8   ; espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 	push bc			;48ab
 	ld a,(00007h)		;48ac   ; el puerto de registros
@@ -1479,39 +1503,39 @@ L_48A8:
 ; ----------------------------------------------------------------------
 ; UN MARCO: cuatro rayas, desde (H, L), de D de ancho y E de alto (los recuadros del marcador).
 ; ----------------------------------------------------------------------
-L_48DC:
+un_marco:
 	ld b,e			;48dc   ; el alto
-	call L_48F6		;48dd   ; la raya de la izquierda (vertical)
+	call raya_vertical_sin_tocar		;48dd   ; la raya de la izquierda (vertical)
 	ld b,d			;48e0   ; el ancho
-	call L_4900		;48e1   ; la de arriba (horizontal)
+	call raya_horizontal_sin_tocar		;48e1   ; la de arriba (horizontal)
 	push hl			;48e4
 	ld a,l			;48e5   ; L + E - 1: la fila de abajo
 	dec a			;48e6
 	add a,e			;48e7
 	ld l,a			;48e8
 	ld b,d			;48e9   ; el ancho
-	call L_4900		;48ea   ; la de abajo
+	call raya_horizontal_sin_tocar		;48ea   ; la de abajo
 	pop hl			;48ed
 	ld a,h			;48ee   ; H + D - 1: la columna de la derecha
 	dec a			;48ef
 	add a,d			;48f0
 	ld h,a			;48f1
 	ld b,e			;48f2   ; el alto
-	jp L_48F6		;48f3   ; y la de la derecha
-L_48F6:
+	jp raya_vertical_sin_tocar		;48f3   ; y la de la derecha
+raya_vertical_sin_tocar:
 	push hl			;48f6
 	push de			;48f7
 	push bc			;48f8
-	call L_48A8		;48f9   ; vertical, sin tocar registros
+	call raya_vertical		;48f9   ; vertical, sin tocar registros
 	pop bc			;48fc
 	pop de			;48fd
 	pop hl			;48fe
 	ret			;48ff
-L_4900:
+raya_horizontal_sin_tocar:
 	push hl			;4900
 	push de			;4901
 	push bc			;4902
-	call L_4875		;4903   ; horizontal, sin tocar registros
+	call raya_horizontal		;4903   ; horizontal, sin tocar registros
 	pop bc			;4906
 	pop de			;4907
 	pop hl			;4908
@@ -1669,7 +1693,7 @@ L_49CA:
 ; ----------------------------------------------------------------------
 ; COPIA CON OPERACION LOGICA: orden LMMM (0x90 + la operacion) de (H, L) a (D, E), de B x C puntos. A lleva empaquetadas la pagina de origen (bits 6-7), la de destino (bits 4-5) y la operacion logica (bits 0-3; con 8, TIMP, el color 0 no se copia y hace de transparente).
 ; ----------------------------------------------------------------------
-L_49DB:
+copia_con_operacion:
 	ex af,af'			;49db   ; lo empaquetado, a guardar
 	call espera_al_vdp		;49dc   ; espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 	push bc			;49df
@@ -1721,7 +1745,7 @@ L_49DB:
 	ret			;4a26
 sube_letras:
 	call sube_una_letra		;4a27   ; sube_una_letra: un caracter de 1 bit de HL
-	call L_4B4F		;4a2a   ; la siguiente posicion
+	call la_posicion_siguiente		;4a2a   ; la siguiente posicion
 	djnz sube_letras		;4a2d   ; B caracteres
 	ret			;4a2f
 sube_una_letra:
@@ -1729,7 +1753,7 @@ sube_una_letra:
 	push de			;4a31
 	push hl			;4a32
 	push de			;4a33   ; la posicion, a guardar
-	call L_4AA5		;4a34   ; el caracter, de 1 bit a 4 bits en 0xC110
+	call colorea_una_letra		;4a34   ; el caracter, de 1 bit a 4 bits en 0xC110
 	pop de			;4a37
 	ld b,d			;4a38   ; D es la x y E la y: se cambian
 	ld d,e			;4a39
@@ -1778,7 +1802,7 @@ L_4A76:
 	pop bc			;4a77
 	djnz sube_dibujos		;4a78   ; B dibujos
 	ret			;4a7a
-L_4A7B:
+sube_un_dibujo_de_16:
 	push de			;4a7b
 	ld b,010h		;4a7c   ; dieciseis filas
 L_4A7E:
@@ -1795,7 +1819,7 @@ L_4A7E:
 	ret			;4a8f
 sube_dibujos_de_16:
 	push bc			;4a90
-	call L_4A7B		;4a91
+	call sube_un_dibujo_de_16		;4a91
 	ld a,008h		;4a94   ; ocho bytes (dieciseis puntos) a la derecha
 	add a,e			;4a96
 	cp 080h		;4a97   ; se llego al borde?
@@ -1809,7 +1833,7 @@ L_4AA0:
 	pop bc			;4aa1
 	djnz sube_dibujos_de_16		;4aa2   ; B dibujos
 	ret			;4aa4
-L_4AA5:
+colorea_una_letra:
 	ld b,008h		;4aa5   ; ocho filas
 	ld de,0c110h		;4aa7   ; al bufer de 0xC110
 L_4AAA:
@@ -1859,19 +1883,19 @@ L_4AD5:
 	inc b			;4ada   ; 0xFE: otra posicion...
 	jr z,rotulo		;4adb   ; ...y vuelve a pintar: tras un 0xFE, borra_rotulo PINTA
 	and c			;4add   ; al borrar, el caracter 0
-	call L_4AE7		;4ade   ; pinta el caracter en (D, E)
+	call pinta_una_letra		;4ade   ; pinta el caracter en (D, E)
 	ld a,d			;4ae1   ; ocho puntos a la derecha
 	add a,008h		;4ae2
 	ld d,a			;4ae4
 	jr L_4AD5		;4ae5
-L_4AE7:
+pinta_una_letra:
 	push bc			;4ae7
 	push hl			;4ae8
 	push de			;4ae9
 	or a			;4aea   ; el 0 es el espacio
 	ld h,a			;4aeb   ; H = 0 para el espacio
 	jr z,L_4AF3		;4aec
-	call L_4B41		;4aee   ; la columna del caracter en la fuente
+	call sitio_del_dibujo		;4aee   ; la columna del caracter en la fuente
 	add a,038h		;4af1   ; y su fila: la fuente empieza en la linea 0x38
 L_4AF3:
 	ld l,a			;4af3
@@ -1896,99 +1920,107 @@ DATA_codigo_sin_llamar_4B00:
 ; ======================================================================
 
 
-L_4B0B:
+
+; ----------------------------------------------------------------------
+; PINTA EL DIBUJO A de la pagina 1 (el de (A % 32 * 8, A / 32 * 8), 8 x 8) en (D, E): 0x4B0B tal cual en la pagina 0 (HMMM), 0x4B1D con transparencia (LMMM y TIMP) y 0x4B2F dentro de la pagina 1.
+; ----------------------------------------------------------------------
+pinta_el_dibujo:
 	push bc			;4b0b
 	push hl			;4b0c
 	push de			;4b0d
-	call L_4B41		;4b0e
-	ld bc,00808h		;4b11
-	ld a,001h		;4b14
+	call sitio_del_dibujo		;4b0e   ; su sitio en la pagina 1
+	ld bc,00808h		;4b11   ; 8 x 8...
+	ld a,001h		;4b14   ; ... de la pagina 1 a la 0
 	call copia_rectangulo		;4b16   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop de			;4b19
 	pop hl			;4b1a
 	pop bc			;4b1b
 	ret			;4b1c
-L_4B1D:
+pinta_el_dibujo_con_transparencia:
 	push bc			;4b1d
 	push hl			;4b1e
 	push de			;4b1f
-	call L_4B41		;4b20
-	ld bc,00808h		;4b23
-	ld a,048h		;4b26
-	call L_49DB		;4b28
+	call sitio_del_dibujo		;4b20   ; su sitio en la pagina 1
+	ld bc,00808h		;4b23   ; 8 x 8...
+	ld a,048h		;4b26   ; ... con TIMP, de la 1 a la 0
+	call copia_con_operacion		;4b28
 	pop de			;4b2b
 	pop hl			;4b2c
 	pop bc			;4b2d
 	ret			;4b2e
-L_4B2F:
+copia_el_dibujo_en_la_pagina_1:
 	push bc			;4b2f
 	push hl			;4b30
 	push de			;4b31
-	call L_4B41		;4b32
-	ld bc,00808h		;4b35
-	ld a,005h		;4b38
+	call sitio_del_dibujo		;4b32   ; su sitio en la pagina 1
+	ld bc,00808h		;4b35   ; 8 x 8...
+	ld a,005h		;4b38   ; ... de la pagina 1 a la 1
 	call copia_rectangulo		;4b3a   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop de			;4b3d
 	pop hl			;4b3e
 	pop bc			;4b3f
 	ret			;4b40
-L_4B41:
-	ld b,a			;4b41
-	and 01fh		;4b42
-	add a,a			;4b44
+sitio_del_dibujo:
+	ld b,a			;4b41   ; el dibujo A...
+	and 01fh		;4b42   ; ... su columna (A % 32)...
+	add a,a			;4b44   ; ... por 8: H
 	add a,a			;4b45
 	add a,a			;4b46
 	ld h,a			;4b47
-	ld a,b			;4b48
+	ld a,b			;4b48   ; su fila (A / 32)...
 	and 0e0h		;4b49
-	rrca			;4b4b
+	rrca			;4b4b   ; ... por 8: L
 	rrca			;4b4c
 	ld l,a			;4b4d
 	ret			;4b4e
-L_4B4F:
-	ld a,d			;4b4f
+la_posicion_siguiente:
+	ld a,d			;4b4f   ; ocho a la derecha...
 	add a,008h		;4b50
 	ld d,a			;4b52
-	ret nz			;4b53
-	ld a,e			;4b54
+	ret nz			;4b53   ; ... y al pasar del borde...
+	ld a,e			;4b54   ; ... ocho mas abajo
 	add a,008h		;4b55
 	ld e,a			;4b57
 	ret			;4b58
-L_4B59:
-	call L_5076		;4b59
-	call L_47FE		;4b5c
-	ld a,005h		;4b5f
+
+; ----------------------------------------------------------------------
+; PREPARA LA PANTALLA: el sonido, sin sprites, SCREEN 5 por la BIOS, la pantalla apagada, las paginas 0 y 1 enteras a cero, cuatro registros del VDP de 0x4B95, los sprites escondidos y la pantalla encendida.
+; ----------------------------------------------------------------------
+prepara_la_pantalla:
+	call L_5076		;4b59   ; el sonido
+	call apaga_los_sprites		;4b5c   ; sin sprites
+	ld a,005h		;4b5f   ; SCREEN 5
 	call 0005fh		;4b61   ; BIOS CHGMOD - Switches to given screen mode
 	call apaga_la_pantalla		;4b64   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-	xor a			;4b67
+	xor a			;4b67   ; la pagina 0 entera...
 	ld h,a			;4b68
 	ld l,a			;4b69
 	ld b,a			;4b6a
 	ld c,a			;4b6b
 	ld d,a			;4b6c
-	call rellena_rectangulo		;4b6d   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	xor a			;4b70
+	call rellena_rectangulo		;4b6d   ; ... a cero
+	xor a			;4b70   ; y la 1
 	ld h,a			;4b71
 	ld l,a			;4b72
 	ld b,a			;4b73
 	ld c,a			;4b74
 	ld d,001h		;4b75
 	call rellena_rectangulo		;4b77   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	call espera_al_vdp		;4b7a   ; espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
-	ld b,004h		;4b7d
+	call espera_al_vdp		;4b7a   ; cuando acabe...
+	ld b,004h		;4b7d   ; ... los cuatro registros de 0x4B95
 	ld hl,04b95h		;4b7f
 L_4B82:
 	push bc			;4b82
-	ld c,(hl)			;4b83
+	ld c,(hl)			;4b83   ; C = el registro...
 	inc hl			;4b84
-	ld b,(hl)			;4b85
+	ld b,(hl)			;4b85   ; ... B = el valor
 	inc hl			;4b86
 	push hl			;4b87
 	call 00047h		;4b88   ; BIOS WRTVDP - Writes data in the VDP-register
 	pop hl			;4b8b
 	pop bc			;4b8c
 	djnz L_4B82		;4b8d
-	call L_47F0		;4b8f
+	call esconde_los_sprites		;4b8f
 	jp enciende_la_pantalla		;4b92   ; enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 
 ; ----------------------------------------------------------------------
@@ -2004,72 +2036,84 @@ DATA_registros_del_vdp:
 ; ======================================================================
 
 
-L_4B9D:
-	ld a,(0c002h)		;4b9d   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
+
+; ----------------------------------------------------------------------
+; LOS MANDOS DE CADA CUADRO: en una partida (bit 6 de 0xC002), las teclas F1-F3 a 0xC00C (las recien pulsadas en 0xC00B: F1 la pausa, F2 el mapa del pergamino) y el mando y el teclado a 0xC007 (recien pulsados en 0xC006); si no, las pulsaciones de la demostracion.
+; ----------------------------------------------------------------------
+lee_los_mandos:
+	ld a,(0c002h)		;4b9d   ; en una partida?
 	and 040h		;4ba0
-	jp z,L_4E2E		;4ba2
-	call L_4BF4		;4ba5
-	ld hl,0c00ch		;4ba8
-	call L_4BB4		;4bab
-	call L_4BBB		;4bae
-L_4BB1:
-	ld hl,0c007h		;4bb1
-L_4BB4:
-	ld c,(hl)			;4bb4
-	ld (hl),a			;4bb5
-	xor c			;4bb6
-	and (hl)			;4bb7
+	jp z,L_4E2E		;4ba2   ; no: las de la demostracion
+	call f1_a_f3		;4ba5   ; F1-F3...
+	ld hl,0c00ch		;4ba8   ; ... a 0xC00C
+	call recien_pulsado		;4bab
+	call el_mando_y_el_teclado		;4bae   ; el mando y el teclado...
+a_los_mandos:
+	ld hl,0c007h		;4bb1   ; ... a 0xC007
+
+; ----------------------------------------------------------------------
+; GUARDA A EN (HL) y en (HL - 1) lo recien pulsado: lo que esta a 1 ahora y no lo estaba antes.
+; ----------------------------------------------------------------------
+recien_pulsado:
+	ld c,(hl)			;4bb4   ; lo de antes
+	ld (hl),a			;4bb5   ; lo de ahora
+	xor c			;4bb6   ; lo que cambia...
+	and (hl)			;4bb7   ; ... y esta a 1
 	dec hl			;4bb8
-	ld (hl),a			;4bb9
+	ld (hl),a			;4bb9   ; a (HL - 1)
 	ret			;4bba
-L_4BBB:
-	ld e,08fh		;4bbb
+
+; ----------------------------------------------------------------------
+; EL MANDO Y EL TECLADO: el mando 1 (registro 14 del PSG con el 15 a 0x8F: las cuatro direcciones y los dos disparos, bits 0-5, a 1 si se pulsan) mezclado con la fila 8 del teclado (los cursores y el espacio) repartida en los mismos bits.
+; ----------------------------------------------------------------------
+el_mando_y_el_teclado:
+	ld e,08fh		;4bbb   ; el registro 15 a 0x8F...
 	ld a,00fh		;4bbd
 	call 00093h		;4bbf   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,00eh		;4bc2
+	ld a,00eh		;4bc2   ; ... y el 14: el mando 1
 	di			;4bc4
 	call 00096h		;4bc5   ; BIOS RDPSG - Reads value from PSG-register
 	ei			;4bc8
-	cpl			;4bc9
-	and 03fh		;4bca
+	cpl			;4bc9   ; (a 1, pulsado)
+	and 03fh		;4bca   ; sus seis bits
 	push af			;4bcc
-	ld a,008h		;4bcd
+	ld a,008h		;4bcd   ; la fila 8 del teclado...
 	call 00141h		;4bcf   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix
 	cpl			;4bd2
 	ld e,a			;4bd3
-	and 020h		;4bd4
+	and 020h		;4bd4   ; ... su bit 5
 	ld e,a			;4bd6
-	ld a,008h		;4bd7
+	ld a,008h		;4bd7   ; otra vez la fila 8...
 	call 00141h		;4bd9   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix
 	cpl			;4bdc
 	rrca			;4bdd
 	rrca			;4bde
 	ld b,a			;4bdf
-	and 004h		;4be0
+	and 004h		;4be0   ; ... su bit 4 al 2
 	or e			;4be2
 	ld c,a			;4be3
 	ld a,b			;4be4
 	rrca			;4be5
 	rrca			;4be6
 	ld b,a			;4be7
-	and 018h		;4be8
+	and 018h		;4be8   ; ... dos mas a los bits 3 y 4
 	or c			;4bea
 	ld c,a			;4beb
 	ld a,b			;4bec
 	rrca			;4bed
-	and 003h		;4bee
+	and 003h		;4bee   ; ... y dos a los bits 0 y 1
 	or c			;4bf0
 	pop bc			;4bf1
-	or b			;4bf2
+	or b			;4bf2   ; junto con el mando
 	ret			;4bf3
-L_4BF4:
-	ld a,006h		;4bf4
+f1_a_f3:
+	ld a,006h		;4bf4   ; la fila 6 del teclado...
 	call 00141h		;4bf6   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix
-	cpl			;4bf9
-	rlca			;4bfa
+	cpl			;4bf9   ; (a 1, pulsada)
+	rlca			;4bfa   ; ... sus bits 5-7, F1, F2 y F3...
 	rlca			;4bfb
 	rlca			;4bfc
-	and 007h		;4bfd
+	and 007h		;4bfd   ; ... a los bits 0-2
 	ret			;4bff
 
 ; ----------------------------------------------------------------------
@@ -2192,7 +2236,7 @@ L_4D66:
 	ld a,00fh		;4d74
 	ld de,00700h		;4d76
 	call pon_un_color		;4d79   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-	call L_47F0		;4d7c
+	call esconde_los_sprites		;4d7c
 	call L_53B6		;4d7f
 	call L_59FB		;4d82
 	ld hl,00010h		;4d85
@@ -2272,7 +2316,7 @@ L_4DE7:
 	ld (0c418h),a		;4e14   ; guarda la vida del enemigo (barra ENEMY)
 	call 062d0h		;4e17   ; empieza una vida
 	call 062e6h		;4e1a   ; monta la fase
-	jp L_4513		;4e1d   ; y el marcador
+	jp pinta_el_marcador		;4e1d   ; y el marcador
 L_4E20:
 	call L_5C25		;4e20
 	ld a,(0c41bh)		;4e23   ; lee el lado por el que se sale de la habitacion
@@ -2293,7 +2337,7 @@ L_4E34:
 	cp 0ffh		;4e37   ; 0xFF...
 	jr z,L_4E41		;4e39   ; ... acaba la demostracion
 	ld hl,0c007h		;4e3b   ; se entregan como mandos
-	jp L_4BB1		;4e3e
+	jp a_los_mandos		;4e3e
 L_4E41:
 	xor a			;4e41   ; fin de la demostracion
 	ld (0c413h),a		;4e42   ; guarda la VIDA en marcha
@@ -2466,7 +2510,7 @@ L_4F99:
 	ld b,020h		;4f9a
 L_4F9C:
 	ld a,(hl)			;4f9c
-	call L_4B0B		;4f9d
+	call pinta_el_dibujo		;4f9d
 	inc hl			;4fa0
 	ld a,d			;4fa1
 	add a,008h		;4fa2
@@ -3538,7 +3582,7 @@ L_5768:
 	call rle_a_la_vram		;577a   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 	jp bancos_1_2_3		;577d   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 L_5780:
-	call L_47FE		;5780
+	call apaga_los_sprites		;5780
 	call bancos_9_10		;5783   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 	ld hl,09ab0h		;5786
 	ld a,(0d000h)		;5789   ; lee la FASE (0 el patio, 1-18)
@@ -3808,7 +3852,7 @@ L_5969:
 L_596F:
 	push bc			;596f
 	ld bc,00004h		;5970
-	call L_465A		;5973
+	call lee_de_la_vram		;5973
 	ld a,e			;5976
 	sub 008h		;5977
 	ld e,a			;5979
@@ -4383,7 +4427,7 @@ DATA_firma_de_otro_cartucho:
 L_5CEF:
 	call L_5CFD		;5cef
 	ld c,00eh		;5cf2
-	call L_48DC		;5cf4
+	call un_marco		;5cf4
 	ld hl,05d16h		;5cf7
 	jp rotulo		;5cfa   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 L_5CFD:
@@ -4401,7 +4445,7 @@ L_5D03:
 L_5D0E:
 	call L_5D03		;5d0e
 	ld c,00eh		;5d11
-	jp L_48DC		;5d13
+	jp un_marco		;5d13
 
 ; ----------------------------------------------------------------------
 ; DATOS rotulo_5D16: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
@@ -4427,7 +4471,7 @@ L_5D61:
 	ld de,0b0b8h		;5d6a
 L_5D6D:
 	ld b,001h		;5d6d
-	jp L_4578		;5d6f
+	jp pinta_en_bcd		;5d6f
 
 ; ----------------------------------------------------------------------
 ; DATOS rotulo_5D72: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
@@ -4491,7 +4535,7 @@ L_5DCA:
 	rld		;5dd3
 	ld de,(0e602h)		;5dd5
 	ld b,001h		;5dd9
-	call L_4578		;5ddb
+	call pinta_en_bcd		;5ddb
 	jp L_5E08		;5dde
 L_5DE1:
 	rra			;5de1
@@ -4640,7 +4684,7 @@ L_5EA8:
 	ld e,(hl)			;5eae
 	ld d,028h		;5eaf
 	ld a,b			;5eb1
-	jp L_4AE7		;5eb2
+	jp pinta_una_letra		;5eb2
 
 ; ----------------------------------------------------------------------
 ; DATOS tres_columnas: tres columnas en las que p00:5EA8 pinta, en la fila

@@ -726,6 +726,294 @@ C 0x44D3 las vidas, la fase del marcador y 0xC412, de 0x44E9
 C 0x44DE la vida llena...
 C 0x44E3 ... y la barra del enemigo
 
+B 0x4513 EL MARCADOR ENTERO (la franja de arriba, y de 0 a 0x1F): los rotulos de 0x4C00, la fase, los corazones, las vidas, las dos barras de vida, los tres recuadros (el arma, las llaves y lo que lleva) y lo de dentro, y los puntos.
+L 0x4513 pinta_el_marcador
+C 0x4519 la fase
+C 0x451C los corazones
+C 0x451F las vidas
+C 0x4522 las dos barras de vida
+C 0x4525 los tres recuadros
+C 0x4528 el arma
+C 0x452B la llave
+C 0x452E lo que lleva
+L 0x4531 pinta_los_puntos
+C 0x4531 los puntos, tres bytes BCD desde el alto...
+C 0x4534 ... en (0x38, 0)
+L 0x453B pinta_la_fase
+C 0x453B en (0x9C, 0)...
+C 0x453E ... un byte BCD
+L 0x4545 pinta_los_recuadros
+C 0x4545 el del arma, en (0x7F, 0x0B)...
+C 0x4548 ... de 0x12 x 0x12...
+C 0x454B ... del color 8
+C 0x4550 el de las llaves, en (0x93, 0x0B), 0x22 x 0x12...
+C 0x4556 ... del color 0x0E
+C 0x455B el de lo que lleva, en (0xB7, 0x0B), 0x42 x 0x12...
+C 0x4561 ... del color 0x0E
+L 0x4566 pinta_los_corazones
+C 0x4569 en (0xC0, 0)
+L 0x456E pinta_las_vidas
+C 0x4571 en (0xE4, 0)
+C 0x4574 un byte BCD
+B 0x4578 PINTA B BYTES BCD, desde HL hacia atras, dos cifras cada uno, en (D, E): cada cifra es la letra 0x20 + cifra, de 8 en 8 puntos.
+L 0x4578 pinta_en_bcd
+C 0x4578 la cifra alta...
+C 0x4580 ... y la baja
+C 0x4584 el byte anterior
+L 0x4588 pinta_una_cifra
+C 0x4588 la cifra...
+C 0x458A ... es la letra 0x20 + cifra
+C 0x458F la x, 8 mas
+L 0x4594 mas_corazones
+C 0x4594 B corazones mas...
+C 0x459A ... hasta 99
+L 0x45A0 menos_corazones
+C 0x45A0 B corazones menos...
+C 0x45A4 ... si hay...
+L 0x45A9 corazones_y_repinta
+C 0x45A9 se guardan y se pintan
+L 0x45AD sin_corazones
+C 0x45AD si no, cero
+L 0x45B0 pinta_las_dos_barras
+C 0x45B0 la de Simon...
+L 0x45B3 pinta_la_barra_del_enemigo
+C 0x45B3 la del enemigo: se borra...
+C 0x45B6 ... y se pinta
+L 0x45B9 pinta_la_barra_de_simon
+C 0x45B9 se borra...
+C 0x45BC ... y se pinta
+L 0x45BF borra_la_barra_del_enemigo
+C 0x45BF desde (0x3B, 0x16)...
+C 0x45C2 ... 0x42 x 6
+L 0x45C8 borra_la_barra_de_simon
+C 0x45C8 desde (0x3B, 0x0D), 0x42 x 6
+L 0x45D1 la_vida_de_simon
+C 0x45D5 desde (0x3C, 0x0E)...
+C 0x45D8 ... dos puntos por punto de vida
+C 0x45DA ninguno: nada
+C 0x45DC ... 4 de alto...
+C 0x45E0 ... del color 1
+L 0x45E5 la_vida_del_enemigo
+C 0x45E9 desde (0x3C, 0x17)...
+C 0x45ED ... lo que sobra de cuatro...
+C 0x45F1 ... y medio punto por cada punto de vida
+C 0x45F5 algo?
+C 0x45F7 solo lo que sobra...
+C 0x45F9 ... se pinta como 2
+L 0x45FB pinta_la_barra
+C 0x45FB B de ancho...
+C 0x45FC ... 4 de alto...
+C 0x4600 ... del color 8
+L 0x4605 mas_vida
+C 0x4605 B de vida mas...
+C 0x460A ... hasta 0x20
+C 0x460E (B, lo que de verdad sube)
+L 0x4614 vida_y_repinta
+C 0x4614 se guarda y se pinta
+L 0x462B menos_vida
+C 0x462B B de vida menos...
+C 0x462F ... no mas de la que hay
+L 0x4633 quita_b_de_vida
+C 0x4633 nada que quitar: nada
+C 0x4636 la vida menos B...
+C 0x4639 ... y se pinta
+L 0x463C menos_vida_del_enemigo
+C 0x463C B de vida menos al enemigo...
+C 0x4640 ... no mas de la que hay
+L 0x4644 quita_b_al_enemigo
+C 0x4644 nada que quitar: nada
+C 0x4647 la vida menos B...
+C 0x464A ... y se pinta
+L 0x4651 un_punto_de_vida_mas
+B 0x465A LEE DE LA VRAM: BC bytes de HL a DE (la RAM), por el puerto de lectura del VDP.
+L 0x465A lee_de_la_vram
+C 0x465D B y A, las vueltas
+C 0x4661 el puerto de datos del VDP (0x0006)
+L 0x4666 lee_bloques
+C 0x4666 B bytes...
+C 0x4668 ... A veces
+B 0x466D DE BC A DOS CONTADORES para OTIR/INIR: B = C (0 son 256) y A = las vueltas de 256 (B + 1 si C no es cero).
+L 0x466D cuenta_para_otir
+C 0x466D (y HL y DE cambiados)
+C 0x4671 B = los bytes de la primera vuelta
+C 0x4672 sin resto: B vueltas
+C 0x4673 con resto: una mas
+C 0x4675 COPIA A LA VRAM: BC bytes de HL a DE
+C 0x467D el puerto de datos (0x0007)
+L 0x4682 escribe_bloques
+C 0x4682 B bytes...
+C 0x4684 ... A veces
+B 0x4688 RELLENA LA VRAM: BC bytes desde HL con el byte A.
+L 0x4688 rellena_la_vram
+C 0x468D D = los de la primera vuelta
+C 0x4690 sin resto...
+C 0x4692 ... con resto, una vuelta mas
+C 0x4693 el puerto de datos
+L 0x4698 rellena_bloques
+C 0x4698 el byte...
+C 0x469A ... D veces...
+C 0x469D ... B vueltas (D a 0 da 256)
+C 0x46AF VRAM PARA ESCRIBIR: el puerto de registros (0x0007 + 1)
+C 0x46B5 los bits 14-16 de la direccion...
+C 0x46BB ... al registro 14
+C 0x46C1 los ocho de abajo...
+C 0x46C4 ... y los seis de arriba, con el bit 6: escribir
+C 0x46CE VRAM PARA LEER: lo mismo...
+C 0x46E3 ... sin el bit 6: leer
+C 0x46EB RLE CON EL DESTINO DELANTE: los dos primeros bytes...
+C 0x46F0 ... son el destino
+C 0x46F1 RLE A LA VRAM de HL desde DE
+L 0x46F8 rle_mando
+C 0x46F8 el mando...
+C 0x46FA ... 0: acaba
+C 0x46FC bit 7 puesto?
+C 0x4700 no: se repite el siguiente
+C 0x4702 0x80: otro destino
+C 0x4705 si: los siete de abajo...
+C 0x4707 ... tal cual
+L 0x470C rle_repite
+C 0x470C el byte...
+L 0x470E rle_otra_vez
+C 0x470E ... B veces
+C 0x4714 EL GUION DE CARGA: el mando...
+C 0x4716 ... 0xFF acaba
+C 0x4719 0: un rle aparte
+C 0x471C 1: dar la vuelta a dibujos
+C 0x471F lo demas: una copia en crudo
+L 0x4724 guion_rle
+L 0x4729 guion_voltea
+L 0x472E rle_del_guion
+C 0x472E DE = la fuente...
+C 0x4732 ... HL = el destino...
+C 0x4739 ... y se descomprime
+C 0x473E VOLTEA DIBUJOS: DE = donde estan...
+C 0x4742 ... A = cuantos...
+C 0x4745 ... de 32 bytes: BC = A * 32
+C 0x4752 a 0xE800
+C 0x4759 volteados a 0xEC00
+C 0x475E y al destino, DE
+L 0x476B copia_del_guion
+C 0x476B DE = la fuente...
+C 0x476F ... BC = cuantos...
+C 0x4773 ... HL = el destino...
+C 0x4779 ... en crudo
+B 0x477F DA LA VUELTA A A PATRONES DE SPRITE de 16 x 16 (de 0xE800 a 0xEC00): cada byte con los bits al reves y las dos mitades de 16 bytes cambiadas.
+L 0x477F voltea_patrones
+C 0x477F de 0xE800...
+C 0x4782 ... a la mitad derecha de 0xEC00
+L 0x4786 voltea_un_patron
+C 0x4786 la mitad izquierda, a la derecha
+C 0x4789 0x20 bytes atras...
+C 0x4790 ... la derecha, a la izquierda
+C 0x4793 el patron siguiente
+L 0x479D voltea_16_bytes
+C 0x479D dieciseis
+C 0x47A3 A = 1: la marca
+L 0x47A5 bits_al_reves
+C 0x47A5 un bit de C...
+C 0x47A7 ... entra por la derecha de A...
+C 0x47A8 ... hasta que sale la marca
+L 0x47B1 pantalla_en_negro_entera
+C 0x47B1 sin sprites y todas las lineas
+L 0x47B9 pantalla_en_negro
+C 0x47B9 sin sprites...
+C 0x47BC ... 0xD4 lineas
+L 0x47BF borra_con_la_pantalla_apagada
+C 0x47C4 se borran
+C 0x47C7 ENCIENDE LA PANTALLA: el bit 6 del registro 1
+C 0x47D4 APAGA LA PANTALLA
+L 0x47E1 borra_c_lineas
+C 0x47E1 desde (0, 0), C lineas enteras del color 0
+C 0x47E9 y el desplazamiento vertical (registro 23) a 0
+L 0x47F0 esconde_los_sprites
+C 0x47F0 la tabla de atributos de sprites (VRAM 0xF600)...
+C 0x47F3 ... 0x80 bytes con 0xE0
+C 0x47FB y lo de 0x63C5
+
+L 0x47FE apaga_los_sprites
+C 0x47FE el registro 8...
+C 0x4801 ... con el bit 1 (SPD): sin sprites
+L 0x4809 enciende_los_sprites
+C 0x4809 el registro 8 sin el bit 1
+L 0x4875 raya_horizontal
+L 0x48A8 raya_vertical
+L 0x48DC un_marco
+L 0x48F6 raya_vertical_sin_tocar
+L 0x4900 raya_horizontal_sin_tocar
+L 0x49DB copia_con_operacion
+L 0x4A7B sube_un_dibujo_de_16
+L 0x4AA5 colorea_una_letra
+L 0x4AE7 pinta_una_letra
+B 0x4B0B PINTA EL DIBUJO A de la pagina 1 (el de (A % 32 * 8, A / 32 * 8), 8 x 8) en (D, E): 0x4B0B tal cual en la pagina 0 (HMMM), 0x4B1D con transparencia (LMMM y TIMP) y 0x4B2F dentro de la pagina 1.
+L 0x4B0B pinta_el_dibujo
+C 0x4B0E su sitio en la pagina 1
+C 0x4B11 8 x 8...
+C 0x4B14 ... de la pagina 1 a la 0
+L 0x4B1D pinta_el_dibujo_con_transparencia
+C 0x4B20 su sitio en la pagina 1
+C 0x4B23 8 x 8...
+C 0x4B26 ... con TIMP, de la 1 a la 0
+L 0x4B2F copia_el_dibujo_en_la_pagina_1
+C 0x4B32 su sitio en la pagina 1
+C 0x4B35 8 x 8...
+C 0x4B38 ... de la pagina 1 a la 1
+L 0x4B41 sitio_del_dibujo
+C 0x4B41 el dibujo A...
+C 0x4B42 ... su columna (A % 32)...
+C 0x4B44 ... por 8: H
+C 0x4B48 su fila (A / 32)...
+C 0x4B4B ... por 8: L
+L 0x4B4F la_posicion_siguiente
+C 0x4B4F ocho a la derecha...
+C 0x4B53 ... y al pasar del borde...
+C 0x4B54 ... ocho mas abajo
+B 0x4B59 PREPARA LA PANTALLA: el sonido, sin sprites, SCREEN 5 por la BIOS, la pantalla apagada, las paginas 0 y 1 enteras a cero, cuatro registros del VDP de 0x4B95, los sprites escondidos y la pantalla encendida.
+L 0x4B59 prepara_la_pantalla
+C 0x4B59 el sonido
+C 0x4B5C sin sprites
+C 0x4B5F SCREEN 5
+C 0x4B67 la pagina 0 entera...
+C 0x4B6D ... a cero
+C 0x4B70 y la 1
+C 0x4B7A cuando acabe...
+C 0x4B7D ... los cuatro registros de 0x4B95
+C 0x4B83 C = el registro...
+C 0x4B85 ... B = el valor
+B 0x4B9D LOS MANDOS DE CADA CUADRO: en una partida (bit 6 de 0xC002), las teclas F1-F3 a 0xC00C (las recien pulsadas en 0xC00B: F1 la pausa, F2 el mapa del pergamino) y el mando y el teclado a 0xC007 (recien pulsados en 0xC006); si no, las pulsaciones de la demostracion.
+L 0x4B9D lee_los_mandos
+C 0x4B9D en una partida?
+C 0x4BA2 no: las de la demostracion
+C 0x4BA5 F1-F3...
+C 0x4BA8 ... a 0xC00C
+C 0x4BAE el mando y el teclado...
+L 0x4BB1 a_los_mandos
+C 0x4BB1 ... a 0xC007
+B 0x4BB4 GUARDA A EN (HL) y en (HL - 1) lo recien pulsado: lo que esta a 1 ahora y no lo estaba antes.
+L 0x4BB4 recien_pulsado
+C 0x4BB4 lo de antes
+C 0x4BB5 lo de ahora
+C 0x4BB6 lo que cambia...
+C 0x4BB7 ... y esta a 1
+C 0x4BB9 a (HL - 1)
+B 0x4BBB EL MANDO Y EL TECLADO: el mando 1 (registro 14 del PSG con el 15 a 0x8F: las cuatro direcciones y los dos disparos, bits 0-5, a 1 si se pulsan) mezclado con la fila 8 del teclado (los cursores y el espacio) repartida en los mismos bits.
+L 0x4BBB el_mando_y_el_teclado
+C 0x4BBB el registro 15 a 0x8F...
+C 0x4BC2 ... y el 14: el mando 1
+C 0x4BC9 (a 1, pulsado)
+C 0x4BCA sus seis bits
+C 0x4BCD la fila 8 del teclado...
+C 0x4BD4 ... su bit 5
+C 0x4BD7 otra vez la fila 8...
+C 0x4BE0 ... su bit 4 al 2
+C 0x4BE8 ... dos mas a los bits 3 y 4
+C 0x4BEE ... y dos a los bits 0 y 1
+C 0x4BF2 junto con el mando
+L 0x4BF4 f1_a_f3
+C 0x4BF4 la fila 6 del teclado...
+C 0x4BF9 (a 1, pulsada)
+C 0x4BFA ... sus bits 5-7, F1, F2 y F3...
+C 0x4BFD ... a los bits 0-2
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
 F 0x44E9 16
@@ -927,27 +1215,17 @@ C 0x44D6 apunta a las vidas
 C 0x44E0 guarda la vida de Simon
 C 0x44E5 guarda la vida del enemigo (barra ENEMY)
 C 0x4516 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-C 0x453E apunta a la fase en BCD, la del marcador
 C 0x4566 apunta a los corazones, en BCD
-C 0x4569 apunta a el ESTADO del juego
 C 0x456E apunta a las vidas
-C 0x4594 apunta a los corazones, en BCD
-C 0x45A0 apunta a los corazones, en BCD
 C 0x45D1 apunta a la vida de Simon
 C 0x45E2 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x45E5 apunta a la vida del enemigo (barra ENEMY)
 C 0x4602 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-C 0x4605 apunta a la vida de Simon
-C 0x462B apunta a la vida de Simon
-C 0x463C apunta a la vida del enemigo (barra ENEMY)
 C 0x465A vram_para_leer: prepara el V9938 para leer de la direccion HL
 C 0x4676 vram_para_escribir: prepara el V9938 para escribir en la direccion HL
 C 0x468A vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-C 0x46F1 vram_para_escribir: prepara el V9938 para escribir en la direccion HL
 C 0x4729 voltea_dibujos: da la vuelta a dibujos que ya estan en la VRAM
-C 0x4739 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x4766 copia_a_la_vram: BC bytes de HL a la VRAM de DE
-C 0x4779 copia_a_la_vram: BC bytes de HL a la VRAM de DE
 C 0x4795 de_mas_a: DE += A
 C 0x47C0 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x47E6 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
@@ -968,11 +1246,8 @@ C 0x4A82 copia_a_la_vram: BC bytes de HL a la VRAM de DE
 C 0x4B16 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x4B3A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x4B64 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-C 0x4B6D rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x4B77 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-C 0x4B7A espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4B92 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
-C 0x4B9D lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x4D47 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x4D4D espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4D5A pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
