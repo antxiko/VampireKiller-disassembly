@@ -102,6 +102,109 @@ C 0xA4CF los tramos de 0xA4F3 o 0xA4F7...
 C 0xA4DB ... uno de cuatro, con la cuenta
 L 0xA4E8 sonido_si_simon_vive
 C 0xA4E8 el efecto A, salvo con Simon muerto (0xC420 = 6)
+B 0xA4FB EL TIPO 8: cruza la pantalla a 0x280 (hacia el lado contrario al que nace) subiendo y bajando alrededor de la altura a la que nacio: la velocidad vertical se tuerce 0x40 por cuadro hacia esa altura (0xA53B), asi que ondula. Dibujos 0x71-0x74 segun el lado y cada cuatro cuadros.
+L 0xA4FB nace_el_tipo_8
+C 0xA502 la altura alrededor de la que ondula
+C 0xA505 arranca subiendo
+C 0xA50E nacio a la izquierda: hacia la derecha...
+C 0xA515 ... y si no, hacia la izquierda
+L 0xA51B mueve_el_tipo_8
+C 0xA51B el dibujo 0x71...
+C 0xA520 ... o el 0x72 en la fase 0x15, que no existe (0-18): no sale nunca
+C 0xA526 cada cuatro cuadros, el siguiente
+C 0xA530 hacia la derecha, dos mas
+C 0xA53B por debajo de su altura: la velocidad vertical baja...
+C 0xA546 ... y por encima, sube: ondula
+C 0xA549 la velocidad vertical...
+C 0xA54F ... mas DE
+C 0xA551 hacia arriba, sin tope
+C 0xA556 hacia abajo, hasta 0x7FF
+L 0xA564 suma_a_la_velocidad_x
+C 0xA564 la velocidad horizontal...
+C 0xA56A ... mas DE
+B 0xA573 EL CABALLERO (el tipo 6; por su dibujo, con armadura y lanza). Anda a 0x160 y se da la vuelta contra una pared, al borde del suelo o de la pantalla; si Simon esta a su altura se vuelve hacia el y acelera (0xA653: 32 mas por VUELTA).
+L 0xA573 nace_el_caballero
+C 0xA577 sin velocidad vertical
+C 0xA583 hacia la derecha, a 0x160
+L 0xA592 mueve_el_caballero
+C 0xA595 la celda de delante: x + 0x14...
+C 0xA59D ... o x - 8 hacia la izquierda
+C 0xA5A6 pared delante? media vuelta
+C 0xA5AE sin suelo delante?
+C 0xA5B7 a la derecha...
+C 0xA5BC ... o a la izquierda
+C 0xA5BF sin suelo: media vuelta
+C 0xA5C1 contra el borde derecho de la pantalla...
+C 0xA5D0 ... o el izquierdo: media vuelta
+C 0xA5DC Simon a su altura?
+C 0xA5E1 ya lo sabia: sigue
+C 0xA5E7 a por el: 0x160 hacia Simon, mas lo de la vuelta
+C 0xA5F8 lo sabe
+C 0xA5FE Simon no esta a su altura
+C 0xA602 cada 0x60 cuadros...
+C 0xA608 ... media vuelta
+C 0xA60F la animacion: cada cuatro cuadros...
+C 0xA619 ... de 0xA627, una por lado
+L 0xA637 simon_a_su_altura
+C 0xA637 carry si Simon esta de y - 8 a y + 7
+L 0xA642 media_vuelta
+C 0xA642 la velocidad horizontal, cambiada de signo
+L 0xA653 velocidad_x_con_la_vuelta
+C 0xA653 DE = 0: parado
+C 0xA65A mas rapido en cada VUELTA: 32 por vuelta...
+C 0xA665 ... hacia donde vaya
+B 0xA670 EL MURCIELAGO (el tipo 0x0C; por su dibujo). Colgado 0x18 cuadros (dibujo 0x89); luego vuela hacia Simon a 0x200 en horizontal y, en vertical, con una de las cuatro velocidades de 0xA813 (Simon mas arriba) o 0xA81B (mas abajo); se para a 0x18 cuadros al llegar a un borde (0xA82D) o al frenar, se vuelve a lanzar y, al pasar junto a Simon, frena y da la vuelta. Pasos en 0xA686.
+L 0xA670 nace_el_murcielago
+C 0xA670 colgado 0x18 cuadros
+L 0xA67D mueve_el_murcielago
+C 0xA67D la cuenta de cuadros, para 0xA7F0
+L 0xA696 murcielago_colgado
+C 0xA69E a volar, hacia Simon
+L 0xA6A5 murcielago_frenando_en_vertical
+C 0xA6AC la vertical, 0x20 mas cerca de cero por cuadro
+C 0xA6C5 parado en vertical?
+C 0xA6CF quieto 0x18 cuadros
+L 0xA6D7 murcielago_quieto
+L 0xA6EA murcielago_otra_vez
+C 0xA6EE Simon a menos de 0x18 por debajo?
+C 0xA6F6 no: otro lanzamiento hacia el
+C 0xA6F9 si: en horizontal (paso 4)
+L 0xA6FE murcielago_en_horizontal
+C 0xA6FE 0x300 hacia la derecha...
+C 0xA70E ... o hacia la izquierda, hacia Simon
+C 0xA716 sin velocidad vertical
+C 0xA721 hasta 0x30 cuadros
+L 0xA728 murcielago_hasta_simon
+C 0xA72F se acabo el tiempo?
+C 0xA734 hacia la izquierda: hasta pasar a Simon
+C 0xA74B hacia la derecha: igual
+C 0xA75C otro lanzamiento
+L 0xA764 murcielago_frenando
+C 0xA76B la horizontal, 0x20 mas cerca de cero...
+C 0xA775 ... segun el lado
+C 0xA788 hasta dar la vuelta (0x02 o 0xFE)
+L 0xA793 murcielago_de_vuelta
+L 0xA797 aletea
+C 0xA797 dos dibujos por lado (0xA7B9)...
+C 0xA7A3 ... cambiando cada ocho cuadros
+L 0xA7BD lanza_el_murcielago
+C 0xA7BD 0x200 hacia Simon...
+C 0xA7CC ... salvo contra los bordes: por la derecha de 0xC0, a la izquierda...
+C 0xA7D3 ... y por la izquierda de 0x40, a la derecha
+C 0xA7E2 la vertical: de 0xA813 si Simon esta mas arriba...
+C 0xA7ED ... o de 0xA81B si esta mas abajo
+C 0xA7F0 una de cuatro, con la cuenta de cuadros
+C 0xA7FC subiendo cerca del techo (y < 0x40): hacia abajo
+C 0xA80B bajando cerca del suelo (y >= 0xC0): hacia arriba
+L 0xA823 hl_mas_a_con_signo
+C 0xA823 positivo: HL + A
+C 0xA828 negativo: HL + A - 0x100
+L 0xA82D murcielago_en_un_borde
+C 0xA82D bajando: el suelo, en y = 0xC0
+C 0xA83C subiendo: el techo, en y = 0x20
+C 0xA840 hacia la derecha: hasta x = 0xE8
+C 0xA84F hacia la izquierda: hasta x = 0x10
+C 0xA852 en un borde: quieto 0x18 cuadros, con carry
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -370,17 +473,13 @@ C 0xA4FF lee la y de la cosa
 C 0xA508 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA50B lee la x de la cosa
 C 0xA51D lee la FASE (0 el patio, 1-18)
-C 0xA526 sube la cuenta de cuadros del paso
 C 0xA529 mira el bit 2 de la cuenta de cuadros del paso
-C 0xA530 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA538 guarda el dibujo de la cosa
 C 0xA53E lee la y de la cosa
-C 0xA549 lee la velocidad vertical (parte baja)
 C 0xA54C lee la velocidad vertical
 C 0xA553 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA55D guarda la velocidad vertical (parte baja)
 C 0xA560 guarda la velocidad vertical
-C 0xA564 lee la velocidad horizontal (parte baja)
 C 0xA567 lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA56C guarda la velocidad horizontal (parte baja)
 C 0xA56F guarda la velocidad horizontal (el bit 7, hacia la izquierda)
@@ -393,58 +492,44 @@ C 0xA592 baja la cuenta de cuadros del paso
 C 0xA597 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA59F le suma la x de la cosa
 C 0xA5A3 lee la y de la cosa
-C 0xA5A6 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 C 0xA5AB lee la x de la cosa
 C 0xA5B1 va hacia la izquierda? (bit 7 de la velocidad horizontal)
-C 0xA5C1 lee la x de la cosa
 C 0xA5C8 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA5D5 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA5EA lee la X de Simon
 C 0xA5ED compara con la x de la cosa
-C 0xA602 lee la cuenta de cuadros del paso
-C 0xA608 la cuenta de cuadros del paso = 0x60
 C 0xA61C va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA633 guarda el dibujo de la cosa
-C 0xA637 lee la Y de Simon
 C 0xA63A le resta la y de la cosa
 C 0xA644 lee la velocidad horizontal (parte baja)
 C 0xA647 lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA64A niega_de: DE = -DE
 C 0xA64D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA655 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xA65A lee la VUELTA (0, 1 o 2)
 C 0xA667 niega_de: DE = -DE
 C 0xA66D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA674 el dibujo de la cosa = 0x89
 C 0xA680 lee el paso en que va la cosa
 C 0xA683 despacha: salta a la entrada A de la tabla que va detras del call
 C 0xA69A la cosa se mueve
-C 0xA69E sube el paso en que va la cosa
 C 0xA6AE mira el bit 7 de la velocidad vertical
 C 0xA6B6 lee la velocidad vertical
 C 0xA6B9 lee la velocidad vertical (parte baja)
 C 0xA6BF guarda la velocidad vertical
 C 0xA6C2 guarda la velocidad vertical (parte baja)
-C 0xA6C5 lee la velocidad vertical
 C 0xA6CA lee la velocidad vertical (parte baja)
 C 0xA6D3 sube el paso en que va la cosa
 C 0xA6DA la cosa se queda quieta
 C 0xA6E2 la cosa se mueve
 C 0xA6E6 sube el paso en que va la cosa
 C 0xA6EA el paso en que va la cosa = 0x01
-C 0xA6EE lee la Y de Simon
 C 0xA6F1 le resta la y de la cosa
-C 0xA6F9 el paso en que va la cosa = 0x04
-C 0xA6FE la velocidad horizontal (el bit 7, hacia la izquierda) = 0x03
 C 0xA702 la velocidad horizontal (parte baja) = 0x00
 C 0xA706 lee la X de Simon
 C 0xA709 compara con la x de la cosa
-C 0xA70E la velocidad horizontal (el bit 7, hacia la izquierda) = 0xFD
 C 0xA712 la velocidad horizontal (parte baja) = 0x00
-C 0xA716 la velocidad vertical = 0x00
 C 0xA71A la velocidad vertical (parte baja) = 0x00
 C 0xA71E sube el paso en que va la cosa
-C 0xA734 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA73E lee la X de Simon
 C 0xA743 compara con la x de la cosa
 C 0xA747 sube el paso en que va la cosa
@@ -463,20 +548,16 @@ C 0xA7B1 hl_mas_a: HL += A
 C 0xA7B5 guarda el dibujo de la cosa
 C 0xA7C3 lee la X de Simon
 C 0xA7C6 compara con la x de la cosa
-C 0xA7CC lee la x de la cosa
 C 0xA7DF pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA7E5 lee la Y de Simon
 C 0xA7E8 compara con la y de la cosa
 C 0xA7F6 hl_mas_a: HL += A
-C 0xA7FC lee la y de la cosa
 C 0xA805 niega_de: DE = -DE
 C 0xA808 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA80D niega_de: DE = -DE
 C 0xA810 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA825 hl_mas_a: HL += A
-C 0xA82D lee la y de la cosa
 C 0xA830 mira el bit 7 de la velocidad vertical
-C 0xA840 lee la x de la cosa
 C 0xA843 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA856 el paso en que va la cosa = 0x02
 C 0xA85C lee la x de la cosa
