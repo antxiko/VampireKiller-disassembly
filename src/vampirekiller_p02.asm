@@ -1789,7 +1789,7 @@ L_8A48:
 	pop bc			;8a48
 	ret			;8a49
 L_8A4A:
-	call L_8F55		;8a4a   ; mueve los objetos
+	call cuenta_de_lo_recogido		;8a4a   ; mueve los objetos
 	ld bc,00800h		;8a4d   ; ocho, y C cuenta cual es
 	ld hl,0c500h		;8a50   ; la lista de objetos
 L_8A53:
@@ -2028,7 +2028,7 @@ L_8BCC:
 	ret			;8bde
 L_8BDF:
 	ld (ix+003h),000h		;8bdf   ; paso 1: lo coge Simon
-	call L_8F68		;8be3   ; lo toca Simon?
+	call puede_abrirlo		;8be3   ; lo toca Simon?
 	ret nz			;8be6   ; no
 	ld a,(hl)			;8be7   ; el estado
 	and 07fh		;8be8
@@ -2213,7 +2213,7 @@ L_8D12:
 	pop de			;8d18
 	call L_884D		;8d19   ; al mapa
 	call L_926C		;8d1c   ; repinta
-	call L_916E		;8d1f
+	call puerta_de_la_fase_a_0xff		;8d1f
 	call L_8707		;8d22   ; y los marcos
 	pop de			;8d25
 	pop ix		;8d26
@@ -2225,7 +2225,7 @@ L_8D2C:
 	push hl			;8d2f   ; ... suena al volver
 L_8D30:
 	ld (0c419h),a		;8d30   ; el ultimo objeto recogido
-	call L_8F23		;8d33   ; cambia el arma repetida
+	call ensena_lo_recogido		;8d33   ; cambia el arma repetida
 	cp 01ah		;8d36   ; desde 0x1A son armas
 	jr nc,$+56		;8d38
 	dec a			;8d3a   ; desde el tipo 1
@@ -2496,14 +2496,14 @@ L_8EC9:
 L_8EE4:
 	jr L_8EA6		;8ee4
 L_8EE6:
-	call L_8F4A		;8ee6   ; REPINTA LO QUE LLEVA: los cinco bits de arriba de 0xC701
+	call borra_lo_que_lleva		;8ee6   ; REPINTA LO QUE LLEVA: los cinco bits de arriba de 0xC701
 	ld a,(0c701h)		;8ee9   ; lee lo que lleva Simon (un bit por objeto)
 	ld c,a			;8eec
 	ld b,005h		;8eed   ; cinco
 	xor a			;8eef   ; A cuenta cual
 L_8EF0:
 	rl c		;8ef0   ; el bit de arriba...
-	call c,L_8F05		;8ef2   ; ... puesto: se pinta
+	call c,pinta_lo_que_lleva		;8ef2   ; ... puesto: se pinta
 	inc a			;8ef5   ; el siguiente
 	djnz L_8EF0		;8ef6
 	ret			;8ef8
@@ -2521,18 +2521,18 @@ DATA_codigo_sin_llamar_8EF9:
 ; ======================================================================
 
 
-L_8F05:
-	push af			;8f05
+pinta_lo_que_lleva:
+	push af			;8f05   ; A = cual de los cinco (bits 7 a 3 de 0xC701)
 	push bc			;8f06
-	ld hl,08f19h		;8f07
-	add a,a			;8f0a
+	ld hl,08f19h		;8f07   ; su sitio y su dibujo, de 0x8F19...
+	add a,a			;8f0a   ; (dos bytes cada uno)
 	call 04061h		;8f0b   ; hl_mas_a: HL += A
-	ld d,(hl)			;8f0e
-	ld e,00ch		;8f0f
+	ld d,(hl)			;8f0e   ; D = la x en el marcador...
+	ld e,00ch		;8f0f   ; ... E = 0x0C, la fila
 	inc hl			;8f11
-	ld a,(hl)			;8f12
-	call L_8EA6		;8f13
-	pop bc			;8f16
+	ld a,(hl)			;8f12   ; A = el dibujo
+	call L_8EA6		;8f13   ; lo copia
+	pop bc			;8f16   ; B y A, para el bucle de quien llama
 	pop af			;8f17
 	ret			;8f18
 
@@ -2547,102 +2547,106 @@ DATA_cinco_pares:
 ; ======================================================================
 
 
-L_8F23:
-	cp 001h		;8f23
+ensena_lo_recogido:
+	cp 001h		;8f23   ; A = lo recogido: el 1 no se ensena...
 	ret z			;8f25
-	cp 01eh		;8f26
+	cp 01eh		;8f26   ; ... el 0x1E si...
 	jr z,L_8F2D		;8f28
-	cp 017h		;8f2a
+	cp 017h		;8f2a   ; ... y del 0x17 en adelante, no
 	ret nc			;8f2c
 L_8F2D:
 	push ix		;8f2d
 	push af			;8f2f
-	ld a,0ffh		;8f30
+	ld a,0ffh		;8f30   ; un rato (0xC5E5 = 0xFF)...
 	ld (0c5e5h),a		;8f32
-	ld a,020h		;8f35
+	ld a,020h		;8f35   ; ... de 0x20 pasos de cuenta
 	ld (0c5e6h),a		;8f37
-	call L_8F4A		;8f3a
-	ld de,0d00ch		;8f3d
+	call borra_lo_que_lleva		;8f3a   ; borra la zona de lo que lleva...
+	ld de,0d00ch		;8f3d   ; ... y pinta ahi, en (0xD0, 0x0C), lo recogido
 	ld a,(0c419h)		;8f40   ; lee el ultimo objeto recogido
 	call L_8EA6		;8f43
 	pop af			;8f46
 	pop ix		;8f47
 	ret			;8f49
-L_8F4A:
-	ld hl,0b80ch		;8f4a
-	ld bc,04010h		;8f4d
-	xor a			;8f50
+borra_lo_que_lleva:
+	ld hl,0b80ch		;8f4a   ; de (0xB8, 0x0C)...
+	ld bc,04010h		;8f4d   ; ... 0x40 x 0x10 puntos...
+	xor a			;8f50   ; ... del color 0 (D = 0)
 	ld d,a			;8f51
 	jp 0490ah		;8f52   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-L_8F55:
-	ld a,(0c5e5h)		;8f55
-	inc a			;8f58
-	ret nz			;8f59
+cuenta_de_lo_recogido:
+	ld a,(0c5e5h)		;8f55   ; ensenando lo recogido?
+	inc a			;8f58   ; (0xFF + 1 = 0)
+	ret nz			;8f59   ; no: nada
 	ld a,(0c003h)		;8f5a   ; lee el contador de cuadros
-	and 03fh		;8f5d
+	and 03fh		;8f5d   ; un cuadro de cada 64 no cuenta
 	ret z			;8f5f
-	ld hl,0c5e6h		;8f60
+	ld hl,0c5e6h		;8f60   ; la cuenta...
 	dec (hl)			;8f63
-	ret nz			;8f64
-	jp L_8EE6		;8f65
-L_8F68:
+	ret nz			;8f64   ; (aun no)
+	jp L_8EE6		;8f65   ; acabada: vuelve a pintar lo que lleva
+puede_abrirlo:
 	push hl			;8f68
-	ld a,(ix+004h)		;8f69   ; lee la fraccion de la x de la cosa
-	cp 019h		;8f6c
+	ld a,(ix+004h)		;8f69   ; el tipo del objeto (+4 en la lista de 0xC500)
+	cp 019h		;8f6c   ; el 0x19 (el cofre) pide un uso de 0xC700
 	jr nz,L_8F83		;8f6e
-	ld hl,0c700h		;8f70
+	ld hl,0c700h		;8f70   ; le quedan?
 	ld a,(hl)			;8f73
 	or a			;8f74
-	jr nz,L_8F7A		;8f75
-	inc a			;8f77
+	jr nz,L_8F7A		;8f75   ; si: a gastar uno
+	inc a			;8f77   ; no: A = 1, no se abre
 	pop hl			;8f78
 	ret			;8f79
 L_8F7A:
-	dec (hl)			;8f7a
-	ld a,011h		;8f7b
+	dec (hl)			;8f7a   ; gasta uno...
+	ld a,011h		;8f7b   ; ... con el efecto 0x11...
 	call 0509fh		;8f7d   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_8F80:
-	xor a			;8f80
+	xor a			;8f80   ; ... y A = 0: se abre
 	pop hl			;8f81
 	ret			;8f82
 L_8F83:
-	cp 017h		;8f83
+	cp 017h		;8f83   ; el 0x17 mira los bits 1 y 2 de lo que lleva...
 	ld b,006h		;8f85
 	jr z,L_8F8F		;8f87
-	cp 018h		;8f89
+	cp 018h		;8f89   ; ... el 0x18, el bit 0...
 	ld b,001h		;8f8b
-	jr nz,L_8F80		;8f8d
+	jr nz,L_8F80		;8f8d   ; ... y los demas se abren
 L_8F8F:
-	call L_8F94		;8f8f
+	call lleva_lo_de_b		;8f8f   ; NZ si lo lleva
 	pop hl			;8f92
 	ret			;8f93
-L_8F94:
+lleva_lo_de_b:
 	ld hl,0c701h		;8f94   ; apunta a lo que lleva Simon (un bit por objeto)
-	ld a,(hl)			;8f97
-	and b			;8f98
+	ld a,(hl)			;8f97   ; lo que lleva...
+	and b			;8f98   ; ... por la mascara de B
 	ret			;8f99
-L_8F9A:
-	ld a,(0c580h)		;8f9a
+
+; ----------------------------------------------------------------------
+; LAS TRES TRAMPAS DE CADENA de la habitacion 1 de la fase 6: tres registros de ocho bytes en 0xC580 ([estado][y][x][cada cuanto][cuenta][tope][cuenta del tope][...]) desde 0x8FBD, en x = 0x3C, 0x7C y 0xBC. Bajan de 4 en 4 (estado 1, cuando la cuenta y la mascara dan cero) y suben de 4 en 4 (estado 2, uno de cada cuatro cuadros), y cambian de sentido al llegar al tope de pasos; cada paso copia su dibujo de 32x16 de (0x80, 0x70) de la pagina 1 a (x, y - 4). Cotejado en tools/secretos.py.
+; ----------------------------------------------------------------------
+pon_las_trampas_de_cadena:
+	ld a,(0c580h)		;8f9a   ; ya puestas?
 	or a			;8f9d
-	ret nz			;8f9e
+	ret nz			;8f9e   ; si: nada
 L_8F9F:
 	ld hl,(0d000h)		;8f9f   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-	ld de,00106h		;8fa2
+	ld de,00106h		;8fa2   ; solo en la fase 6, habitacion 1
 	rst 20h			;8fa5
-	ret nz			;8fa6
-	ld hl,08fbdh		;8fa7
-	ld de,0c580h		;8faa
-	ld b,003h		;8fad
+	ret nz			;8fa6   ; (en otra, nada)
+	ld hl,08fbdh		;8fa7   ; los tres registros de 0x8FBD...
+	ld de,0c580h		;8faa   ; ... a 0xC580...
+	ld b,003h		;8fad   ; ... tres
 L_8FAF:
 	push bc			;8faf
-	ld bc,00006h		;8fb0
+	ld bc,00006h		;8fb0   ; seis bytes de cada uno...
 	ldir		;8fb3
-	xor a			;8fb5
+	xor a			;8fb5   ; ... y los dos siguientes a cero
 	ld (de),a			;8fb6
-	inc e			;8fb7
+	inc e			;8fb7   ; (el octavo, sin tocar)
 	inc e			;8fb8
 	pop bc			;8fb9
-	djnz L_8FAF		;8fba
+	djnz L_8FAF		;8fba   ; el siguiente
 	ret			;8fbc
 
 ; ----------------------------------------------------------------------
@@ -2658,121 +2662,125 @@ DATA_tres_registros_de_seis:
 ; ======================================================================
 
 
-L_8FCF:
-	call L_8F9A		;8fcf
+mueve_las_trampas_de_cadena:
+	call pon_las_trampas_de_cadena		;8fcf   ; puestas, si toca
 L_8FD2:
-	ld hl,0c580h		;8fd2
+	ld hl,0c580h		;8fd2   ; las tres de 0xC580
 	ld b,003h		;8fd5
 L_8FD7:
-	push hl			;8fd7
+	push hl			;8fd7   ; IX = la trampa
 	pop ix		;8fd8
 	push bc			;8fda
 	push hl			;8fdb
-	ld a,(hl)			;8fdc
+	ld a,(hl)			;8fdc   ; con estado?
 	or a			;8fdd
-	call nz,L_8FEA		;8fde
+	call nz,mueve_una_trampa		;8fde   ; si: se mueve
 	pop hl			;8fe1
 	pop bc			;8fe2
-	ld a,008h		;8fe3
+	ld a,008h		;8fe3   ; la siguiente, ocho bytes mas
 	add a,l			;8fe5
 	ld l,a			;8fe6
 	djnz L_8FD7		;8fe7
 	ret			;8fe9
-L_8FEA:
-	inc hl			;8fea
+mueve_una_trampa:
+	inc hl			;8fea   ; E = la y...
 	ld e,(hl)			;8feb
-	inc hl			;8fec
+	inc hl			;8fec   ; ... D = la x...
 	ld d,(hl)			;8fed
-	inc hl			;8fee
+	inc hl			;8fee   ; ... C = cada cuanto baja...
 	ld c,(hl)			;8fef
-	inc hl			;8ff0
+	inc hl			;8ff0   ; ... y la cuenta, una mas
 	inc (hl)			;8ff1
-	ld b,(hl)			;8ff2
+	ld b,(hl)			;8ff2   ; B = la cuenta
 	inc hl			;8ff3
-	dec a			;8ff4
-	jr nz,L_8FFE		;8ff5
-	ld a,c			;8ff7
+	dec a			;8ff4   ; estado 1 o 2?
+	jr nz,L_8FFE		;8ff5   ; 2: sube
+	ld a,c			;8ff7   ; 1, bajando: solo cuando la cuenta por la mascara da cero...
 	and b			;8ff8
 	ret nz			;8ff9
-	ld a,004h		;8ffa
+	ld a,004h		;8ffa   ; ... 4 abajo
 	jr L_9004		;8ffc
 L_8FFE:
-	ld a,003h		;8ffe
+	ld a,003h		;8ffe   ; 2, subiendo: uno de cada cuatro cuadros...
 	and b			;9000
 	ret nz			;9001
-	ld a,0fch		;9002
+	ld a,0fch		;9002   ; ... 4 arriba
 L_9004:
-	add a,e			;9004
+	add a,e			;9004   ; la y nueva
 	ld e,a			;9005
-	ld a,(hl)			;9006
+	ld a,(hl)			;9006   ; el tope de pasos...
 	inc hl			;9007
-	inc (hl)			;9008
-	sub (hl)			;9009
+	inc (hl)			;9008   ; ... la cuenta de pasos, una mas
+	sub (hl)			;9009   ; llega al tope?
 	jr nz,L_9015		;900a
-	ld (hl),a			;900c
-	ld a,(ix+000h)		;900d
+	ld (hl),a			;900c   ; si: la cuenta a cero...
+	ld a,(ix+000h)		;900d   ; ... y el estado de 1 a 2 o de 2 a 1
 	xor 003h		;9010
-	ld (ix+000h),a		;9012   ; guarda el tipo de la cosa
+	ld (ix+000h),a		;9012   ; (el estado de la trampa)
 L_9015:
-	ld (ix+001h),e		;9015   ; guarda el paso en que va la cosa
-	ld a,e			;9018
+	ld (ix+001h),e		;9015   ; la y de la trampa
+	ld a,e			;9018   ; cuatro por encima...
 	sub 004h		;9019
 	ld e,a			;901b
-	ld hl,08070h		;901c
-	ld bc,02010h		;901f
-	ld a,001h		;9022
+	ld hl,08070h		;901c   ; ... su dibujo, de (0x80, 0x70)...
+	ld bc,02010h		;901f   ; ... 32 x 16...
+	ld a,001h		;9022   ; ... de la pagina 1 a la 0
 	jp 04946h		;9024   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
-L_9027:
+las_trampas_de_cadena:
 	call L_8F9F		;9027
 	jp L_8FD2		;902a
-L_902D:
-	ld hl,0c598h		;902d
+
+; ----------------------------------------------------------------------
+; LAS PLATAFORMAS QUE SE MUEVEN (con sprites): la lista de 0x906C, [fase][habitacion][cuantas] y cuatro bytes por plataforma ([y][x][paso][cuadros]), las pone en 0xC598 (dos, de siete bytes, con su numero delante) al entrar en la habitacion. Solo la fase 5: una en la habitacion 1 (x = 0x60, 0x40 cuadros) y dos en la 4. Cada cuadro avanzan un punto y dan la vuelta al acabar sus cuadros (0x90B8); cada una son cuatro sprites (0x9112: patrones 0xD0/0xD4, colores 2 y 0x44 con CC en la fase 5; en otra, 0xD8/0xDC y 9/0x4C). Son sprites: no salen en las laminas del mapa.
+; ----------------------------------------------------------------------
+pon_las_plataformas:
+	ld hl,0c598h		;902d   ; ya puestas?
 	ld a,(hl)			;9030
-	or a			;9031
-	ret nz			;9032
-	ld hl,0906ch		;9033
+	or a			;9031   ; (0xC598)
+	ret nz			;9032   ; si: nada
+	ld hl,0906ch		;9033   ; la lista de 0x906C
 L_9036:
-	ld a,(hl)			;9036
+	ld a,(hl)			;9036   ; el 0xFF la acaba
 	inc a			;9037
 	ret z			;9038
-	dec a			;9039
+	dec a			;9039   ; la fase de la entrada
 	push hl			;903a
 	ld de,(0d000h)		;903b   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-	cp e			;903f
+	cp e			;903f   ; es esta fase?
 	jr nz,L_9060		;9040
 	inc hl			;9042
-	ld a,(hl)			;9043
+	ld a,(hl)			;9043   ; y esta habitacion?
 	cp d			;9044
 	jr nz,L_9060		;9045
 	inc hl			;9047
-	ld b,(hl)			;9048
+	ld b,(hl)			;9048   ; B = cuantas
 	inc hl			;9049
-	ld de,0c598h		;904a
-	ld c,001h		;904d
+	ld de,0c598h		;904a   ; a 0xC598...
+	ld c,001h		;904d   ; ... numeradas desde 1
 L_904F:
 	push bc			;904f
-	ld a,c			;9050
+	ld a,c			;9050   ; el numero...
 	ld (de),a			;9051
 	inc de			;9052
-	ld bc,00004h		;9053
+	ld bc,00004h		;9053   ; ... y sus cuatro bytes
 	ldir		;9056
-	inc de			;9058
+	inc de			;9058   ; dos bytes mas: la cuenta y la cuenta de la vuelta
 	inc de			;9059
 	pop bc			;905a
-	inc c			;905b
+	inc c			;905b   ; la siguiente
 	djnz L_904F		;905c
 	pop hl			;905e
 	ret			;905f
 L_9060:
 	pop hl			;9060
-	inc hl			;9061
+	inc hl			;9061   ; otra habitacion: salta la entrada...
 	inc hl			;9062
-	ld a,(hl)			;9063
+	ld a,(hl)			;9063   ; ... (tres bytes y cuatro por plataforma)
 	inc hl			;9064
 	add a,a			;9065
 	add a,a			;9066
 	call 04061h		;9067   ; hl_mas_a: HL += A
-	jr L_9036		;906a
+	jr L_9036		;906a   ; la siguiente entrada
 
 ; ----------------------------------------------------------------------
 ; DATOS dos_listas: dos listas que termina un 0xFF: la de 0x906C la recorre
@@ -2788,120 +2796,120 @@ DATA_dos_listas:
 ; ======================================================================
 
 
-L_909B:
-	ld hl,0c598h		;909b
+mueve_las_plataformas:
+	ld hl,0c598h		;909b   ; las dos de 0xC598
 	ld b,002h		;909e
 L_90A0:
 	push bc			;90a0
 	push hl			;90a1
-	ld a,(hl)			;90a2
+	ld a,(hl)			;90a2   ; puesta?
 	or a			;90a3
 	jr z,L_90AE		;90a4
 	push hl			;90a6
-	call L_90B8		;90a7
+	call mueve_una_plataforma		;90a7   ; se mueve...
 	pop hl			;90aa
-	call L_90D8		;90ab
+	call pinta_una_plataforma		;90ab   ; ... y se pinta
 L_90AE:
 	pop hl			;90ae
 	pop bc			;90af
-	ld de,00007h		;90b0
+	ld de,00007h		;90b0   ; la siguiente, siete bytes mas
 	add hl,de			;90b3
 	inc c			;90b4
 	djnz L_90A0		;90b5
 	ret			;90b7
-L_90B8:
+mueve_una_plataforma:
 	inc hl			;90b8
 	inc hl			;90b9
-	ld d,(hl)			;90ba
+	ld d,(hl)			;90ba   ; D = la x...
 	inc hl			;90bb
-	ld e,(hl)			;90bc
+	ld e,(hl)			;90bc   ; ... E = el paso (+1 o -1)...
 	inc hl			;90bd
-	ld c,(hl)			;90be
+	ld c,(hl)			;90be   ; ... C = los cuadros de ida
 	inc hl			;90bf
-	inc (hl)			;90c0
+	inc (hl)			;90c0   ; la cuenta de cuadros, una mas
 	ld a,(hl)			;90c1
 	inc hl			;90c2
-	inc (hl)			;90c3
+	inc (hl)			;90c3   ; la de la vuelta, una mas
 	ld a,c			;90c4
-	sub (hl)			;90c5
+	sub (hl)			;90c5   ; llega a los cuadros de ida?
 	jr nz,L_90C9		;90c6
-	ld (hl),a			;90c8
+	ld (hl),a			;90c8   ; si: a cero
 L_90C9:
-	dec hl			;90c9
+	dec hl			;90c9   ; HL = el paso
 	dec hl			;90ca
 	dec hl			;90cb
-	jr nz,L_90D3		;90cc
-	ld a,(hl)			;90ce
+	jr nz,L_90D3		;90cc   ; no ha llegado: a avanzar
+	ld a,(hl)			;90ce   ; ha llegado: el paso, del reves
 	neg		;90cf
 	ld (hl),a			;90d1
 	ret			;90d2
 L_90D3:
-	dec hl			;90d3
-	ld a,d			;90d4
+	dec hl			;90d3   ; la x...
+	ld a,d			;90d4   ; ... mas el paso
 	add a,e			;90d5
 	ld (hl),a			;90d6
 	ret			;90d7
-L_90D8:
-	ld a,(hl)			;90d8
+pinta_una_plataforma:
+	ld a,(hl)			;90d8   ; su numero
 	push af			;90d9
 	inc hl			;90da
-	ld de,0d638h		;90db
+	ld de,0d638h		;90db   ; la primera, en los sprites de 0xD638...
 	dec a			;90de
 	jr z,L_90E4		;90df
-	ld de,0d648h		;90e1
+	ld de,0d648h		;90e1   ; ... la segunda, en los de 0xD648
 L_90E4:
-	call L_9112		;90e4
+	call sprites_de_una_plataforma		;90e4   ; los cuatro sprites
 	pop af			;90e7
-	ld hl,0d4e0h		;90e8
+	ld hl,0d4e0h		;90e8   ; los colores de la primera, en 0xD4E0...
 	dec a			;90eb
 	jr z,L_90F1		;90ec
-	ld hl,0d520h		;90ee
+	ld hl,0d520h		;90ee   ; ... los de la segunda, en 0xD520
 L_90F1:
-	ld de,00244h		;90f1
+	ld de,00244h		;90f1   ; en la fase 5, 2 y 0x44...
 	ld a,(0d000h)		;90f4   ; lee la FASE (0 el patio, 1-18)
 	cp 005h		;90f7
 	jr z,L_90FE		;90f9
-	ld de,0094ch		;90fb
+	ld de,0094ch		;90fb   ; ... en otra, 9 y 0x4C
 L_90FE:
-	ld a,d			;90fe
-	call L_910B		;90ff
+	ld a,d			;90fe   ; los cuatro sprites: D, E, D, E
+	call dieciseis_lineas_de_un_color		;90ff
 	ld a,e			;9102
-	call L_910B		;9103
+	call dieciseis_lineas_de_un_color		;9103
 	ld a,d			;9106
-	call L_910B		;9107
+	call dieciseis_lineas_de_un_color		;9107
 	ld a,e			;910a
-L_910B:
-	ld b,010h		;910b
+dieciseis_lineas_de_un_color:
+	ld b,010h		;910b   ; las 16 lineas del sprite, del color A
 L_910D:
 	ld (hl),a			;910d
 	inc hl			;910e
 	djnz L_910D		;910f
 	ret			;9111
-L_9112:
-	ld ix,0913fh		;9112
-	ld b,004h		;9116
+sprites_de_una_plataforma:
+	ld ix,0913fh		;9112   ; los desplazamientos y patrones de 0x913F
+	ld b,004h		;9116   ; cuatro sprites
 L_9118:
 	push bc			;9118
 	push hl			;9119
-	ld a,(hl)			;911a
+	ld a,(hl)			;911a   ; la y, menos uno
 	dec a			;911b
 	ld (de),a			;911c
 	inc hl			;911d
 	inc de			;911e
-	ld a,(ix+000h)		;911f
+	ld a,(ix+000h)		;911f   ; la x, mas su desplazamiento (0 o 0x10)
 	add a,(hl)			;9122
 	ld (de),a			;9123
 	inc hl			;9124
 	inc de			;9125
-	ld c,(ix+001h)		;9126
+	ld c,(ix+001h)		;9126   ; el patron (0xD0 o 0xD4)...
 	ld a,(0d000h)		;9129   ; lee la FASE (0 el patio, 1-18)
-	cp 005h		;912c
+	cp 005h		;912c   ; ... en la fase 5...
 	ld a,c			;912e
 	jr z,L_9133		;912f
-	add a,008h		;9131
+	add a,008h		;9131   ; ... y en otra, 8 mas
 L_9133:
 	ld (de),a			;9133
-	inc de			;9134
+	inc de			;9134   ; el siguiente sprite, cuatro bytes mas
 	inc de			;9135
 	inc ix		;9136
 	inc ix		;9138
@@ -2921,39 +2929,39 @@ DATA_cuatro_pares:
 ; ======================================================================
 
 
-L_9147:
+abre_la_puerta_de_la_fase:
 	ld hl,0c5ach		;9147   ; apunta a el estado de la puerta de la fase
-	ld a,(hl)			;914a
+	ld a,(hl)			;914a   ; 0xFF?
 	inc a			;914b
-	jp z,053fch		;914c
-	cp 003h		;914f
-	ret nz			;9151
+	jp z,053fch		;914c   ; si: a 0x53FC
+	cp 003h		;914f   ; 2: abriendose
+	ret nz			;9151   ; (lo demas: nada)
 	inc l			;9152
-	ld e,(hl)			;9153
+	ld e,(hl)			;9153   ; E = la y de la puerta...
 	inc l			;9154
-	ld d,(hl)			;9155
+	ld d,(hl)			;9155   ; ... D = la x...
 	inc l			;9156
-	inc (hl)			;9157
+	inc (hl)			;9157   ; ... y una linea mas
 	ld a,(hl)			;9158
-	cp 02ch		;9159
+	cp 02ch		;9159   ; 0x2C lineas?
 	jr nc,L_9168		;915b
-	ld h,d			;915d
+	ld h,d			;915d   ; no: la puerta, de (x, y + 1)...
 	ld l,e			;915e
 	inc l			;915f
-	ld bc,0082fh		;9160
-	ld a,000h		;9163
+	ld bc,0082fh		;9160   ; ... 8 x 0x2F puntos...
+	ld a,000h		;9163   ; ... a (x, y) en la pagina 0: sube una linea
 	jp 04946h		;9165   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_9168:
-	ld a,003h		;9168
+	ld a,003h		;9168   ; abierta: estado 3
 	ld (0c5ach),a		;916a   ; guarda el estado de la puerta de la fase
 	ret			;916d
-L_916E:
+puerta_de_la_fase_a_0xff:
 	ld hl,0c5ach		;916e   ; apunta a el estado de la puerta de la fase
 	ld a,(hl)			;9171
-	dec a			;9172
-	ret nz			;9173
-	ld (hl),0ffh		;9174
-	jp L_9147		;9176
+	dec a			;9172   ; estado 1?
+	ret nz			;9173   ; no: nada
+	ld (hl),0ffh		;9174   ; si: 0xFF, y a 0x53FC
+	jp abre_la_puerta_de_la_fase		;9176
 L_9179:
 	ld (0c70dh),hl		;9179
 	call L_91A2		;917c
@@ -3600,8 +3608,8 @@ L_95B3:
 	bit 1,a		;95b6
 	ret z			;95b8
 	call 04f91h		;95b9
-	call L_9027		;95bc
-	call L_916E		;95bf
+	call las_trampas_de_cadena		;95bc
+	call puerta_de_la_fase_a_0xff		;95bf
 	call L_926C		;95c2
 	call L_8707		;95c5
 	call 04809h		;95c8

@@ -1,6 +1,173 @@
 # Notas del banco 02: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+L 0x8F05 pinta_lo_que_lleva
+C 0x8F05 A = cual de los cinco (bits 7 a 3 de 0xC701)
+C 0x8F07 su sitio y su dibujo, de 0x8F19...
+C 0x8F0A (dos bytes cada uno)
+C 0x8F0E D = la x en el marcador...
+C 0x8F0F ... E = 0x0C, la fila
+C 0x8F12 A = el dibujo
+C 0x8F13 lo copia
+C 0x8F16 B y A, para el bucle de quien llama
+L 0x8F23 ensena_lo_recogido
+C 0x8F23 A = lo recogido: el 1 no se ensena...
+C 0x8F26 ... el 0x1E si...
+C 0x8F2A ... y del 0x17 en adelante, no
+C 0x8F30 un rato (0xC5E5 = 0xFF)...
+C 0x8F35 ... de 0x20 pasos de cuenta
+C 0x8F3A borra la zona de lo que lleva...
+C 0x8F3D ... y pinta ahi, en (0xD0, 0x0C), lo recogido
+L 0x8F4A borra_lo_que_lleva
+C 0x8F4A de (0xB8, 0x0C)...
+C 0x8F4D ... 0x40 x 0x10 puntos...
+C 0x8F50 ... del color 0 (D = 0)
+L 0x8F55 cuenta_de_lo_recogido
+C 0x8F55 ensenando lo recogido?
+C 0x8F58 (0xFF + 1 = 0)
+C 0x8F59 no: nada
+C 0x8F5D un cuadro de cada 64 no cuenta
+C 0x8F60 la cuenta...
+C 0x8F64 (aun no)
+C 0x8F65 acabada: vuelve a pintar lo que lleva
+L 0x8F68 puede_abrirlo
+C 0x8F69 el tipo del objeto (+4 en la lista de 0xC500)
+C 0x8F6C el 0x19 (el cofre) pide un uso de 0xC700
+C 0x8F70 le quedan?
+C 0x8F75 si: a gastar uno
+C 0x8F77 no: A = 1, no se abre
+C 0x8F7A gasta uno...
+C 0x8F7B ... con el efecto 0x11...
+C 0x8F80 ... y A = 0: se abre
+C 0x8F83 el 0x17 mira los bits 1 y 2 de lo que lleva...
+C 0x8F89 ... el 0x18, el bit 0...
+C 0x8F8D ... y los demas se abren
+C 0x8F8F NZ si lo lleva
+L 0x8F94 lleva_lo_de_b
+C 0x8F97 lo que lleva...
+C 0x8F98 ... por la mascara de B
+B 0x8F9A LAS TRES TRAMPAS DE CADENA de la habitacion 1 de la fase 6: tres registros de ocho bytes en 0xC580 ([estado][y][x][cada cuanto][cuenta][tope][cuenta del tope][...]) desde 0x8FBD, en x = 0x3C, 0x7C y 0xBC. Bajan de 4 en 4 (estado 1, cuando la cuenta y la mascara dan cero) y suben de 4 en 4 (estado 2, uno de cada cuatro cuadros), y cambian de sentido al llegar al tope de pasos; cada paso copia su dibujo de 32x16 de (0x80, 0x70) de la pagina 1 a (x, y - 4). Cotejado en tools/secretos.py.
+L 0x8F9A pon_las_trampas_de_cadena
+C 0x8F9A ya puestas?
+C 0x8F9E si: nada
+C 0x8FA2 solo en la fase 6, habitacion 1
+C 0x8FA6 (en otra, nada)
+C 0x8FA7 los tres registros de 0x8FBD...
+C 0x8FAA ... a 0xC580...
+C 0x8FAD ... tres
+C 0x8FB0 seis bytes de cada uno...
+C 0x8FB5 ... y los dos siguientes a cero
+C 0x8FB7 (el octavo, sin tocar)
+C 0x8FBA el siguiente
+L 0x8FCF mueve_las_trampas_de_cadena
+C 0x8FCF puestas, si toca
+C 0x8FD2 las tres de 0xC580
+C 0x8FD7 IX = la trampa
+C 0x8FDC con estado?
+C 0x8FDE si: se mueve
+C 0x8FE3 la siguiente, ocho bytes mas
+L 0x8FEA mueve_una_trampa
+C 0x8FEA E = la y...
+C 0x8FEC ... D = la x...
+C 0x8FEE ... C = cada cuanto baja...
+C 0x8FF0 ... y la cuenta, una mas
+C 0x8FF2 B = la cuenta
+C 0x8FF4 estado 1 o 2?
+C 0x8FF5 2: sube
+C 0x8FF7 1, bajando: solo cuando la cuenta por la mascara da cero...
+C 0x8FFA ... 4 abajo
+C 0x8FFE 2, subiendo: uno de cada cuatro cuadros...
+C 0x9002 ... 4 arriba
+C 0x9004 la y nueva
+C 0x9006 el tope de pasos...
+C 0x9008 ... la cuenta de pasos, una mas
+C 0x9009 llega al tope?
+C 0x900C si: la cuenta a cero...
+C 0x900D ... y el estado de 1 a 2 o de 2 a 1
+C 0x9012 (el estado de la trampa)
+C 0x9015 la y de la trampa
+C 0x9018 cuatro por encima...
+C 0x901C ... su dibujo, de (0x80, 0x70)...
+C 0x901F ... 32 x 16...
+C 0x9022 ... de la pagina 1 a la 0
+L 0x9027 las_trampas_de_cadena
+B 0x902D LAS PLATAFORMAS QUE SE MUEVEN (con sprites): la lista de 0x906C, [fase][habitacion][cuantas] y cuatro bytes por plataforma ([y][x][paso][cuadros]), las pone en 0xC598 (dos, de siete bytes, con su numero delante) al entrar en la habitacion. Solo la fase 5: una en la habitacion 1 (x = 0x60, 0x40 cuadros) y dos en la 4. Cada cuadro avanzan un punto y dan la vuelta al acabar sus cuadros (0x90B8); cada una son cuatro sprites (0x9112: patrones 0xD0/0xD4, colores 2 y 0x44 con CC en la fase 5; en otra, 0xD8/0xDC y 9/0x4C). Son sprites: no salen en las laminas del mapa.
+L 0x902D pon_las_plataformas
+C 0x902D ya puestas?
+C 0x9031 (0xC598)
+C 0x9032 si: nada
+C 0x9033 la lista de 0x906C
+C 0x9036 el 0xFF la acaba
+C 0x9039 la fase de la entrada
+C 0x903F es esta fase?
+C 0x9043 y esta habitacion?
+C 0x9048 B = cuantas
+C 0x904A a 0xC598...
+C 0x904D ... numeradas desde 1
+C 0x9050 el numero...
+C 0x9053 ... y sus cuatro bytes
+C 0x9058 dos bytes mas: la cuenta y la cuenta de la vuelta
+C 0x905B la siguiente
+C 0x9061 otra habitacion: salta la entrada...
+C 0x9063 ... (tres bytes y cuatro por plataforma)
+C 0x906A la siguiente entrada
+L 0x909B mueve_las_plataformas
+C 0x909B las dos de 0xC598
+C 0x90A2 puesta?
+C 0x90A7 se mueve...
+C 0x90AB ... y se pinta
+C 0x90B0 la siguiente, siete bytes mas
+L 0x90B8 mueve_una_plataforma
+C 0x90BA D = la x...
+C 0x90BC ... E = el paso (+1 o -1)...
+C 0x90BE ... C = los cuadros de ida
+C 0x90C0 la cuenta de cuadros, una mas
+C 0x90C3 la de la vuelta, una mas
+C 0x90C5 llega a los cuadros de ida?
+C 0x90C8 si: a cero
+C 0x90C9 HL = el paso
+C 0x90CC no ha llegado: a avanzar
+C 0x90CE ha llegado: el paso, del reves
+C 0x90D3 la x...
+C 0x90D4 ... mas el paso
+L 0x90D8 pinta_una_plataforma
+C 0x90D8 su numero
+C 0x90DB la primera, en los sprites de 0xD638...
+C 0x90E1 ... la segunda, en los de 0xD648
+C 0x90E4 los cuatro sprites
+C 0x90E8 los colores de la primera, en 0xD4E0...
+C 0x90EE ... los de la segunda, en 0xD520
+C 0x90F1 en la fase 5, 2 y 0x44...
+C 0x90FB ... en otra, 9 y 0x4C
+C 0x90FE los cuatro sprites: D, E, D, E
+L 0x910B dieciseis_lineas_de_un_color
+C 0x910B las 16 lineas del sprite, del color A
+L 0x9112 sprites_de_una_plataforma
+C 0x9112 los desplazamientos y patrones de 0x913F
+C 0x9116 cuatro sprites
+C 0x911A la y, menos uno
+C 0x911F la x, mas su desplazamiento (0 o 0x10)
+C 0x9126 el patron (0xD0 o 0xD4)...
+C 0x912C ... en la fase 5...
+C 0x9131 ... y en otra, 8 mas
+C 0x9134 el siguiente sprite, cuatro bytes mas
+L 0x9147 abre_la_puerta_de_la_fase
+C 0x914A 0xFF?
+C 0x914C si: a 0x53FC
+C 0x914F 2: abriendose
+C 0x9151 (lo demas: nada)
+C 0x9153 E = la y de la puerta...
+C 0x9155 ... D = la x...
+C 0x9157 ... y una linea mas
+C 0x9159 0x2C lineas?
+C 0x915D no: la puerta, de (x, y + 1)...
+C 0x9160 ... 8 x 0x2F puntos...
+C 0x9163 ... a (x, y) en la pagina 0: sube una linea
+C 0x9168 abierta: estado 3
+L 0x916E puerta_de_la_fase_a_0xff
+C 0x9172 estado 1?
+C 0x9173 no: nada
+C 0x9174 si: 0xFF, y a 0x53FC
 C 0x8001 (viene de p01:7FFE, la instruccion partida entre bancos)
 C 0x8002 lo que hay en esa ficha
 C 0x8003 es el 0x1B?
@@ -1068,12 +1235,9 @@ C 0x8F0B hl_mas_a: HL += A
 C 0x8F40 lee el ultimo objeto recogido
 C 0x8F52 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x8F5A lee el contador de cuadros
-C 0x8F69 lee la fraccion de la x de la cosa
 C 0x8F7D sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x8F94 apunta a lo que lleva Simon (un bit por objeto)
 C 0x8F9F lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-C 0x9012 guarda el tipo de la cosa
-C 0x9015 guarda el paso en que va la cosa
 C 0x9024 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x903B lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 C 0x9067 hl_mas_a: HL += A
