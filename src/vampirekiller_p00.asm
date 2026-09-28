@@ -434,7 +434,7 @@ L_42BF:
 	ld hl,0c004h		;42c4   ; apunta a la espera del estado, en cuadros
 	dec (hl)			;42c7
 	ret nz			;42c8
-	ld hl,0c002h		;42c9
+	ld hl,0c002h		;42c9   ; apunta a las banderas de la partida (bit 7: de verdad, no la demostracion)
 	ld a,(hl)			;42cc
 	and 0bfh		;42cd
 	ld (hl),a			;42cf
@@ -445,7 +445,7 @@ L_42D3:
 	xor a			;42d8
 	ld h,a			;42d9
 	ld l,a			;42da
-	ld (0c405h),hl		;42db
+	ld (0c405h),hl		;42db   ; guarda el MARCADOR, tres bytes en BCD
 	ld (0c407h),a		;42de
 	jr L_429B		;42e1
 L_42E3:
@@ -571,7 +571,7 @@ L_4391:
 	and 030h		;43a7
 	ret z			;43a9
 	ld a,040h		;43aa
-	ld (0c002h),a		;43ac
+	ld (0c002h),a		;43ac   ; guarda las banderas de la partida (bit 7: de verdad, no la demostracion)
 	ld a,(0e600h)		;43af   ; lee si se puede pausar (partida en marcha)
 	or a			;43b2
 	jr nz,L_43C4		;43b3
@@ -722,7 +722,7 @@ L_44B8:
 	ld a,001h		;44c1
 	jp copia_rectangulo		;44c3   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_44C6:
-	ld hl,0c405h		;44c6
+	ld hl,0c405h		;44c6   ; apunta a el MARCADOR, tres bytes en BCD
 	ld bc,01bfbh		;44c9
 	ld d,h			;44cc
 	ld e,l			;44cd
@@ -754,32 +754,36 @@ DATA_valores_iniciales_de_la_partida:
 
 L_44EC:
 	ld c,000h		;44ec
+
+; ----------------------------------------------------------------------
+; SUMA AL MARCADOR C D E, en BCD (decenas de millar, centenas, unidades), solo en una partida de verdad (bit 7 de 0xC002); se planta en 999999.
+; ----------------------------------------------------------------------
 L_44EE:
-	ld a,(0c002h)		;44ee
-	add a,a			;44f1
-	ret p			;44f2
-	ld hl,0c405h		;44f3
+	ld a,(0c002h)		;44ee   ; en la demostracion...
+	add a,a			;44f1   ; ... (bit 7 a cero)...
+	ret p			;44f2   ; ... no se cuentan puntos
+	ld hl,0c405h		;44f3   ; el marcador, tres bytes en BCD
 	ld a,(hl)			;44f6
-	add a,e			;44f7
-	daa			;44f8
-	ld (hl),a			;44f9
+	add a,e			;44f7   ; las unidades y decenas
+	daa			;44f8   ; 
+	ld (hl),a			;44f9   ; 
 	inc l			;44fa
-	ld a,(hl)			;44fb
+	ld a,(hl)			;44fb   ; centenas y millares, con el acarreo
 	adc a,d			;44fc
-	daa			;44fd
-	ld (hl),a			;44fe
+	daa			;44fd   ; 
+	ld (hl),a			;44fe   ; 
 	inc hl			;44ff
-	ld a,(hl)			;4500
+	ld a,(hl)			;4500   ; decenas y centenas de millar
 	adc a,c			;4501
-	daa			;4502
-	ld (hl),a			;4503
-	jr nc,L_4531		;4504
-	ld bc,09999h		;4506
+	daa			;4502   ; 
+	ld (hl),a			;4503   ; 
+	jr nc,L_4531		;4504   ; sin desbordar: listo
+	ld bc,09999h		;4506   ; se paso de 999999: se queda ahi
 	ld (0c402h),bc		;4509
 	ld (0c403h),bc		;450d
 	jr L_4531		;4511
 L_4513:
-	ld hl,04c00h		;4513
+	ld hl,04c00h		;4513   ; el marcador de arriba: SCORE-, PLAYER, ENEMY, corazones, P- y STAGE-
 	call rotulo		;4516   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 	call L_453B		;4519
 	call L_4566		;451c
@@ -1997,7 +2001,7 @@ DATA_registros_del_vdp:
 
 
 L_4B9D:
-	ld a,(0c002h)		;4b9d
+	ld a,(0c002h)		;4b9d   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 	and 040h		;4ba0
 	jp z,L_4E2E		;4ba2
 	call L_4BF4		;4ba5
@@ -2585,121 +2589,129 @@ L_5013:
 	pop hl			;5073
 	ei			;5074
 	ret			;5075
+
+; ----------------------------------------------------------------------
+; INICIA EL SONIDO: el mezclador con los tres tonos abiertos (0xBC) y todos los canales a la rutina de reposo. 0x5085 es la parte que se usa tambien para callarlo todo (sonido 0).
+; ----------------------------------------------------------------------
 L_5076:
-	ld a,0bch		;5076
+	ld a,0bch		;5076   ; 0xBC: tonos abiertos, ruidos cerrados, el puerto A de entrada (los mandos)
 	ld (0c097h),a		;5078   ; guarda la copia del registro 7 del PSG (el mezclador)
-	xor a			;507b
+	xor a			;507b   ; sin fundido
 	ld (0c0a5h),a		;507c   ; guarda la cuenta del fundido de la musica
 	ld (0c0a6h),a		;507f   ; guarda el volumen que se le resta a la musica
 	ld (0c0a7h),a		;5082
 L_5085:
-	xor a			;5085
+	xor a			;5085   ; sin efecto sonando
 	ld (0c096h),a		;5086   ; guarda la prioridad del efecto que suena
 	ld (0c098h),a		;5089   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 	ld (0c0a8h),a		;508c
-	ld hl,089ceh		;508f
+	ld hl,089ceh		;508f   ; los cuatro manejadores a canal_en_reposo
 	ld (0c010h),hl		;5092   ; guarda el manejador del canal A del sonido
 	ld (0c012h),hl		;5095   ; guarda el manejador del canal B
 	ld (0c014h),hl		;5098   ; guarda el manejador del canal C
 	ld (0c016h),hl		;509b   ; guarda el manejador del efecto de sonido
 L_509E:
-	ret			;509e
+	ret			;509e   ; (este `ret` hace tambien de manejador vacio: p00:511C lo pone en el canal de los efectos)
+
+; ----------------------------------------------------------------------
+; SONIDO: el numero en A. 0 lo calla todo; 0x80-0xFA es una musica (tres canales, tabla de 0x8DC9); 1-0x7F un efecto, que solo suena si su numero no es menor que el del que ya suena (0xC096 hace de prioridad); 0xFB y 0xFC ponen y quitan el segundo efecto (0x948B) guardando lo que habia; 0xFD y 0xFE hacen lo mismo con la musica de la pausa (0x9463); 0xFF funde la musica. Todo con los bancos 14 y 15, que al final se cambian por 1, 2 y 3.
+; ----------------------------------------------------------------------
 sonido:
-	push hl			;509f
+	push hl			;509f   ; lo guarda todo
 	push de			;50a0
 	push bc			;50a1
 	push af			;50a2
-	di			;50a3
-	ld a,00eh		;50a4
+	di			;50a3   ; los bancos del sonido, con su copia
+	ld a,00eh		;50a4   ; el 14
 	ld (08000h),a		;50a6   ; el mapper: pone en 0x8000 el banco de A
 	ld (0f0f2h),a		;50a9   ; guarda la copia del banco de 0x8000
 	ei			;50ac
 	di			;50ad
-	ld a,00fh		;50ae
+	ld a,00fh		;50ae   ; el 15
 	ld (0a000h),a		;50b0   ; el mapper: pone en 0xA000 el banco de A
 	ld (0f0f3h),a		;50b3   ; guarda la copia del banco de 0xA000
 	ei			;50b6
-	pop af			;50b7
+	pop af			;50b7   ; el numero
 	di			;50b8
-	or a			;50b9
+	or a			;50b9   ; 0: callarlo todo
 	jp z,L_51A4		;50ba
-	cp 0fbh		;50bd
+	cp 0fbh		;50bd   ; 0xFB en adelante: las ordenes especiales
 	jp nc,L_51AA		;50bf
 	or a			;50c2
-	jp p,L_516A		;50c3
-	ld de,0c01ch		;50c6
-	ld hl,05156h		;50c9
+	jp p,L_516A		;50c3   ; bit 7 a cero: un efecto
+	ld de,0c01ch		;50c6   ; una MUSICA: los tres canales, limpios
+	ld hl,05156h		;50c9   ; con los 20 bytes del canal en reposo
 	ld bc,00014h		;50cc
 	ldir		;50cf
-	ld hl,05156h		;50d1
+	ld hl,05156h		;50d1   ; el segundo canal (0xC030)
 	ld bc,00014h		;50d4
 	ldir		;50d7
-	ld hl,05156h		;50d9
+	ld hl,05156h		;50d9   ; el tercero (0xC044)
 	ld bc,00014h		;50dc
 	ldir		;50df
-	and 07fh		;50e1
-	rlca			;50e3
+	and 07fh		;50e1   ; el numero de musica
+	rlca			;50e3   ; por dos...
 	ld e,a			;50e4
-	rlca			;50e5
+	rlca			;50e5   ; ... y por cuatro: por seis
 	add a,e			;50e6
-	ld hl,08dc9h		;50e7
+	ld hl,08dc9h		;50e7   ; la tabla de musicas
 	add a,l			;50ea
 	ld l,a			;50eb
 	jr nc,L_50EF		;50ec
 	inc h			;50ee
 L_50EF:
-	ld e,(hl)			;50ef
+	ld e,(hl)			;50ef   ; la partitura del canal A
 	inc hl			;50f0
 	ld d,(hl)			;50f1
 	inc hl			;50f2
-	ld (0c01ch),de		;50f3
-	ld e,(hl)			;50f7
+	ld (0c01ch),de		;50f3   ; a su ficha
+	ld e,(hl)			;50f7   ; la del canal B
 	inc hl			;50f8
 	ld d,(hl)			;50f9
 	inc hl			;50fa
-	ld (0c030h),de		;50fb
-	ld e,(hl)			;50ff
+	ld (0c030h),de		;50fb   ; a su ficha
+	ld e,(hl)			;50ff   ; la del canal C
 	inc hl			;5100
 	ld d,(hl)			;5101
-	ld (0c044h),de		;5102
-	ld hl,08a64h		;5106
+	ld (0c044h),de		;5102   ; a su ficha
+	ld hl,08a64h		;5106   ; los manejadores de los tres canales
 	ld (0c010h),hl		;5109   ; guarda el manejador del canal A del sonido
 	ld hl,08a6bh		;510c
 	ld (0c012h),hl		;510f   ; guarda el manejador del canal B
 	ld hl,08a72h		;5112
 	ld (0c014h),hl		;5115   ; guarda el manejador del canal C
-	xor a			;5118
+	xor a			;5118   ; ningun efecto
 	ld (0c096h),a		;5119   ; guarda la prioridad del efecto que suena
-	ld hl,l509eh		;511c
+	ld hl,l509eh		;511c   ; y el de los efectos, a un `ret`
 	ld (0c016h),hl		;511f   ; guarda el manejador del efecto de sonido
-	ld a,(0c098h)		;5122   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
+	ld a,(0c098h)		;5122   ; quita el bit 1 de las banderas
 	and 0fdh		;5125
 	ld (0c098h),a		;5127   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 L_512A:
-	xor a			;512a
+	xor a			;512a   ; sin fundido
 	ld (0c0a5h),a		;512b   ; guarda la cuenta del fundido de la musica
 	ld (0c0a6h),a		;512e   ; guarda el volumen que se le resta a la musica
 	ld (0c0a8h),a		;5131
-	ld a,007h		;5134
+	ld a,007h		;5134   ; la cuenta de 0xC0A7 a 7
 	ld (0c0a7h),a		;5136
 L_5139:
-	di			;5139
+	di			;5139   ; y se vuelven a poner los bancos 1, 2 y 3
 	push hl			;513a
 	ld hl,0f0f1h		;513b   ; apunta a la copia del banco de 0x6000
-	ld a,001h		;513e
+	ld a,001h		;513e   ; el 1 en 0x6000
 	ld (06000h),a		;5140   ; el mapper: pone en 0x6000 el banco de A
-	ld (hl),a			;5143
-	inc a			;5144
+	ld (hl),a			;5143   ; y en su copia
+	inc a			;5144   ; el 2 en 0x8000
 	ld (08000h),a		;5145   ; el mapper: pone en 0x8000 el banco de A
 	inc hl			;5148
-	ld (hl),a			;5149
-	inc a			;514a
+	ld (hl),a			;5149   ; y en su copia
+	inc a			;514a   ; el 3 en 0xA000
 	ld (0a000h),a		;514b   ; el mapper: pone en 0xA000 el banco de A
 	inc hl			;514e
-	ld (hl),a			;514f
+	ld (hl),a			;514f   ; y en su copia
 	pop hl			;5150
 	ei			;5151
-	pop bc			;5152
+	pop bc			;5152   ; lo que se guardo al entrar
 	pop de			;5153
 	pop hl			;5154
 	ret			;5155
@@ -2720,181 +2732,181 @@ DATA_canal_en_reposo:
 
 
 L_516A:
-	ld c,a			;516a
-	ld a,(0c0a8h)		;516b
+	ld c,a			;516a   ; un EFECTO: su numero en C
+	ld a,(0c0a8h)		;516b   ; hay algo que no deja?
 	or a			;516e
-	jp nz,L_5139		;516f
+	jp nz,L_5139		;516f   ; si: no suena
 	ld a,(0c096h)		;5172   ; lee la prioridad del efecto que suena
-	cp c			;5175
-	jp z,L_517C		;5176
-	jp nc,L_5139		;5179
+	cp c			;5175   ; comparado con el que suena
+	jp z,L_517C		;5176   ; el mismo: vuelve a empezar
+	jp nc,L_5139		;5179   ; menor: no lo pisa
 L_517C:
-	ld a,c			;517c
+	ld a,c			;517c   ; este pasa a ser el que suena
 	ld (0c096h),a		;517d   ; guarda la prioridad del efecto que suena
-	ld de,0c058h		;5180
+	ld de,0c058h		;5180   ; la ficha del canal de efectos, limpia
 	ld hl,05156h		;5183
 	ld bc,00014h		;5186
 	ldir		;5189
-	rlca			;518b
-	ld hl,08d8dh		;518c
+	rlca			;518b   ; por dos
+	ld hl,08d8dh		;518c   ; la tabla de efectos (desde el 1)
 	add a,l			;518f
 	ld l,a			;5190
 	jr nc,L_5194		;5191
 	inc h			;5193
 L_5194:
-	ld e,(hl)			;5194
+	ld e,(hl)			;5194   ; su guion
 	inc hl			;5195
 	ld d,(hl)			;5196
-	ld (0c064h),de		;5197
-	ld hl,08c9ch		;519b
+	ld (0c064h),de		;5197   ; a la ficha
+	ld hl,08c9ch		;519b   ; y el manejador de los efectos
 	ld (0c016h),hl		;519e   ; guarda el manejador del efecto de sonido
 	jp L_5139		;51a1
 L_51A4:
-	call L_5085		;51a4
+	call L_5085		;51a4   ; el 0: todo callado
 	jp L_5139		;51a7
 L_51AA:
-	jp z,L_5276		;51aa
+	jp z,L_5276		;51aa   ; 0xFB
 	cp 0fch		;51ad
-	jp z,L_52C9		;51af
+	jp z,L_52C9		;51af   ; 0xFC
 	cp 0fdh		;51b2
-	jp z,L_51C4		;51b4
+	jp z,L_51C4		;51b4   ; 0xFD: la musica de la pausa
 	cp 0feh		;51b7
-	jp z,L_522D		;51b9
-	ld a,03ah		;51bc
+	jp z,L_522D		;51b9   ; 0xFE: se vuelve de la pausa
+	ld a,03ah		;51bc   ; 0xFF: el fundido, 0x3A cuadros
 	ld (0c0a5h),a		;51be   ; guarda la cuenta del fundido de la musica
 	jp L_5139		;51c1
 L_51C4:
 	ld a,(0c098h)		;51c4   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
-	or 001h		;51c7
+	or 001h		;51c7   ; el bit 0 de las banderas: en la pausa
 	ld (0c098h),a		;51c9   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 	ld a,(0c0a5h)		;51cc   ; lee la cuenta del fundido de la musica
-	ld (0c099h),a		;51cf
+	ld (0c099h),a		;51cf   ; guarda el fundido
 	ld a,(0c0a6h)		;51d2   ; lee el volumen que se le resta a la musica
-	ld (0c09ah),a		;51d5
+	ld (0c09ah),a		;51d5   ; el volumen restado
 	ld a,(0c097h)		;51d8   ; lee la copia del registro 7 del PSG (el mezclador)
-	ld (0c09bh),a		;51db
-	ld a,0bfh		;51de
+	ld (0c09bh),a		;51db   ; el mezclador
+	ld a,0bfh		;51de   ; un mezclador nuevo: solo el tono A
 	ld (0c097h),a		;51e0   ; guarda la copia del registro 7 del PSG (el mezclador)
-	xor a			;51e3
+	xor a			;51e3   ; guarda los periodos y volumenes que hay en el PSG:
 	call 00096h		;51e4   ; BIOS RDPSG - Reads value from PSG-register
-	ld (0c09ch),a		;51e7
-	ld a,001h		;51ea
+	ld (0c09ch),a		;51e7   ; el periodo fino del canal A
+	ld a,001h		;51ea   ; el grueso
 	call 00096h		;51ec   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c09dh),a		;51ef
-	ld a,008h		;51f2
+	ld a,008h		;51f2   ; el volumen del A
 	call 00096h		;51f4   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c09eh),a		;51f7
-	ld a,009h		;51fa
+	ld a,009h		;51fa   ; el del B
 	call 00096h		;51fc   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c09fh),a		;51ff
-	ld a,00ah		;5202
+	ld a,00ah		;5202   ; el del C
 	call 00096h		;5204   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c0a0h),a		;5207
-	xor a			;520a
+	xor a			;520a   ; el canal 0...
 	ld (0c094h),a		;520b   ; guarda el canal del PSG que se esta tocando
-	ld a,005h		;520e
+	ld a,005h		;520e   ; ... con el numero 5
 	ld (0c095h),a		;5210   ; guarda el numero de canal
-	ld hl,08a5dh		;5213
+	ld hl,08a5dh		;5213   ; el manejador de la musica de la pausa
 	ld (0c01ah),hl		;5216   ; guarda el manejador de la musica de la pausa
-	ld de,0c080h		;5219
+	ld de,0c080h		;5219   ; su ficha, limpia
 	ld hl,05156h		;521c
 	ld bc,00014h		;521f
 	ldir		;5222
-	ld hl,09463h		;5224
+	ld hl,09463h		;5224   ; y su partitura
 	ld (0c080h),hl		;5227
 	jp L_512A		;522a
 L_522D:
 	ld a,(0c098h)		;522d   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
-	and 0feh		;5230
+	and 0feh		;5230   ; fuera la pausa de las banderas
 	ld (0c098h),a		;5232   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
-	ld a,(0c099h)		;5235
+	ld a,(0c099h)		;5235   ; y se devuelve todo lo guardado
 	ld (0c0a5h),a		;5238   ; guarda la cuenta del fundido de la musica
 	ld a,(0c09ah)		;523b
 	ld (0c0a6h),a		;523e   ; guarda el volumen que se le resta a la musica
 	ld a,(0c09bh)		;5241
 	ld (0c097h),a		;5244   ; guarda la copia del registro 7 del PSG (el mezclador)
-	ld a,(0c09ch)		;5247
+	ld a,(0c09ch)		;5247   ; el periodo fino del A
 	ld e,a			;524a
-	xor a			;524b
+	xor a			;524b   ; registro 0
 	call 00093h		;524c   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c09dh)		;524f
+	ld a,(0c09dh)		;524f   ; el grueso
 	ld e,a			;5252
-	ld a,001h		;5253
+	ld a,001h		;5253   ; registro 1
 	call 00093h		;5255   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c09eh)		;5258
+	ld a,(0c09eh)		;5258   ; el volumen del A
 	ld e,a			;525b
-	ld a,008h		;525c
+	ld a,008h		;525c   ; registro 8
 	call 00093h		;525e   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c09fh)		;5261
+	ld a,(0c09fh)		;5261   ; el del B
 	ld e,a			;5264
-	ld a,009h		;5265
+	ld a,009h		;5265   ; registro 9
 	call 00093h		;5267   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c0a0h)		;526a
+	ld a,(0c0a0h)		;526a   ; el del C
 	ld e,a			;526d
-	ld a,00ah		;526e
+	ld a,00ah		;526e   ; registro 10
 	call 00093h		;5270   ; BIOS WRTPSG - Writes data to PSG-register
 	jp L_5139		;5273
 L_5276:
 	ld a,(0c098h)		;5276   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
-	or 002h		;5279
+	or 002h		;5279   ; 0xFB: el bit 1 de las banderas
 	ld (0c098h),a		;527b   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 	ld a,(0c097h)		;527e   ; lee la copia del registro 7 del PSG (el mezclador)
-	ld (0c0a1h),a		;5281
+	ld (0c0a1h),a		;5281   ; guarda el mezclador
 	ld a,(0c096h)		;5284   ; lee la prioridad del efecto que suena
-	or a			;5287
+	or a			;5287   ; hay efecto sonando?
 	jp nz,L_5290		;5288
-	ld a,0bfh		;528b
+	ld a,0bfh		;528b   ; no: solo el tono A
 	jp L_5295		;528d
 L_5290:
 	ld a,(0c097h)		;5290   ; lee la copia del registro 7 del PSG (el mezclador)
-	or 01bh		;5293
+	or 01bh		;5293   ; si: se le abren mas canales
 L_5295:
 	ld (0c097h),a		;5295   ; guarda la copia del registro 7 del PSG (el mezclador)
-	xor a			;5298
+	xor a			;5298   ; guarda el periodo del canal A...
 	call 00096h		;5299   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c0a2h),a		;529c
 	ld a,001h		;529f
 	call 00096h		;52a1   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c0a3h),a		;52a4
-	ld a,008h		;52a7
+	ld a,008h		;52a7   ; ... y su volumen
 	call 00096h		;52a9   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0c0a4h),a		;52ac
-	ld hl,08c95h		;52af
+	ld hl,08c95h		;52af   ; el manejador del segundo efecto
 	ld (0c018h),hl		;52b2   ; guarda el manejador del segundo efecto
-	ld de,0c06ch		;52b5
+	ld de,0c06ch		;52b5   ; su ficha, limpia
 	ld hl,05156h		;52b8
 	ld bc,00014h		;52bb
 	ldir		;52be
-	ld hl,0948bh		;52c0
+	ld hl,0948bh		;52c0   ; y su guion
 	ld (0c078h),hl		;52c3
 	jp L_5139		;52c6
 L_52C9:
 	ld a,(0c098h)		;52c9   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
-	and 0fdh		;52cc
+	and 0fdh		;52cc   ; 0xFC: fuera el bit 1
 	ld (0c098h),a		;52ce   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 	ld a,(0c096h)		;52d1   ; lee la prioridad del efecto que suena
-	or a			;52d4
-	ld a,(0c0a1h)		;52d5
+	or a			;52d4   ; habia efecto?
+	ld a,(0c0a1h)		;52d5   ; el mezclador guardado
 	jp z,L_52E9		;52d8
 	ld b,a			;52db
 	ld a,(0c097h)		;52dc   ; lee la copia del registro 7 del PSG (el mezclador)
-	or 0dbh		;52df
+	or 0dbh		;52df   ; se mezcla con el de ahora...
 	and b			;52e1
 	ld b,a			;52e2
 	ld a,(0c097h)		;52e3   ; lee la copia del registro 7 del PSG (el mezclador)
-	and 024h		;52e6
+	and 024h		;52e6   ; ... dejando los bits del efecto
 	or b			;52e8
 L_52E9:
 	ld (0c097h),a		;52e9   ; guarda la copia del registro 7 del PSG (el mezclador)
-	ld a,(0c0a2h)		;52ec
+	ld a,(0c0a2h)		;52ec   ; y se devuelve el canal A
 	ld e,a			;52ef
-	xor a			;52f0
+	xor a			;52f0   ; registro 0
 	call 00093h		;52f1   ; BIOS WRTPSG - Writes data to PSG-register
 	ld a,(0c0a3h)		;52f4
 	ld e,a			;52f7
-	ld a,001h		;52f8
+	ld a,001h		;52f8   ; registro 1
 	call 00093h		;52fa   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c0a4h)		;52fd
+	ld a,(0c0a4h)		;52fd   ; su volumen
 	ld e,a			;5300
 	ld a,008h		;5301
 	call 00093h		;5303   ; BIOS WRTPSG - Writes data to PSG-register
@@ -4147,7 +4159,7 @@ L_5BB7:
 	push hl			;5bb7
 	pop ix		;5bb8
 	call L_5B96		;5bba
-	ld a,(ix+000h)		;5bbd   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;5bbd
 	ld c,a			;5bc0
 	and 03ch		;5bc1
 	rrca			;5bc3
@@ -4235,7 +4247,7 @@ L_5C25:
 	ld a,(0cf38h)		;5c35
 	and a			;5c38
 	ret nz			;5c39
-	ld a,(0c002h)		;5c3a
+	ld a,(0c002h)		;5c3a   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 	and 040h		;5c3d
 	jr z,L_5C5C		;5c3f
 	ld a,(0c00bh)		;5c41
@@ -4766,7 +4778,7 @@ L_5F77:
 	ld de,060e1h		;5fb8
 	call de_mas_a		;5fbb   ; de_mas_a: DE += A
 	ld a,(de)			;5fbe
-	ld (ix+00dh),a		;5fbf
+	ld (ix+00dh),a		;5fbf   ; guarda la vida de la cosa
 	ld hl,(0cff3h)		;5fc2   ; lee la ficha de la cosa que se crea
 	ld a,(ix+000h)		;5fc5   ; lee el tipo de la cosa
 	dec a			;5fc8

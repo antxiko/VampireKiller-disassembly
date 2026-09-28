@@ -31,54 +31,55 @@ DATA_cola_del_ld:
 
 
 L_8001:
-	inc l			;8001
-	ld a,(hl)			;8002
-	cp 01bh		;8003
+	inc l			;8001   ; (viene de p01:7FFE, la instruccion partida entre bancos)
+	ld a,(hl)			;8002   ; lo que hay en esa ficha
+	cp 01bh		;8003   ; es el 0x1B?
 	jr nz,L_8015		;8005
-	ld a,0e0h		;8007
-	ld (0d618h),a		;8009
+	ld a,0e0h		;8007   ; si: 0xE0 (y fuera de la pantalla)
+	ld (0d618h),a		;8009   ; a cuatro sprites de la tabla de 0xD600
 	ld (0d61ch),a		;800c
 	ld (0d620h),a		;800f
 	ld (0d624h),a		;8012
 L_8015:
 	pop hl			;8015
 	pop bc			;8016
-	ld a,010h		;8017
+	ld a,010h		;8017   ; la ficha siguiente, 16 bytes mas alla
 	add a,l			;8019
 	ld l,a			;801a
-	djnz $-47		;801b
+	djnz $-47		;801b   ; B fichas
 	ret			;801d
 L_801E:
-	ld a,(0c450h)		;801e
+	ld a,(0c450h)		;801e   ; las dos armas de 0xC450 y 0xC460
 	ld b,a			;8021
 	ld a,(0c460h)		;8022
-	or b			;8025
-	ret z			;8026
-	ld ix,0c800h		;8027
+	or b			;8025   ; hay alguna en el aire?
+	ret z			;8026   ; ninguna: nada que mirar
+	ld ix,0c800h		;8027   ; las siete fichas de cosas de 0xC800
 	ld b,007h		;802b
 L_802D:
 	ld a,(ix+000h)		;802d   ; lee el tipo de la cosa
-	and a			;8030
+	and a			;8030   ; vacia?
 	jr z,L_8040		;8031
-	ld a,(ix+00eh)		;8033
+	ld a,(ix+00eh)		;8033   ; el bit 0 de (ix+0x0E): se le puede dar
 	rra			;8036
 	jr nc,L_8040		;8037
-	push bc			;8039
+	push bc			;8039   ; mira si alguna arma la toca
 	call L_82A4		;803a
 	pop bc			;803d
-	jr c,$+14		;803e
+	jr c,$+14		;803e   ; si: a restarle vida
 L_8040:
-	ld de,00080h		;8040
+	ld de,00080h		;8040   ; la ficha siguiente
 	add ix,de		;8043
-	djnz L_802D		;8045
+	djnz L_802D		;8045   ; siete fichas
 	ret			;8047
 
 ; ----------------------------------------------------------------------
-; DATOS cuatro_valores: cuatro bytes que p02:805F elige con (iy+1) - 2; los
-;   mismos bytes los usan como coordenadas de VRAM p00:58E7, p00:592A y
-;   p01:662B
+; DATOS lo_que_quita_cada_arma: cuanto quita cada arma (1, 4, 2, 2): p02:805F
+;   lo elige con el tipo de arma (iy+1) menos 2 y p02:8069 se lo resta a la
+;   vida de la cosa; los mismos bytes los usan como coordenadas de VRAM
+;   p00:58E7, p00:592A y p01:662B
 ;   0x8048..0x804c  (4 bytes)
-DATA_cuatro_valores:
+DATA_lo_que_quita_cada_arma:
 	defb 001h,004h,002h,002h	; 8048
 
 ; ======================================================================
@@ -87,66 +88,66 @@ DATA_cuatro_valores:
 
 
 L_804C:
-	ld a,00ch		;804c
+	ld a,00ch		;804c   ; el golpe: efecto 0x0C
 	call 0509fh		;804e   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,(ix+000h)		;8051   ; lee el tipo de la cosa
-	sub 011h		;8054
+	sub 011h		;8054   ; los tipos 0x11 a 0x17...
 	cp 007h		;8056
-	jr c,L_8088		;8058
+	jr c,L_8088		;8058   ; ... van aparte
 L_805A:
-	ld a,(iy+001h)		;805a
+	ld a,(iy+001h)		;805a   ; el arma: (iy+1) menos 2...
 	sub 002h		;805d
-	ld hl,08048h		;805f
+	ld hl,08048h		;805f   ; ... elige cuanto quita, en la tabla de 0x8048
 	call 04061h		;8062   ; hl_mas_a: HL += A
-	ld b,(hl)			;8065
-	ld a,(ix+00dh)		;8066
+	ld b,(hl)			;8065   ; lo que quita el arma
+	ld a,(ix+00dh)		;8066   ; la vida de la cosa (ix+0x0D)
 	sub b			;8069
-	ld (ix+00dh),a		;806a
-	jr z,L_8072		;806d
-	jp p,L_8078		;806f
+	ld (ix+00dh),a		;806a   ; guarda la vida de la cosa
+	jr z,L_8072		;806d   ; a cero: muerta
+	jp p,L_8078		;806f   ; aun le queda: sigue
 L_8072:
-	call L_81AB		;8072
-	call L_9A3E		;8075
+	call L_81AB		;8072   ; muerta: puntos
+	call L_9A3E		;8075   ; y lo que suelta
 L_8078:
-	ld a,(iy+001h)		;8078
-	cp 002h		;807b
+	ld a,(iy+001h)		;8078   ; que arma era?
+	cp 002h		;807b   ; la 2 se gasta al dar
 	push iy		;807d
 	pop hl			;807f
-	jp z,074ech		;8080
-	res 0,(ix+00eh)		;8083
+	jp z,074ech		;8080   ; la 2: se quita
+	res 0,(ix+00eh)		;8083   ; ya no se le puede dar hasta que vuelva a poder
 	ret			;8087
 L_8088:
 	ld a,(ix+000h)		;8088   ; lee el tipo de la cosa
-	cp 012h		;808b
+	cp 012h		;808b   ; el tipo 0x12...
 	jr nz,L_8095		;808d
-	ld a,(0ce00h)		;808f
+	ld a,(0ce00h)		;808f   ; ... solo cuenta aparte con 0xCE00 puesto
 	and a			;8092
 	jr z,L_805A		;8093
 L_8095:
-	call 07e2ch		;8095
+	call 07e2ch		;8095   ; los tipos 0x11-0x17 restan de la barra ENEMY
 	ld a,(0c418h)		;8098   ; lee la vida del enemigo (barra ENEMY)
-	and a			;809b
+	and a			;809b   ; a cero?
 	jr z,L_80A1		;809c
-	rla			;809e
+	rla			;809e   ; el bit 7: aun le queda
 	jr nc,L_8078		;809f
 L_80A1:
-	call 07e17h		;80a1
+	call 07e17h		;80a1   ; se acabo la barra
 	jr L_8078		;80a4
 L_80A6:
-	ld ix,0c470h		;80a6
+	ld ix,0c470h		;80a6   ; las ocho cosas fijas de la habitacion (0xC470, 16 bytes cada una; las pone p00:5B1E)
 	ld b,008h		;80aa
 L_80AC:
-	ld a,(ix+000h)		;80ac   ; lee el tipo de la cosa
-	and a			;80af
+	ld a,(ix+000h)		;80ac
+	and a			;80af   ; vacia?
 	jr z,L_80D4		;80b0
 	push bc			;80b2
-	call L_8460		;80b3
+	call L_8460		;80b3   ; le da un arma?
 	pop bc			;80b6
-	jr nc,L_80D4		;80b7
-	inc (ix+003h)		;80b9   ; sube la y de la cosa
-	ld a,(ix+004h)		;80bc   ; lee la fraccion de la x de la cosa
-	ld (0c433h),a		;80bf
-	ld a,(iy+001h)		;80c2
+	jr nc,L_80D4		;80b7   ; no
+	inc (ix+003h)		;80b9   ; si: sube su estado ((ix+3) en esta lista)
+	ld a,(ix+004h)		;80bc
+	ld (0c433h),a		;80bf   ; a 0xC433
+	ld a,(iy+001h)		;80c2   ; el arma 2 se gasta al dar
 	dec a			;80c5
 	dec a			;80c6
 	jr nz,L_80CF		;80c7
@@ -154,37 +155,37 @@ L_80AC:
 	pop hl			;80cb
 	call z,074ech		;80cc
 L_80CF:
-	ld a,00ch		;80cf
+	ld a,00ch		;80cf   ; el golpe: efecto 0x0C
 	jp 0509fh		;80d1   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_80D4:
-	ld de,00010h		;80d4
+	ld de,00010h		;80d4   ; la cosa fija siguiente, 16 bytes mas alla
 	add ix,de		;80d7
-	djnz L_80AC		;80d9
+	djnz L_80AC		;80d9   ; ocho
 	ret			;80db
 L_80DC:
-	ld hl,0c5b5h		;80dc
+	ld hl,0c5b5h		;80dc   ; las dos fichas de 0xC5B5 y 0xC5C5
 	call L_80E5		;80df
 	ld hl,0c5c5h		;80e2
 L_80E5:
-	ld a,(hl)			;80e5
+	ld a,(hl)			;80e5   ; el bit 7: esta puesta?
 	rla			;80e6
-	ret nc			;80e7
+	ret nc			;80e7   ; no
 	ld a,(0c416h)		;80e8   ; lee el arma que lleva Simon (0, ninguna)
-	cp 002h		;80eb
+	cp 002h		;80eb   ; con el arma 0 o 1...
 	jr nc,L_80FD		;80ed
-	ld a,(0c422h)		;80ef
+	ld a,(0c422h)		;80ef   ; ... y 0xC422 a 3...
 	cp 003h		;80f2
 	jr nz,L_80FD		;80f4
 	push hl			;80f6
-	call L_83A1		;80f7
+	call L_83A1		;80f7   ; ... se mira de otra forma
 	pop hl			;80fa
-	jr c,L_8112		;80fb
+	jr c,L_8112		;80fb   ; le da
 L_80FD:
 	push hl			;80fd
-	call L_83B3		;80fe
+	call L_83B3		;80fe   ; le da un arma?
 	pop hl			;8101
-	ret nc			;8102
-	ld a,(iy+001h)		;8103
+	ret nc			;8102   ; no
+	ld a,(iy+001h)		;8103   ; el arma 2 se gasta al dar
 	cp 002h		;8106
 	jr nz,L_8112		;8108
 	push hl			;810a
@@ -193,122 +194,126 @@ L_80FD:
 	call 074ech		;810e
 	pop hl			;8111
 L_8112:
-	inc l			;8112
+	inc l			;8112   ; su cuarto byte...
 	inc l			;8113
 	inc l			;8114
-	inc (hl)			;8115
-	ld a,00ch		;8116
+	inc (hl)			;8115   ; ... sube
+	ld a,00ch		;8116   ; el golpe: efecto 0x0C
 	jp 0509fh		;8118   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_811B:
-	ld hl,0c500h		;811b
+	ld hl,0c500h		;811b   ; las ocho fichas de 16 bytes de 0xC500
 	ld b,008h		;811e
 L_8120:
 	push bc			;8120
 	push hl			;8121
-	ld a,(hl)			;8122
+	ld a,(hl)			;8122   ; el bit 7: esta puesta?
 	rla			;8123
-	jr nc,L_8163		;8124
+	jr nc,L_8163		;8124   ; no
 	push hl			;8126
-	ld a,004h		;8127
+	ld a,004h		;8127   ; su quinto byte...
 	add a,l			;8129
 	ld l,a			;812a
 	ld a,(hl)			;812b
 	pop hl			;812c
-	cp 00ah		;812d
+	cp 00ah		;812d   ; ... es 0x0A...
 	jr z,L_8135		;812f
-	cp 00bh		;8131
-	jr nz,L_8163		;8133
+	cp 00bh		;8131   ; ... o 0x0B?
+	jr nz,L_8163		;8133   ; ni uno ni otro: no se le puede dar
 L_8135:
 	ld a,(0c416h)		;8135   ; lee el arma que lleva Simon (0, ninguna)
-	cp 002h		;8138
+	cp 002h		;8138   ; con el arma 0 o 1...
 	jr nc,L_814A		;813a
-	ld a,(0c422h)		;813c
+	ld a,(0c422h)		;813c   ; ... y 0xC422 a 3...
 	cp 003h		;813f
 	jr nz,L_814A		;8141
 	push hl			;8143
-	call L_839C		;8144
+	call L_839C		;8144   ; ... se mira de otra forma
 	pop hl			;8147
-	jr c,L_8159		;8148
+	jr c,L_8159		;8148   ; le da
 L_814A:
 	push hl			;814a
-	call L_83AE		;814b
+	call L_83AE		;814b   ; le da un arma?
 	pop hl			;814e
-	jr nc,L_8163		;814f
+	jr nc,L_8163		;814f   ; no
 	push hl			;8151
 	push iy		;8152
 	pop hl			;8154
-	call 074ech		;8155
+	call 074ech		;8155   ; el arma 2 se gasta al dar
 	pop hl			;8158
 L_8159:
-	inc l			;8159
+	inc l			;8159   ; su cuarto byte...
 	inc l			;815a
 	inc l			;815b
-	ld (hl),002h		;815c
-	ld a,00ch		;815e
+	ld (hl),002h		;815c   ; ... a 2
+	ld a,00ch		;815e   ; el golpe: efecto 0x0C
 	call 0509fh		;8160   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_8163:
 	pop hl			;8163
 	pop bc			;8164
-	ld a,010h		;8165
+	ld a,010h		;8165   ; la siguiente, 16 bytes mas alla
 	add a,l			;8167
 	ld l,a			;8168
-	djnz L_8120		;8169
+	djnz L_8120		;8169   ; ocho
 	ret			;816b
+
+; ----------------------------------------------------------------------
+; UNA COSA TOCA A SIMON: el dano sale de la tabla de 0x81CE (segundo byte del tipo) y se DOBLA, salvo que Simon lleve lo del bit 4 de 0xC701 y este mirando hacia la cosa: entonces no se dobla y se gasta uno de los usos de 0xC441; al acabarse, el bit 4 se quita y se repinta lo que lleva.
+; ----------------------------------------------------------------------
 L_816C:
 	ld a,(ix+000h)		;816c   ; lee el tipo de la cosa
-	dec a			;816f
-	add a,a			;8170
-	ld hl,081ceh		;8171
+	dec a			;816f   ; desde el tipo 1
+	add a,a			;8170   ; dos bytes por tipo
+	ld hl,081ceh		;8171   ; puntos y dano de cada tipo
 	call 04061h		;8174   ; hl_mas_a: HL += A
-	inc hl			;8177
-	ld b,(hl)			;8178
-	ld a,(0c701h)		;8179
-	bit 4,a		;817c
-	jr z,L_8193		;817e
+	inc hl			;8177   ; el segundo:
+	ld b,(hl)			;8178   ; B = el dano
+	ld a,(0c701h)		;8179   ; lo que lleva Simon
+	bit 4,a		;817c   ; el bit 4 (lo que para golpes)
+	jr z,L_8193		;817e   ; no lo lleva: dano doble
 	ld a,(0c427h)		;8180   ; lee la X de Simon
 	sub (ix+005h)		;8183   ; le resta la x de la cosa
-	ld a,(0c42ch)		;8186   ; lee el lado al que mira Simon
-	jr nc,L_8190		;8189
-	and a			;818b
-	jr z,L_8198		;818c
-	jr L_8193		;818e
+	ld a,(0c42ch)		;8186   ; lee el lado al que mira Simon (0 derecha)
+	jr nc,L_8190		;8189   ; la cosa esta a la izquierda de Simon
+	and a			;818b   ; Simon mira a la derecha...
+	jr z,L_8198		;818c   ; ... hacia la cosa: para el golpe
+	jr L_8193		;818e   ; de espaldas: dano doble
 L_8190:
-	and a			;8190
-	jr nz,L_8198		;8191
+	and a			;8190   ; la cosa a la derecha: Simon mira a la izquierda...
+	jr nz,L_8198		;8191   ; ... hacia ella: para el golpe
 L_8193:
-	ld a,b			;8193
+	ld a,b			;8193   ; dano doble
 	add a,a			;8194
 	ld b,a			;8195
-	jr L_81A8		;8196
+	jr L_81A8		;8196   ; 
 L_8198:
-	ld hl,0c441h		;8198
+	ld hl,0c441h		;8198   ; gasta un uso
 	dec (hl)			;819b
-	jr nz,L_81A8		;819c
-	ld hl,0c701h		;819e
-	res 4,(hl)		;81a1
+	jr nz,L_81A8		;819c   ; aun le quedan
+	ld hl,0c701h		;819e   ; se acabo:
+	res 4,(hl)		;81a1   ; fuera el bit 4
 	push bc			;81a3
-	call L_8EE6		;81a4
+	call L_8EE6		;81a4   ; y se repinta lo que lleva
 	pop bc			;81a7
 L_81A8:
-	jp 0462bh		;81a8
+	jp 0462bh		;81a8   ; quita B de vida a Simon
 L_81AB:
 	ld a,(ix+000h)		;81ab   ; lee el tipo de la cosa
-	ld b,a			;81ae
-	dec a			;81af
-	add a,a			;81b0
-	ld hl,081ceh		;81b1
+	ld b,a			;81ae   ; B = el tipo
+	dec a			;81af   ; desde el tipo 1
+	add a,a			;81b0   ; dos bytes por tipo
+	ld hl,081ceh		;81b1   ; puntos y dano de cada tipo
 	call 04061h		;81b4   ; hl_mas_a: HL += A
-	ld e,000h		;81b7
-	ld d,(hl)			;81b9
-	ld a,b			;81ba
+	ld e,000h		;81b7   ; E = 0 (las unidades)
+	ld d,(hl)			;81b9   ; D = los puntos, en BCD, de cien en cien
+	ld a,b			;81ba   ; el tipo 0x11...
 	cp 011h		;81bb
-	ld c,003h		;81bd
+	ld c,003h		;81bd   ; ... da 30.000 mas
 	jp z,044eeh		;81bf
-	ld c,005h		;81c2
+	ld c,005h		;81c2   ; el 0x17 da 50.000 mas
 	cp 017h		;81c4
 	jp z,044eeh		;81c6
-	ld c,000h		;81c9
-	jp 044eeh		;81cb
+	ld c,000h		;81c9   ; los demas, solo los de la tabla
+	jp 044eeh		;81cb   ; suma C D E (BCD) al marcador
 
 ; ----------------------------------------------------------------------
 ; DATOS puntos_y_dano_de_cada_tipo: 46 pares, uno por tipo de cosa (1-46):
@@ -329,26 +334,30 @@ DATA_puntos_y_dano_de_cada_tipo:
 
 
 L_822A:
-	ld de,00100h		;822a
-	jp 044ech		;822d
+	ld de,00100h		;822a   ; 100 puntos
+	jp 044ech		;822d   ; al marcador
+
+; ----------------------------------------------------------------------
+; LAS CAJAS DE CHOQUE. Cada puerta pone en HL el tamano (H de alto, L de ancho, a cada lado) y en DE el centro (D la x, E la y), y sale hacia una de las cuatro comprobaciones: toca_a_simon (0x847A), le_alcanza_el_latigo (0x84A7), le_da_un_arma (0x84F0) o delante_de_simon (0x864B). Todas devuelven carry si hay choque.
+; ----------------------------------------------------------------------
 L_8230:
-	inc l			;8230
+	inc l			;8230   ; en las listas de cosas fijas: la y...
 	ld a,(hl)			;8231
-	add a,010h		;8232
+	add a,010h		;8232   ; ... mas 0x10
 	ld e,a			;8234
-	inc l			;8235
+	inc l			;8235   ; la x...
 	ld a,(hl)			;8236
-	add a,008h		;8237
+	add a,008h		;8237   ; ... mas 8
 	ld d,a			;8239
-	ld hl,01008h		;823a
-	jp L_847A		;823d
+	ld hl,01008h		;823a   ; una caja de 0x10 x 8
+	jp toca_a_simon		;823d   ; toca a Simon?
 L_8240:
 	ld d,(ix+005h)		;8240   ; lee la x de la cosa
 	ld e,(ix+004h)		;8243   ; lee la fraccion de la x de la cosa
-	ld hl,01008h		;8246
-	jp L_847A		;8249
+	ld hl,01008h		;8246   ; una caja de 0x10 x 8 en la x de la cosa
+	jp toca_a_simon		;8249   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_824C:
-	call L_82FB		;824c
+	call L_82FB		;824c   ; B = su x, C = su y, A = su forma de caja
 	call 0406bh		;824f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -420,7 +429,7 @@ DATA_tabla_8276:
 
 
 L_827C:
-	call L_82B8		;827c
+	call L_82B8		;827c   ; B = su x, C = su y, A = su otra forma de caja
 	call 0406bh		;827f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -490,11 +499,11 @@ DATA_tabla_82AA:
 
 L_82B8:
 	ld a,(ix+000h)		;82b8   ; lee el tipo de la cosa
-	dec a			;82bb
-	ld hl,082cbh		;82bc
+	dec a			;82bb   ; desde el tipo 1
+	ld hl,082cbh		;82bc   ; la forma de caja de cada tipo
 	call 04061h		;82bf   ; hl_mas_a: HL += A
-	ld a,(hl)			;82c2
-	dec a			;82c3
+	ld a,(hl)			;82c2   ; la forma
+	dec a			;82c3   ; desde 0, para el despachador
 	ld b,(ix+005h)		;82c4   ; lee la x de la cosa
 	ld c,(ix+003h)		;82c7   ; lee la y de la cosa
 	ret			;82ca
@@ -515,10 +524,10 @@ DATA_un_byte_de_cada_tipo:
 
 L_82FB:
 	ld a,(ix+000h)		;82fb   ; lee el tipo de la cosa
-	dec a			;82fe
-	ld hl,0830dh		;82ff
+	dec a			;82fe   ; desde el tipo 1
+	ld hl,0830dh		;82ff   ; la otra tabla de formas
 	call 04061h		;8302   ; hl_mas_a: HL += A
-	ld a,(hl)			;8305
+	ld a,(hl)			;8305   ; la forma
 	ld b,(ix+005h)		;8306   ; lee la x de la cosa
 	ld c,(ix+003h)		;8309   ; lee la y de la cosa
 	ret			;830c
@@ -536,569 +545,569 @@ DATA_once_valores:
 
 
 L_8318:
-	ld hl,00603h		;8318
+	ld hl,00603h		;8318   ; caja de 6 x 3
 	ld d,b			;831b
 	ld e,c			;831c
-	jp L_847A		;831d
+	jp toca_a_simon		;831d   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8320:
-	ld hl,00603h		;8320
+	ld hl,00603h		;8320   ; caja de 6 x 3
 	ld d,b			;8323
 	ld e,c			;8324
-	jp L_84A7		;8325
+	jp le_alcanza_el_latigo		;8325   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8328:
-	ld hl,00603h		;8328
+	ld hl,00603h		;8328   ; caja de 6 x 3
 	ld d,b			;832b
 	ld e,c			;832c
-	jp L_84F0		;832d
+	jp le_da_un_arma		;832d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8330:
-	ld hl,00603h		;8330
+	ld hl,00603h		;8330   ; caja de 6 x 3
 	ld d,b			;8333
 	ld e,c			;8334
-	jp L_864B		;8335
+	jp delante_de_simon		;8335   ; delante_de_simon: carry si la caja esta justo delante de Simon
 L_8338:
-	ld hl,00606h		;8338
+	ld hl,00606h		;8338   ; caja de 6 x 6
 	ld d,b			;833b
 	ld e,c			;833c
-	jp L_847A		;833d
+	jp toca_a_simon		;833d   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8340:
-	ld hl,00606h		;8340
+	ld hl,00606h		;8340   ; caja de 6 x 6
 	ld d,b			;8343
 	ld e,c			;8344
-	jp L_84A7		;8345
+	jp le_alcanza_el_latigo		;8345   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8348:
-	ld hl,00606h		;8348
+	ld hl,00606h		;8348   ; caja de 6 x 6
 	ld d,b			;834b
 	ld e,c			;834c
-	jp L_84F0		;834d
+	jp le_da_un_arma		;834d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8350:
-	ld hl,00606h		;8350
+	ld hl,00606h		;8350   ; caja de 6 x 6
 	ld d,b			;8353
 	ld e,c			;8354
-	jp L_864B		;8355
+	jp delante_de_simon		;8355   ; delante_de_simon: carry si la caja esta justo delante de Simon
 L_8358:
-	ld hl,00c06h		;8358
+	ld hl,00c06h		;8358   ; caja de 0x0C x 6
 	ld d,b			;835b
 	ld e,c			;835c
-	jp L_847A		;835d
+	jp toca_a_simon		;835d   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8360:
-	ld hl,00c06h		;8360
+	ld hl,00c06h		;8360   ; caja de 0x0C x 6
 	ld d,b			;8363
 	ld e,c			;8364
-	jp L_84A7		;8365
+	jp le_alcanza_el_latigo		;8365   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8368:
-	ld hl,00c06h		;8368
+	ld hl,00c06h		;8368   ; caja de 0x0C x 6
 	ld d,b			;836b
 	ld e,c			;836c
-	jp L_84F0		;836d
+	jp le_da_un_arma		;836d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8370:
-	ld hl,00c06h		;8370
+	ld hl,00c06h		;8370   ; caja de 0x0C x 6
 	ld d,b			;8373
 	ld e,c			;8374
-	jp L_864B		;8375
+	jp delante_de_simon		;8375   ; delante_de_simon: carry si la caja esta justo delante de Simon
 L_8378:
-	ld hl,01805h		;8378
+	ld hl,01805h		;8378   ; caja de 0x18 x 5
 	ld d,b			;837b
 	ld e,c			;837c
-	jp L_847A		;837d
+	jp toca_a_simon		;837d   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8380:
-	ld hl,01805h		;8380
+	ld hl,01805h		;8380   ; caja de 0x18 x 5
 	ld d,b			;8383
 	ld e,c			;8384
-	jp L_84A7		;8385
+	jp le_alcanza_el_latigo		;8385   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8388:
-	ld hl,01805h		;8388
+	ld hl,01805h		;8388   ; caja de 0x18 x 5
 	ld d,b			;838b
 	ld e,c			;838c
-	jp L_84F0		;838d
+	jp le_da_un_arma		;838d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8390:
-	ld hl,01008h		;8390
+	ld hl,01008h		;8390   ; caja de 0x10 x 8
 	ld d,b			;8393
 	ld e,c			;8394
-	jp L_847A		;8395
+	jp toca_a_simon		;8395   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8398:
-	ld d,b			;8398
+	ld d,b			;8398   ; la posicion de B y C
 	ld e,c			;8399
 	jr L_83A4		;839a
 L_839C:
-	call L_83C7		;839c
+	call L_83C7		;839c   ; la de la lista de HL
 	jr L_83A4		;839f
 L_83A1:
-	call L_83BC		;83a1
+	call L_83BC		;83a1   ; la de la lista de HL, mas grande
 L_83A4:
-	ld hl,01008h		;83a4
-	jp L_84A7		;83a7
+	ld hl,01008h		;83a4   ; caja de 0x10 x 8: le alcanza el latigo?
+	jp le_alcanza_el_latigo		;83a7   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_83AA:
-	ld d,b			;83aa
+	ld d,b			;83aa   ; la posicion de B y C
 	ld e,c			;83ab
 	jr L_83B6		;83ac
 L_83AE:
-	call L_83C7		;83ae
+	call L_83C7		;83ae   ; la de la lista
 	jr L_83B6		;83b1
 L_83B3:
-	call L_83BC		;83b3
+	call L_83BC		;83b3   ; la de la lista, mas grande
 L_83B6:
-	ld hl,01008h		;83b6
-	jp L_84F0		;83b9
+	ld hl,01008h		;83b6   ; caja de 0x10 x 8: le da un arma?
+	jp le_da_un_arma		;83b9   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_83BC:
-	inc l			;83bc
+	inc l			;83bc   ; la y de la lista...
 	ld a,(hl)			;83bd
-	add a,020h		;83be
+	add a,020h		;83be   ; ... mas 0x20
 	ld e,a			;83c0
-	inc l			;83c1
+	inc l			;83c1   ; la x...
 	ld a,(hl)			;83c2
-	add a,010h		;83c3
+	add a,010h		;83c3   ; ... mas 0x10
 	ld d,a			;83c5
 	ret			;83c6
 L_83C7:
-	inc l			;83c7
+	inc l			;83c7   ; la y de la lista...
 	ld a,(hl)			;83c8
-	add a,010h		;83c9
+	add a,010h		;83c9   ; ... mas 0x10
 	ld e,a			;83cb
-	inc l			;83cc
+	inc l			;83cc   ; la x...
 	ld a,(hl)			;83cd
-	add a,008h		;83ce
+	add a,008h		;83ce   ; ... mas 8
 	ld d,a			;83d0
 	ret			;83d1
 L_83D2:
-	ld hl,00a0ch		;83d2
+	ld hl,00a0ch		;83d2   ; caja de 0x0A x 0x0C
 	ld d,b			;83d5
 	ld e,c			;83d6
-	jp L_847A		;83d7
+	jp toca_a_simon		;83d7   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_83DA:
-	ld hl,00a0ch		;83da
+	ld hl,00a0ch		;83da   ; caja de 0x0A x 0x0C
 	ld d,b			;83dd
 	ld e,c			;83de
-	jp L_84A7		;83df
+	jp le_alcanza_el_latigo		;83df   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_83E2:
-	ld hl,00a0ch		;83e2
+	ld hl,00a0ch		;83e2   ; caja de 0x0A x 0x0C
 	ld d,b			;83e5
 	ld e,c			;83e6
-	jp L_84F0		;83e7
+	jp le_da_un_arma		;83e7   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_83EA:
-	ld hl,0180ch		;83ea
+	ld hl,0180ch		;83ea   ; caja de 0x18 x 0x0C
 	ld d,b			;83ed
 	ld e,c			;83ee
-	jp L_847A		;83ef
+	jp toca_a_simon		;83ef   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_83F2:
-	ld hl,0180ch		;83f2
+	ld hl,0180ch		;83f2   ; caja de 0x18 x 0x0C
 	ld d,b			;83f5
 	ld e,c			;83f6
-	jp L_84A7		;83f7
+	jp le_alcanza_el_latigo		;83f7   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_83FA:
-	ld hl,0180ch		;83fa
+	ld hl,0180ch		;83fa   ; caja de 0x18 x 0x0C
 	ld d,b			;83fd
 	ld e,c			;83fe
-	jp L_84F0		;83ff
+	jp le_da_un_arma		;83ff   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8402:
-	ld hl,03010h		;8402
+	ld hl,03010h		;8402   ; caja de 0x30 x 0x10
 	ld d,b			;8405
 	ld e,c			;8406
-	jp L_847A		;8407
+	jp toca_a_simon		;8407   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_840A:
-	ld hl,01805h		;840a
+	ld hl,01805h		;840a   ; caja de 0x18 x 5, 0x20 mas arriba
 	ld d,b			;840d
 	ld a,c			;840e
 	sub 020h		;840f
 	ld e,a			;8411
-	jp L_84A7		;8412
+	jp le_alcanza_el_latigo		;8412   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8415:
-	ld hl,01805h		;8415
+	ld hl,01805h		;8415   ; caja de 0x18 x 5, 0x20 mas arriba
 	ld d,b			;8418
 	ld a,c			;8419
 	sub 020h		;841a
 	ld e,a			;841c
-	jp L_84F0		;841d
+	jp le_da_un_arma		;841d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8420:
-	ld hl,02805h		;8420
+	ld hl,02805h		;8420   ; caja de 0x28 x 5
 	ld d,b			;8423
 	ld e,c			;8424
-	jp L_847A		;8425
+	jp toca_a_simon		;8425   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8428:
-	ld hl,02805h		;8428
+	ld hl,02805h		;8428   ; caja de 0x28 x 5
 	ld d,b			;842b
 	ld e,c			;842c
-	jp L_84A7		;842d
+	jp le_alcanza_el_latigo		;842d   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8430:
-	ld hl,02805h		;8430
+	ld hl,02805h		;8430   ; caja de 0x28 x 5
 	ld d,b			;8433
 	ld e,c			;8434
-	jp L_84F0		;8435
+	jp le_da_un_arma		;8435   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8438:
-	ld hl,03008h		;8438
+	ld hl,03008h		;8438   ; caja de 0x30 x 8
 	ld d,b			;843b
 	ld e,c			;843c
-	jp L_847A		;843d
+	jp toca_a_simon		;843d   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_8440:
-	ld hl,03008h		;8440
+	ld hl,03008h		;8440   ; caja de 0x30 x 8
 	ld d,b			;8443
 	ld e,c			;8444
-	jp L_84A7		;8445
+	jp le_alcanza_el_latigo		;8445   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8448:
-	ld hl,03008h		;8448
+	ld hl,03008h		;8448   ; caja de 0x30 x 8
 	ld d,b			;844b
 	ld e,c			;844c
-	jp L_84F0		;844d
+	jp le_da_un_arma		;844d   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
 L_8450:
-	inc hl			;8450
+	inc hl			;8450   ; la y de la lista...
 	ld a,(hl)			;8451
-	add a,010h		;8452
+	add a,010h		;8452   ; ... mas 0x10
 	ld e,a			;8454
-	inc hl			;8455
+	inc hl			;8455   ; la x...
 	ld a,(hl)			;8456
-	add a,008h		;8457
+	add a,008h		;8457   ; ... mas 8
 	ld d,a			;8459
-	ld hl,01008h		;845a
-	jp L_84A7		;845d
+	ld hl,01008h		;845a   ; caja de 0x10 x 8: le alcanza el latigo?
+	jp le_alcanza_el_latigo		;845d   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 L_8460:
-	ld a,(ix+004h)		;8460   ; lee la fraccion de la x de la cosa
-	cp 002h		;8463
+	ld a,(ix+004h)		;8460   ; en la lista de cosas fijas (IX = 0xC470 + 16 n): el tamano (byte 4)
+	cp 002h		;8463   ; menor que 2: la caja pequena
 	ld hl,01008h		;8465
 	jr c,L_846D		;8468
-	ld hl,02010h		;846a
+	ld hl,02010h		;846a   ; si no, 0x20 x 0x10
 L_846D:
-	ld a,(ix+001h)		;846d   ; lee el paso en que va la cosa
-	add a,h			;8470
+	ld a,(ix+001h)		;846d   ; el byte 1...
+	add a,h			;8470   ; ... mas el alto: la y
 	ld e,a			;8471
-	ld a,(ix+002h)		;8472   ; lee la fraccion de la y de la cosa
-	add a,l			;8475
+	ld a,(ix+002h)		;8472   ; el byte 2...
+	add a,l			;8475   ; ... mas el ancho: la x
 	ld d,a			;8476
-	jp L_84F0		;8477
-L_847A:
-	ld a,005h		;847a
+	jp le_da_un_arma		;8477   ; le da un arma?
+toca_a_simon:
+	ld a,005h		;847a   ; el ancho de Simon, 5 mas
 	add a,l			;847c
 	ld l,a			;847d
 	ld a,(0c427h)		;847e   ; lee la X de Simon
-	sub d			;8481
+	sub d			;8481   ; la distancia en x...
 	jr nc,L_8486		;8482
-	neg		;8484
+	neg		;8484   ; ... sin signo
 L_8486:
-	cp l			;8486
-	ret nc			;8487
+	cp l			;8486   ; mas que la suma de los anchos?
+	ret nc			;8487   ; si: no se tocan
 	ld c,h			;8488
-	ld a,(0c420h)		;8489
+	ld a,(0c420h)		;8489   ; la postura de Simon
 	ld b,a			;848c
-	dec a			;848d
+	dec a			;848d   ; la 1 y la 2...
 	cp 002h		;848e
-	ld a,012h		;8490
+	ld a,012h		;8490   ; ... le dan 0x12 de alto
 	jr c,L_8496		;8492
-	ld a,01ah		;8494
+	ld a,01ah		;8494   ; las demas, 0x1A
 L_8496:
-	add a,h			;8496
+	add a,h			;8496   ; la suma de las alturas
 	ld h,a			;8497
 	ld a,b			;8498
-	dec a			;8499
+	dec a			;8499   ; la postura 1...
 	ld a,(0c425h)		;849a   ; lee la Y de Simon
-	jr nz,L_84A1		;849d
+	jr nz,L_84A1		;849d   ; ... tiene la y 8 mas arriba
 	sub 008h		;849f
 L_84A1:
 	sub 002h		;84a1
-	sub e			;84a3
+	sub e			;84a3   ; la distancia en y
 	add a,c			;84a4
-	cp h			;84a5
+	cp h			;84a5   ; carry: se tocan
 	ret			;84a6
-L_84A7:
+le_alcanza_el_latigo:
 	ld a,(0c416h)		;84a7   ; lee el arma que lleva Simon (0, ninguna)
-	dec a			;84aa
-	ld a,00ch		;84ab
+	dec a			;84aa   ; con el latigo 1...
+	ld a,00ch		;84ab   ; ... el alcance es 0x0C
 	jr nz,L_84B1		;84ad
-	ld a,010h		;84af
+	ld a,010h		;84af   ; ... o 0x10
 L_84B1:
-	add a,l			;84b1
+	add a,l			;84b1   ; mas el ancho de la cosa
 	ld l,a			;84b2
-	call L_84D9		;84b3
+	call punta_del_latigo		;84b3   ; A = la x de la punta del latigo
 	jr nc,L_84BA		;84b6
-	xor a			;84b8
+	xor a			;84b8   ; se sale por el borde: no alcanza
 	ret			;84b9
 L_84BA:
-	sub d			;84ba
+	sub d			;84ba   ; la distancia en x
 	jr nc,L_84BF		;84bb
-	neg		;84bd
+	neg		;84bd   ; sin signo
 L_84BF:
 	cp l			;84bf
-	ret nc			;84c0
-	ld a,(0c420h)		;84c1
-	cp 002h		;84c4
-	ld b,012h		;84c6
+	ret nc			;84c0   ; demasiado lejos
+	ld a,(0c420h)		;84c1   ; la postura de Simon
+	cp 002h		;84c4   ; la 2...
+	ld b,012h		;84c6   ; ... el latigo a 0x12 de los pies
 	jr nz,L_84CC		;84c8
-	ld b,00ah		;84ca
+	ld b,00ah		;84ca   ; ... si no, a 0x0A
 L_84CC:
 	ld c,h			;84cc
-	ld a,004h		;84cd
+	ld a,004h		;84cd   ; 4 de alto
 	add a,h			;84cf
 	ld h,a			;84d0
 	ld a,(0c425h)		;84d1   ; lee la Y de Simon
-	sub b			;84d4
-	sub e			;84d5
+	sub b			;84d4   ; la y del latigo
+	sub e			;84d5   ; la distancia en y
 	add a,c			;84d6
-	cp h			;84d7
+	cp h			;84d7   ; carry: le alcanza
 	ret			;84d8
-L_84D9:
+punta_del_latigo:
 	ld a,(0c416h)		;84d9   ; lee el arma que lleva Simon (0, ninguna)
-	dec a			;84dc
-	ld b,014h		;84dd
+	dec a			;84dc   ; con el latigo 1...
+	ld b,014h		;84dd   ; ... la punta a 0x14
 	jr nz,L_84E3		;84df
-	ld b,018h		;84e1
+	ld b,018h		;84e1   ; ... o a 0x18
 L_84E3:
-	ld a,(0c42ch)		;84e3   ; lee el lado al que mira Simon
-	and a			;84e6
+	ld a,(0c42ch)		;84e3   ; lee el lado al que mira Simon (0 derecha)
+	and a			;84e6   ; mirando a la derecha?
 	ld a,(0c427h)		;84e7   ; lee la X de Simon
 	jr z,L_84EE		;84ea
-	sub b			;84ec
+	sub b			;84ec   ; a la izquierda: la x menos el alcance
 	ret			;84ed
 L_84EE:
-	add a,b			;84ee
+	add a,b			;84ee   ; a la derecha: mas el alcance
 	ret			;84ef
-L_84F0:
-	ld iy,0c450h		;84f0
-	call L_8500		;84f4
-	ret c			;84f7
-	ld iy,0c460h		;84f8
+le_da_un_arma:
+	ld iy,0c450h		;84f0   ; la primera arma
+	call L_8500		;84f4   ; le da?
+	ret c			;84f7   ; si
+	ld iy,0c460h		;84f8   ; la segunda
 	call L_8500		;84fc
 	ret			;84ff
 L_8500:
-	ld a,006h		;8500
+	ld a,006h		;8500   ; el ancho del arma, 6 mas
 	add a,l			;8502
 	ld l,a			;8503
-	ld a,(iy+005h)		;8504
-	sub d			;8507
+	ld a,(iy+005h)		;8504   ; la x del arma
+	sub d			;8507   ; la distancia en x
 	jr nc,L_850C		;8508
-	neg		;850a
+	neg		;850a   ; sin signo
 L_850C:
 	cp l			;850c
-	ret nc			;850d
-	ld a,(iy+001h)		;850e
-	cp 002h		;8511
-	ld b,00ch		;8513
+	ret nc			;850d   ; lejos
+	ld a,(iy+001h)		;850e   ; el tipo de arma
+	cp 002h		;8511   ; la 2...
+	ld b,00ch		;8513   ; ... mide 0x0C
 	jr nz,L_8519		;8515
-	ld b,006h		;8517
+	ld b,006h		;8517   ; ... las otras, 6
 L_8519:
 	ld c,h			;8519
 	ld a,b			;851a
 	add a,h			;851b
 	ld h,a			;851c
-	ld a,(iy+004h)		;851d
-	sub e			;8520
+	ld a,(iy+004h)		;851d   ; la y del arma
+	sub e			;8520   ; la distancia en y
 	add a,c			;8521
-	cp h			;8522
+	cp h			;8522   ; carry: le da
 	ret			;8523
 L_8524:
-	ld a,(0c420h)		;8524
+	ld a,(0c420h)		;8524   ; en la postura 4...
 	cp 004h		;8527
 	jr nz,L_8531		;8529
-	ld a,(0c428h)		;852b
+	ld a,(0c428h)		;852b   ; ... hasta el paso 3...
 	cp 003h		;852e
-	ret c			;8530
+	ret c			;8530   ; ... no se mira
 L_8531:
-	ld hl,0c598h		;8531
-	ld de,00000h		;8534
+	ld hl,0c598h		;8531   ; las dos de 0xC598, siete bytes cada una
+	ld de,00000h		;8534   ; D y E a cero
 	ld b,002h		;8537
 L_8539:
-	ld a,(hl)			;8539
+	ld a,(hl)			;8539   ; puesta?
 	and a			;853a
 	push hl			;853b
 	push bc			;853c
-	call nz,L_854F		;853d
+	call nz,L_854F		;853d   ; si: esta debajo de Simon?
 	pop bc			;8540
 	pop hl			;8541
-	ld a,007h		;8542
+	ld a,007h		;8542   ; la siguiente, 7 bytes mas alla
 	call 04061h		;8544   ; hl_mas_a: HL += A
 	djnz L_8539		;8547
-	ld a,d			;8549
+	ld a,d			;8549   ; hay alguna debajo?
 	or e			;854a
-	ld (0c439h),a		;854b
+	ld (0c439h),a		;854b   ; a 0xC439
 	ret			;854e
 L_854F:
-	ld c,(hl)			;854f
+	ld c,(hl)			;854f   ; la bandera (bit 0: cual de las dos)
 	inc hl			;8550
-	ld a,(0c425h)		;8551   ; lee la Y de Simon
-	sub (hl)			;8554
-	cp 008h		;8555
+	ld a,(0c425h)		;8551   ; la y de Simon...
+	sub (hl)			;8554   ; ... menos la de la cosa
+	cp 008h		;8555   ; a menos de 8?
 	jr nc,L_856E		;8557
-	ld b,007h		;8559
+	ld b,007h		;8559   ; medio ancho de Simon, 7
 	inc hl			;855b
-	ld a,(0c427h)		;855c   ; lee la X de Simon
+	ld a,(0c427h)		;855c   ; su borde izquierdo...
 	sub b			;855f
 	sub (hl)			;8560
-	cp 020h		;8561
+	cp 020h		;8561   ; ... dentro de las 0x20 de la cosa?
 	jr c,L_8578		;8563
-	ld a,(0c427h)		;8565   ; lee la X de Simon
+	ld a,(0c427h)		;8565   ; el derecho...
 	add a,b			;8568
 	sub (hl)			;8569
-	cp 020h		;856a
+	cp 020h		;856a   ; ... dentro?
 	jr c,L_8578		;856c
 L_856E:
-	ld a,c			;856e
+	ld a,c			;856e   ; no esta encima:
 	rra			;856f
-	jr c,L_8575		;8570
-	ld d,000h		;8572
+	jr c,L_8575		;8570   ; segun cual sea...
+	ld d,000h		;8572   ; ... se borra D
 	ret			;8574
 L_8575:
-	ld e,000h		;8575
+	ld e,000h		;8575   ; ... o E
 	ret			;8577
 L_8578:
-	ld a,c			;8578
+	ld a,c			;8578   ; esta encima:
 	rra			;8579
 	jr c,L_857E		;857a
-	ld d,c			;857c
+	ld d,c			;857c   ; D = la bandera
 	ret			;857d
 L_857E:
-	ld e,c			;857e
+	ld e,c			;857e   ; E = la bandera
 	ret			;857f
 L_8580:
-	ld a,(0c42ch)		;8580   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;8580   ; mirando a la izquierda?
 	and a			;8583
 	jr z,L_858C		;8584
-	ld a,c			;8586
+	ld a,c			;8586   ; 8 menos
 	sub 008h		;8587
 	ld c,a			;8589
 	jr L_8590		;858a
 L_858C:
-	ld a,c			;858c
+	ld a,c			;858c   ; 8 mas
 	add a,008h		;858d
 	ld c,a			;858f
 L_8590:
 	dec b			;8590
 	dec b			;8591
-	ld a,(0c5adh)		;8592   ; lee donde esta la puerta de la fase
-	sub 008h		;8595
+	ld a,(0c5adh)		;8592   ; la y de la puerta...
+	sub 008h		;8595   ; ... 8 mas arriba
 	ld d,a			;8597
 	ld a,b			;8598
-	sub d			;8599
+	sub d			;8599   ; a menos de 0x38?
 	cp 038h		;859a
-	ret nc			;859c
-	ld a,(0c5aeh)		;859d
+	ret nc			;859c   ; no: lejos
+	ld a,(0c5aeh)		;859d   ; la x de la puerta
 	ld d,a			;85a0
 	ld a,c			;85a1
 	sub d			;85a2
-	cp 008h		;85a3
+	cp 008h		;85a3   ; carry: esta en la puerta
 	ret			;85a5
 L_85A6:
-	ld a,(0c420h)		;85a6
+	ld a,(0c420h)		;85a6   ; en la postura 6...
 	cp 006h		;85a9
-	ret z			;85ab
+	ret z			;85ab   ; ... nada
 	ld a,(0c42dh)		;85ac
 	and a			;85af
 	ret nz			;85b0
 	ld a,(0c43ah)		;85b1
 	and a			;85b4
 	ret nz			;85b5
-	ld hl,0c580h		;85b6
+	ld hl,0c580h		;85b6   ; las tres de 0xC580, ocho bytes cada una
 	ld b,003h		;85b9
 L_85BB:
-	ld a,(hl)			;85bb
+	ld a,(hl)			;85bb   ; puesta?
 	and a			;85bc
 	jr z,L_85D6		;85bd
 	push hl			;85bf
-	call L_85DE		;85c0
+	call L_85DE		;85c0   ; toca a Simon?
 	pop hl			;85c3
 	jr nc,L_85D6		;85c4
-	ld a,005h		;85c6
+	ld a,005h		;85c6   ; si: Simon a la postura 5 (herido)
 	ld (0c420h),a		;85c8
-	ld a,(hl)			;85cb
-	rra			;85cc
-	ld b,008h		;85cd
+	ld a,(hl)			;85cb   ; el primer byte...
+	rra			;85cc   ; ... bit 0:
+	ld b,008h		;85cd   ; quita 8...
 	jr nc,L_85D3		;85cf
-	ld b,010h		;85d1
+	ld b,010h		;85d1   ; ... o 16
 L_85D3:
-	jp 0462bh		;85d3
+	jp 0462bh		;85d3   ; le quita vida a Simon
 L_85D6:
-	ld a,008h		;85d6
+	ld a,008h		;85d6   ; la siguiente, 8 bytes mas alla
 	call 04061h		;85d8   ; hl_mas_a: HL += A
 	djnz L_85BB		;85db
 	ret			;85dd
 L_85DE:
-	inc hl			;85de
+	inc hl			;85de   ; su y
 	ld a,(hl)			;85df
 	ld d,a			;85e0
-	ld a,(0c425h)		;85e1   ; lee la Y de Simon
-	sub 01ch		;85e4
+	ld a,(0c425h)		;85e1   ; la y de Simon...
+	sub 01ch		;85e4   ; ... 0x1C mas arriba (la cabeza)
 	sub d			;85e6
-	cp 008h		;85e7
+	cp 008h		;85e7   ; a menos de 8?
 	ret nc			;85e9
 	inc hl			;85ea
-	ld a,(hl)			;85eb
+	ld a,(hl)			;85eb   ; su x
 	ld d,a			;85ec
 	ld a,(0c427h)		;85ed   ; lee la X de Simon
 	sub d			;85f0
-	cp 020h		;85f1
+	cp 020h		;85f1   ; carry: a menos de 0x20
 	ret			;85f3
 L_85F4:
-	ld hl,0c5b1h		;85f4
+	ld hl,0c5b1h		;85f4   ; hay paso a otra habitacion?
 	ld a,(hl)			;85f7
 	and a			;85f8
 	ret z			;85f9
-	inc hl			;85fa
+	inc hl			;85fa   ; su y
 	ld a,(hl)			;85fb
 	ld d,a			;85fc
 	ld a,(0c425h)		;85fd   ; lee la Y de Simon
 	sub 004h		;8600
 	sub d			;8602
-	cp 010h		;8603
+	cp 010h		;8603   ; a menos de 0x10?
 	ret nc			;8605
-	inc hl			;8606
+	inc hl			;8606   ; su x
 	ld a,(hl)			;8607
 	ld d,a			;8608
 	ld a,(0c427h)		;8609   ; lee la X de Simon
 	sub d			;860c
-	cp 010h		;860d
+	cp 010h		;860d   ; carry: Simon esta en el paso
 	ret			;860f
 L_8610:
-	ld a,(0c701h)		;8610
+	ld a,(0c701h)		;8610   ; lo del bit 5 de lo que lleva...
 	and 020h		;8613
-	ret z			;8615
-	ld ix,0d700h		;8616
+	ret z			;8615   ; ... si no lo lleva, nada
+	ld ix,0d700h		;8616   ; las ocho cosas de 0xD700
 	ld b,008h		;861a
 L_861C:
 	push bc			;861c
 	ld a,(ix+000h)		;861d   ; lee el tipo de la cosa
-	and a			;8620
+	and a			;8620   ; vacia?
 	jr z,L_8642		;8621
-	cp 00ch		;8623
+	cp 00ch		;8623   ; el tipo 0x0C no cuenta
 	jr z,L_8642		;8625
-	call L_8264		;8627
+	call L_8264		;8627   ; la toca?
 	jr nc,L_8642		;862a
-	call L_9A1A		;862c
-	ld a,00bh		;862f
+	call L_9A1A		;862c   ; si: se la carga
+	ld a,00bh		;862f   ; efecto 0x0B
 	call 0509fh		;8631   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld hl,0c441h		;8634
-	dec (hl)			;8637
+	ld hl,0c441h		;8634   ; apunta a los usos que le quedan a lo que para golpes
+	dec (hl)			;8637   ; gasta un uso
 	jr nz,L_8642		;8638
-	ld hl,0c701h		;863a
-	res 5,(hl)		;863d
-	call L_8EE6		;863f
+	ld hl,0c701h		;863a   ; se acabo:
+	res 5,(hl)		;863d   ; fuera el bit 5
+	call L_8EE6		;863f   ; y se repinta lo que lleva
 L_8642:
 	pop bc			;8642
-	ld de,00080h		;8643
+	ld de,00080h		;8643   ; la siguiente ficha
 	add ix,de		;8646
 	djnz L_861C		;8648
 	ret			;864a
-L_864B:
-	ld a,004h		;864b
+delante_de_simon:
+	ld a,004h		;864b   ; el ancho, 4 mas
 	add a,l			;864d
 	ld l,a			;864e
-	ld a,(0c42ch)		;864f   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;864f   ; mirando a la derecha?
 	and a			;8652
-	ld a,008h		;8653
+	ld a,008h		;8653   ; 8 por delante...
 	jr z,L_8659		;8655
-	neg		;8657
+	neg		;8657   ; ... o por detras
 L_8659:
 	ld b,a			;8659
-	ld a,(0c427h)		;865a   ; lee la X de Simon
+	ld a,(0c427h)		;865a   ; la x de Simon, 8 hacia donde mira
 	add a,b			;865d
-	sub d			;865e
+	sub d			;865e   ; la distancia en x
 	jr nc,L_8663		;865f
-	neg		;8661
+	neg		;8661   ; sin signo
 L_8663:
 	cp l			;8663
-	ret nc			;8664
+	ret nc			;8664   ; lejos
 	ld c,h			;8665
-	ld a,020h		;8666
+	ld a,020h		;8666   ; 0x20 de alto mas
 	add a,h			;8668
 	ld h,a			;8669
 	ld a,(0c425h)		;866a   ; lee la Y de Simon
-	sub e			;866d
+	sub e			;866d   ; la distancia en y
 	add a,c			;866e
-	cp h			;866f
+	cp h			;866f   ; carry: delante de Simon
 	ret			;8670
 L_8671:
 	ld bc,00800h		;8671
@@ -1794,10 +1803,10 @@ L_8A63:
 	djnz L_8A53		;8a6a
 	ret			;8a6c
 L_8A6D:
-	ld e,(ix+001h)		;8a6d   ; lee el paso en que va la cosa
-	ld d,(ix+002h)		;8a70   ; lee la fraccion de la y de la cosa
+	ld e,(ix+001h)		;8a6d
+	ld d,(ix+002h)		;8a70
 	ex af,af'			;8a73
-	ld a,(ix+003h)		;8a74   ; lee la y de la cosa
+	ld a,(ix+003h)		;8a74
 	dec a			;8a77
 	jp z,L_8BDF		;8a78
 	ex af,af'			;8a7b
@@ -1828,12 +1837,12 @@ DATA_tabla_de_p02_8A80:
 
 
 L_8A99:
-	inc (ix+006h)		;8a99   ; sube si la cosa se mueve
-	ld a,(ix+006h)		;8a9c   ; lee si la cosa se mueve
+	inc (ix+006h)		;8a99
+	ld a,(ix+006h)		;8a9c
 	and 00fh		;8a9f
 	ret nz			;8aa1
 	inc (hl)			;8aa2
-	ld a,(ix+004h)		;8aa3   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8aa3
 	or a			;8aa6
 	jp z,L_8B1B		;8aa7
 	cp 015h		;8aaa
@@ -1844,13 +1853,13 @@ L_8A99:
 	jr z,L_8AB7		;8ab3
 	ld a,002h		;8ab5
 L_8AB7:
-	ld (ix+005h),a		;8ab7   ; guarda la x de la cosa
+	ld (ix+005h),a		;8ab7
 	ret nz			;8aba
-	ld (ix+006h),000h		;8abb   ; la cosa se queda quieta
-	ld (ix+009h),002h		;8abf   ; la velocidad horizontal (parte baja) = 0x02
-	ld (ix+00ah),000h		;8ac3   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0x00
-	ld (ix+00bh),000h		;8ac7   ; el dibujo de la cosa = 0x00
-	ld (ix+00ch),020h		;8acb   ; la cuenta de cuadros del paso = 0x20
+	ld (ix+006h),000h		;8abb
+	ld (ix+009h),002h		;8abf
+	ld (ix+00ah),000h		;8ac3
+	ld (ix+00bh),000h		;8ac7
+	ld (ix+00ch),020h		;8acb
 	ret			;8acf
 L_8AD0:
 	ld a,(0d002h)		;8ad0   ; lee el bloque de tres fases (0-5)
@@ -1895,21 +1904,21 @@ L_8AF8:
 	sub 001h		;8b05
 	cp 009h		;8b07
 	jr c,L_8B68		;8b09
-	ld a,(ix+004h)		;8b0b   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8b0b
 	dec a			;8b0e
 	jp z,L_8B22		;8b0f
-	ld a,(ix+001h)		;8b12   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;8b12
 	add a,008h		;8b15
-	ld (ix+001h),a		;8b17   ; guarda el paso en que va la cosa
+	ld (ix+001h),a		;8b17
 	ret			;8b1a
 L_8B1B:
-	ld (ix+005h),0ffh		;8b1b   ; la x de la cosa = 0xFF
+	ld (ix+005h),0ffh		;8b1b
 	jp L_8BC7		;8b1f
 L_8B22:
 	push ix		;8b22
 	pop hl			;8b24
 	inc l			;8b25
-	inc (ix+006h)		;8b26   ; sube si la cosa se mueve
+	inc (ix+006h)		;8b26
 	ld a,(0c003h)		;8b29   ; lee el contador de cuadros
 	rra			;8b2c
 	jr nc,L_8B30		;8b2d
@@ -1917,13 +1926,13 @@ L_8B22:
 L_8B30:
 	inc l			;8b30
 	ld d,(hl)			;8b31
-	ld e,(ix+008h)		;8b32   ; lee la velocidad vertical
+	ld e,(ix+008h)		;8b32
 	ex de,hl			;8b35
-	ld b,(ix+009h)		;8b36   ; lee la velocidad horizontal (parte baja)
-	ld c,(ix+00ah)		;8b39   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld b,(ix+009h)		;8b36
+	ld c,(ix+00ah)		;8b39
 	add hl,bc			;8b3c
 	ex de,hl			;8b3d
-	ld (ix+008h),e		;8b3e   ; guarda la velocidad vertical
+	ld (ix+008h),e		;8b3e
 	ld (hl),d			;8b41
 	ld h,b			;8b42
 	ld l,c			;8b43
@@ -2034,7 +2043,7 @@ L_8C0B:
 	ld (hl),000h		;8c11
 	ret			;8c13
 L_8C14:
-	ld a,(ix+00dh)		;8c14
+	ld a,(ix+00dh)		;8c14   ; lee la vida de la cosa
 	ld (ix+004h),a		;8c17   ; guarda la fraccion de la x de la cosa
 	call L_8C2F		;8c1a
 	ld a,(0c700h)		;8c1d
@@ -2285,7 +2294,7 @@ L_8DA1:
 	ld b,020h		;8da6
 L_8DA8:
 	ld a,010h		;8da8
-	ld (0c441h),a		;8daa
+	ld (0c441h),a		;8daa   ; guarda los usos que le quedan a lo que para golpes
 	jr L_8D8F		;8dad
 L_8DAF:
 	ld b,001h		;8daf
@@ -2691,7 +2700,7 @@ L_9004:
 	sub (hl)			;9009
 	jr nz,L_9015		;900a
 	ld (hl),a			;900c
-	ld a,(ix+000h)		;900d   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;900d
 	xor 003h		;9010
 	ld (ix+000h),a		;9012   ; guarda el tipo de la cosa
 L_9015:
@@ -3019,7 +3028,7 @@ L_91D8:
 	jr z,L_9229		;91e7
 	ret			;91e9
 L_91EA:
-	ld (ix+009h),c		;91ea   ; guarda la velocidad horizontal (parte baja)
+	ld (ix+009h),c		;91ea
 	ld (hl),082h		;91ed
 	jp L_924C		;91ef
 L_91F2:
@@ -3042,8 +3051,8 @@ L_91F2:
 	inc (hl)			;9208
 	call L_92BB		;9209
 L_920C:
-	ld (ix+00ah),020h		;920c   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0x20
-	ld (ix+000h),003h		;9210   ; el tipo de la cosa = 0x03
+	ld (ix+00ah),020h		;920c
+	ld (ix+000h),003h		;9210
 	ret			;9214
 L_9215:
 	ld a,006h		;9215
@@ -3052,13 +3061,13 @@ L_9215:
 	ld (0c70bh),a		;921c
 	jr L_920C		;921f
 L_9221:
-	ld a,(ix+009h)		;9221   ; lee la velocidad horizontal (parte baja)
+	ld a,(ix+009h)		;9221
 	call L_944F		;9224
 	inc hl			;9227
 	ret			;9228
 L_9229:
-	dec (ix+00ah)		;9229   ; baja la velocidad horizontal (el bit 7, hacia la izquierda)
-	ld a,(ix+00ah)		;922c   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	dec (ix+00ah)		;9229
+	ld a,(ix+00ah)		;922c
 	push af			;922f
 	rra			;9230
 	ld a,002h		;9231
@@ -3072,7 +3081,7 @@ L_9238:
 	ret nz			;923e
 	ld a,(0c70bh)		;923f
 	call L_925E		;9242
-	ld (ix+000h),082h		;9245   ; el tipo de la cosa = 0x82
+	ld (ix+000h),082h		;9245
 	jp L_92A7		;9249
 L_924C:
 	push de			;924c
@@ -3527,7 +3536,7 @@ L_954B:
 	and 001h		;954f
 	ret			;9551
 L_9552:
-	ld a,(0c002h)		;9552
+	ld a,(0c002h)		;9552   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 	and 040h		;9555
 	ret z			;9557
 	ld a,(0ce00h)		;9558
@@ -3642,10 +3651,10 @@ L_9609:
 L_9634:
 	ld b,008h		;9634
 L_9636:
-	ld a,(ix+000h)		;9636   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;9636
 	and a			;9639
 	jr z,L_9644		;963a
-	ld a,(ix+004h)		;963c   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;963c
 	cp 003h		;963f
 	call z,L_964C		;9641
 L_9644:
@@ -3654,9 +3663,9 @@ L_9644:
 	djnz L_9636		;9649
 	ret			;964b
 L_964C:
-	ld a,(ix+001h)		;964c   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;964c
 	sub 010h		;964f
-	ld h,(ix+002h)		;9651   ; lee la fraccion de la y de la cosa
+	ld h,(ix+002h)		;9651
 	rra			;9654
 	rra			;9655
 	rra			;9656
@@ -4532,7 +4541,7 @@ L_9D2C:
 	ld e,0c0h		;9d2c
 L_9D2E:
 	ld d,0f0h		;9d2e
-	ld a,(0c42ch)		;9d30   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;9d30   ; lee el lado al que mira Simon (0 derecha)
 	and a			;9d33
 	ret z			;9d34
 	ld d,010h		;9d35

@@ -1,9 +1,339 @@
 # Notas del banco 02: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+C 0x8001 (viene de p01:7FFE, la instruccion partida entre bancos)
+C 0x8002 lo que hay en esa ficha
+C 0x8003 es el 0x1B?
+C 0x8007 si: 0xE0 (y fuera de la pantalla)
+C 0x8009 a cuatro sprites de la tabla de 0xD600
+C 0x8017 la ficha siguiente, 16 bytes mas alla
+C 0x801B B fichas
+C 0x801E las dos armas de 0xC450 y 0xC460
+C 0x8025 hay alguna en el aire?
+C 0x8026 ninguna: nada que mirar
+C 0x8027 las siete fichas de cosas de 0xC800
+C 0x8030 vacia?
+C 0x8033 el bit 0 de (ix+0x0E): se le puede dar
+C 0x8039 mira si alguna arma la toca
+C 0x803E si: a restarle vida
+C 0x8040 la ficha siguiente
+C 0x8045 siete fichas
+C 0x804C el golpe: efecto 0x0C
+C 0x8054 los tipos 0x11 a 0x17...
+C 0x8058 ... van aparte
+C 0x805A el arma: (iy+1) menos 2...
+C 0x805F ... elige cuanto quita, en la tabla de 0x8048
+C 0x8065 lo que quita el arma
+C 0x8066 la vida de la cosa (ix+0x0D)
+C 0x806D a cero: muerta
+C 0x806F aun le queda: sigue
+C 0x8072 muerta: puntos
+C 0x8075 y lo que suelta
+C 0x8078 que arma era?
+C 0x807B la 2 se gasta al dar
+C 0x8080 la 2: se quita
+C 0x8083 ya no se le puede dar hasta que vuelva a poder
+C 0x808B el tipo 0x12...
+C 0x808F ... solo cuenta aparte con 0xCE00 puesto
+C 0x8095 los tipos 0x11-0x17 restan de la barra ENEMY
+C 0x809B a cero?
+C 0x809E el bit 7: aun le queda
+C 0x80A1 se acabo la barra
+C 0x80A6 las ocho cosas fijas de la habitacion (0xC470, 16 bytes cada una; las pone p00:5B1E)
+C 0x80AF vacia?
+C 0x80B3 le da un arma?
+C 0x80B7 no
+C 0x80B9 si: sube su estado ((ix+3) en esta lista)
+C 0x80BF a 0xC433
+C 0x80C2 el arma 2 se gasta al dar
+C 0x80CF el golpe: efecto 0x0C
+C 0x80D4 la cosa fija siguiente, 16 bytes mas alla
+C 0x80D9 ocho
+C 0x80DC las dos fichas de 0xC5B5 y 0xC5C5
+C 0x80E5 el bit 7: esta puesta?
+C 0x80E7 no
+C 0x80EB con el arma 0 o 1...
+C 0x80EF ... y 0xC422 a 3...
+C 0x80F7 ... se mira de otra forma
+C 0x80FB le da
+C 0x80FE le da un arma?
+C 0x8102 no
+C 0x8103 el arma 2 se gasta al dar
+C 0x8112 su cuarto byte...
+C 0x8115 ... sube
+C 0x8116 el golpe: efecto 0x0C
+C 0x811B las ocho fichas de 16 bytes de 0xC500
+C 0x8122 el bit 7: esta puesta?
+C 0x8124 no
+C 0x8127 su quinto byte...
+C 0x812D ... es 0x0A...
+C 0x8131 ... o 0x0B?
+C 0x8133 ni uno ni otro: no se le puede dar
+C 0x8138 con el arma 0 o 1...
+C 0x813C ... y 0xC422 a 3...
+C 0x8144 ... se mira de otra forma
+C 0x8148 le da
+C 0x814B le da un arma?
+C 0x814F no
+C 0x8155 el arma 2 se gasta al dar
+C 0x8159 su cuarto byte...
+C 0x815C ... a 2
+C 0x815E el golpe: efecto 0x0C
+C 0x8165 la siguiente, 16 bytes mas alla
+C 0x8169 ocho
+B 0x816C UNA COSA TOCA A SIMON: el dano sale de la tabla de 0x81CE (segundo byte del tipo) y se DOBLA, salvo que Simon lleve lo del bit 4 de 0xC701 y este mirando hacia la cosa: entonces no se dobla y se gasta uno de los usos de 0xC441; al acabarse, el bit 4 se quita y se repinta lo que lleva.
+C 0x816F desde el tipo 1
+C 0x8170 dos bytes por tipo
+C 0x8171 puntos y dano de cada tipo
+C 0x8177 el segundo:
+C 0x8178 B = el dano
+C 0x8179 lo que lleva Simon
+C 0x817C el bit 4 (lo que para golpes)
+C 0x817E no lo lleva: dano doble
+C 0x8189 la cosa esta a la izquierda de Simon
+C 0x818B Simon mira a la derecha...
+C 0x818C ... hacia la cosa: para el golpe
+C 0x818E de espaldas: dano doble
+C 0x8190 la cosa a la derecha: Simon mira a la izquierda...
+C 0x8191 ... hacia ella: para el golpe
+C 0x8193 dano doble
+C 0x8196 
+C 0x8198 gasta un uso
+C 0x819C aun le quedan
+C 0x819E se acabo:
+C 0x81A1 fuera el bit 4
+C 0x81A4 y se repinta lo que lleva
+C 0x81A8 quita B de vida a Simon
+C 0x81AE B = el tipo
+C 0x81AF desde el tipo 1
+C 0x81B0 dos bytes por tipo
+C 0x81B1 puntos y dano de cada tipo
+C 0x81B7 E = 0 (las unidades)
+C 0x81B9 D = los puntos, en BCD, de cien en cien
+C 0x81BA el tipo 0x11...
+C 0x81BD ... da 30.000 mas
+C 0x81C2 el 0x17 da 50.000 mas
+C 0x81C9 los demas, solo los de la tabla
+C 0x81CB suma C D E (BCD) al marcador
+C 0x822A 100 puntos
+C 0x822D al marcador
+B 0x8230 LAS CAJAS DE CHOQUE. Cada puerta pone en HL el tamano (H de alto, L de ancho, a cada lado) y en DE el centro (D la x, E la y), y sale hacia una de las cuatro comprobaciones: toca_a_simon (0x847A), le_alcanza_el_latigo (0x84A7), le_da_un_arma (0x84F0) o delante_de_simon (0x864B). Todas devuelven carry si hay choque.
+C 0x8230 en las listas de cosas fijas: la y...
+C 0x8232 ... mas 0x10
+C 0x8235 la x...
+C 0x8237 ... mas 8
+C 0x823A una caja de 0x10 x 8
+C 0x823D toca a Simon?
+C 0x8246 una caja de 0x10 x 8 en la x de la cosa
+C 0x824C B = su x, C = su y, A = su forma de caja
+C 0x827C B = su x, C = su y, A = su otra forma de caja
+C 0x82BB desde el tipo 1
+C 0x82BC la forma de caja de cada tipo
+C 0x82C2 la forma
+C 0x82C3 desde 0, para el despachador
+C 0x82FE desde el tipo 1
+C 0x82FF la otra tabla de formas
+C 0x8305 la forma
+C 0x8318 caja de 6 x 3
+C 0x8320 caja de 6 x 3
+C 0x8328 caja de 6 x 3
+C 0x8330 caja de 6 x 3
+C 0x8338 caja de 6 x 6
+C 0x8340 caja de 6 x 6
+C 0x8348 caja de 6 x 6
+C 0x8350 caja de 6 x 6
+C 0x8358 caja de 0x0C x 6
+C 0x8360 caja de 0x0C x 6
+C 0x8368 caja de 0x0C x 6
+C 0x8370 caja de 0x0C x 6
+C 0x8378 caja de 0x18 x 5
+C 0x8380 caja de 0x18 x 5
+C 0x8388 caja de 0x18 x 5
+C 0x8390 caja de 0x10 x 8
+C 0x8398 la posicion de B y C
+C 0x839C la de la lista de HL
+C 0x83A1 la de la lista de HL, mas grande
+C 0x83A4 caja de 0x10 x 8: le alcanza el latigo?
+C 0x83AA la posicion de B y C
+C 0x83AE la de la lista
+C 0x83B3 la de la lista, mas grande
+C 0x83B6 caja de 0x10 x 8: le da un arma?
+C 0x83BC la y de la lista...
+C 0x83BE ... mas 0x20
+C 0x83C1 la x...
+C 0x83C3 ... mas 0x10
+C 0x83C7 la y de la lista...
+C 0x83C9 ... mas 0x10
+C 0x83CC la x...
+C 0x83CE ... mas 8
+C 0x83D2 caja de 0x0A x 0x0C
+C 0x83DA caja de 0x0A x 0x0C
+C 0x83E2 caja de 0x0A x 0x0C
+C 0x83EA caja de 0x18 x 0x0C
+C 0x83F2 caja de 0x18 x 0x0C
+C 0x83FA caja de 0x18 x 0x0C
+C 0x8402 caja de 0x30 x 0x10
+C 0x840A caja de 0x18 x 5, 0x20 mas arriba
+C 0x8415 caja de 0x18 x 5, 0x20 mas arriba
+C 0x8420 caja de 0x28 x 5
+C 0x8428 caja de 0x28 x 5
+C 0x8430 caja de 0x28 x 5
+C 0x8438 caja de 0x30 x 8
+C 0x8440 caja de 0x30 x 8
+C 0x8448 caja de 0x30 x 8
+C 0x8450 la y de la lista...
+C 0x8452 ... mas 0x10
+C 0x8455 la x...
+C 0x8457 ... mas 8
+C 0x845A caja de 0x10 x 8: le alcanza el latigo?
+C 0x8460 en la lista de cosas fijas (IX = 0xC470 + 16 n): el tamano (byte 4)
+C 0x8463 menor que 2: la caja pequena
+C 0x846A si no, 0x20 x 0x10
+C 0x846D el byte 1...
+C 0x8470 ... mas el alto: la y
+C 0x8472 el byte 2...
+C 0x8475 ... mas el ancho: la x
+C 0x8477 le da un arma?
+C 0x847A el ancho de Simon, 5 mas
+C 0x8481 la distancia en x...
+C 0x8484 ... sin signo
+C 0x8486 mas que la suma de los anchos?
+C 0x8487 si: no se tocan
+C 0x8489 la postura de Simon
+C 0x848D la 1 y la 2...
+C 0x8490 ... le dan 0x12 de alto
+C 0x8494 las demas, 0x1A
+C 0x8496 la suma de las alturas
+C 0x8499 la postura 1...
+C 0x849D ... tiene la y 8 mas arriba
+C 0x84A3 la distancia en y
+C 0x84A5 carry: se tocan
+C 0x84AA con el latigo 1...
+C 0x84AB ... el alcance es 0x0C
+C 0x84AF ... o 0x10
+C 0x84B1 mas el ancho de la cosa
+C 0x84B3 A = la x de la punta del latigo
+C 0x84B8 se sale por el borde: no alcanza
+C 0x84BA la distancia en x
+C 0x84BD sin signo
+C 0x84C0 demasiado lejos
+C 0x84C1 la postura de Simon
+C 0x84C4 la 2...
+C 0x84C6 ... el latigo a 0x12 de los pies
+C 0x84CA ... si no, a 0x0A
+C 0x84CD 4 de alto
+C 0x84D4 la y del latigo
+C 0x84D5 la distancia en y
+C 0x84D7 carry: le alcanza
+C 0x84DC con el latigo 1...
+C 0x84DD ... la punta a 0x14
+C 0x84E1 ... o a 0x18
+C 0x84E6 mirando a la derecha?
+C 0x84EC a la izquierda: la x menos el alcance
+C 0x84EE a la derecha: mas el alcance
+C 0x84F0 la primera arma
+C 0x84F4 le da?
+C 0x84F7 si
+C 0x84F8 la segunda
+C 0x8500 el ancho del arma, 6 mas
+C 0x8504 la x del arma
+C 0x8507 la distancia en x
+C 0x850A sin signo
+C 0x850D lejos
+C 0x850E el tipo de arma
+C 0x8511 la 2...
+C 0x8513 ... mide 0x0C
+C 0x8517 ... las otras, 6
+C 0x851D la y del arma
+C 0x8520 la distancia en y
+C 0x8522 carry: le da
+C 0x8524 en la postura 4...
+C 0x852B ... hasta el paso 3...
+C 0x8530 ... no se mira
+C 0x8531 las dos de 0xC598, siete bytes cada una
+C 0x8534 D y E a cero
+C 0x8539 puesta?
+C 0x853D si: esta debajo de Simon?
+C 0x8542 la siguiente, 7 bytes mas alla
+C 0x8549 hay alguna debajo?
+C 0x854B a 0xC439
+C 0x854F la bandera (bit 0: cual de las dos)
+C 0x8551 la y de Simon...
+C 0x8554 ... menos la de la cosa
+C 0x8555 a menos de 8?
+C 0x8559 medio ancho de Simon, 7
+C 0x855C su borde izquierdo...
+C 0x8561 ... dentro de las 0x20 de la cosa?
+C 0x8565 el derecho...
+C 0x856A ... dentro?
+C 0x856E no esta encima:
+C 0x8570 segun cual sea...
+C 0x8572 ... se borra D
+C 0x8575 ... o E
+C 0x8578 esta encima:
+C 0x857C D = la bandera
+C 0x857E E = la bandera
+C 0x8580 mirando a la izquierda?
+C 0x8586 8 menos
+C 0x858C 8 mas
+C 0x8592 la y de la puerta...
+C 0x8595 ... 8 mas arriba
+C 0x8599 a menos de 0x38?
+C 0x859C no: lejos
+C 0x859D la x de la puerta
+C 0x85A3 carry: esta en la puerta
+C 0x85A6 en la postura 6...
+C 0x85AB ... nada
+C 0x85B6 las tres de 0xC580, ocho bytes cada una
+C 0x85BB puesta?
+C 0x85C0 toca a Simon?
+C 0x85C6 si: Simon a la postura 5 (herido)
+C 0x85CB el primer byte...
+C 0x85CC ... bit 0:
+C 0x85CD quita 8...
+C 0x85D1 ... o 16
+C 0x85D3 le quita vida a Simon
+C 0x85D6 la siguiente, 8 bytes mas alla
+C 0x85DE su y
+C 0x85E1 la y de Simon...
+C 0x85E4 ... 0x1C mas arriba (la cabeza)
+C 0x85E7 a menos de 8?
+C 0x85EB su x
+C 0x85F1 carry: a menos de 0x20
+C 0x85F4 hay paso a otra habitacion?
+C 0x85FA su y
+C 0x8603 a menos de 0x10?
+C 0x8606 su x
+C 0x860D carry: Simon esta en el paso
+C 0x8610 lo del bit 5 de lo que lleva...
+C 0x8615 ... si no lo lleva, nada
+C 0x8616 las ocho cosas de 0xD700
+C 0x8620 vacia?
+C 0x8623 el tipo 0x0C no cuenta
+C 0x8627 la toca?
+C 0x862C si: se la carga
+C 0x862F efecto 0x0B
+C 0x8637 gasta un uso
+C 0x863A se acabo:
+C 0x863D fuera el bit 5
+C 0x863F y se repinta lo que lleva
+C 0x8643 la siguiente ficha
+C 0x864B el ancho, 4 mas
+C 0x864F mirando a la derecha?
+C 0x8653 8 por delante...
+C 0x8657 ... o por detras
+C 0x865A la x de Simon, 8 hacia donde mira
+C 0x865E la distancia en x
+C 0x8661 sin signo
+C 0x8664 lejos
+C 0x8666 0x20 de alto mas
+C 0x866D la distancia en y
+C 0x866F carry: delante de Simon
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
 F 0x8000 16
-D 0x8048 0x804C cuatro_valores  cuatro bytes que p02:805F elige con (iy+1) - 2; los mismos bytes los usan como coordenadas de VRAM p00:58E7, p00:592A y p01:662B
+D 0x8048 0x804C lo_que_quita_cada_arma  cuanto quita cada arma (1, 4, 2, 2): p02:805F lo elige con el tipo de arma (iy+1) menos 2 y p02:8069 se lo resta a la vida de la cosa; los mismos bytes los usan como coordenadas de VRAM p00:58E7, p00:592A y p01:662B
 F 0x8048 16
 D 0x81CE 0x822A puntos_y_dano_de_cada_tipo  46 pares, uno por tipo de cosa (1-46): [puntos que da al morir, en BCD, que p02:81B9 pasa a 0x44EE][dano que hace al tocar a Simon, que p02:8178 pasa a 0x462B]
 F 0x81CE 16
@@ -98,17 +428,20 @@ F 0x9E5F 2
 # --- fin de los bloques de bloques.py ---
 
 # --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0x847A toca_a_simon
+L 0x84A7 le_alcanza_el_latigo
+L 0x84D9 punta_del_latigo
+L 0x84F0 le_da_un_arma
+L 0x864B delante_de_simon
 L 0x99F6 borra_la_cosa
 L 0x9F6D crea_con_parametros
 C 0x802D lee el tipo de la cosa
 C 0x804E sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x8051 lee el tipo de la cosa
 C 0x8062 hl_mas_a: HL += A
+C 0x806A guarda la vida de la cosa
 C 0x8088 lee el tipo de la cosa
 C 0x8098 lee la vida del enemigo (barra ENEMY)
-C 0x80AC lee el tipo de la cosa
-C 0x80B9 sube la y de la cosa
-C 0x80BC lee la fraccion de la x de la cosa
 C 0x80D1 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x80E8 lee el arma que lleva Simon (0, ninguna)
 C 0x8118 sonido: arranca la musica o el efecto A (bit 7 = musica)
@@ -118,11 +451,12 @@ C 0x816C lee el tipo de la cosa
 C 0x8174 hl_mas_a: HL += A
 C 0x8180 lee la X de Simon
 C 0x8183 le resta la x de la cosa
-C 0x8186 lee el lado al que mira Simon
+C 0x8186 lee el lado al que mira Simon (0 derecha)
 C 0x81AB lee el tipo de la cosa
 C 0x81B4 hl_mas_a: HL += A
 C 0x8240 lee la x de la cosa
 C 0x8243 lee la fraccion de la x de la cosa
+C 0x8249 toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 C 0x824F despacha: salta a la entrada A de la tabla que va detras del call
 C 0x825B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8267 despacha: salta a la entrada A de la tabla que va detras del call
@@ -138,31 +472,55 @@ C 0x82FB lee el tipo de la cosa
 C 0x8302 hl_mas_a: HL += A
 C 0x8306 lee la x de la cosa
 C 0x8309 lee la y de la cosa
-C 0x8460 lee la fraccion de la x de la cosa
-C 0x846D lee el paso en que va la cosa
-C 0x8472 lee la fraccion de la y de la cosa
+C 0x831D toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8325 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x832D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8335 delante_de_simon: carry si la caja esta justo delante de Simon
+C 0x833D toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8345 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x834D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8355 delante_de_simon: carry si la caja esta justo delante de Simon
+C 0x835D toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8365 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x836D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8375 delante_de_simon: carry si la caja esta justo delante de Simon
+C 0x837D toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8385 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x838D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8395 toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x83A7 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x83B9 le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x83D7 toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x83DF le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x83E7 le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x83EF toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x83F7 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x83FF le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8407 toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8412 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x841D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x8425 toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x842D le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x8435 le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x843D toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
+C 0x8445 le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
+C 0x844D le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
+C 0x845D le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
 C 0x847E lee la X de Simon
 C 0x849A lee la Y de Simon
 C 0x84A7 lee el arma que lleva Simon (0, ninguna)
 C 0x84D1 lee la Y de Simon
 C 0x84D9 lee el arma que lleva Simon (0, ninguna)
-C 0x84E3 lee el lado al que mira Simon
+C 0x84E3 lee el lado al que mira Simon (0 derecha)
 C 0x84E7 lee la X de Simon
 C 0x8544 hl_mas_a: HL += A
-C 0x8551 lee la Y de Simon
-C 0x855C lee la X de Simon
-C 0x8565 lee la X de Simon
-C 0x8580 lee el lado al que mira Simon
-C 0x8592 lee donde esta la puerta de la fase
 C 0x85D8 hl_mas_a: HL += A
-C 0x85E1 lee la Y de Simon
 C 0x85ED lee la X de Simon
 C 0x85FD lee la Y de Simon
 C 0x8609 lee la X de Simon
 C 0x861D lee el tipo de la cosa
 C 0x8631 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x864F lee el lado al que mira Simon
-C 0x865A lee la X de Simon
+C 0x8634 apunta a los usos que le quedan a lo que para golpes
 C 0x866A lee la Y de Simon
 C 0x86CB lee el bloque de tres fases (0-5)
 C 0x86E4 hl_mas_a: HL += A
@@ -193,33 +551,12 @@ C 0x88C1 de_mas_a: DE += A
 C 0x890F de_mas_a: DE += A
 C 0x8987 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x8A2D lee el arma que lleva Simon (0, ninguna)
-C 0x8A6D lee el paso en que va la cosa
-C 0x8A70 lee la fraccion de la y de la cosa
-C 0x8A74 lee la y de la cosa
 C 0x8A84 hl_mas_a: HL += A
-C 0x8A99 sube si la cosa se mueve
-C 0x8A9C lee si la cosa se mueve
-C 0x8AA3 lee la fraccion de la x de la cosa
-C 0x8AB7 guarda la x de la cosa
-C 0x8ABB la cosa se queda quieta
-C 0x8ABF la velocidad horizontal (parte baja) = 0x02
-C 0x8AC3 la velocidad horizontal (el bit 7, hacia la izquierda) = 0x00
-C 0x8AC7 el dibujo de la cosa = 0x00
-C 0x8ACB la cuenta de cuadros del paso = 0x20
 C 0x8AD0 lee el bloque de tres fases (0-5)
 C 0x8ADE hl_mas_a: HL += A
 C 0x8AE8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x8B02 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x8B0B lee la fraccion de la x de la cosa
-C 0x8B12 lee el paso en que va la cosa
-C 0x8B17 guarda el paso en que va la cosa
-C 0x8B1B la x de la cosa = 0xFF
-C 0x8B26 sube si la cosa se mueve
 C 0x8B29 lee el contador de cuadros
-C 0x8B32 lee la velocidad vertical
-C 0x8B36 lee la velocidad horizontal (parte baja)
-C 0x8B39 lee la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x8B3E guarda la velocidad vertical
 C 0x8B44 lee el dibujo de la cosa
 C 0x8B47 lee la cuenta de cuadros del paso
 C 0x8B4D guarda la velocidad horizontal (parte baja)
@@ -249,6 +586,7 @@ C 0x8BDF la y de la cosa = 0x00
 C 0x8BF3 lee la fraccion de la x de la cosa
 C 0x8BFA la x de la cosa = 0xFF
 C 0x8C01 lee la fraccion de la x de la cosa
+C 0x8C14 lee la vida de la cosa
 C 0x8C17 guarda la fraccion de la x de la cosa
 C 0x8C2F lee el paso en que va la cosa
 C 0x8C34 guarda el paso en que va la cosa
@@ -275,6 +613,7 @@ C 0x8D05 hl_mas_a: HL += A
 C 0x8D29 lee la fraccion de la x de la cosa
 C 0x8D3B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8D76 guarda el arma que lleva Simon (0, ninguna)
+C 0x8DAA guarda los usos que le quedan a lo que para golpes
 C 0x8E94 guarda el arma que lleva Simon (0, ninguna)
 C 0x8E9A lee el arma que lleva Simon (0, ninguna)
 C 0x8F0B hl_mas_a: HL += A
@@ -283,7 +622,6 @@ C 0x8F5A lee el contador de cuadros
 C 0x8F69 lee la fraccion de la x de la cosa
 C 0x8F7D sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x8F9F lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-C 0x900D lee el tipo de la cosa
 C 0x9012 guarda el tipo de la cosa
 C 0x9015 guarda el paso en que va la cosa
 C 0x9024 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
@@ -296,13 +634,6 @@ C 0x9165 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRA
 C 0x916A guarda el estado de la puerta de la fase
 C 0x916E apunta a el estado de la puerta de la fase
 C 0x91A7 hl_mas_a: HL += A
-C 0x91EA guarda la velocidad horizontal (parte baja)
-C 0x920C la velocidad horizontal (el bit 7, hacia la izquierda) = 0x20
-C 0x9210 el tipo de la cosa = 0x03
-C 0x9221 lee la velocidad horizontal (parte baja)
-C 0x9229 baja la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x922C lee la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x9245 el tipo de la cosa = 0x82
 C 0x92AA despacha: salta a la entrada A de la tabla que va detras del call
 C 0x92BE lee la x de la cosa
 C 0x92C4 de_mas_a: DE += A
@@ -330,6 +661,7 @@ C 0x94D3 lee los corazones, en BCD
 C 0x94F1 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x94FE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x951A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x9552 lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x958E rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x959B rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x95A0 sonido: arranca la musica o el efecto A (bit 7 = musica)
@@ -337,10 +669,6 @@ C 0x95E8 lee la FASE (0 el patio, 1-18)
 C 0x95EE hl_mas_a: HL += A
 C 0x960C lee la FASE (0 el patio, 1-18)
 C 0x9627 lee la HABITACION dentro de la fase
-C 0x9636 lee el tipo de la cosa
-C 0x963C lee la fraccion de la x de la cosa
-C 0x964C lee el paso en que va la cosa
-C 0x9651 lee la fraccion de la y de la cosa
 C 0x9673 hl_mas_a: HL += A
 C 0x967A lee la FASE (0 el patio, 1-18)
 C 0x9680 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
@@ -446,7 +774,7 @@ C 0x9CE6 apunta a los plazos de las siete cosas de la habitacion
 C 0x9CF9 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9CFC lee la Y de Simon
 C 0x9D00 lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-C 0x9D30 lee el lado al que mira Simon
+C 0x9D30 lee el lado al que mira Simon (0 derecha)
 C 0x9D6A hl_mas_a: HL += A
 C 0x9D6E lee la X de Simon
 C 0x9D76 crea_una_cosa: crea una cosa del tipo C en la posicion DE

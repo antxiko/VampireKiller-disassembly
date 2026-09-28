@@ -296,6 +296,132 @@ C 0x4AF1 y su fila: la fuente empieza en la linea 0x38
 C 0x4AF4 8 x 8 puntos
 C 0x4AF7 de la pagina 1 a la 0
 C 0x4AF9 copia la letra de la fuente a la pantalla
+B 0x5076 INICIA EL SONIDO: el mezclador con los tres tonos abiertos (0xBC) y todos los canales a la rutina de reposo. 0x5085 es la parte que se usa tambien para callarlo todo (sonido 0).
+C 0x5076 0xBC: tonos abiertos, ruidos cerrados, el puerto A de entrada (los mandos)
+C 0x507B sin fundido
+C 0x5085 sin efecto sonando
+C 0x508F los cuatro manejadores a canal_en_reposo
+C 0x509E (este `ret` hace tambien de manejador vacio: p00:511C lo pone en el canal de los efectos)
+B 0x509F SONIDO: el numero en A. 0 lo calla todo; 0x80-0xFA es una musica (tres canales, tabla de 0x8DC9); 1-0x7F un efecto, que solo suena si su numero no es menor que el del que ya suena (0xC096 hace de prioridad); 0xFB y 0xFC ponen y quitan el segundo efecto (0x948B) guardando lo que habia; 0xFD y 0xFE hacen lo mismo con la musica de la pausa (0x9463); 0xFF funde la musica. Todo con los bancos 14 y 15, que al final se cambian por 1, 2 y 3.
+C 0x509F lo guarda todo
+C 0x50A3 los bancos del sonido, con su copia
+C 0x50A4 el 14
+C 0x50AE el 15
+C 0x50B7 el numero
+C 0x50B9 0: callarlo todo
+C 0x50BD 0xFB en adelante: las ordenes especiales
+C 0x50C3 bit 7 a cero: un efecto
+C 0x50C6 una MUSICA: los tres canales, limpios
+C 0x50C9 con los 20 bytes del canal en reposo
+C 0x50D1 el segundo canal (0xC030)
+C 0x50D9 el tercero (0xC044)
+C 0x50E1 el numero de musica
+C 0x50E3 por dos...
+C 0x50E5 ... y por cuatro: por seis
+C 0x50E7 la tabla de musicas
+C 0x50EF la partitura del canal A
+C 0x50F3 a su ficha
+C 0x50F7 la del canal B
+C 0x50FB a su ficha
+C 0x50FF la del canal C
+C 0x5102 a su ficha
+C 0x5106 los manejadores de los tres canales
+C 0x5118 ningun efecto
+C 0x511C y el de los efectos, a un `ret`
+C 0x5122 quita el bit 1 de las banderas
+C 0x512A sin fundido
+C 0x5134 la cuenta de 0xC0A7 a 7
+C 0x5139 y se vuelven a poner los bancos 1, 2 y 3
+C 0x513E el 1 en 0x6000
+C 0x5143 y en su copia
+C 0x5144 el 2 en 0x8000
+C 0x5149 y en su copia
+C 0x514A el 3 en 0xA000
+C 0x514F y en su copia
+C 0x5152 lo que se guardo al entrar
+C 0x516A un EFECTO: su numero en C
+C 0x516B hay algo que no deja?
+C 0x516F si: no suena
+C 0x5175 comparado con el que suena
+C 0x5176 el mismo: vuelve a empezar
+C 0x5179 menor: no lo pisa
+C 0x517C este pasa a ser el que suena
+C 0x5180 la ficha del canal de efectos, limpia
+C 0x518B por dos
+C 0x518C la tabla de efectos (desde el 1)
+C 0x5194 su guion
+C 0x5197 a la ficha
+C 0x519B y el manejador de los efectos
+C 0x51A4 el 0: todo callado
+C 0x51AA 0xFB
+C 0x51AF 0xFC
+C 0x51B4 0xFD: la musica de la pausa
+C 0x51B9 0xFE: se vuelve de la pausa
+C 0x51BC 0xFF: el fundido, 0x3A cuadros
+C 0x51C7 el bit 0 de las banderas: en la pausa
+C 0x51CF guarda el fundido
+C 0x51D5 el volumen restado
+C 0x51DB el mezclador
+C 0x51DE un mezclador nuevo: solo el tono A
+C 0x51E3 guarda los periodos y volumenes que hay en el PSG:
+C 0x51E7 el periodo fino del canal A
+C 0x51EA el grueso
+C 0x51F2 el volumen del A
+C 0x51FA el del B
+C 0x5202 el del C
+C 0x520A el canal 0...
+C 0x520E ... con el numero 5
+C 0x5213 el manejador de la musica de la pausa
+C 0x5219 su ficha, limpia
+C 0x5224 y su partitura
+C 0x5230 fuera la pausa de las banderas
+C 0x5235 y se devuelve todo lo guardado
+C 0x5247 el periodo fino del A
+C 0x524B registro 0
+C 0x524F el grueso
+C 0x5253 registro 1
+C 0x5258 el volumen del A
+C 0x525C registro 8
+C 0x5261 el del B
+C 0x5265 registro 9
+C 0x526A el del C
+C 0x526E registro 10
+C 0x5279 0xFB: el bit 1 de las banderas
+C 0x5281 guarda el mezclador
+C 0x5287 hay efecto sonando?
+C 0x528B no: solo el tono A
+C 0x5293 si: se le abren mas canales
+C 0x5298 guarda el periodo del canal A...
+C 0x52A7 ... y su volumen
+C 0x52AF el manejador del segundo efecto
+C 0x52B5 su ficha, limpia
+C 0x52C0 y su guion
+C 0x52CC 0xFC: fuera el bit 1
+C 0x52D4 habia efecto?
+C 0x52D5 el mezclador guardado
+C 0x52DF se mezcla con el de ahora...
+C 0x52E6 ... dejando los bits del efecto
+C 0x52EC y se devuelve el canal A
+C 0x52F0 registro 0
+C 0x52F8 registro 1
+C 0x52FD su volumen
+B 0x44EE SUMA AL MARCADOR C D E, en BCD (decenas de millar, centenas, unidades), solo en una partida de verdad (bit 7 de 0xC002); se planta en 999999.
+C 0x44EE en la demostracion...
+C 0x44F1 ... (bit 7 a cero)...
+C 0x44F2 ... no se cuentan puntos
+C 0x44F3 el marcador, tres bytes en BCD
+C 0x44F7 las unidades y decenas
+C 0x44F8 
+C 0x44F9 
+C 0x44FB centenas y millares, con el acarreo
+C 0x44FD 
+C 0x44FE 
+C 0x4500 decenas y centenas de millar
+C 0x4502 
+C 0x4503 
+C 0x4504 sin desbordar: listo
+C 0x4506 se paso de 999999: se queda ahi
+C 0x4513 el marcador de arriba: SCORE-, PLAYER, ENEMY, corazones, P- y STAGE-
 
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
@@ -483,7 +609,9 @@ C 0x42A8 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera e
 C 0x42AD sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x42B4 lee si se puede pausar (partida en marcha)
 C 0x42C4 apunta a la espera del estado, en cuadros
+C 0x42C9 apunta a las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x42D5 guarda las vidas
+C 0x42DB guarda el MARCADOR, tres bytes en BCD
 C 0x42E9 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x42EC lee si se puede pausar (partida en marcha)
 C 0x42F5 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
@@ -498,6 +626,7 @@ C 0x437C cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera e
 C 0x4384 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x439C apunta a la espera del estado, en cuadros
 C 0x43A1 apunta a el ESTADO del juego
+C 0x43AC guarda las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x43AF lee si se puede pausar (partida en marcha)
 C 0x43BE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x43CA guarda la fase del marcador que da el Game Master
@@ -516,6 +645,7 @@ C 0x447C guarda las vidas que da el Game Master
 C 0x44A2 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x44AD rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x44C3 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x44C6 apunta a el MARCADOR, tres bytes en BCD
 C 0x44D6 apunta a las vidas
 C 0x44E0 guarda la vida de Simon
 C 0x44E5 guarda la vida del enemigo (barra ENEMY)
@@ -565,6 +695,7 @@ C 0x4B6D rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#
 C 0x4B77 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x4B7A espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4B92 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
+C 0x4B9D lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x4D47 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x4D4D espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4D5A pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
@@ -652,7 +783,6 @@ C 0x510F guarda el manejador del canal B
 C 0x5115 guarda el manejador del canal C
 C 0x5119 guarda la prioridad del efecto que suena
 C 0x511F guarda el manejador del efecto de sonido
-C 0x5122 lee las banderas del sonido (bit 0 pausa, bit 1 ...)
 C 0x5127 guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
 C 0x512B guarda la cuenta del fundido de la musica
 C 0x512E guarda el volumen que se le resta a la musica
@@ -867,10 +997,10 @@ C 0x5AA0 lee el bloque de tres fases (0-5)
 C 0x5AA7 hl_mas_a: HL += A
 C 0x5AF2 hl_mas_a: HL += A
 C 0x5B52 lee la FASE (0 el patio, 1-18)
-C 0x5BBD lee el tipo de la cosa
 C 0x5BCF lee la HABITACION dentro de la fase
 C 0x5BDA lee la FASE (0 el patio, 1-18)
 C 0x5BE4 hl_mas_a: HL += A
+C 0x5C3A lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x5C59 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x5CAF guarda si se puede pausar (partida en marcha)
 C 0x5CFA rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
@@ -909,6 +1039,7 @@ C 0x5F7F lee el tipo de la cosa que se crea
 C 0x5F86 lee la posicion de la cosa que se crea
 C 0x5FB5 lee el tipo de la cosa que se crea
 C 0x5FBB de_mas_a: DE += A
+C 0x5FBF guarda la vida de la cosa
 C 0x5FC2 lee la ficha de la cosa que se crea
 C 0x5FC5 lee el tipo de la cosa
 C 0x5FC9 despacha: salta a la entrada A de la tabla que va detras del call

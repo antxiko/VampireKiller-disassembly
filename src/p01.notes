@@ -5,7 +5,7 @@ D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cua
 F 0x6058 16
 D 0x6086 0x60E2 colores_de_cada_tipo  46 punteros, uno por tipo (1-46), a la lista de colores de sus sprites: p00:5FB2 llama a 0x6029 con DE = 0x6084, que copia un color por sprite a (ix+0x25), (ix+0x2A)...; el ultimo byte, 0x60E1, es a la vez la entrada 0 (sin usar) de la tabla siguiente
 F 0x6086 16
-D 0x60E2 0x6110 un_byte_de_cada_tipo  46 bytes, uno por tipo (1-46), que p00:5FB8 pone en (ix+0x0D)
+D 0x60E2 0x6110 vida_de_cada_tipo  46 bytes, uno por tipo (1-46): la vida con la que nace cada cosa; p00:5FB8 la pone en (ix+0x0D) y p02:8069 le resta lo que quita el arma
 F 0x60E2 16
 D 0x6110 0x6154 listas_de_colores  las listas de colores de sprite a las que apuntan los punteros de 0x6086: un byte por sprite
 F 0x6110 16
@@ -131,7 +131,7 @@ C 0x6402 lee la FASE (0 el patio, 1-18)
 C 0x6409 hl_mas_a: HL += A
 C 0x6411 guarda la Y de Simon
 C 0x6415 guarda la X de Simon
-C 0x641B guarda el lado al que mira Simon
+C 0x641B guarda el lado al que mira Simon (0 derecha)
 C 0x6445 lee el tipo de la cosa
 C 0x6451 el mapper: pone en 0xA000 el banco de A
 C 0x6454 guarda la copia del banco de 0xA000
@@ -266,9 +266,9 @@ C 0x6C09 guarda la fraccion de la y de Simon
 C 0x6C0C guarda la fraccion de la x de Simon
 C 0x6C28 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6C2C pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x6C31 guarda el lado al que mira Simon
+C 0x6C31 guarda el lado al que mira Simon (0 derecha)
 C 0x6C3A lee la X de Simon
-C 0x6C54 guarda el lado al que mira Simon
+C 0x6C54 guarda el lado al que mira Simon (0 derecha)
 C 0x6C5D lee la X de Simon
 C 0x6C74 lee la Y de Simon
 C 0x6C78 lee la X de Simon
@@ -297,27 +297,27 @@ C 0x6E14 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E18 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E1B lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E1F guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
-C 0x6E23 guarda el lado al que mira Simon
+C 0x6E23 guarda el lado al que mira Simon (0 derecha)
 C 0x6E29 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6E44 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
 C 0x6E4C lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E50 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E53 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E58 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
-C 0x6E5D guarda el lado al que mira Simon
+C 0x6E5D guarda el lado al que mira Simon (0 derecha)
 C 0x6E63 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6E7E mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
 C 0x6E85 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E8A guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E8D lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E91 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
-C 0x6E95 guarda el lado al que mira Simon
+C 0x6E95 guarda el lado al que mira Simon (0 derecha)
 C 0x6E9B guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6EBD lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6EC2 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6EC6 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6ECB guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
-C 0x6ED0 guarda el lado al que mira Simon
+C 0x6ED0 guarda el lado al que mira Simon (0 derecha)
 C 0x6ED6 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6EF8 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6F03 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
@@ -339,11 +339,12 @@ C 0x6F6A lee la Y de Simon
 C 0x6F6F guarda la Y de Simon
 C 0x6F7E sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x6F88 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6F93 lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x6F9A sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x6FA9 lee la vida de Simon
 C 0x6FB6 guarda la pose de abajo de Simon
 C 0x6FB9 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x6FBF guarda el lado al que mira Simon
+C 0x6FBF guarda el lado al que mira Simon (0 derecha)
 C 0x6FCD guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x6FD1 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6FE0 aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
@@ -354,8 +355,8 @@ C 0x6FFF lee la vida de Simon
 C 0x700C lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x7012 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x703C lee el estado de la puerta de la fase
-C 0x704B lee el lado al que mira Simon
-C 0x7050 guarda el lado al que mira Simon
+C 0x704B lee el lado al que mira Simon (0 derecha)
+C 0x7050 guarda el lado al que mira Simon (0 derecha)
 C 0x7053 lee la vida de Simon
 C 0x7058 apunta a la X de Simon
 C 0x7076 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
@@ -365,6 +366,7 @@ C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70B4 apunta a los corazones, en BCD
 C 0x70D6 guarda la HABITACION dentro de la fase
 C 0x70E5 guarda el arma que lleva Simon (0, ninguna)
+C 0x70EE guarda los usos que le quedan a lo que para golpes
 C 0x7109 guarda el lado por el que se sale de la habitacion
 C 0x7123 lee el arma que lleva Simon (0, ninguna)
 C 0x714D lee los corazones, en BCD
@@ -374,8 +376,6 @@ C 0x7176 guarda los corazones, en BCD
 C 0x7191 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x71B2 lee los corazones, en BCD
 C 0x71B8 guarda los corazones, en BCD
-C 0x71CC lee el paso en que va la cosa
-C 0x71D4 guarda el tipo de la cosa
 C 0x71EF despacha: salta a la entrada A de la tabla que va detras del call
 C 0x7209 guarda la pose de arriba de Simon
 C 0x721D guarda la pose de abajo de Simon
@@ -387,18 +387,10 @@ C 0x7240 apunta a la pose de abajo de Simon
 C 0x725A apunta a la pose de abajo de Simon
 C 0x7280 guarda la pose de abajo de Simon
 C 0x7283 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x7292 lee el tipo de la cosa
-C 0x729A guarda si la cosa se mueve
-C 0x729D lee el lado al que mira Simon
-C 0x72A0 guarda la velocidad vertical
-C 0x72A6 guarda el paso en que va la cosa
-C 0x72BD lee el paso en que va la cosa
-C 0x72CE lee el paso en que va la cosa
+C 0x729D lee el lado al que mira Simon (0 derecha)
 C 0x72D3 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x72DE lee el contador de cuadros
-C 0x72EB guarda si la cosa se mueve
 C 0x72F5 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x72F8 lee el tipo de la cosa
 C 0x72FC despacha: salta a la entrada A de la tabla que va detras del call
 C 0x730C lee la Y de Simon
 C 0x7316 guarda la fraccion de la x de la cosa
@@ -493,16 +485,16 @@ C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7624 apunta a la pose de arriba de Simon
 C 0x7654 apunta a la pose de arriba de Simon
-C 0x765F lee el lado al que mira Simon
+C 0x765F lee el lado al que mira Simon (0 derecha)
 C 0x7664 lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x7677 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x7681 apunta a el lado por el que se sale de la habitacion
 C 0x7684 apunta a la Y de Simon
 C 0x7687 apunta a la X de Simon
-C 0x76AC lee el lado al que mira Simon
+C 0x76AC lee el lado al que mira Simon (0 derecha)
 C 0x76D4 lee la FASE (0 el patio, 1-18)
 C 0x76E5 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x76F2 lee el lado al que mira Simon
+C 0x76F2 lee el lado al que mira Simon (0 derecha)
 C 0x7718 lee el estado de la puerta de la fase
 C 0x771B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x772A apunta a la Y de Simon
@@ -516,7 +508,7 @@ C 0x7774 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x778A lee el estado de la puerta de la fase
 C 0x779A guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 C 0x779E pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x77A1 lee el lado al que mira Simon
+C 0x77A1 lee el lado al que mira Simon (0 derecha)
 C 0x77B3 lee el estado de la puerta de la fase
 C 0x77BA lee la X de Simon
 C 0x77CA lee la X de Simon
@@ -610,6 +602,9 @@ C 0x7DB9 lee el tipo de la cosa
 C 0x7DD6 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7DDD lee el tipo de la cosa
 C 0x7DE6 lee el arma que lleva Simon (0, ninguna)
+C 0x7DEC baja la vida de la cosa
+C 0x7DEF baja la vida de la cosa
+C 0x7DF4 lee la vida de la cosa
 C 0x7DFF lee el tipo de la cosa
 C 0x7E0F lee la vida del enemigo (barra ENEMY)
 C 0x7E1E sonido: arranca la musica o el efecto A (bit 7 = musica)

@@ -102,10 +102,11 @@ DATA_colores_de_cada_tipo:
 	defb 046h,061h,020h,061h,020h,061h,052h,061h,052h,061h,052h,061h	; 60d6  Fa a aRaRaRa
 
 ; ----------------------------------------------------------------------
-; DATOS un_byte_de_cada_tipo: 46 bytes, uno por tipo (1-46), que p00:5FB8 pone
-;   en (ix+0x0D)
+; DATOS vida_de_cada_tipo: 46 bytes, uno por tipo (1-46): la vida con la que
+;   nace cada cosa; p00:5FB8 la pone en (ix+0x0D) y p02:8069 le resta lo que
+;   quita el arma
 ;   0x60e2..0x6110  (46 bytes)
-DATA_un_byte_de_cada_tipo:
+DATA_vida_de_cada_tipo:
 	defb 001h,001h,002h,001h,001h,004h,002h,001h,002h,008h,004h,001h,001h,00ch,008h,008h	; 60e2  ................
 	defb 020h,010h,010h,010h,020h,020h,004h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; 60f2   ...  ..........
 	defb 002h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; 6102  ..............
@@ -510,7 +511,7 @@ L_6402:
 	ld (0c427h),a		;6415   ; guarda la X de Simon
 	ld a,c			;6418
 	and 001h		;6419
-	ld (0c42ch),a		;641b   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;641b   ; guarda el lado al que mira Simon (0 derecha)
 	ret			;641e
 
 ; ----------------------------------------------------------------------
@@ -1687,7 +1688,7 @@ L_6C10:
 	jp pose_segun_el_lado		;6c2c   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_6C2F:
 	ld a,001h		;6c2f
-	ld (0c42ch),a		;6c31   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6c31   ; guarda el lado al que mira Simon (0 derecha)
 	ld a,(0c41eh)		;6c34
 	inc a			;6c37
 	jr nz,L_6C40		;6c38
@@ -1706,7 +1707,7 @@ L_6C51:
 	jr L_6C73		;6c51
 L_6C53:
 	xor a			;6c53
-	ld (0c42ch),a		;6c54   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6c54   ; guarda el lado al que mira Simon (0 derecha)
 	ld a,(0c41fh)		;6c57
 	inc a			;6c5a
 	jr nz,L_6C63		;6c5b
@@ -1992,7 +1993,7 @@ L_6E14:
 	add hl,de			;6e1e
 	ld (0c426h),hl		;6e1f   ; guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 	xor a			;6e22
-	ld (0c42ch),a		;6e23   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6e23   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e26
 	ld (0c42eh),de		;6e29   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 	call L_6F09		;6e2d
@@ -2021,7 +2022,7 @@ L_6E4B:
 	sbc hl,de		;6e56
 	ld (0c426h),hl		;6e58   ; guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 	ld a,001h		;6e5b
-	ld (0c42ch),a		;6e5d   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6e5d   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6e60
 	ld (0c42eh),de		;6e63   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 	call L_6F09		;6e67
@@ -2050,7 +2051,7 @@ L_6E84:
 	add hl,de			;6e90
 	ld (0c426h),hl		;6e91   ; guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 	xor a			;6e94
-	ld (0c42ch),a		;6e95   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6e95   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e98
 	ld (0c42eh),de		;6e9b   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 	call L_6F24		;6e9f
@@ -2080,7 +2081,7 @@ L_6EBC:
 	sbc hl,de		;6ec9
 	ld (0c426h),hl		;6ecb   ; guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 	ld a,001h		;6ece
-	ld (0c42ch),a		;6ed0   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6ed0   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6ed3
 	ld (0c42eh),de		;6ed6   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 	call L_6F24		;6eda
@@ -2203,7 +2204,7 @@ DATA_tabla_6F8B:
 
 
 L_6F93:
-	ld a,(0c002h)		;6f93
+	ld a,(0c002h)		;6f93   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 	and 040h		;6f96
 	ld a,013h		;6f98
 	call nz,0509fh		;6f9a   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
@@ -2222,7 +2223,7 @@ L_6F93:
 	jp pose_segun_el_lado		;6fb9   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_6FBC:
 	ld a,(0c43ch)		;6fbc
-	ld (0c42ch),a		;6fbf   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;6fbf   ; guarda el lado al que mira Simon (0 derecha)
 	inc a			;6fc2
 	ld (0c423h),a		;6fc3
 	xor a			;6fc6
@@ -2289,9 +2290,9 @@ L_701D:
 	jr z,L_7053		;7045
 	cp 005h		;7047
 	jr z,L_7053		;7049
-	ld a,(0c42ch)		;704b   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;704b   ; lee el lado al que mira Simon (0 derecha)
 	xor 001h		;704e
-	ld (0c42ch),a		;7050   ; guarda el lado al que mira Simon
+	ld (0c42ch),a		;7050   ; guarda el lado al que mira Simon (0 derecha)
 L_7053:
 	ld a,(0c415h)		;7053   ; lee la vida de Simon
 	and a			;7056
@@ -2371,7 +2372,7 @@ L_70DC:
 	ld (0c416h),a		;70e5   ; guarda el arma que lleva Simon (0, ninguna)
 	ld (0c431h),a		;70e8
 	ld (0c432h),a		;70eb
-	ld (0c441h),a		;70ee
+	ld (0c441h),a		;70ee   ; guarda los usos que le quedan a lo que para golpes
 	ld (0c442h),a		;70f1
 	ld (0c702h),a		;70f4
 	ld (0c700h),a		;70f7
@@ -2495,11 +2496,11 @@ L_71BE:
 L_71C8:
 	ld ix,0c450h		;71c8
 L_71CC:
-	ld a,(ix+001h)		;71cc   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;71cc
 	and a			;71cf
 	jr nz,L_71D8		;71d0
 	ld a,001h		;71d2
-	ld (ix+000h),a		;71d4   ; guarda el tipo de la cosa
+	ld (ix+000h),a		;71d4
 	ret			;71d7
 L_71D8:
 	ld de,00010h		;71d8
@@ -2624,15 +2625,15 @@ L_7286:
 	ld ix,0c450h		;728c
 	ld b,002h		;7290
 L_7292:
-	ld a,(ix+000h)		;7292   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;7292
 	dec a			;7295
 	jr nz,L_72AA		;7296
 	ld a,018h		;7298
-	ld (ix+006h),a		;729a   ; guarda si la cosa se mueve
-	ld a,(0c42ch)		;729d   ; lee el lado al que mira Simon
-	ld (ix+008h),a		;72a0   ; guarda la velocidad vertical
+	ld (ix+006h),a		;729a
+	ld a,(0c42ch)		;729d   ; lee el lado al que mira Simon (0 derecha)
+	ld (ix+008h),a		;72a0
 	ld a,(0c436h)		;72a3
-	ld (ix+001h),a		;72a6   ; guarda el paso en que va la cosa
+	ld (ix+001h),a		;72a6
 	ret			;72a9
 L_72AA:
 	ld de,00010h		;72aa
@@ -2644,7 +2645,7 @@ L_72B2:
 	call L_72BD		;72b6
 	ld ix,0c460h		;72b9
 L_72BD:
-	ld a,(ix+001h)		;72bd   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;72bd
 	and a			;72c0
 	ret z			;72c1
 	call L_72CE		;72c2
@@ -2652,7 +2653,7 @@ L_72BD:
 	call L_74CE		;72c8
 	jp L_7535		;72cb
 L_72CE:
-	ld a,(ix+001h)		;72ce   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;72ce
 	dec a			;72d1
 	dec a			;72d2
 	call 0406bh		;72d3   ; despacha: salta a la entrada A de la tabla que va detras del call
@@ -2682,14 +2683,14 @@ L_72DE:
 	add a,a			;72e7
 	add a,a			;72e8
 	add a,018h		;72e9
-	ld (ix+006h),a		;72eb   ; guarda si la cosa se mueve
+	ld (ix+006h),a		;72eb
 	ld a,c			;72ee
 	and 007h		;72ef
 	jr nz,L_72F8		;72f1
 	ld a,003h		;72f3
 	call 0509fh		;72f5   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_72F8:
-	ld a,(ix+000h)		;72f8   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;72f8
 	dec a			;72fb
 	call 0406bh		;72fc   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -3189,7 +3190,7 @@ L_764E:
 	ld (hl),a			;765d
 	ret			;765e
 pose_segun_el_lado:
-	ld a,(0c42ch)		;765f   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;765f   ; lee el lado al que mira Simon (0 derecha)
 	and a			;7662
 	ret z			;7663
 	ld hl,(0c42eh)		;7664   ; lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
@@ -3235,7 +3236,7 @@ L_76A4:
 	ret z			;76a8
 	ld a,0e0h		;76a9
 	ld (de),a			;76ab
-	ld a,(0c42ch)		;76ac   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;76ac   ; lee el lado al que mira Simon (0 derecha)
 	and a			;76af
 	ld d,0f0h		;76b0
 	jr z,L_76B6		;76b2
@@ -3276,7 +3277,7 @@ L_76E8:
 	ld a,(0c420h)		;76eb
 	cp 003h		;76ee
 	jr nz,L_76FF		;76f0
-	ld a,(0c42ch)		;76f2   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;76f2   ; lee el lado al que mira Simon (0 derecha)
 	and a			;76f5
 	ld d,0f0h		;76f6
 	jr z,L_76FC		;76f8
@@ -3393,7 +3394,7 @@ L_778A:
 	ld bc,00000h		;7797
 	ld (0c42eh),bc		;779a   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
 	call pose_segun_el_lado		;779e   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-	ld a,(0c42ch)		;77a1   ; lee el lado al que mira Simon
+	ld a,(0c42ch)		;77a1   ; lee el lado al que mira Simon (0 derecha)
 	and a			;77a4
 	ld bc,00080h		;77a5
 	jr z,L_77AD		;77a8
@@ -4239,11 +4240,11 @@ L_7DE6:
 	ld a,(0c416h)		;7de6   ; lee el arma que lleva Simon (0, ninguna)
 	and a			;7de9
 	jr z,L_7DEF		;7dea
-	dec (ix+00dh)		;7dec
+	dec (ix+00dh)		;7dec   ; baja la vida de la cosa
 L_7DEF:
-	dec (ix+00dh)		;7def
+	dec (ix+00dh)		;7def   ; baja la vida de la cosa
 	jr z,L_7DF9		;7df2
-	ld a,(ix+00dh)		;7df4
+	ld a,(ix+00dh)		;7df4   ; lee la vida de la cosa
 	rla			;7df7
 	ret nc			;7df8
 L_7DF9:

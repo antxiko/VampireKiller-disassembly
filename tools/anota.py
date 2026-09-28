@@ -84,6 +84,11 @@ RUTINAS = {
     (1, 0x7B98): ("choca_con_el_decorado", "mira las dos celdas del decorado en (E, D) y (E, D-10)"),
     (1, 0x7C5E): ("es_pared", "carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)"),
     (1, 0x7D2F): ("celda_del_mapa", "de una posicion en puntos (E, D) a su celda en el mapa de la habitacion"),
+    (2, 0x847A): ("toca_a_simon", "carry si la caja (HL tamano, DE centro) toca a Simon"),
+    (2, 0x84A7): ("le_alcanza_el_latigo", "carry si la caja (HL tamano, DE centro) la alcanza el latigo"),
+    (2, 0x84D9): ("punta_del_latigo", "A = la x de la punta del latigo"),
+    (2, 0x84F0): ("le_da_un_arma", "carry si le da alguna de las dos armas de 0xC450 y 0xC460"),
+    (2, 0x864B): ("delante_de_simon", "carry si la caja esta justo delante de Simon"),
     (2, 0x99F6): ("borra_la_cosa", "tipo a cero y sus sprites libres"),
     (2, 0x9F6D): ("crea_con_parametros", "guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa"),
     (3, 0xA17C): ("niega_de", "DE = -DE"),
@@ -107,6 +112,9 @@ RAM = {
     0xC001: ("el subestado", "p00:4151 lo carga en B con el estado"),
     0xC003: ("el contador de cuadros", "p00:414D lo sube cada cuadro"),
     0xC004: ("la espera del estado, en cuadros", "p00:41B6 la pone a 0x20"),
+    0xC002: ("las banderas de la partida (bit 7: de verdad, no la demostracion)", "p00:44EE no cuenta puntos con el bit 7 a cero"),
+    0xC405: ("el MARCADOR, tres bytes en BCD", "p00:44F3 le suma los puntos con `daa`"),
+    0xC441: ("los usos que le quedan a lo que para golpes", "p02:8198 gasta uno por golpe"),
     0xC005: ("el semaforo de la interrupcion", "p00:404E: no se entra dos veces"),
     0xC010: ("el manejador del canal A del sonido", "p14:89A7 salta por el"),
     0xC012: ("el manejador del canal B", "p14:89B0"),
@@ -133,7 +141,7 @@ RAM = {
     0xC425: ("la Y de Simon", "p01:7B88 la compara con 0xD0, el suelo; y en las cosas la y es (ix+3), que p02:99E5 borra pasado 0xE4"),
     0xC426: ("la fraccion de la x de Simon", "p01:6C94 suma en 16 bits a 0xC426"),
     0xC427: ("la X de Simon", "p03:AF40 la resta de (ix+5), la x de las cosas, que p02:99EC borra fuera de 7..0xF0"),
-    0xC42C: ("el lado al que mira Simon", "p01:6402 lo saca del bit 0 de la tabla de salida"),
+    0xC42C: ("el lado al que mira Simon (0 derecha)", "p02:8186: con la cosa a su derecha, 0 es mirarla; p01:6402 lo saca del bit 0 de la tabla de salida"),
     0xC42E: ("la pose de arriba de Simon", "p01:785C elige por ella en 0x7985"),
     0xC42F: ("la pose de abajo de Simon", "p01:787E elige por ella en 0x79D5"),
     0xC5AC: ("el estado de la puerta de la fase", "p13:BB5D lo pone a 4 o a 0xFF"),
@@ -188,6 +196,7 @@ RAM16 = {
 #   7-8    la gravedad de 0xA549 se suma aqui, con tope 0x07FF
 #   11     p01:6458 lo usa para elegir la composicion de sprites de 0xB473
 #   12     `dec (ix+0x0C) / ret nz` en todos los pasos que esperan
+#   13     p00:5FB8 la pone de la tabla de 0x60E2; p02:8069 le resta el golpe y a cero muere
 #   32     p00:5F52: cuantos sprites lleva (tabla de 0x6058)
 #   33-37  cinco bytes por sprite: p00:6048 pone el hueco de sprite en 33 + 5k,
 #          p01:6476 la y, la x y el patron en 34, 35 y 36, y 0x6029 el color en 37
@@ -205,6 +214,7 @@ CAMPOS = {
     0x0A: "la velocidad horizontal (el bit 7, hacia la izquierda)",
     0x0B: "el dibujo de la cosa",
     0x0C: "la cuenta de cuadros del paso",
+    0x0D: "la vida de la cosa",
     0x20: "cuantos sprites lleva la cosa",
 }
 
@@ -251,18 +261,40 @@ def por_nombre():
     return {}
 
 
+# Tramos en los que IX apunta a OTRA lista y no a una ficha, porque se carga
+# con `push hl / pop ix` o lo trae quien llama (medido leyendo cada bucle):
+#   p00:5B96  la lista de cosas de la habitacion (p00:5BB8 `push hl / pop ix`)
+#   p01:71C0  las dos armas de 0xC450 y 0xC460 y lo que llaman (0x72BD, 0x72CE)
+#   p02:8460  lo llama el bucle de las cosas fijas de 0xC470 (p02:80B3)
+#   p02:8671  otra vuelta a 0xC470 (`push hl / pop ix`) y 0x868C
+#   p02:8A30  las ocho de 0xC500 (p02:8A53)
+#   p02:8FD8  las tres de 0xC580 (p02:8FDB)
+#   p02:9112  la tabla de 0x913F
+#   p02:91B0  las de 0xC5B5 (p02:91C7 y p02:9275)
+#   p02:9620  0xEB00 y otra vuelta a 0xC470 (p02:962A y p02:9634)
+NO_FICHAS = {
+    0: [(0x5B96, 0x5C04)],
+    1: [(0x71C0, 0x7300)],
+    2: [(0x8460, 0x847A), (0x8671, 0x8710), (0x8A30, 0x8B40), (0x8FD8, 0x9010),
+        (0x9112, 0x9130), (0x91B0, 0x92A0), (0x9620, 0x9660)],
+}
+
+
 def fichas_de(filas):
     """Para cada instruccion, si IX apunta ahi a la ficha de una cosa.
 
-    Se da por buena salvo en los tramos (de etiqueta a `ret`/`jp`) en los que
-    IX se carga con una direccion del cartucho (`ld ix,0x558E`...), que son
-    tablas y no fichas.
+    Se da por buena salvo en los tramos (hasta un `ret` o un `jp`) en los que
+    IX se carga con una direccion que no es la de una ficha: las fichas son
+    0xC800-0xCB7F (siete) y 0xD700-0xDAFF (ocho), de 0x80 en 0x80. Con
+    `ld ix,0x558E` es una tabla del cartucho, y con `ld ix,0xC470` otra lista
+    de la RAM, de 16 en 16 (p02:80A6), con otros campos.
     """
     fuera, malo = {}, False
     for k, (a, t) in enumerate(filas):
         m = re.match(r"ld ix,0([0-9a-f]{4})h$", t)
         if m:
-            malo = int(m.group(1), 16) < 0xC000
+            v = int(m.group(1), 16)
+            malo = not (0xC800 <= v < 0xCB80 or 0xD700 <= v < 0xDB00)
         fuera[k] = not malo
         if t.startswith(("ret", "jp ")) and not re.match(r"ret [a-z]", t):
             malo = False
@@ -288,7 +320,8 @@ def comentario(b, filas, k, fichas):
                 if bb == 0 or ORG[bb] <= dest < ORG[bb] + 0x2000:
                     return "%s: %s" % (nom, que)
     # los campos de la ficha de la cosa
-    if b in (0, 1, 2, 3) and fichas.get(k, False):
+    if b in (0, 1, 2, 3) and fichas.get(k, False) and \
+            not any(i <= a < f for i, f in NO_FICHAS.get(b, [])):
         mm = re.search(r"\(ix\+0?([0-9a-f]+)h?\)", t)
         if mm:
             n = int(mm.group(1), 16)
