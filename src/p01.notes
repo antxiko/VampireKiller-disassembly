@@ -1086,6 +1086,290 @@ C 0x760D ... el color del borde 0x0E...
 C 0x7611 ... o 0
 C 0x7612 (por CHGCLR)
 
+B 0x7618 LAS POSES CON ESCUDO: con uno de los dos escudos (bits 4 y 5 de 0xC701, p02:8D98 y 8DA1) y sin golpear, las piernas 0x14 mas alla y el cuerpo de pie (0, 1, 2) o hacia la izquierda (0x0F, 0x10, 0x11) pasa a 0x1E-0x23; golpeando en la escalera, las piernas vuelven a las de siempre.
+L 0x7618 poses_con_escudo
+C 0x7618 golpeando?
+C 0x761E con un escudo?
+C 0x7624 las piernas...
+C 0x7628 ... 0x14 mas alla
+L 0x762F cuerpo_con_escudo
+C 0x762F el cuerpo: 0, 1 o 2...
+C 0x7631 ... a 0x1E, 0x1F o 0x20...
+C 0x763E ... 0x0F, 0x10 o 0x11...
+C 0x763F ... a 0x21, 0x22 o 0x23
+C 0x764B (los demas, igual)
+L 0x764C pon_el_cuerpo
+L 0x764E golpe_en_la_escalera_con_escudo
+C 0x764E en la escalera...
+C 0x7654 ... las piernas de siempre
+C 0x765F POSE SEGUN EL LADO: mirando a la izquierda...
+C 0x7664 ... las piernas 0x0A mas alla...
+C 0x766F ... y el cuerpo 0x0F
+B 0x767B LOS BORDES DE LA HABITACION: Simon sale por arriba (en la escalera, y menos de 0x30: 0xC41B = 1, abajo del todo), por abajo (y 0xE1 o mas: 0xC41B = 2 arriba del todo, o, si no hay salida por abajo en 0xC41D, muere: estado 6, y el efecto 9 en las fases 2 y 10), por la izquierda (x menos de 8: 0xC41B = 3) o por la derecha (x 0xF8 o mas: 0xC41B = 4), si 0xC41E o 0xC41F no son 0xFF.
+L 0x767B los_bordes
+C 0x767B muerto: nada
+C 0x7681 el lado por el que sale...
+C 0x7684 ... la y...
+C 0x7687 ... y la x
+C 0x768A en la escalera...
+C 0x7692 ... por arriba?
+L 0x7696 bordes_abajo_y_lados
+C 0x7696 por abajo?
+C 0x769A por la izquierda?
+C 0x769F por la derecha?
+L 0x76A4 sale_por_arriba
+C 0x76A4 saltando, no
+C 0x76A9 abajo del todo, y = 0xE0...
+C 0x76AC ... y un poco mas alla, por donde mira
+C 0x76B9 0xC41B = 1: arriba
+L 0x76BC sale_por_abajo
+C 0x76BC hay salida por abajo?
+C 0x76C2 no: muere...
+C 0x76CB ... fuera de la pantalla (0xFA)...
+C 0x76CE ... 0x1E cuadros...
+C 0x76D4 ... en las fases 2 y 10...
+C 0x76DF ... (en las demas, uno)
+L 0x76E3 al_agua
+C 0x76E3 ... con el efecto 9
+L 0x76E8 baja_de_habitacion
+C 0x76E8 arriba del todo, y = 0x30
+C 0x76EB en la escalera...
+C 0x76F2 ... un poco mas alla, por donde mira
+L 0x76FF sale_por_abajo_fin
+C 0x76FF 0xC41B = 2: abajo
+L 0x7702 sale_por_la_izquierda
+C 0x7702 hay salida?
+C 0x7707 a la derecha del todo, x = 0xF6...
+C 0x770A ... 0xC41B = 3
+L 0x770D sale_por_la_derecha
+C 0x770D hay salida?
+C 0x7712 a la izquierda del todo, x = 0x0A...
+C 0x7715 ... 0xC41B = 4
+B 0x7718 LA PUERTA DE LA FASE, por su estado (0xC5AC; 0, 2 nada): 1 y 4, con Simon delante y la llave blanca (bit 0 de 0xC701; en el patio no hace falta) la gasta, mueren las cosas, fuera las armas, el estado siguiente y el efecto 0x1A (0x15 al llegar al 5), y en las fases 3, 6, 9, 10, 12, 15, 17 y 18 (0x7777) la musica se funde; 3 y 5, Simon anda solo (0x80 por cuadro) y, al llegar al borde (en el 3) o al marco (en el 5), sale por ese lado (efecto 0x87; 0x86 en la fase 18) o, sin salida, la fase se acaba (0xC408).
+L 0x7718 la_puerta_de_la_fase
+C 0x7718 por su estado
+L 0x772A llega_a_la_puerta
+C 0x772A ESTADOS 1 y 4: la y...
+C 0x7731 ... y la x de Simon...
+C 0x7733 ... en la puerta?
+C 0x7737 lo que lleva...
+C 0x773A ... en el patio no hace falta llave...
+C 0x7740 ... si no, la blanca (bit 0)
+L 0x7743 abre_con_la_llave
+C 0x7743 se gasta...
+C 0x7745 ... y se borra del marcador
+C 0x7748 sin golpe
+C 0x774C mueren las cosas
+C 0x774F fuera las armas
+C 0x7752 el estado siguiente de la puerta
+C 0x7756 en las fases de 0x7777...
+C 0x7763 ... la musica se funde
+L 0x7768 efecto_de_la_puerta
+C 0x7768 el efecto 0x1A...
+L 0x7772 efecto_del_5
+C 0x7772 ... o, en el 5, el 0x15
+L 0x778A simon_anda_a_la_puerta
+C 0x778A ESTADOS 3 y 5: en el 5, los sprites de la puerta
+C 0x7792 de pie?
+C 0x7797 de pie...
+C 0x77A1 ... y andando, 0x80 por cuadro...
+C 0x77AA ... hacia donde mira
+C 0x77B3 en el 5, al marco...
+C 0x77BA en el 3, aun dentro (x de 8 a 0xF7): sigue
+L 0x77C4 llega_a_la_puerta_abierta
+C 0x77C4 en el 5: a menos de 8 del marco?
+L 0x77D1 sale_por_la_puerta
+C 0x77D1 a la izquierda (x menos de 0x80)...
+C 0x77DB ... si hay salida...
+C 0x77DF ... sale por la izquierda (3), x = 0xF6
+L 0x77E4 sale_por_la_puerta_derecha
+C 0x77E4 a la derecha: si hay salida...
+C 0x77E9 ... sale por la derecha (4), x = 0x0A
+L 0x77EC la_salida_de_la_puerta
+C 0x77F2 el efecto 0x87...
+C 0x77FB ... o, en la fase 18, el 0x86
+L 0x7800 fase_acabada
+C 0x7800 sin salida: la fase se acaba (0xC408)
+L 0x7806 mueren_las_cosas
+C 0x7806 las siete de 0xC800...
+C 0x7813 ... se van (sin soltar nada)
+C 0x7820 y las ocho de 0xD700...
+C 0x782B ... se vuelven llamas
+
+B 0x7837 LOS SPRITES DE SIMON: sus colores (0x790C), los sprites 4 a 7 fuera (4 y 5 solo, si lleva un arma que se lanza, que usa los 6-9), y las piernas (0x7985, sprites 0 y 1) y el cuerpo (0x79D5, sprites 2 y 3) de sus poses; con la puerta de la fase en 5, en los sprites 8-11 (los 0-7 son de la puerta). Agachado o saltando encogido, las piernas suben 6 al saltar y el cuerpo baja 6 si no; con el respiro (0xC42D) parpadea.
+L 0x7837 sprites_de_simon
+C 0x7837 los colores
+C 0x783A con la puerta en 5, sin borrar
+C 0x7841 desde el sprite 4...
+C 0x7844 ... con un arma que se lanza, 2...
+C 0x784D ... si no, 4
+L 0x784F fuera_desde_el_4
+L 0x7851 un_sprite_fuera
+L 0x7858 sprites_de_las_piernas
+C 0x7858 la lista de las piernas...
+C 0x785C ... de 0x7985 por la pose
+C 0x7866 patrones desde el 0
+C 0x786D en los sprites 0 y 1...
+C 0x7872 ... o, con la puerta en 5, 8 y 9
+C 0x7875 cuantos
+C 0x787A la lista del cuerpo, de 0x79D5
+C 0x7888 patrones desde el 2 (8)
+C 0x788F en los sprites 2 y 3...
+C 0x7894 ... o 10 y 11
+L 0x7897 cuantos_sprites
+L 0x7899 un_sprite_de_simon
+C 0x7899 la y de Simon mas dy
+C 0x789F las poses encogidas (6, 0x10, 0x1A, 0x24)...
+L 0x78B2 encogido
+C 0x78B2 saltando...
+C 0x78B8 ... las piernas...
+C 0x78BD ... 6 mas arriba
+L 0x78C3 encogido_de_pie
+C 0x78C3 si no, el cuerpo...
+C 0x78C8 ... 6 mas abajo
+L 0x78CC parpadea
+C 0x78CC con el respiro...
+C 0x78D2 ... uno de cada dos cuadros...
+C 0x78D9 ... fuera de la pantalla
+L 0x78DB la_y_del_sprite
+C 0x78DD menos 2
+C 0x78E3 dx, con signo en el bit 7...
+L 0x78F6 dx_positivo
+C 0x78F6 ... sumado a la x
+L 0x78F7 fuera_si_se_sale
+C 0x78F7 se sale por el borde: fuera
+L 0x78FE la_x_del_sprite
+C 0x7902 el patron: el numero por 4
+C 0x7906 el siguiente
+B 0x790C LOS COLORES DE SIMON, en 0xD400 (0xD480 con la puerta en 5), 16 lineas por sprite: invencible, 0x0E uno de cada dos cuadros; con la cuenta de 0xC434, 8 uno de cada dos; si no, 0x42 (con CC) y 1, un sprite si y otro no. Ocho sprites, o cuatro con un arma que se lanza.
+L 0x790C colores_de_simon
+C 0x790C ocho sprites...
+C 0x7915 ... o cuatro
+L 0x7917 donde_los_colores
+C 0x7917 0xD400...
+C 0x7921 ... o 0xD480
+L 0x7924 color_de_una_linea_de_simon
+C 0x7924 invencible...
+C 0x792A ... uno de cada dos cuadros...
+C 0x792E ... 0x0E
+L 0x7932 con_la_cuenta_de_0xc434
+C 0x7932 con 0xC434...
+C 0x7938 ... uno de cada dos...
+C 0x793C ... 8
+L 0x7940 color_normal
+C 0x7940 de 16 en 16 lineas...
+C 0x7944 ... 1...
+C 0x7948 ... o 0x42
+L 0x794A pon_el_color
+L 0x794F la_musica_de_la_fase
+C 0x794F al empezar la vida (0xC40D)...
+C 0x7955 ... o en el patio...
+C 0x795B ... o en las fases de 0x7777...
+C 0x7964 (en las demas, la que sonaba)
+L 0x7965 suena_la_de_la_fase
+C 0x7965 la de 0x7972, por la fase
+
+L 0x7ACF rayas_del_titulo
+C 0x7ACF dieciseis...
+L 0x7AD1 una_raya_del_titulo
+C 0x7AD1 ... rectangulos del byte 2...
+C 0x7AD5 ... de 7 x 9 puntos...
+C 0x7ADF ... de 16 en 16 puntos
+L 0x7AE7 color_2_del_titulo
+C 0x7AE7 el color 2 a 0x1101
+B 0x7AEF LOS SPRITES DEL TITULO JAPONES: once pares en la copia de 0xD600, cada par con la posicion de 0x7B52 y dos patrones seguidos (desde el 0), de los colores 8 y 2 (el 2, negro), sin rotar.
+L 0x7AEF sprites_del_titulo
+C 0x7AF5 once pares
+L 0x7AF9 un_par_del_titulo
+L 0x7AFC un_sprite_del_titulo
+C 0x7AFD y y x...
+C 0x7B05 ... y el patron, cuatro mas
+C 0x7B11 los colores: 16 lineas del 8...
+C 0x7B1D ... y 16 del 2, once veces
+C 0x7B27 el color 2, negro
+C 0x7B32 ROTULO POR FILAS: [dibujo], 0xFE [dx] fila nueva, 0xFF acaba
+C 0x7B36 0xFF: acaba
+C 0x7B39 0xFE: fila nueva...
+C 0x7B3D ... dx...
+C 0x7B41 ... y 8 mas abajo
+L 0x7B47 un_dibujo_del_rotulo
+C 0x7B47 el dibujo, con transparencia...
+C 0x7B4B ... y la posicion siguiente
+L 0x7B50 rotulo_acabado
+L 0x7B68 pared_bajo_los_pies
+C 0x7B68 la celda 7 por debajo de Simon: pared?
+L 0x7B78 techo_encima
+C 0x7B78 la celda 0x2C por encima de Simon: pared?
+C 0x7B88 MIRA EL SUELO: por debajo de 0xD0...
+C 0x7B90 ... no hay (NC)
+L 0x7B92 suelo_bajo_los_pies
+C 0x7B92 x + 5...
+C 0x7B98 CHOCA CON EL DECORADO: (E, D) pared?
+C 0x7B9F ... o (E, D - 10)
+L 0x7BA3 pared_en_de
+B 0x7BA9 PARED A LA DERECHA de Simon (0x7C05 a la izquierda): las celdas a 8 de su x, desde su y - 2 hacia arriba de 8 en 8: cuatro, o tres agachado; 0x7BB7 mira a 0x10 desde y - 4, solo dos; 0x7BBE, con B y C de quien llama, siempre cuatro. Carry si hay.
+L 0x7BA9 pared_a_la_derecha
+C 0x7BB1 8 a la derecha, desde y - 2
+L 0x7BB7 pared_a_la_derecha_lejos
+C 0x7BB7 0x10 a la derecha, desde y - 4, dos celdas
+L 0x7BBE pared_a_la_derecha_alta
+C 0x7BBE siempre cuatro, desde donde diga BC
+L 0x7BC0 mira_la_derecha
+C 0x7BC0 el modo, a 0xCFF0 de temporal
+C 0x7BC3 y - C...
+C 0x7BC6 ... x + B
+C 0x7BCC pared?
+C 0x7BD0 8 mas arriba
+C 0x7BDB en el modo 2, dos celdas
+C 0x7BE1 8 mas arriba
+C 0x7BEC en el modo 0...
+C 0x7BF2 ... agachado, tres
+L 0x7BFB la_cuarta_celda
+C 0x7BFB 8 mas arriba
+L 0x7C05 pared_a_la_izquierda
+C 0x7C0D 8 a la izquierda, desde y - 2
+L 0x7C13 pared_a_la_izquierda_lejos
+L 0x7C1A pared_a_la_izquierda_alta
+L 0x7C1C mira_la_izquierda
+C 0x7C1C el modo
+C 0x7C1F y - C...
+C 0x7C22 ... x - B
+C 0x7C2C 8 mas arriba
+C 0x7C37 en el modo 2, dos
+C 0x7C3D 8 mas arriba
+C 0x7C48 en el modo 0, agachado, tres
+L 0x7C57 la_cuarta_celda_izquierda
+C 0x7C5E ES PARED la celda A? En la sala de Dracula, de la 1 a la 6...
+C 0x7C66 ... si no, de la 1 al tope de la fase (0x7C78)
+L 0x7C73 pared_en_la_sala_de_dracula
+B 0x7C8B LAS ESCALERAS: celdas 4 y 3 al pie (bajan a la derecha y a la izquierda: 0x7C8B y 0x7CB3), 0x0D y 0x0C arriba (suben a la izquierda y a la derecha: 0x7CDB y 0x7D05), bajo Simon o a 8 puntos, que se le suman a su x para ponerlo en la escalera. Z si la hay; en la sala de Dracula no hay ninguna.
+L 0x7C8B escalera_que_baja_a_la_derecha
+C 0x7C8B en la sala de Dracula...
+C 0x7C92 ... no (NZ)
+L 0x7C94 celda_4
+C 0x7C94 la celda bajo Simon...
+C 0x7CA0 ... la 4?
+C 0x7CA3 o 8 a la derecha...
+C 0x7CAD ... y alli se pone
+L 0x7CB3 escalera_que_baja_a_la_izquierda
+L 0x7CBC celda_3
+C 0x7CBC la celda bajo Simon...
+C 0x7CC8 ... la 3?
+C 0x7CCB o 8 a la izquierda...
+C 0x7CD5 ... y alli se pone
+L 0x7CDB escalera_que_sube_a_la_izquierda
+L 0x7CE4 celda_0x0d
+C 0x7CE4 8 por encima y 8 a la izquierda...
+C 0x7CF4 ... la 0x0D?
+C 0x7CF7 o encima...
+C 0x7CFF ... y 8 a la derecha
+L 0x7D05 escalera_que_sube_a_la_derecha
+L 0x7D0E celda_0x0c
+C 0x7D0E 8 por encima y 8 a la derecha...
+C 0x7D1E ... la 0x0C?
+C 0x7D21 o encima...
+C 0x7D29 ... y 8 a la izquierda
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
 F 0x6058 16
@@ -1421,119 +1705,66 @@ C 0x7489 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x749A despacha: salta a la entrada A de la tabla que va detras del call
 C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x761E lee lo que lleva Simon (un bit por objeto)
-C 0x7624 apunta a la pose de las piernas de Simon
-C 0x7654 apunta a la pose de las piernas de Simon
-C 0x765F lee el lado al que mira Simon (0 derecha)
-C 0x7664 lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x7677 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-C 0x7681 apunta a el lado por el que se sale de la habitacion
-C 0x7684 apunta a la Y de Simon
-C 0x7687 apunta a la X de Simon
-C 0x76AC lee el lado al que mira Simon (0 derecha)
-C 0x76D4 lee la FASE (0 el patio, 1-18)
 C 0x76E5 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x76F2 lee el lado al que mira Simon (0 derecha)
-C 0x7718 lee el estado de la puerta de la fase
 C 0x771B despacha: salta a la entrada A de la tabla que va detras del call
-C 0x772A apunta a la Y de Simon
-C 0x7737 apunta a lo que lleva Simon (un bit por objeto)
-C 0x773A lee la FASE (0 el patio, 1-18)
-C 0x7752 apunta a el estado de la puerta de la fase
-C 0x7756 lee la FASE (0 el patio, 1-18)
 C 0x775C de_mas_a: DE += A
 C 0x7765 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x776F sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7774 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x778A lee el estado de la puerta de la fase
 C 0x779A guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x779E pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x77A1 lee el lado al que mira Simon (0 derecha)
-C 0x77B3 lee el estado de la puerta de la fase
-C 0x77BA lee la X de Simon
 C 0x77CA lee la X de Simon
 C 0x77D4 apunta a la X de Simon
 C 0x77ED guarda el lado por el que se sale de la habitacion
-C 0x77F2 lee la FASE (0 el patio, 1-18)
 C 0x77FD sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x780C lee el tipo de la cosa
 C 0x7826 lee el tipo de la cosa
-C 0x783A lee el estado de la puerta de la fase
-C 0x7844 lee el arma que lleva Simon (0, ninguna)
-C 0x7858 lee la pose de las piernas de Simon
 C 0x785F hl_mas_a: HL += A
 C 0x7868 lee el estado de la puerta de la fase
-C 0x787A lee la pose del cuerpo de Simon
 C 0x7881 hl_mas_a: HL += A
 C 0x788A lee el estado de la puerta de la fase
-C 0x7899 lee la Y de Simon
-C 0x789F lee la pose de las piernas de Simon
-C 0x78D2 lee el contador de cuadros
 C 0x78E4 lee la X de Simon
-C 0x790C lee el arma que lleva Simon (0, ninguna)
-C 0x7917 lee el estado de la puerta de la fase
-C 0x7924 lee la cuenta de la INVENCIBILIDAD
-C 0x792A lee el contador de cuadros
-C 0x7938 lee el contador de cuadros
-C 0x7955 lee la FASE (0 el patio, 1-18)
 C 0x795F hl_mas_a: HL += A
-C 0x7965 lee la FASE (0 el patio, 1-18)
 C 0x796B hl_mas_a: HL += A
 C 0x796F sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7ADA rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x7AEC pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x7B2C pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-C 0x7B68 lee la Y de Simon
 C 0x7B6E lee la X de Simon
 C 0x7B72 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7B75 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7B78 lee la Y de Simon
 C 0x7B7E lee la X de Simon
 C 0x7B82 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7B85 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7B88 lee la Y de Simon
-C 0x7B92 lee la X de Simon
-C 0x7B98 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7B9B es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 C 0x7BA3 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7BA6 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 C 0x7BA9 lee la Y de Simon
 C 0x7BAD lee la X de Simon
-C 0x7BC0 guarda el tipo de la cosa que se crea
 C 0x7BC9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x7BCC es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 C 0x7BD4 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7BD7 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7BDB lee el tipo de la cosa que se crea
 C 0x7BE5 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7BE8 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7BEC lee el tipo de la cosa que se crea
 C 0x7BFF celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7C02 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 C 0x7C05 lee la Y de Simon
 C 0x7C09 lee la X de Simon
-C 0x7C1C guarda el tipo de la cosa que se crea
 C 0x7C25 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7C28 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 C 0x7C30 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7C33 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7C37 lee el tipo de la cosa que se crea
 C 0x7C41 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7C44 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-C 0x7C48 lee el tipo de la cosa que se crea
 C 0x7C5B celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x7C66 lee la FASE (0 el patio, 1-18)
 C 0x7C6C hl_mas_a: HL += A
-C 0x7C94 apunta a la Y de Simon
 C 0x7C9D celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7CA7 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x7CBC apunta a la Y de Simon
 C 0x7CC5 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7CCF celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x7CE4 apunta a la Y de Simon
 C 0x7CF1 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7CF9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x7D0E apunta a la Y de Simon
 C 0x7D1B celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7D23 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7D45 hl_mas_a: HL += A

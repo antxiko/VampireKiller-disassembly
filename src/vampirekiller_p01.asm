@@ -874,7 +874,7 @@ dracula_paso_6:
 dracula_paso_6_cae:
 	call dos_trozos_segundos		;6667
 	call destello_a_negro		;666a
-	call L_7806		;666d   ; borra todas las cosas
+	call mueren_las_cosas		;666d   ; borra todas las cosas
 	xor a			;6670
 	ld (0ce37h),a		;6671
 	jp 0be3dh		;6674   ; siguiente_paso: sube el paso de la escena (0xCE01)
@@ -1529,7 +1529,7 @@ simon_cada_cuadro:
 	ld (0c007h),a		;6b06
 	ld (0c006h),a		;6b09
 L_6B0C:
-	call L_7718		;6b0c
+	call la_puerta_de_la_fase		;6b0c
 	call el_estado_de_simon		;6b0f
 	ld a,(0c5ach)		;6b12   ; la puerta de la fase...
 	cp 002h		;6b15
@@ -1540,13 +1540,13 @@ L_6B0C:
 	jr z,L_6B24		;6b1f
 	call latigo_y_armas		;6b21   ; ... si no esta abriendose
 L_6B24:
-	call L_767B		;6b24
+	call los_bordes		;6b24
 	call cuentas_de_simon		;6b27
 	call cuenta_de_la_invencibilidad		;6b2a
 	call cuenta_del_reloj		;6b2d
 	call cuenta_de_0xc445		;6b30
 	call destello_del_borde		;6b33
-	jp L_7618		;6b36
+	jp poses_con_escudo		;6b36
 
 ; ----------------------------------------------------------------------
 ; LOS ESTADOS DE SIMON (0xC420, subestado en 0xC421): 0 de pie o andando, 1 saltando, 2 agachado, 3 en la escalera, 4 cayendo, 5-7 los de 0x6F85, 0x7093 y 0x70FB.
@@ -1613,7 +1613,7 @@ abajo_y_a_los_lados:
 	ld a,(0c006h)		;6b91   ; el segundo disparo recien pulsado...
 	and 020h		;6b94
 	ret z			;6b96
-	call L_7B78		;6b97   ; ... sin techo encima...
+	call techo_encima		;6b97   ; ... sin techo encima...
 	ret c			;6b9a
 	ld a,001h		;6b9b   ; ... al estado 1: salta
 	ld (0c420h),a		;6b9d
@@ -1645,12 +1645,12 @@ hacia_donde_va:
 	rla			;6bbf
 	ld d,000h		;6bc0
 	jr c,plataforma_a_la_izquierda		;6bc2
-	call L_7BA9		;6bc4   ; no: pared a la derecha?
+	call pared_a_la_derecha		;6bc4   ; no: pared a la derecha?
 	ret c			;6bc7
 	ld d,001h		;6bc8   ; un punto a la derecha
 	jr mueve_con_la_plataforma		;6bca
 plataforma_a_la_izquierda:
-	call L_7C05		;6bcc   ; pared a la izquierda?
+	call pared_a_la_izquierda		;6bcc   ; pared a la izquierda?
 	ret c			;6bcf
 	ld d,0ffh		;6bd0   ; un punto a la izquierda
 mueve_con_la_plataforma:
@@ -1664,10 +1664,10 @@ mueve_con_la_plataforma:
 ; ----------------------------------------------------------------------
 arriba:
 	ex af,af'			;6bda
-	call L_7CDB		;6bdb   ; sube a la izquierda?
+	call escalera_que_sube_a_la_izquierda		;6bdb   ; sube a la izquierda?
 	ld bc,00001h		;6bde   ; (subestado 0, tecla 1: arriba)
 	jr z,a_la_escalera		;6be1
-	call L_7D05		;6be3   ; sube a la derecha?
+	call escalera_que_sube_a_la_derecha		;6be3   ; sube a la derecha?
 	ld bc,00101h		;6be6   ; (subestado 1)
 	jr z,a_la_escalera		;6be9
 	ex af,af'			;6beb   ; no hay: lo demas
@@ -1695,10 +1695,10 @@ L_6C03:
 ; ABAJO: si hay escalera que baja (0x7C8B, 0x7CB3), al estado 3; si no, agachado (estado 2, poses 6 y 0).
 ; ----------------------------------------------------------------------
 abajo:
-	call L_7C8B		;6c10   ; baja a la derecha?
+	call escalera_que_baja_a_la_derecha		;6c10   ; baja a la derecha?
 	ld bc,00002h		;6c13   ; (tecla 2: abajo)
 	jr z,a_la_escalera		;6c16
-	call L_7CB3		;6c18   ; baja a la izquierda?
+	call escalera_que_baja_a_la_izquierda		;6c18   ; baja a la izquierda?
 	ld bc,00102h		;6c1b
 	jr z,a_la_escalera		;6c1e
 	ld a,002h		;6c20   ; no: ESTADO 2, agachado
@@ -1720,7 +1720,7 @@ anda_a_la_izquierda:
 	cp 010h		;6c3d
 	ret c			;6c3f
 izquierda_sin_pared:
-	call L_7C05		;6c40   ; pared?
+	call pared_a_la_izquierda		;6c40   ; pared?
 	ret c			;6c43
 	ld a,(0c431h)		;6c44   ; con las botas...
 	and 008h		;6c47
@@ -1739,7 +1739,7 @@ anda_a_la_derecha:
 	cp 0f0h		;6c60
 	ret nc			;6c62
 derecha_sin_pared:
-	call L_7BA9		;6c63   ; pared?
+	call pared_a_la_derecha		;6c63   ; pared?
 	ret c			;6c66
 	ld a,(0c431h)		;6c67   ; con las botas...
 	and 008h		;6c6a
@@ -2100,7 +2100,7 @@ escalera_libre_1:
 	ld a,b			;6eb2   ; tras ocho...
 	cp 008h		;6eb3
 	ret c			;6eb5
-	call L_7B68		;6eb6   ; ... arriba del todo, fuera
+	call pared_bajo_los_pies		;6eb6   ; ... arriba del todo, fuera
 	ret nc			;6eb9
 	jr fuera_de_la_escalera		;6eba
 sube_a_la_izquierda:
@@ -2130,7 +2130,7 @@ escalera_libre_2:
 	ld a,b			;6eed   ; tras ocho...
 	cp 008h		;6eee
 	ret c			;6ef0
-	call L_7B68		;6ef1   ; ... arriba del todo, fuera
+	call pared_bajo_los_pies		;6ef1   ; ... arriba del todo, fuera
 	ret nc			;6ef4
 fuera_de_la_escalera:
 	ld de,00000h		;6ef5   ; de pie...
@@ -3204,49 +3204,53 @@ destello_del_borde:
 L_7612:
 	ld (0f3ebh),a		;7612   ; (por CHGCLR)
 	jp 00062h		;7615   ; BIOS CHGCLR - Changes the screen colors
-L_7618:
-	ld a,(0c422h)		;7618
+
+; ----------------------------------------------------------------------
+; LAS POSES CON ESCUDO: con uno de los dos escudos (bits 4 y 5 de 0xC701, p02:8D98 y 8DA1) y sin golpear, las piernas 0x14 mas alla y el cuerpo de pie (0, 1, 2) o hacia la izquierda (0x0F, 0x10, 0x11) pasa a 0x1E-0x23; golpeando en la escalera, las piernas vuelven a las de siempre.
+; ----------------------------------------------------------------------
+poses_con_escudo:
+	ld a,(0c422h)		;7618   ; golpeando?
 	and a			;761b
-	jr nz,L_764E		;761c
-	ld a,(0c701h)		;761e   ; lee lo que lleva Simon (un bit por objeto)
+	jr nz,golpe_en_la_escalera_con_escudo		;761c
+	ld a,(0c701h)		;761e   ; con un escudo?
 	and 030h		;7621
 	ret z			;7623
-	ld hl,0c42eh		;7624   ; apunta a la pose de las piernas de Simon
+	ld hl,0c42eh		;7624   ; las piernas...
 	ld a,(hl)			;7627
-	cp 014h		;7628
-	jr nc,L_762F		;762a
+	cp 014h		;7628   ; ... 0x14 mas alla
+	jr nc,cuerpo_con_escudo		;762a
 	add a,014h		;762c
 	ld (hl),a			;762e
-L_762F:
-	inc hl			;762f
+cuerpo_con_escudo:
+	inc hl			;762f   ; el cuerpo: 0, 1 o 2...
 	ld a,(hl)			;7630
-	ld b,01eh		;7631
+	ld b,01eh		;7631   ; ... a 0x1E, 0x1F o 0x20...
 	and a			;7633
-	jr z,L_764C		;7634
+	jr z,pon_el_cuerpo		;7634
 	inc b			;7636
 	dec a			;7637
-	jr z,L_764C		;7638
+	jr z,pon_el_cuerpo		;7638
 	inc b			;763a
 	dec a			;763b
-	jr z,L_764C		;763c
-	ld a,(hl)			;763e
-	ld b,021h		;763f
+	jr z,pon_el_cuerpo		;763c
+	ld a,(hl)			;763e   ; ... 0x0F, 0x10 o 0x11...
+	ld b,021h		;763f   ; ... a 0x21, 0x22 o 0x23
 	sub 00fh		;7641
-	jr z,L_764C		;7643
+	jr z,pon_el_cuerpo		;7643
 	inc b			;7645
 	dec a			;7646
-	jr z,L_764C		;7647
+	jr z,pon_el_cuerpo		;7647
 	inc b			;7649
 	dec a			;764a
-	ret nz			;764b
-L_764C:
+	ret nz			;764b   ; (los demas, igual)
+pon_el_cuerpo:
 	ld (hl),b			;764c
 	ret			;764d
-L_764E:
-	ld a,(0c420h)		;764e
+golpe_en_la_escalera_con_escudo:
+	ld a,(0c420h)		;764e   ; en la escalera...
 	cp 003h		;7651
 	ret nz			;7653
-	ld hl,0c42eh		;7654   ; apunta a la pose de las piernas de Simon
+	ld hl,0c42eh		;7654   ; ... las piernas de siempre
 	ld a,(hl)			;7657
 	cp 014h		;7658
 	ret c			;765a
@@ -3254,17 +3258,17 @@ L_764E:
 	ld (hl),a			;765d
 	ret			;765e
 pose_segun_el_lado:
-	ld a,(0c42ch)		;765f   ; lee el lado al que mira Simon (0 derecha)
+	ld a,(0c42ch)		;765f   ; POSE SEGUN EL LADO: mirando a la izquierda...
 	and a			;7662
 	ret z			;7663
-	ld hl,(0c42eh)		;7664   ; lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
+	ld hl,(0c42eh)		;7664   ; ... las piernas 0x0A mas alla...
 	ld a,l			;7667
 	cp 00ah		;7668
 	jr nc,L_766F		;766a
 	add a,00ah		;766c
 	ld l,a			;766e
 L_766F:
-	ld a,h			;766f
+	ld a,h			;766f   ; ... y el cuerpo 0x0F
 	cp 00fh		;7670
 	jr nc,L_7677		;7672
 	add a,00fh		;7674
@@ -3272,35 +3276,39 @@ L_766F:
 L_7677:
 	ld (0c42eh),hl		;7677   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ret			;767a
-L_767B:
-	ld a,(0c420h)		;767b
+
+; ----------------------------------------------------------------------
+; LOS BORDES DE LA HABITACION: Simon sale por arriba (en la escalera, y menos de 0x30: 0xC41B = 1, abajo del todo), por abajo (y 0xE1 o mas: 0xC41B = 2 arriba del todo, o, si no hay salida por abajo en 0xC41D, muere: estado 6, y el efecto 9 en las fases 2 y 10), por la izquierda (x menos de 8: 0xC41B = 3) o por la derecha (x 0xF8 o mas: 0xC41B = 4), si 0xC41E o 0xC41F no son 0xFF.
+; ----------------------------------------------------------------------
+los_bordes:
+	ld a,(0c420h)		;767b   ; muerto: nada
 	cp 006h		;767e
 	ret z			;7680
-	ld hl,0c41bh		;7681   ; apunta a el lado por el que se sale de la habitacion
-	ld de,0c425h		;7684   ; apunta a la Y de Simon
-	ld bc,0c427h		;7687   ; apunta a la X de Simon
-	ld a,(0c420h)		;768a
+	ld hl,0c41bh		;7681   ; el lado por el que sale...
+	ld de,0c425h		;7684   ; ... la y...
+	ld bc,0c427h		;7687   ; ... y la x
+	ld a,(0c420h)		;768a   ; en la escalera...
 	cp 003h		;768d
 	ld a,(de)			;768f
-	jr nz,L_7696		;7690
-	cp 030h		;7692
-	jr c,L_76A4		;7694
-L_7696:
-	cp 0e1h		;7696
-	jr nc,L_76BC		;7698
-	ld a,(bc)			;769a
+	jr nz,bordes_abajo_y_lados		;7690
+	cp 030h		;7692   ; ... por arriba?
+	jr c,sale_por_arriba		;7694
+bordes_abajo_y_lados:
+	cp 0e1h		;7696   ; por abajo?
+	jr nc,sale_por_abajo		;7698
+	ld a,(bc)			;769a   ; por la izquierda?
 	cp 008h		;769b
-	jr c,L_7702		;769d
-	cp 0f8h		;769f
-	jr nc,L_770D		;76a1
+	jr c,sale_por_la_izquierda		;769d
+	cp 0f8h		;769f   ; por la derecha?
+	jr nc,sale_por_la_derecha		;76a1
 	ret			;76a3
-L_76A4:
-	ld a,(0c420h)		;76a4
+sale_por_arriba:
+	ld a,(0c420h)		;76a4   ; saltando, no
 	dec a			;76a7
 	ret z			;76a8
-	ld a,0e0h		;76a9
+	ld a,0e0h		;76a9   ; abajo del todo, y = 0xE0...
 	ld (de),a			;76ab
-	ld a,(0c42ch)		;76ac   ; lee el lado al que mira Simon (0 derecha)
+	ld a,(0c42ch)		;76ac   ; ... y un poco mas alla, por donde mira
 	and a			;76af
 	ld d,0f0h		;76b0
 	jr z,L_76B6		;76b2
@@ -3309,39 +3317,39 @@ L_76B6:
 	ld a,(bc)			;76b6
 	add a,d			;76b7
 	ld (bc),a			;76b8
-	ld (hl),001h		;76b9
+	ld (hl),001h		;76b9   ; 0xC41B = 1: arriba
 	ret			;76bb
-L_76BC:
-	ld a,(0c41dh)		;76bc
+sale_por_abajo:
+	ld a,(0c41dh)		;76bc   ; hay salida por abajo?
 	inc a			;76bf
-	jr nz,L_76E8		;76c0
-	xor a			;76c2
+	jr nz,baja_de_habitacion		;76c0
+	xor a			;76c2   ; no: muere...
 	ld (0c421h),a		;76c3
 	ld a,006h		;76c6
 	ld (0c420h),a		;76c8
-	ld a,0fah		;76cb
+	ld a,0fah		;76cb   ; ... fuera de la pantalla (0xFA)...
 	ld (de),a			;76cd
-	ld hl,0c428h		;76ce
+	ld hl,0c428h		;76ce   ; ... 0x1E cuadros...
 	ld a,01eh		;76d1
 	ld (hl),a			;76d3
-	ld a,(0d000h)		;76d4   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;76d4   ; ... en las fases 2 y 10...
 	cp 002h		;76d7
-	jr z,L_76E3		;76d9
+	jr z,al_agua		;76d9
 	cp 00ah		;76db
-	jr z,L_76E3		;76dd
-	ld a,001h		;76df
+	jr z,al_agua		;76dd
+	ld a,001h		;76df   ; ... (en las demas, uno)
 	ld (hl),a			;76e1
 	ret			;76e2
-L_76E3:
-	ld a,009h		;76e3
+al_agua:
+	ld a,009h		;76e3   ; ... con el efecto 9
 	jp 0509fh		;76e5   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_76E8:
-	ld a,030h		;76e8
+baja_de_habitacion:
+	ld a,030h		;76e8   ; arriba del todo, y = 0x30
 	ld (de),a			;76ea
-	ld a,(0c420h)		;76eb
+	ld a,(0c420h)		;76eb   ; en la escalera...
 	cp 003h		;76ee
-	jr nz,L_76FF		;76f0
-	ld a,(0c42ch)		;76f2   ; lee el lado al que mira Simon (0 derecha)
+	jr nz,sale_por_abajo_fin		;76f0
+	ld a,(0c42ch)		;76f2   ; ... un poco mas alla, por donde mira
 	and a			;76f5
 	ld d,0f0h		;76f6
 	jr z,L_76FC		;76f8
@@ -3350,27 +3358,31 @@ L_76FC:
 	ld a,(bc)			;76fc
 	add a,d			;76fd
 	ld (bc),a			;76fe
-L_76FF:
-	ld (hl),002h		;76ff
+sale_por_abajo_fin:
+	ld (hl),002h		;76ff   ; 0xC41B = 2: abajo
 	ret			;7701
-L_7702:
-	ld a,(0c41eh)		;7702
+sale_por_la_izquierda:
+	ld a,(0c41eh)		;7702   ; hay salida?
 	inc a			;7705
 	ret z			;7706
-	ld a,0f6h		;7707
+	ld a,0f6h		;7707   ; a la derecha del todo, x = 0xF6...
 	ld (bc),a			;7709
-	ld (hl),003h		;770a
+	ld (hl),003h		;770a   ; ... 0xC41B = 3
 	ret			;770c
-L_770D:
-	ld a,(0c41fh)		;770d
+sale_por_la_derecha:
+	ld a,(0c41fh)		;770d   ; hay salida?
 	inc a			;7710
 	ret z			;7711
-	ld a,00ah		;7712
+	ld a,00ah		;7712   ; a la izquierda del todo, x = 0x0A...
 	ld (bc),a			;7714
-	ld (hl),004h		;7715
+	ld (hl),004h		;7715   ; ... 0xC41B = 4
 	ret			;7717
-L_7718:
-	ld a,(0c5ach)		;7718   ; lee el estado de la puerta de la fase
+
+; ----------------------------------------------------------------------
+; LA PUERTA DE LA FASE, por su estado (0xC5AC; 0, 2 nada): 1 y 4, con Simon delante y la llave blanca (bit 0 de 0xC701; en el patio no hace falta) la gasta, mueren las cosas, fuera las armas, el estado siguiente y el efecto 0x1A (0x15 al llegar al 5), y en las fases 3, 6, 9, 10, 12, 15, 17 y 18 (0x7777) la musica se funde; 3 y 5, Simon anda solo (0x80 por cuadro) y, al llegar al borde (en el 3) o al marco (en el 5), sale por ese lado (efecto 0x87; 0x86 en la fase 18) o, sin salida, la fase se acaba (0xC408).
+; ----------------------------------------------------------------------
+la_puerta_de_la_fase:
+	ld a,(0c5ach)		;7718   ; por su estado
 	call 0406bh		;771b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -3391,48 +3403,48 @@ DATA_tabla_771E:
 ; ======================================================================
 
 
-L_772A:
-	ld de,0c425h		;772a   ; apunta a la Y de Simon
+llega_a_la_puerta:
+	ld de,0c425h		;772a   ; ESTADOS 1 y 4: la y...
 	ld a,(de)			;772d
 	ld b,a			;772e
 	inc e			;772f
 	inc e			;7730
-	ld a,(de)			;7731
+	ld a,(de)			;7731   ; ... y la x de Simon...
 	ld c,a			;7732
-	call 08580h		;7733
+	call 08580h		;7733   ; ... en la puerta?
 	ret nc			;7736
-	ld hl,0c701h		;7737   ; apunta a lo que lleva Simon (un bit por objeto)
-	ld a,(0d000h)		;773a   ; lee la FASE (0 el patio, 1-18)
+	ld hl,0c701h		;7737   ; lo que lleva...
+	ld a,(0d000h)		;773a   ; ... en el patio no hace falta llave...
 	and a			;773d
-	jr z,L_7743		;773e
-	ld a,(hl)			;7740
+	jr z,abre_con_la_llave		;773e
+	ld a,(hl)			;7740   ; ... si no, la blanca (bit 0)
 	rra			;7741
 	ret nc			;7742
-L_7743:
-	res 0,(hl)		;7743
-	call 08ebah		;7745
-	xor a			;7748
+abre_con_la_llave:
+	res 0,(hl)		;7743   ; se gasta...
+	call 08ebah		;7745   ; ... y se borra del marcador
+	xor a			;7748   ; sin golpe
 	ld (0c422h),a		;7749
-	call L_7806		;774c
-	call quita_las_armas		;774f
-	ld hl,0c5ach		;7752   ; apunta a el estado de la puerta de la fase
+	call mueren_las_cosas		;774c   ; mueren las cosas
+	call quita_las_armas		;774f   ; fuera las armas
+	ld hl,0c5ach		;7752   ; el estado siguiente de la puerta
 	inc (hl)			;7755
-	ld a,(0d000h)		;7756   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;7756   ; en las fases de 0x7777...
 	ld de,07777h		;7759
 	call 04066h		;775c   ; de_mas_a: DE += A
 	ld a,(de)			;775f
 	and a			;7760
-	jr z,L_7768		;7761
-	ld a,0ffh		;7763
+	jr z,efecto_de_la_puerta		;7761
+	ld a,0ffh		;7763   ; ... la musica se funde
 	call 0509fh		;7765   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7768:
-	ld a,(hl)			;7768
+efecto_de_la_puerta:
+	ld a,(hl)			;7768   ; el efecto 0x1A...
 	cp 005h		;7769
-	jr z,L_7772		;776b
+	jr z,efecto_del_5		;776b
 	ld a,01ah		;776d
 	jp 0509fh		;776f   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7772:
-	ld a,015h		;7772
+efecto_del_5:
+	ld a,015h		;7772   ; ... o, en el 5, el 0x15
 	jp 0509fh		;7774   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 
 ; ----------------------------------------------------------------------
@@ -3448,140 +3460,144 @@ DATA_una_bandera_por_fase:
 ; ======================================================================
 
 
-L_778A:
-	ld a,(0c5ach)		;778a   ; lee el estado de la puerta de la fase
+simon_anda_a_la_puerta:
+	ld a,(0c5ach)		;778a   ; ESTADOS 3 y 5: en el 5, los sprites de la puerta
 	cp 005h		;778d
 	call z,055ech		;778f
-	ld a,(0c420h)		;7792
+	ld a,(0c420h)		;7792   ; de pie?
 	and a			;7795
 	ret nz			;7796
-	ld bc,00000h		;7797
+	ld bc,00000h		;7797   ; de pie...
 	ld (0c42eh),bc		;779a   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call pose_segun_el_lado		;779e   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-	ld a,(0c42ch)		;77a1   ; lee el lado al que mira Simon (0 derecha)
+	ld a,(0c42ch)		;77a1   ; ... y andando, 0x80 por cuadro...
 	and a			;77a4
 	ld bc,00080h		;77a5
 	jr z,L_77AD		;77a8
-	ld bc,0ff80h		;77aa
+	ld bc,0ff80h		;77aa   ; ... hacia donde mira
 L_77AD:
 	call suma_la_velocidad		;77ad
 	call poses_por_el_cuadro		;77b0
-	ld a,(0c5ach)		;77b3   ; lee el estado de la puerta de la fase
+	ld a,(0c5ach)		;77b3   ; en el 5, al marco...
 	cp 005h		;77b6
-	jr z,L_77C4		;77b8
-	ld a,(0c427h)		;77ba   ; lee la X de Simon
+	jr z,llega_a_la_puerta_abierta		;77b8
+	ld a,(0c427h)		;77ba   ; en el 3, aun dentro (x de 8 a 0xF7): sigue
 	sub 008h		;77bd
 	cp 0f0h		;77bf
 	ret c			;77c1
-	jr L_77D1		;77c2
-L_77C4:
-	ld a,(0c5aeh)		;77c4
+	jr sale_por_la_puerta		;77c2
+llega_a_la_puerta_abierta:
+	ld a,(0c5aeh)		;77c4   ; en el 5: a menos de 8 del marco?
 	add a,008h		;77c7
 	ld b,a			;77c9
 	ld a,(0c427h)		;77ca   ; lee la X de Simon
 	sub b			;77cd
 	cp 008h		;77ce
 	ret nc			;77d0
-L_77D1:
-	ld hl,0c41eh		;77d1
+sale_por_la_puerta:
+	ld hl,0c41eh		;77d1   ; a la izquierda (x menos de 0x80)...
 	ld de,0c427h		;77d4   ; apunta a la X de Simon
 	ld a,(de)			;77d7
 	rla			;77d8
-	jr c,L_77E4		;77d9
-	ld a,(hl)			;77db
+	jr c,sale_por_la_puerta_derecha		;77d9
+	ld a,(hl)			;77db   ; ... si hay salida...
 	inc a			;77dc
-	jr z,L_7800		;77dd
-	ld bc,003f6h		;77df
-	jr L_77EC		;77e2
-L_77E4:
-	inc hl			;77e4
+	jr z,fase_acabada		;77dd
+	ld bc,003f6h		;77df   ; ... sale por la izquierda (3), x = 0xF6
+	jr la_salida_de_la_puerta		;77e2
+sale_por_la_puerta_derecha:
+	inc hl			;77e4   ; a la derecha: si hay salida...
 	ld a,(hl)			;77e5
 	inc a			;77e6
-	jr z,L_7800		;77e7
-	ld bc,0040ah		;77e9
-L_77EC:
+	jr z,fase_acabada		;77e7
+	ld bc,0040ah		;77e9   ; ... sale por la derecha (4), x = 0x0A
+la_salida_de_la_puerta:
 	ld a,b			;77ec
 	ld (0c41bh),a		;77ed   ; guarda el lado por el que se sale de la habitacion
 	ld a,c			;77f0
 	ld (de),a			;77f1
-	ld a,(0d000h)		;77f2   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;77f2   ; el efecto 0x87...
 	cp 012h		;77f5
 	ld a,087h		;77f7
 	jr nz,L_77FD		;77f9
-	ld a,086h		;77fb
+	ld a,086h		;77fb   ; ... o, en la fase 18, el 0x86
 L_77FD:
 	jp 0509fh		;77fd   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7800:
-	ld a,001h		;7800
+fase_acabada:
+	ld a,001h		;7800   ; sin salida: la fase se acaba (0xC408)
 	ld (0c408h),a		;7802
 L_7805:
 	ret			;7805
-L_7806:
-	ld ix,0c800h		;7806
+mueren_las_cosas:
+	ld ix,0c800h		;7806   ; las siete de 0xC800...
 	ld b,007h		;780a
 L_780C:
 	ld a,(ix+000h)		;780c   ; lee el tipo de la cosa
 	and a			;780f
 	push bc			;7810
 	push ix		;7811
-	call nz,09a3ah		;7813
+	call nz,09a3ah		;7813   ; ... se van (sin soltar nada)
 	pop ix		;7816
 	pop bc			;7818
 	ld de,00080h		;7819
 	add ix,de		;781c
 	djnz L_780C		;781e
-	ld ix,0d700h		;7820
+	ld ix,0d700h		;7820   ; y las ocho de 0xD700...
 	ld b,008h		;7824
 L_7826:
 	ld a,(ix+000h)		;7826   ; lee el tipo de la cosa
 	and a			;7829
 	push bc			;782a
-	call nz,09a1ah		;782b
+	call nz,09a1ah		;782b   ; ... se vuelven llamas
 	pop bc			;782e
 	ld de,00080h		;782f
 	add ix,de		;7832
 	djnz L_7826		;7834
 	ret			;7836
-L_7837:
-	call L_790C		;7837
-	ld a,(0c5ach)		;783a   ; lee el estado de la puerta de la fase
+
+; ----------------------------------------------------------------------
+; LOS SPRITES DE SIMON: sus colores (0x790C), los sprites 4 a 7 fuera (4 y 5 solo, si lleva un arma que se lanza, que usa los 6-9), y las piernas (0x7985, sprites 0 y 1) y el cuerpo (0x79D5, sprites 2 y 3) de sus poses; con la puerta de la fase en 5, en los sprites 8-11 (los 0-7 son de la puerta). Agachado o saltando encogido, las piernas suben 6 al saltar y el cuerpo baja 6 si no; con el respiro (0xC42D) parpadea.
+; ----------------------------------------------------------------------
+sprites_de_simon:
+	call colores_de_simon		;7837   ; los colores
+	ld a,(0c5ach)		;783a   ; con la puerta en 5, sin borrar
 	cp 005h		;783d
-	jr z,L_7858		;783f
-	ld de,0d610h		;7841
-	ld a,(0c416h)		;7844   ; lee el arma que lleva Simon (0, ninguna)
+	jr z,sprites_de_las_piernas		;783f
+	ld de,0d610h		;7841   ; desde el sprite 4...
+	ld a,(0c416h)		;7844   ; ... con un arma que se lanza, 2...
 	cp 002h		;7847
 	ld b,004h		;7849
-	jr c,L_784F		;784b
-	ld b,002h		;784d
-L_784F:
+	jr c,fuera_desde_el_4		;784b
+	ld b,002h		;784d   ; ... si no, 4
+fuera_desde_el_4:
 	ld a,0e0h		;784f
-L_7851:
+un_sprite_fuera:
 	ld (de),a			;7851
 	inc de			;7852
 	inc de			;7853
 	inc de			;7854
 	inc de			;7855
-	djnz L_7851		;7856
-L_7858:
-	ld a,(0c42eh)		;7858   ; lee la pose de las piernas de Simon
+	djnz un_sprite_fuera		;7856
+sprites_de_las_piernas:
+	ld a,(0c42eh)		;7858   ; la lista de las piernas...
 	add a,a			;785b
-	ld hl,07985h		;785c
+	ld hl,07985h		;785c   ; ... de 0x7985 por la pose
 	call 04061h		;785f   ; hl_mas_a: HL += A
 	ld e,(hl)			;7862
 	inc hl			;7863
 	ld d,(hl)			;7864
 	ex de,hl			;7865
-	ld c,000h		;7866
+	ld c,000h		;7866   ; patrones desde el 0
 	ld a,(0c5ach)		;7868   ; lee el estado de la puerta de la fase
 	cp 005h		;786b
-	ld de,0d600h		;786d
+	ld de,0d600h		;786d   ; en los sprites 0 y 1...
 	jr nz,L_7875		;7870
-	ld de,0d620h		;7872
+	ld de,0d620h		;7872   ; ... o, con la puerta en 5, 8 y 9
 L_7875:
-	ld b,(hl)			;7875
+	ld b,(hl)			;7875   ; cuantos
 	inc hl			;7876
-	call L_7899		;7877
-	ld a,(0c42fh)		;787a   ; lee la pose del cuerpo de Simon
+	call un_sprite_de_simon		;7877
+	ld a,(0c42fh)		;787a   ; la lista del cuerpo, de 0x79D5
 	add a,a			;787d
 	ld hl,079d5h		;787e
 	call 04061h		;7881   ; hl_mas_a: HL += A
@@ -3589,152 +3605,156 @@ L_7875:
 	inc hl			;7885
 	ld d,(hl)			;7886
 	ex de,hl			;7887
-	ld c,002h		;7888
+	ld c,002h		;7888   ; patrones desde el 2 (8)
 	ld a,(0c5ach)		;788a   ; lee el estado de la puerta de la fase
 	cp 005h		;788d
-	ld de,0d608h		;788f
-	jr nz,L_7897		;7892
-	ld de,0d628h		;7894
-L_7897:
+	ld de,0d608h		;788f   ; en los sprites 2 y 3...
+	jr nz,cuantos_sprites		;7892
+	ld de,0d628h		;7894   ; ... o 10 y 11
+cuantos_sprites:
 	ld b,(hl)			;7897
 	inc hl			;7898
-L_7899:
-	ld a,(0c425h)		;7899   ; lee la Y de Simon
+un_sprite_de_simon:
+	ld a,(0c425h)		;7899   ; la y de Simon mas dy
 	add a,(hl)			;789c
 	push bc			;789d
 	ld b,a			;789e
-	ld a,(0c42eh)		;789f   ; lee la pose de las piernas de Simon
+	ld a,(0c42eh)		;789f   ; las poses encogidas (6, 0x10, 0x1A, 0x24)...
 	cp 006h		;78a2
-	jr z,L_78B2		;78a4
+	jr z,encogido		;78a4
 	cp 010h		;78a6
-	jr z,L_78B2		;78a8
+	jr z,encogido		;78a8
 	cp 01ah		;78aa
-	jr z,L_78B2		;78ac
+	jr z,encogido		;78ac
 	cp 024h		;78ae
-	jr nz,L_78CC		;78b0
-L_78B2:
-	ld a,(0c420h)		;78b2
+	jr nz,parpadea		;78b0
+encogido:
+	ld a,(0c420h)		;78b2   ; saltando...
 	dec a			;78b5
-	jr nz,L_78C3		;78b6
-	ld a,c			;78b8
+	jr nz,encogido_de_pie		;78b6
+	ld a,c			;78b8   ; ... las piernas...
 	cp 002h		;78b9
-	jr nc,L_78CC		;78bb
-	ld a,b			;78bd
+	jr nc,parpadea		;78bb
+	ld a,b			;78bd   ; ... 6 mas arriba
 	sub 006h		;78be
 	ld b,a			;78c0
-	jr L_78CC		;78c1
-L_78C3:
-	ld a,c			;78c3
+	jr parpadea		;78c1
+encogido_de_pie:
+	ld a,c			;78c3   ; si no, el cuerpo...
 	cp 002h		;78c4
-	jr c,L_78CC		;78c6
-	ld a,b			;78c8
+	jr c,parpadea		;78c6
+	ld a,b			;78c8   ; ... 6 mas abajo
 	add a,006h		;78c9
 	ld b,a			;78cb
-L_78CC:
-	ld a,(0c42dh)		;78cc
+parpadea:
+	ld a,(0c42dh)		;78cc   ; con el respiro...
 	and a			;78cf
-	jr z,L_78DB		;78d0
-	ld a,(0c003h)		;78d2   ; lee el contador de cuadros
+	jr z,la_y_del_sprite		;78d0
+	ld a,(0c003h)		;78d2   ; ... uno de cada dos cuadros...
 	and 002h		;78d5
-	jr z,L_78DB		;78d7
-	ld b,0e0h		;78d9
-L_78DB:
+	jr z,la_y_del_sprite		;78d7
+	ld b,0e0h		;78d9   ; ... fuera de la pantalla
+la_y_del_sprite:
 	ld a,b			;78db
 	pop bc			;78dc
-	sub 002h		;78dd
+	sub 002h		;78dd   ; menos 2
 	ld (de),a			;78df
 	inc hl			;78e0
 	inc de			;78e1
 	push bc			;78e2
-	ld b,(hl)			;78e3
+	ld b,(hl)			;78e3   ; dx, con signo en el bit 7...
 	ld a,(0c427h)		;78e4   ; lee la X de Simon
 	ld c,a			;78e7
 	rl b		;78e8
-	jr nc,L_78F6		;78ea
+	jr nc,dx_positivo		;78ea
 	rr b		;78ec
 	ld a,b			;78ee
 	neg		;78ef
 	ld b,a			;78f1
 	ld a,c			;78f2
 	sub b			;78f3
-	jr L_78F7		;78f4
-L_78F6:
-	add a,(hl)			;78f6
-L_78F7:
-	jr nc,L_78FE		;78f7
+	jr fuera_si_se_sale		;78f4
+dx_positivo:
+	add a,(hl)			;78f6   ; ... sumado a la x
+fuera_si_se_sale:
+	jr nc,la_x_del_sprite		;78f7   ; se sale por el borde: fuera
 	dec de			;78f9
 	ld a,0e0h		;78fa
 	ld (de),a			;78fc
 	inc de			;78fd
-L_78FE:
+la_x_del_sprite:
 	ld (de),a			;78fe
 	pop bc			;78ff
 	inc hl			;7900
 	inc de			;7901
-	ld a,c			;7902
+	ld a,c			;7902   ; el patron: el numero por 4
 	add a,a			;7903
 	add a,a			;7904
 	ld (de),a			;7905
-	inc c			;7906
+	inc c			;7906   ; el siguiente
 	inc de			;7907
 	inc de			;7908
-	djnz L_7899		;7909
+	djnz un_sprite_de_simon		;7909
 	ret			;790b
-L_790C:
-	ld a,(0c416h)		;790c   ; lee el arma que lleva Simon (0, ninguna)
+
+; ----------------------------------------------------------------------
+; LOS COLORES DE SIMON, en 0xD400 (0xD480 con la puerta en 5), 16 lineas por sprite: invencible, 0x0E uno de cada dos cuadros; con la cuenta de 0xC434, 8 uno de cada dos; si no, 0x42 (con CC) y 1, un sprite si y otro no. Ocho sprites, o cuatro con un arma que se lanza.
+; ----------------------------------------------------------------------
+colores_de_simon:
+	ld a,(0c416h)		;790c   ; ocho sprites...
 	cp 002h		;790f
 	ld b,080h		;7911
-	jr c,L_7917		;7913
-	ld b,040h		;7915
-L_7917:
-	ld a,(0c5ach)		;7917   ; lee el estado de la puerta de la fase
+	jr c,donde_los_colores		;7913
+	ld b,040h		;7915   ; ... o cuatro
+donde_los_colores:
+	ld a,(0c5ach)		;7917   ; 0xD400...
 	cp 005h		;791a
 	ld hl,0d400h		;791c
-	jr nz,L_7924		;791f
-	ld hl,0d480h		;7921
-L_7924:
-	ld a,(0c43ah)		;7924   ; lee la cuenta de la INVENCIBILIDAD
+	jr nz,color_de_una_linea_de_simon		;791f
+	ld hl,0d480h		;7921   ; ... o 0xD480
+color_de_una_linea_de_simon:
+	ld a,(0c43ah)		;7924   ; invencible...
 	and a			;7927
-	jr z,L_7932		;7928
-	ld a,(0c003h)		;792a   ; lee el contador de cuadros
+	jr z,con_la_cuenta_de_0xc434		;7928
+	ld a,(0c003h)		;792a   ; ... uno de cada dos cuadros...
 	rra			;792d
-	ld a,00eh		;792e
-	jr c,L_794A		;7930
-L_7932:
-	ld a,(0c434h)		;7932
+	ld a,00eh		;792e   ; ... 0x0E
+	jr c,pon_el_color		;7930
+con_la_cuenta_de_0xc434:
+	ld a,(0c434h)		;7932   ; con 0xC434...
 	and a			;7935
-	jr z,L_7940		;7936
-	ld a,(0c003h)		;7938   ; lee el contador de cuadros
+	jr z,color_normal		;7936
+	ld a,(0c003h)		;7938   ; ... uno de cada dos...
 	rra			;793b
-	ld a,008h		;793c
-	jr c,L_794A		;793e
-L_7940:
-	ld a,b			;7940
+	ld a,008h		;793c   ; ... 8
+	jr c,pon_el_color		;793e
+color_normal:
+	ld a,b			;7940   ; de 16 en 16 lineas...
 	dec a			;7941
 	and 010h		;7942
-	ld a,001h		;7944
-	jr nz,L_794A		;7946
-	ld a,042h		;7948
-L_794A:
+	ld a,001h		;7944   ; ... 1...
+	jr nz,pon_el_color		;7946
+	ld a,042h		;7948   ; ... o 0x42
+pon_el_color:
 	ld (hl),a			;794a
 	inc hl			;794b
-	djnz L_7924		;794c
+	djnz color_de_una_linea_de_simon		;794c
 	ret			;794e
-L_794F:
-	ld a,(0c40dh)		;794f
+la_musica_de_la_fase:
+	ld a,(0c40dh)		;794f   ; al empezar la vida (0xC40D)...
 	and a			;7952
-	jr nz,L_7965		;7953
-	ld a,(0d000h)		;7955   ; lee la FASE (0 el patio, 1-18)
+	jr nz,suena_la_de_la_fase		;7953
+	ld a,(0d000h)		;7955   ; ... o en el patio...
 	and a			;7958
-	jr z,L_7965		;7959
-	dec a			;795b
+	jr z,suena_la_de_la_fase		;7959
+	dec a			;795b   ; ... o en las fases de 0x7777...
 	ld hl,07777h		;795c
 	call 04061h		;795f   ; hl_mas_a: HL += A
 	ld a,(hl)			;7962
 	and a			;7963
-	ret z			;7964
-L_7965:
-	ld a,(0d000h)		;7965   ; lee la FASE (0 el patio, 1-18)
+	ret z			;7964   ; (en las demas, la que sonaba)
+suena_la_de_la_fase:
+	ld a,(0d000h)		;7965   ; la de 0x7972, por la fase
 	ld hl,07972h		;7968
 	call 04061h		;796b   ; hl_mas_a: HL += A
 	ld a,(hl)			;796e
@@ -3795,52 +3815,56 @@ DATA_sprites_de_las_poses:
 ; ======================================================================
 
 
-L_7ACF:
-	ld e,010h		;7acf
-L_7AD1:
-	ld a,002h		;7ad1
+rayas_del_titulo:
+	ld e,010h		;7acf   ; dieciseis...
+una_raya_del_titulo:
+	ld a,002h		;7ad1   ; ... rectangulos del byte 2...
 	ld d,000h		;7ad3
-	ld bc,00709h		;7ad5
+	ld bc,00709h		;7ad5   ; ... de 7 x 9 puntos...
 	push hl			;7ad8
 	push de			;7ad9
 	call 0490ah		;7ada   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 	pop de			;7add
 	pop hl			;7ade
-	ld a,010h		;7adf
+	ld a,010h		;7adf   ; ... de 16 en 16 puntos
 	add a,h			;7ae1
 	ld h,a			;7ae2
 	dec e			;7ae3
-	jr nz,L_7AD1		;7ae4
+	jr nz,una_raya_del_titulo		;7ae4
 	ret			;7ae6
-L_7AE7:
-	ld a,002h		;7ae7
+color_2_del_titulo:
+	ld a,002h		;7ae7   ; el color 2 a 0x1101
 	ld de,01101h		;7ae9
 	jp 04814h		;7aec   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-L_7AEF:
+
+; ----------------------------------------------------------------------
+; LOS SPRITES DEL TITULO JAPONES: once pares en la copia de 0xD600, cada par con la posicion de 0x7B52 y dos patrones seguidos (desde el 0), de los colores 8 y 2 (el 2, negro), sin rotar.
+; ----------------------------------------------------------------------
+sprites_del_titulo:
 	ld de,0d600h		;7aef
 	ld hl,07b52h		;7af2
-	ld b,00bh		;7af5
+	ld b,00bh		;7af5   ; once pares
 	ld a,0fch		;7af7
-L_7AF9:
+un_par_del_titulo:
 	push bc			;7af9
 	ld b,002h		;7afa
-L_7AFC:
+un_sprite_del_titulo:
 	push bc			;7afc
-	ld bc,00002h		;7afd
+	ld bc,00002h		;7afd   ; y y x...
 	ldir		;7b00
 	pop bc			;7b02
 	dec hl			;7b03
 	dec hl			;7b04
-	add a,004h		;7b05
+	add a,004h		;7b05   ; ... y el patron, cuatro mas
 	ld (de),a			;7b07
 	inc de			;7b08
 	inc de			;7b09
-	djnz L_7AFC		;7b0a
+	djnz un_sprite_del_titulo		;7b0a
 	inc hl			;7b0c
 	inc hl			;7b0d
 	pop bc			;7b0e
-	djnz L_7AF9		;7b0f
-	ld hl,0d400h		;7b11
+	djnz un_par_del_titulo		;7b0f
+	ld hl,0d400h		;7b11   ; los colores: 16 lineas del 8...
 	ld c,00bh		;7b14
 L_7B16:
 	ld b,010h		;7b16
@@ -3848,42 +3872,42 @@ L_7B18:
 	ld (hl),008h		;7b18
 	inc hl			;7b1a
 	djnz L_7B18		;7b1b
-	ld b,010h		;7b1d
+	ld b,010h		;7b1d   ; ... y 16 del 2, once veces
 L_7B1F:
 	ld (hl),002h		;7b1f
 	inc hl			;7b21
 	djnz L_7B1F		;7b22
 	dec c			;7b24
 	jr nz,L_7B16		;7b25
-	ld a,002h		;7b27
+	ld a,002h		;7b27   ; el color 2, negro
 	ld de,00000h		;7b29
 	call 04814h		;7b2c   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 	jp sprites_sin_rotar		;7b2f
 rotulo_por_filas:
-	push de			;7b32
+	push de			;7b32   ; ROTULO POR FILAS: [dibujo], 0xFE [dx] fila nueva, 0xFF acaba
 L_7B33:
 	ld a,(hl)			;7b33
 	inc hl			;7b34
 	ld c,a			;7b35
-	inc a			;7b36
-	jr z,L_7B50		;7b37
-	inc a			;7b39
-	jr nz,L_7B47		;7b3a
+	inc a			;7b36   ; 0xFF: acaba
+	jr z,rotulo_acabado		;7b37
+	inc a			;7b39   ; 0xFE: fila nueva...
+	jr nz,un_dibujo_del_rotulo		;7b3a
 	pop de			;7b3c
-	ld a,(hl)			;7b3d
+	ld a,(hl)			;7b3d   ; ... dx...
 	inc hl			;7b3e
 	add a,d			;7b3f
 	ld d,a			;7b40
-	ld a,008h		;7b41
+	ld a,008h		;7b41   ; ... y 8 mas abajo
 	add a,e			;7b43
 	ld e,a			;7b44
 	jr rotulo_por_filas		;7b45
-L_7B47:
-	ld a,c			;7b47
+un_dibujo_del_rotulo:
+	ld a,c			;7b47   ; el dibujo, con transparencia...
 	call 04b1dh		;7b48
-	call 04b4fh		;7b4b
+	call 04b4fh		;7b4b   ; ... y la posicion siguiente
 	jr L_7B33		;7b4e
-L_7B50:
+rotulo_acabado:
 	pop de			;7b50
 	ret			;7b51
 
@@ -3900,16 +3924,16 @@ DATA_once_pares:
 ; ======================================================================
 
 
-L_7B68:
-	ld a,(0c425h)		;7b68   ; lee la Y de Simon
+pared_bajo_los_pies:
+	ld a,(0c425h)		;7b68   ; la celda 7 por debajo de Simon: pared?
 	add a,007h		;7b6b
 	ld e,a			;7b6d
 	ld a,(0c427h)		;7b6e   ; lee la X de Simon
 	ld d,a			;7b71
 	call celda_del_mapa		;7b72   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	jp es_pared		;7b75   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-L_7B78:
-	ld a,(0c425h)		;7b78   ; lee la Y de Simon
+techo_encima:
+	ld a,(0c425h)		;7b78   ; la celda 0x2C por encima de Simon: pared?
 	sub 02ch		;7b7b
 	ld e,a			;7b7d
 	ld a,(0c427h)		;7b7e   ; lee la X de Simon
@@ -3917,146 +3941,150 @@ L_7B78:
 	call celda_del_mapa		;7b82   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	jp es_pared		;7b85   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 mira_el_suelo:
-	ld a,(0c425h)		;7b88   ; lee la Y de Simon
+	ld a,(0c425h)		;7b88   ; MIRA EL SUELO: por debajo de 0xD0...
 	ld e,a			;7b8b
 	cp 0d0h		;7b8c
-	jr c,L_7B92		;7b8e
-	or a			;7b90
+	jr c,suelo_bajo_los_pies		;7b8e
+	or a			;7b90   ; ... no hay (NC)
 	ret			;7b91
-L_7B92:
-	ld a,(0c427h)		;7b92   ; lee la X de Simon
+suelo_bajo_los_pies:
+	ld a,(0c427h)		;7b92   ; x + 5...
 	add a,005h		;7b95
 	ld d,a			;7b97
 choca_con_el_decorado:
-	call celda_del_mapa		;7b98   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call celda_del_mapa		;7b98   ; CHOCA CON EL DECORADO: (E, D) pared?
 	call es_pared		;7b9b   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7b9e
-	ld a,d			;7b9f
+	ld a,d			;7b9f   ; ... o (E, D - 10)
 	sub 00ah		;7ba0
 	ld d,a			;7ba2
-L_7BA3:
+pared_en_de:
 	call celda_del_mapa		;7ba3   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	jp es_pared		;7ba6   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-L_7BA9:
+
+; ----------------------------------------------------------------------
+; PARED A LA DERECHA de Simon (0x7C05 a la izquierda): las celdas a 8 de su x, desde su y - 2 hacia arriba de 8 en 8: cuatro, o tres agachado; 0x7BB7 mira a 0x10 desde y - 4, solo dos; 0x7BBE, con B y C de quien llama, siempre cuatro. Carry si hay.
+; ----------------------------------------------------------------------
+pared_a_la_derecha:
 	ld a,(0c425h)		;7ba9   ; lee la Y de Simon
 	ld e,a			;7bac
 	ld a,(0c427h)		;7bad   ; lee la X de Simon
 	ld d,a			;7bb0
-	ld bc,00802h		;7bb1
+	ld bc,00802h		;7bb1   ; 8 a la derecha, desde y - 2
 	xor a			;7bb4
-	jr L_7BC0		;7bb5
-L_7BB7:
-	ld bc,01004h		;7bb7
+	jr mira_la_derecha		;7bb5
+pared_a_la_derecha_lejos:
+	ld bc,01004h		;7bb7   ; 0x10 a la derecha, desde y - 4, dos celdas
 	ld a,002h		;7bba
-	jr L_7BC0		;7bbc
-L_7BBE:
-	ld a,001h		;7bbe
-L_7BC0:
-	ld (0cff0h),a		;7bc0   ; guarda el tipo de la cosa que se crea
-	ld a,e			;7bc3
+	jr mira_la_derecha		;7bbc
+pared_a_la_derecha_alta:
+	ld a,001h		;7bbe   ; siempre cuatro, desde donde diga BC
+mira_la_derecha:
+	ld (0cff0h),a		;7bc0   ; el modo, a 0xCFF0 de temporal
+	ld a,e			;7bc3   ; y - C...
 	sub c			;7bc4
 	ld e,a			;7bc5
-	ld a,d			;7bc6
+	ld a,d			;7bc6   ; ... x + B
 	add a,b			;7bc7
 	ld d,a			;7bc8
 	call celda_del_mapa		;7bc9   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	call es_pared		;7bcc   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+	call es_pared		;7bcc   ; pared?
 	ret c			;7bcf
-	ld a,e			;7bd0
+	ld a,e			;7bd0   ; 8 mas arriba
 	sub 008h		;7bd1
 	ld e,a			;7bd3
 	call celda_del_mapa		;7bd4   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	call es_pared		;7bd7   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7bda
-	ld a,(0cff0h)		;7bdb   ; lee el tipo de la cosa que se crea
+	ld a,(0cff0h)		;7bdb   ; en el modo 2, dos celdas
 	cp 002h		;7bde
 	ret z			;7be0
-	ld a,e			;7be1
+	ld a,e			;7be1   ; 8 mas arriba
 	sub 008h		;7be2
 	ld e,a			;7be4
 	call celda_del_mapa		;7be5   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	call es_pared		;7be8   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7beb
-	ld a,(0cff0h)		;7bec   ; lee el tipo de la cosa que se crea
+	ld a,(0cff0h)		;7bec   ; en el modo 0...
 	and a			;7bef
-	jr nz,L_7BFB		;7bf0
-	ld a,(0c420h)		;7bf2
+	jr nz,la_cuarta_celda		;7bf0
+	ld a,(0c420h)		;7bf2   ; ... agachado, tres
 	cp 002h		;7bf5
-	jr nz,L_7BFB		;7bf7
+	jr nz,la_cuarta_celda		;7bf7
 	xor a			;7bf9
 	ret			;7bfa
-L_7BFB:
-	ld a,e			;7bfb
+la_cuarta_celda:
+	ld a,e			;7bfb   ; 8 mas arriba
 	sub 008h		;7bfc
 	ld e,a			;7bfe
 	call celda_del_mapa		;7bff   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	jp es_pared		;7c02   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
-L_7C05:
+pared_a_la_izquierda:
 	ld a,(0c425h)		;7c05   ; lee la Y de Simon
 	ld e,a			;7c08
 	ld a,(0c427h)		;7c09   ; lee la X de Simon
 	ld d,a			;7c0c
-	ld bc,00802h		;7c0d
+	ld bc,00802h		;7c0d   ; 8 a la izquierda, desde y - 2
 	xor a			;7c10
-	jr L_7C1C		;7c11
-L_7C13:
+	jr mira_la_izquierda		;7c11
+pared_a_la_izquierda_lejos:
 	ld bc,01004h		;7c13
 	ld a,002h		;7c16
-	jr L_7C1C		;7c18
-L_7C1A:
+	jr mira_la_izquierda		;7c18
+pared_a_la_izquierda_alta:
 	ld a,001h		;7c1a
-L_7C1C:
-	ld (0cff0h),a		;7c1c   ; guarda el tipo de la cosa que se crea
-	ld a,e			;7c1f
+mira_la_izquierda:
+	ld (0cff0h),a		;7c1c   ; el modo
+	ld a,e			;7c1f   ; y - C...
 	sub c			;7c20
 	ld e,a			;7c21
-	ld a,d			;7c22
+	ld a,d			;7c22   ; ... x - B
 	sub b			;7c23
 	ld d,a			;7c24
 	call celda_del_mapa		;7c25   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	call es_pared		;7c28   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7c2b
-	ld a,e			;7c2c
+	ld a,e			;7c2c   ; 8 mas arriba
 	sub 008h		;7c2d
 	ld e,a			;7c2f
 	call celda_del_mapa		;7c30   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	call es_pared		;7c33   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7c36
-	ld a,(0cff0h)		;7c37   ; lee el tipo de la cosa que se crea
+	ld a,(0cff0h)		;7c37   ; en el modo 2, dos
 	cp 002h		;7c3a
 	ret z			;7c3c
-	ld a,e			;7c3d
+	ld a,e			;7c3d   ; 8 mas arriba
 	sub 008h		;7c3e
 	ld e,a			;7c40
 	call celda_del_mapa		;7c41   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	call es_pared		;7c44   ; es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
 	ret c			;7c47
-	ld a,(0cff0h)		;7c48   ; lee el tipo de la cosa que se crea
+	ld a,(0cff0h)		;7c48   ; en el modo 0, agachado, tres
 	and a			;7c4b
-	jr nz,L_7C57		;7c4c
+	jr nz,la_cuarta_celda_izquierda		;7c4c
 	ld a,(0c420h)		;7c4e
 	cp 002h		;7c51
-	jr nz,L_7C57		;7c53
+	jr nz,la_cuarta_celda_izquierda		;7c53
 	xor a			;7c55
 	ret			;7c56
-L_7C57:
+la_cuarta_celda_izquierda:
 	ld a,e			;7c57
 	sub 008h		;7c58
 	ld e,a			;7c5a
 	call celda_del_mapa		;7c5b   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 es_pared:
-	ld c,a			;7c5e
+	ld c,a			;7c5e   ; ES PARED la celda A? En la sala de Dracula, de la 1 a la 6...
 	ld a,(0ce00h)		;7c5f
 	cp 006h		;7c62
-	jr z,L_7C73		;7c64
-	ld a,(0d000h)		;7c66   ; lee la FASE (0 el patio, 1-18)
+	jr z,pared_en_la_sala_de_dracula		;7c64
+	ld a,(0d000h)		;7c66   ; ... si no, de la 1 al tope de la fase (0x7C78)
 	ld hl,07c78h		;7c69
 	call 04061h		;7c6c   ; hl_mas_a: HL += A
 	ld a,c			;7c6f
 	dec a			;7c70
 	cp (hl)			;7c71
 	ret			;7c72
-L_7C73:
+pared_en_la_sala_de_dracula:
 	ld a,c			;7c73
 	dec a			;7c74
 	cp 006h		;7c75
@@ -4075,14 +4103,18 @@ DATA_un_valor_por_fase:
 ; ======================================================================
 
 
-L_7C8B:
-	ld a,(0ce00h)		;7c8b
+
+; ----------------------------------------------------------------------
+; LAS ESCALERAS: celdas 4 y 3 al pie (bajan a la derecha y a la izquierda: 0x7C8B y 0x7CB3), 0x0D y 0x0C arriba (suben a la izquierda y a la derecha: 0x7CDB y 0x7D05), bajo Simon o a 8 puntos, que se le suman a su x para ponerlo en la escalera. Z si la hay; en la sala de Dracula no hay ninguna.
+; ----------------------------------------------------------------------
+escalera_que_baja_a_la_derecha:
+	ld a,(0ce00h)		;7c8b   ; en la sala de Dracula...
 	cp 006h		;7c8e
-	jr nz,L_7C94		;7c90
-	and a			;7c92
+	jr nz,celda_4		;7c90
+	and a			;7c92   ; ... no (NZ)
 	ret			;7c93
-L_7C94:
-	ld bc,0c425h		;7c94   ; apunta a la Y de Simon
+celda_4:
+	ld bc,0c425h		;7c94   ; la celda bajo Simon...
 	ld a,(bc)			;7c97
 	ld e,a			;7c98
 	inc c			;7c99
@@ -4090,27 +4122,27 @@ L_7C94:
 	ld a,(bc)			;7c9b
 	ld d,a			;7c9c
 	call celda_del_mapa		;7c9d   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	cp 004h		;7ca0
+	cp 004h		;7ca0   ; ... la 4?
 	ret z			;7ca2
-	ld a,(bc)			;7ca3
+	ld a,(bc)			;7ca3   ; o 8 a la derecha...
 	add a,008h		;7ca4
 	ld d,a			;7ca6
 	call celda_del_mapa		;7ca7   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	cp 004h		;7caa
 	ret nz			;7cac
-	ld a,(bc)			;7cad
+	ld a,(bc)			;7cad   ; ... y alli se pone
 	add a,008h		;7cae
 	ld (bc),a			;7cb0
 	xor a			;7cb1
 	ret			;7cb2
-L_7CB3:
+escalera_que_baja_a_la_izquierda:
 	ld a,(0ce00h)		;7cb3
 	cp 006h		;7cb6
-	jr nz,L_7CBC		;7cb8
+	jr nz,celda_3		;7cb8
 	and a			;7cba
 	ret			;7cbb
-L_7CBC:
-	ld bc,0c425h		;7cbc   ; apunta a la Y de Simon
+celda_3:
+	ld bc,0c425h		;7cbc   ; la celda bajo Simon...
 	ld a,(bc)			;7cbf
 	ld e,a			;7cc0
 	inc c			;7cc1
@@ -4118,27 +4150,27 @@ L_7CBC:
 	ld a,(bc)			;7cc3
 	ld d,a			;7cc4
 	call celda_del_mapa		;7cc5   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	cp 003h		;7cc8
+	cp 003h		;7cc8   ; ... la 3?
 	ret z			;7cca
-	ld a,(bc)			;7ccb
+	ld a,(bc)			;7ccb   ; o 8 a la izquierda...
 	sub 008h		;7ccc
 	ld d,a			;7cce
 	call celda_del_mapa		;7ccf   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	cp 003h		;7cd2
 	ret nz			;7cd4
-	ld a,(bc)			;7cd5
+	ld a,(bc)			;7cd5   ; ... y alli se pone
 	sub 008h		;7cd6
 	ld (bc),a			;7cd8
 	xor a			;7cd9
 	ret			;7cda
-L_7CDB:
+escalera_que_sube_a_la_izquierda:
 	ld a,(0ce00h)		;7cdb
 	cp 006h		;7cde
-	jr nz,L_7CE4		;7ce0
+	jr nz,celda_0x0d		;7ce0
 	and a			;7ce2
 	ret			;7ce3
-L_7CE4:
-	ld bc,0c425h		;7ce4   ; apunta a la Y de Simon
+celda_0x0d:
+	ld bc,0c425h		;7ce4   ; 8 por encima y 8 a la izquierda...
 	ld a,(bc)			;7ce7
 	sub 008h		;7ce8
 	ld e,a			;7cea
@@ -4148,26 +4180,26 @@ L_7CE4:
 	sub 008h		;7cee
 	ld d,a			;7cf0
 	call celda_del_mapa		;7cf1   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	cp 00dh		;7cf4
+	cp 00dh		;7cf4   ; ... la 0x0D?
 	ret z			;7cf6
-	ld a,(bc)			;7cf7
+	ld a,(bc)			;7cf7   ; o encima...
 	ld d,a			;7cf8
 	call celda_del_mapa		;7cf9   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	cp 00dh		;7cfc
 	ret nz			;7cfe
-	ld a,(bc)			;7cff
+	ld a,(bc)			;7cff   ; ... y 8 a la derecha
 	add a,008h		;7d00
 	ld (bc),a			;7d02
 	xor a			;7d03
 	ret			;7d04
-L_7D05:
+escalera_que_sube_a_la_derecha:
 	ld a,(0ce00h)		;7d05
 	cp 006h		;7d08
-	jr nz,L_7D0E		;7d0a
+	jr nz,celda_0x0c		;7d0a
 	and a			;7d0c
 	ret			;7d0d
-L_7D0E:
-	ld bc,0c425h		;7d0e   ; apunta a la Y de Simon
+celda_0x0c:
+	ld bc,0c425h		;7d0e   ; 8 por encima y 8 a la derecha...
 	ld a,(bc)			;7d11
 	sub 008h		;7d12
 	ld e,a			;7d14
@@ -4177,14 +4209,14 @@ L_7D0E:
 	add a,008h		;7d18
 	ld d,a			;7d1a
 	call celda_del_mapa		;7d1b   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	cp 00ch		;7d1e
+	cp 00ch		;7d1e   ; ... la 0x0C?
 	ret z			;7d20
-	ld a,(bc)			;7d21
+	ld a,(bc)			;7d21   ; o encima...
 	ld d,a			;7d22
 	call celda_del_mapa		;7d23   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	cp 00ch		;7d26
 	ret nz			;7d28
-	ld a,(bc)			;7d29
+	ld a,(bc)			;7d29   ; ... y 8 a la izquierda
 	sub 008h		;7d2a
 	ld (bc),a			;7d2c
 	xor a			;7d2d
@@ -4336,7 +4368,7 @@ L_7E17:
 	call 081abh		;7e21
 	ld a,001h		;7e24
 	ld (0ce15h),a		;7e26
-	jp L_7806		;7e29
+	jp mueren_las_cosas		;7e29
 L_7E2C:
 	ld hl,07e59h		;7e2c
 	ld a,(0c416h)		;7e2f   ; lee el arma que lleva Simon (0, ninguna)
