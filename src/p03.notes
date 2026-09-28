@@ -1,5 +1,18 @@
 # Notas del banco 03: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+B 0xAB22 DRACULA (el tipo 0x11). Ocho sprites -la cabeza arriba y los pies abajo, a pares con CC (colores de 0xAD53)- y el cuerpo, un dibujo de 32x32 que se pinta en el fondo. Nace en el dibujo 0x56 subiendo; de pie usa 0x5B-0x5E (0xACAA: capa cerrada y abierta, a un lado y al otro), lanza tres cosas del tipo 5 (0xABE9: crea_con_parametros con A = 0x11, que da el tipo de 0xA08E + 0x11, en la lista de 0xD700) con velocidades de 0x280 hacia Simon y 0, 0x180 y -0x180 en vertical, se esconde subiendo 0x40 y reaparece en una de las ocho x de 0xAC76. Tools: dracula.py, cotejado con lanza_dracula.sh.
+L 0xAB22 nace_dracula
+L 0xAB42 mueve_dracula
+C 0xAB32 el dibujo de la cosa = 0x56 (subiendo, sin cuerpo)
+B 0xAD80 GUARDA EL FONDO QUE VA A PISAR EL CUERPO: HMMM de 32x32 desde (x - 16, 0x91) de la pagina 0 a (0x80, 0x80) de la pagina 1 (A = 4: origen 0, destino 1).
+L 0xAD80 guarda_el_fondo_de_dracula
+C 0xAD80 lee la x de Dracula
+B 0xAD93 PINTA EL CUERPO DE DRACULA, si 0xCE0E vale 1-5 (lo pone 0xADD2 con el dibujo menos 0x5A, o 0xADC6 con 5): de 0xADBC el origen en la pagina 1, (0, 0x80), (32, 0x80), (64, 0x80) o (96, 0x80), copiado con LMMM y TIMP (A = 0x48: el 0 no pinta) a (x - 16, 0x91); con 5, el fondo guardado de vuelta con HMMM. Como TIMP no borra, al pasar de 0x5B a 0x5C quedan puntos del primero.
+L 0xAD93 pinta_el_cuerpo_de_dracula
+L 0xADC6 devuelve_el_fondo_de_dracula
+L 0xADD2 cuerpo_del_dibujo
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0xA08F 0xA0E5 tablas_por_tipo  tres tablas seguidas: 0xA08F, un byte por tipo de cosa que p02:9F8C lee con 0xA08E + tipo; 0xA0BF, punteros por tipo (p03:A011 con DE = 0xA0BD, via 0x6542) a las cuatro listas cortas de 0xA0D7-0xA0E4, que se copian a los sprites de la cosa (p03:A017); los mismos bytes usan p01:68EA y p03:BBFD como coordenadas de VRAM
 F 0xA08F 16
@@ -405,7 +418,6 @@ C 0xAAD7 lee la x de la cosa
 C 0xAB22 la cosa se queda quieta
 C 0xAB29 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xAB2F pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xAB32 el dibujo de la cosa = 0x56
 C 0xAB36 la cuenta de cuadros del paso = 0x1E
 C 0xAB46 lee el paso en que va la cosa
 C 0xAB49 despacha: salta a la entrada A de la tabla que va detras del call
@@ -474,7 +486,6 @@ C 0xAD3D dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 C 0xAD42 dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 C 0xAD6E hl_mas_a: HL += A
 C 0xAD76 hl_mas_a: HL += A
-C 0xAD80 lee la x de la cosa
 C 0xAD90 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0xAD9E palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0xADB9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)

@@ -149,6 +149,54 @@ def coteja_muestras(cart):
     return bien, otro, mal, malas
 
 
+def clasifica_muestras(cart):
+    """Cada muestra compuesta, en una de estas clases:
+      'su dibujo'      la geometria de 0xB473 con el dibujo de la ficha;
+      'otro dibujo'    la de otro dibujo (el codigo lo cambio al componer);
+      'a medio crear'  la ficha recien nacida: desde algun byte todo a cero;
+      'leida a medias' la sonda leyo mientras p01:6445 escribia: la lista se
+                       parte en dos o tres trozos (posiciones y patrones van en
+                       pasadas distintas) y cada trozo es el de algun dibujo en
+                       esos mismos sprites. Un trozo de un solo sprite solo
+                       prueba que su patron es de ese sprite en algun dibujo;
+      'sin explicar'   lo demas.
+    Devuelve (Counter, [muestras sin explicar])."""
+    from collections import Counter
+    cache = {}
+
+    def geometria(tipo, d, n):
+        if (tipo, d, n) not in cache:
+            cache[(tipo, d, n)] = [a[:3] for a in compone(cart, tipo, d, 0, 0, n)]
+        return cache[(tipo, d, n)]
+
+    def trozo_de_algun_dibujo(trozo, tipo, n, j):
+        r = _relativo(trozo)
+        return any(_relativo(geometria(tipo, d, n)[j:j + len(trozo)]) == r for d in range(256))
+
+    clases, raras = Counter(), []
+    for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras():
+        if tipo in SIN_COMPONER or not spr:
+            continue
+        n, s3 = len(spr), [a[:3] for a in spr]
+        plano = [b for a in s3 for b in a]
+        if _relativo(geometria(tipo, dibujo, n)) == _relativo(s3):
+            clases["su dibujo"] += 1
+        elif trozo_de_algun_dibujo(s3, tipo, n, 0):
+            clases["otro dibujo"] += 1
+        elif any(not any(plano[k:]) for k in range(1, len(plano))):
+            clases["a medio crear"] += 1
+        elif any(all(trozo_de_algun_dibujo(s3[a:b], tipo, n, a) for a, b in zip(cortes, cortes[1:]))
+                 for cortes in ([0, j, n] for j in range(1, n))):
+            clases["leida a medias"] += 1
+        elif any(all(trozo_de_algun_dibujo(s3[a:b], tipo, n, a) for a, b in zip(cortes, cortes[1:]))
+                 for cortes in ([0, j, k, n] for j in range(1, n) for k in range(j + 1, n))):
+            clases["leida a medias"] += 1
+        else:
+            clases["sin explicar"] += 1
+            raras.append((fase, hab, cuadro, tipo, dibujo, s3))
+    return clases, raras
+
+
 def vistos(cart):
     """{tipo: [(dibujo, colores, fase, hab)]}: cada cuadro distinto que se vio
     con la geometria de su tabla."""
@@ -161,10 +209,39 @@ def vistos(cart):
         colores = tuple(a[3] for a in spr)
         if not any(colores):
             continue                          # escondida: todo a color 0
+        if tipo == DRACULA and dibujo in DE_PIE and not all(colores):
+            continue                          # p03:AD61: el parpadeo al aparecer
         lista = fuera.setdefault(tipo, [])
         if all((d, c) != (dibujo, colores) for d, c, _, _ in lista):
             lista.append((dibujo, colores, fase, hab))
+    # Dracula de pie en sus cuatro dibujos, los que no salieran en las
+    # muestras: cotejados aparte (coteja.py dracula)
+    from dracula import colores_de_pie, FASE, SALA
+    lista = fuera.setdefault(DRACULA, [])
+    for dibujo in DE_PIE:
+        if all(d != dibujo for d, _, _, _ in lista):
+            lista.append((dibujo, tuple(colores_de_pie(cart)), FASE, SALA))
     return fuera
+
+
+DRACULA = 0x11
+DE_PIE = (0x5B, 0x5C, 0x5D, 0x5E)
+
+
+def pinta_el_cuerpo_en(cart, v, img, dibujo, dy, dx):
+    """El cuerpo de Dracula de pie (tools/dracula.py) debajo de sus sprites,
+    con Dracula en (0x80, 0x80): lo que p03:AD93 copia al fondo en (x - 16,
+    y - 0x2F), sobre el fondo de la hoja."""
+    from dracula import cuerpo, pasos_del_cuerpo, FILA_DEL_CUERPO, Y_DE_PIE
+    from graficos import rgb
+    y0 = 0x80 - (Y_DE_PIE - FILA_DEL_CUERPO)
+    for paso in pasos_del_cuerpo(dibujo):
+        sx, sy = cuerpo(cart, paso)
+        for j in range(32):
+            for i in range(32):
+                c = v.punto(1, sx + i, sy + j)
+                if c and 0 <= y0 + j - dy < len(img) and 0 <= 0x70 + i - dx < len(img[0]):
+                    img[y0 + j - dy][0x70 + i - dx] = rgb(v.paleta, c)
 
 
 def hoja(cart, por_tipo, tope=12):
@@ -192,6 +269,8 @@ def hoja(cart, por_tipo, tope=12):
             v.v[:] = salas[(fase, hab)].v
             v.paleta = salas[(fase, hab)].paleta
             spr = compone(cart, tipo, dibujo, 0x80, 0x80, len(colores))
+            if tipo == DRACULA and dibujo in DE_PIE:
+                pinta_el_cuerpo_en(cart, v, fila, dibujo, 0x80 + y0 - 4, 0x80 + caja[2] - 4 - k * ancho)
             for s, (yy, xx, patron, _) in enumerate(spr):
                 color = colores[s]
                 v.v[ATRIBUTOS + 4 * s:ATRIBUTOS + 4 * s + 3] = bytes((yy if color else 0xE1, xx, patron))

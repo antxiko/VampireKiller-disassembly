@@ -1476,19 +1476,23 @@ DATA_sprites_de_la_cosa:
 ; ======================================================================
 
 
-L_AB22:
+
+; ----------------------------------------------------------------------
+; DRACULA (el tipo 0x11). Ocho sprites -la cabeza arriba y los pies abajo, a pares con CC (colores de 0xAD53)- y el cuerpo, un dibujo de 32x32 que se pinta en el fondo. Nace en el dibujo 0x56 subiendo; de pie usa 0x5B-0x5E (0xACAA: capa cerrada y abierta, a un lado y al otro), lanza tres cosas del tipo 5 (0xABE9: crea_con_parametros con A = 0x11, que da el tipo de 0xA08E + 0x11, en la lista de 0xD700) con velocidades de 0x280 hacia Simon y 0, 0x180 y -0x180 en vertical, se esconde subiendo 0x40 y reaparece en una de las ocho x de 0xAC76. Tools: dracula.py, cotejado con lanza_dracula.sh.
+; ----------------------------------------------------------------------
+nace_dracula:
 	ld (ix+006h),000h		;ab22   ; la cosa se queda quieta
 	ld de,0fe00h		;ab26
 	call pon_velocidad_y		;ab29   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00000h		;ab2c
 	call pon_velocidad_x		;ab2f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld (ix+00bh),056h		;ab32   ; el dibujo de la cosa = 0x56
+	ld (ix+00bh),056h		;ab32   ; el dibujo de la cosa = 0x56 (subiendo, sin cuerpo)
 	ld (ix+00ch),01eh		;ab36   ; la cuenta de cuadros del paso = 0x1E
 	xor a			;ab3a
 	ld (ix+010h),a		;ab3b
 	ld (ix+00eh),a		;ab3e
 	ret			;ab41
-L_AB42:
+mueve_dracula:
 	ld hl,0ab60h		;ab42
 	push hl			;ab45
 	ld a,(ix+001h)		;ab46   ; lee el paso en que va la cosa
@@ -1547,7 +1551,7 @@ L_AB86:
 	ld (ix+00bh),05bh		;ab9b   ; el dibujo de la cosa = 0x5B
 	ld a,01eh		;ab9f
 	ld (ix+00ch),a		;aba1   ; guarda la cuenta de cuadros del paso
-	call L_AD80		;aba4
+	call guarda_el_fondo_de_dracula		;aba4
 L_ABA7:
 	inc (ix+001h)		;aba7   ; sube el paso en que va la cosa
 	ret			;abaa
@@ -1562,7 +1566,7 @@ L_ABAB:
 	dec (ix+00ch)		;abc0   ; baja la cuenta de cuadros del paso
 	ret nz			;abc3
 	call L_AD45		;abc4
-	call L_ADD2		;abc7
+	call cuerpo_del_dibujo		;abc7
 	ld (ix+00ch),004h		;abca   ; la cuenta de cuadros del paso = 0x04
 	ld (ix+00eh),007h		;abce
 	jr L_ABA7		;abd2
@@ -1572,7 +1576,7 @@ L_ABD4:
 	ld c,001h		;abd8
 	ld hl,0acaah		;abda
 	call dibujo_segun_simon		;abdd   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
-	call L_ADD2		;abe0
+	call cuerpo_del_dibujo		;abe0
 	ld (ix+00ch),004h		;abe3   ; la cuenta de cuadros del paso = 0x04
 	jr L_ABA7		;abe7
 L_ABE9:
@@ -1629,7 +1633,7 @@ L_AC62:
 	call 04061h		;ac62   ; hl_mas_a: HL += A
 	ld a,(hl)			;ac65
 	ld (ix+005h),a		;ac66   ; guarda la x de la cosa
-	call L_AD80		;ac69
+	call guarda_el_fondo_de_dracula		;ac69
 	inc (ix+010h)		;ac6c
 	ld (ix+00ch),01eh		;ac6f   ; la cuenta de cuadros del paso = 0x1E
 	jp L_ABA7		;ac73
@@ -1657,7 +1661,7 @@ L_AC7E:
 	dec (ix+00ch)		;ac93   ; baja la cuenta de cuadros del paso
 	ret nz			;ac96
 	call L_AD45		;ac97
-	call L_ADD2		;ac9a
+	call cuerpo_del_dibujo		;ac9a
 	ld (ix+00ch),004h		;ac9d   ; la cuenta de cuadros del paso = 0x04
 	ld (ix+001h),003h		;aca1   ; el paso en que va la cosa = 0x03
 	ld (ix+00eh),007h		;aca5
@@ -1677,7 +1681,7 @@ DATA_dibujos_ACAA:
 
 
 L_ACAE:
-	call L_ADD2		;acae
+	call cuerpo_del_dibujo		;acae
 	xor a			;acb1
 	ld (ix+025h),a		;acb2
 	ld (ix+02ah),a		;acb5
@@ -1698,7 +1702,7 @@ L_ACD9:
 	ret nz			;acdc
 	ld a,001h		;acdd
 	ld (0ce16h),a		;acdf
-	call L_ADC6		;ace2
+	call devuelve_el_fondo_de_dracula		;ace2
 	jp 099f6h		;ace5   ; borra_la_cosa: tipo a cero y sus sprites libres
 L_ACE8:
 	ld (ix+006h),001h		;ace8   ; la cosa se mueve
@@ -1802,8 +1806,12 @@ L_AD72:
 	add a,005h		;ad7c
 	ld e,a			;ad7e
 	ret			;ad7f
-L_AD80:
-	ld a,(ix+005h)		;ad80   ; lee la x de la cosa
+
+; ----------------------------------------------------------------------
+; GUARDA EL FONDO QUE VA A PISAR EL CUERPO: HMMM de 32x32 desde (x - 16, 0x91) de la pagina 0 a (0x80, 0x80) de la pagina 1 (A = 4: origen 0, destino 1).
+; ----------------------------------------------------------------------
+guarda_el_fondo_de_dracula:
+	ld a,(ix+005h)		;ad80   ; lee la x de Dracula
 	sub 010h		;ad83
 	ld h,a			;ad85
 	ld l,091h		;ad86
@@ -1811,7 +1819,11 @@ L_AD80:
 	ld bc,02020h		;ad8b
 	ld a,004h		;ad8e
 	jp 04946h		;ad90   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
-L_AD93:
+
+; ----------------------------------------------------------------------
+; PINTA EL CUERPO DE DRACULA, si 0xCE0E vale 1-5 (lo pone 0xADD2 con el dibujo menos 0x5A, o 0xADC6 con 5): de 0xADBC el origen en la pagina 1, (0, 0x80), (32, 0x80), (64, 0x80) o (96, 0x80), copiado con LMMM y TIMP (A = 0x48: el 0 no pinta) a (x - 16, 0x91); con 5, el fondo guardado de vuelta con HMMM. Como TIMP no borra, al pasar de 0x5B a 0x5C quedan puntos del primero.
+; ----------------------------------------------------------------------
+pinta_el_cuerpo_de_dracula:
 	ld hl,0ce0eh		;ad93
 	ld a,(hl)			;ad96
 	dec a			;ad97
@@ -1846,14 +1858,14 @@ DATA_cinco_pares:
 ; ======================================================================
 
 
-L_ADC6:
+devuelve_el_fondo_de_dracula:
 	ld a,005h		;adc6
 	ld (0ce0eh),a		;adc8
 	ret			;adcb
 L_ADCC:
 	bit 0,(ix+00ch)		;adcc   ; mira el bit 0 de la cuenta de cuadros del paso
-	jr nz,L_ADC6		;add0
-L_ADD2:
+	jr nz,devuelve_el_fondo_de_dracula		;add0
+cuerpo_del_dibujo:
 	ld a,(ix+00bh)		;add2   ; lee el dibujo de la cosa
 	sub 05ah		;add5
 	cp 005h		;add7

@@ -73,6 +73,12 @@ proc encendida {} {
     say "pantalla encendida en p01:6321"
     # sin freno openMSX se salta cuadros al pintar y la captura seria vieja
     if {[info exists ::env(VK_CAPTURA)]} { set ::throttle on }
+    if {[info exists ::env(VK_DRACULA)]} {
+        set ::throttle on
+        set ::quieto 0
+        after frame { seguro acecha }
+        return
+    }
     if {[info exists ::env(VK_MUESTRAS)]} {
         set ::muestras $::env(VK_MUESTRAS)
         global OUT NOMBRE
@@ -101,6 +107,28 @@ proc muestra {} {
     puts $::fm [join $linea " "]
     incr ::muestras -1
     if {$::muestras > 0} { after frame { seguro muestra } } else { close $::fm ; seguro vuelca }
+}
+
+# Con VK_DRACULA=<dibujo> (0x5B..0x5E) espera, en la sala de Dracula, a que la
+# ficha del tipo 0x11 lleve ese dibujo en los pasos 3 a 5 (de pie, con el
+# cuerpo ya pintado: 0xCE0E a cero) dos cuadros seguidos y vuelca (con la
+# captura, para ver los sprites).
+proc acecha {} {
+    pon 0xC43A 0xFF
+    set ok 0
+    foreach base {0xC800 0xC880 0xC900 0xC980 0xCA00 0xCA80 0xCB00} {
+        set paso [lee [expr {$base + 1}]]
+        if {[lee $base] == 0x11 && $paso >= 3 && $paso <= 5 &&
+            [lee [expr {$base + 0x0B}]] == $::env(VK_DRACULA) && [lee 0xCE0E] == 0} { set ok 1 }
+    }
+    if {$ok} { incr ::quieto } else { set ::quieto 0 }
+    if {$::quieto >= 2} {
+        set ::env(VK_CAPTURA) 1
+        say "Dracula quieto con el dibujo $::env(VK_DRACULA)"
+        seguro vuelca
+        return
+    }
+    after frame { seguro acecha }
 }
 
 set throttle off

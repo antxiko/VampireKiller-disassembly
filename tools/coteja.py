@@ -16,7 +16,13 @@ p01:6321 encienda la pantalla).
 
   simon         los sprites de Simon contra los 156 volcados de habitaciones.
 
-Uso:  coteja.py [habitaciones] [mapa] [titulo] [simon] [-v]
+  dracula       Dracula de pie, cuerpo y sprites, contra work/dracula
+                (tools/lanza_dracula.sh).
+
+  enemigos      las cosas grabadas en work/cosas, cada muestra explicada por
+                su composicion (tools/enemigos.py).
+
+Uso:  coteja.py [habitaciones] [mapa] [titulo] [simon] [dracula] [enemigos] [-v]
 """
 import glob
 import os
@@ -217,7 +223,60 @@ def simon(cart, detalle=False):
     return vistos > 0 and malos == 0
 
 
-PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa, "titulo": titulo, "simon": simon}
+def dracula(cart, detalle=False):
+    """Dracula de pie (tools/dracula.py) contra los cuatro volcados de
+    tools/lanza_dracula.sh, uno por dibujo: la pantalla (el cuerpo pintado
+    sobre la sala), el fondo que guarda en la pagina 1, los ocho sprites de su
+    ficha (y, x, patron y color) y los patrones que usan."""
+    from dracula import la_sala, sprites, TIPO, FONDO_GUARDADO
+    from simon import PATRONES
+    vistos = malos = 0
+    for ruta in sorted(glob.glob(os.path.join(WORK, "dracula", "d*", "hab_f18_h09.vram"))):
+        d, r = _lee(ruta), _lee(ruta[:-5] + ".ram")
+        R = lambda a: r[a - 0xC000]  # noqa: E731
+        fichas = [b for b in range(0xC800, 0xCB80, 0x80) if R(b) == TIPO]
+        if len(fichas) != 1:
+            print("  %s: %d fichas de Dracula" % (ruta, len(fichas)))
+            malos += 1
+            continue
+        b = fichas[0]
+        dibujo, y, x = R(b + 0x0B), R(b + 3), R(b + 5)
+        vistos += 1
+        pe = _pantalla(d)
+        variantes = [la_sala(cart, dibujo, x, pasos) for pasos in ((0,), (1,), (0, 1), (1, 0))]
+        ps = [_pantalla(v.v) for v in variantes]
+        d0 = sum(1 for a in range(len(pe)) if all(pe[a] != p[a] for p in ps))
+        v = variantes[0]
+        fx, fy = FONDO_GUARDADO
+        d1 = sum(1 for j in range(32) for k in range(16)
+                 if v.v[0x8000 + (fy + j) * ANCHO_DE_LINEA + fx // 2 + k] != d[0x8000 + (fy + j) * ANCHO_DE_LINEA + fx // 2 + k])
+        n = R(b + 0x20)
+        vistas = [tuple(R(b + 0x22 + 5 * k + i) for i in range(4)) for k in range(n)]
+        ds = sum(1 for a, e in zip(vistas, sprites(cart, dibujo, x, y)) if a != e) + abs(n - 8)
+        dpat = sum(1 for _, _, p, _ in vistas for a in range(PATRONES + 8 * p, PATRONES + 8 * p + 32)
+                   if d[a] != v.v[a])
+        if d0 or d1 or ds or dpat:
+            malos += 1
+        print("  dibujo 0x%02X en x 0x%02X: pantalla %d, fondo guardado %d, sprites %d, patrones %d"
+              % (dibujo, x, d0, d1, ds, dpat))
+    print("dracula: %d volcados, %d con diferencias" % (vistos, malos))
+    return vistos == 4 and malos == 0
+
+
+def enemigos(cart, detalle=False):
+    """Las cosas vistas en openMSX (work/cosas, tools/lanza_cosas.sh: 250
+    cuadros por habitacion) contra su composicion de 0xB473
+    (enemigos.clasifica_muestras): ninguna sin explicar."""
+    from enemigos import clasifica_muestras
+    clases, raras = clasifica_muestras(cart)
+    print("enemigos: " + ", ".join("%d %s" % (n, c) for c, n in clases.most_common()))
+    for r in raras[:20 if detalle else 3]:
+        print("  fase %d hab %d cuadro %d tipo 0x%02X dibujo 0x%02X: %s" % r)
+    return sum(clases.values()) > 0 and not raras
+
+
+PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa, "titulo": titulo, "simon": simon, "dracula": dracula,
+           "enemigos": enemigos}
 
 
 def main():
