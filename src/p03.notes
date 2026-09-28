@@ -629,6 +629,201 @@ C 0xB4BE a 0x180 hacia Simon...
 C 0xB4C3 ... o a la izquierda
 C 0xB4C6 lanza su tipo: 0xA08E + 0x0B, el 4 de la lista de 0xD700
 C 0xB4D1 y a andar
+B 0xB4D2 LOS TIPOS 0x19-0x1C (no salen en las listas de las habitaciones: 0x19 y 0x1A nacen aqui, 0x1B y 0x1C solo se mueven aqui). El dibujo depende de la fase y la habitacion (0xB611). Quietos ocho cuadros, caen (0x200), se quedan 0x1E cuadros y van a 0x1C0 hacia Simon a saltos (-0x300) mientras no este mas de 0x10 por debajo; se paran contra una pared, en el borde de la pantalla o al acabarse la cuenta. Pasos en 0xB4F3.
+L 0xB4D2 nace_el_tipo_0x19
+C 0xB4D2 su dibujo
+C 0xB4D9 quieto en los dos sentidos
+C 0xB4DC sin parpadeo
+C 0xB4E5 ocho cuadros quieto
+C 0xB4E9 al paso 0
+L 0xB4EA mueve_el_tipo_0x19
+C 0xB4EA su dibujo
+C 0xB4FB paso 0: espera
+C 0xB4FF y cae a 0x200
+C 0xB505 parpadeando
+C 0xB50C al paso 1
+C 0xB50D paso 1: cayendo
+C 0xB510 sin suelo: sigue
+C 0xB511 en el suelo: quieto
+C 0xB517 paso 2: quieto 0x1E cuadros...
+C 0xB51B ... y hacia Simon...
+C 0xB51E ... otros 0x1E cuadros
+C 0xB525 al paso 3
+C 0xB52A paso 3, andando: su dibujo
+C 0xB52D Simon no esta mas de 0x10 por debajo...
+C 0xB530 ... y no da carry la celda de delante: salta
+C 0xB533 sin suelo...
+C 0xB536 ... cae
+C 0xB539 pared delante...
+C 0xB53C ... sin avanzar
+C 0xB542 en el borde de la pantalla?
+C 0xB545 si: se para
+C 0xB547 se acaba la cuenta?
+L 0xB54B para_el_tipo_0x19
+C 0xB54B quieto en los dos sentidos...
+C 0xB557 ... la y en la celda...
+C 0xB560 ... 0x1E cuadros...
+C 0xB568 ... en el paso 2
+L 0xB569 cae_el_tipo_0x19
+C 0xB569 pared delante...
+C 0xB56C ... sin avanzar
+C 0xB572 suelo debajo?
+C 0xB575 si: a posarse
+C 0xB577 no: gravedad 0x40
+C 0xB57D sin carry: en el aire
+C 0xB582 la y, a la celda
+C 0xB587 carry: en el suelo
+L 0xB589 cuenta_del_tipo_0x19
+C 0xB589 Z al acabarse la cuenta de (ix+0x10)
+L 0xB58E salta_el_tipo_0x19
+C 0xB592 hacia Simon
+C 0xB595 (este valor lo pisa la instruccion siguiente)
+C 0xB598 salta a -0x300
+L 0xB59E en_el_borde_de_la_pantalla
+C 0xB5A5 a la derecha: el borde derecho
+C 0xB5A7 a la izquierda: carry por debajo de 0x10
+C 0xB5AA a la derecha: carry desde 0xE8
+C 0xB5AD carry: en el borde
+L 0xB5AE pared_hacia_donde_va
+C 0xB5B4 en (0, 0), nada
+C 0xB5BB a la derecha...
+C 0xB5BE ... o a la izquierda
+L 0xB5C1 salta_hacia_simon
+C 0xB5C4 la Y de Simon menos 0x10...
+C 0xB5C9 ... por debajo de la cosa: carry
+C 0xB5D1 la celda de delante: x + 8...
+C 0xB5D9 ... o x - 8
+C 0xB5DC D = esa x
+C 0xB5DD mira esa celda
+L 0xB5E0 suelo_debajo
+C 0xB5E0 sin carry si sube
+C 0xB5E5 subiendo: nada
+C 0xB5EC bajando: mira la celda
+L 0xB5EF cae_sin_avanzar
+C 0xB5EF sin avanzar...
+C 0xB5F5 ... cayendo a 0x200
+C 0xB5FF al paso 1
+L 0xB600 hacia_simon_a_0x1c0
+C 0xB606 0x1C0 a la derecha...
+C 0xB60B ... o a la izquierda
+L 0xB611 dibujo_por_fase_y_habitacion
+C 0xB611 la fase...
+C 0xB614 ... elige en 0xB63F su lista (0xB665-0xB6A5)
+C 0xB61A la habitacion, de dos en dos...
+C 0xB61D (un byte por pareja)
+C 0xB61F la paridad, a guardar
+C 0xB620 el byte de la pareja
+C 0xB623 la paridad
+C 0xB624 el byte
+C 0xB625 impar: el nibble bajo
+C 0xB627 par: el alto
+C 0xB62B el nibble...
+C 0xB62D ... elige el dibujo en 0xB642...
+C 0xB637 ... y cada 16 cuadros...
+C 0xB63D ... el siguiente
+B 0xB6AB EL JEFE DE LA FASE. Con 0xCE0B puesto (el jefe ha caido) lleva el final por pasos (0xCE10, tabla 0xB6CB); si no, 0xCE00 -la clase de la habitacion especial, de 0x636F: 1 en la fase 3, 2 en la 6, 3 en la 9, 4 en la 12, 5 en la 15, 6 en la 18- elige en 0xB6B9 lo de cada jefe.
+L 0xB6AB el_jefe_de_la_fase
+C 0xB6AB el jefe ha caido?
+C 0xB6AF si: el final
+C 0xB6B1 la clase de la habitacion especial...
+C 0xB6B5 cero: no hay jefe
+C 0xB6C5 el final, por pasos
+B 0xB6D9 EL FINAL DEL JEFE. Paso 0: mueren todas las cosas (0x7806) y espera 0x3C cuadros; 1 y 4: esperan; 2: sube el dibujo de la bola (0x57C0) y la crea (el tipo 0x22, en x = 0x78 e y = 0x40); 3: si Simon la coge (0xCE11), la musica 0x8C y 0x96 cuadros; si cae y nadie la coge (0xCE14) en 0xB4 cuadros, salta al paso 6; 5: la vida de Simon sube de uno en uno, cada dos cuadros, hasta 0x20; 6: tras la espera, Simon fuera de la pantalla, sin sprites, y 0xC409 a uno, que p00:427C ve para pasar el juego al estado 8.
+L 0xB6D9 final_del_jefe_0
+C 0xB6D9 mueren todas las cosas
+C 0xB6DC y 0x3C cuadros...
+L 0xB6E3 final_del_jefe_espera
+C 0xB6E3 la espera...
+L 0xB6E8 final_del_jefe_siguiente
+C 0xB6E8 al paso siguiente
+L 0xB6ED final_del_jefe_la_bola
+C 0xB6ED el dibujo de la bola
+C 0xB6F0 ni cogida...
+C 0xB6F4 ... ni caida
+C 0xB6F7 la bola, el tipo 0x22...
+C 0xB6F9 ... en (0x78, 0x40)
+C 0xB6FF la espera para cogerla: 0xB4 cuadros
+L 0xB706 final_del_jefe_coger_la_bola
+C 0xB706 cogida?
+C 0xB709 (0xCE11)
+C 0xB70A si
+C 0xB70C caida?
+C 0xB70F (0xCE14)
+C 0xB710 no: esperando
+C 0xB711 en el suelo: cuenta...
+C 0xB716 ... sin cogerla: al paso 6...
+C 0xB71B ... con 0x90 cuadros...
+C 0xB720 ... y la musica 0x8C
+C 0xB725 cogida: calla la musica...
+C 0xB72A ... y la 0x8C...
+C 0xB72F ... 0x96 cuadros
+L 0xB736 final_del_jefe_la_vida
+C 0xB736 cada dos cuadros...
+C 0xB739 (el bit 0 del contador)
+C 0xB73E ... si la vida no esta llena (0x20)...
+C 0xB742 ... el efecto 1...
+C 0xB747 ... y un punto mas de vida
+C 0xB74A llena: 0x3C cuadros...
+L 0xB751 final_del_jefe_se_acaba
+C 0xB751 la espera...
+C 0xB756 Simon, fuera de la pantalla...
+C 0xB75B ... y los sprites de la copia...
+C 0xB75E ... los 0x80 bytes...
+C 0xB760 ... a 0xE0
+C 0xB765 sin jefe...
+C 0xB766 (0xCE0B)
+C 0xB76C (la bola)
+C 0xB772 y 0xC409 a uno: p00:427C pasa al estado 8
+B 0xB777 LA BOLA (el tipo 0x22): cae (0x100) parpadeando (0xB7CB: los colores de sus cinco sprites, de 0xB7FA en la fase 3 o de 0xB809 en las demas, a color o a cero) y, al tocar suelo, se queda con sus colores y apunta 0xCE14. Pasos en 0xB7A7.
+L 0xB777 nace_la_bola
+C 0xB777 0x5A cuadros parpadeando
+C 0xB77C la bola, en juego
+C 0xB789 sin el otro parpadeo
+C 0xB795 sin avanzar...
+C 0xB79B ... bajando a 0x100
+L 0xB7A1 mueve_la_bola
+C 0xB7AD paso 0: parpadea...
+C 0xB7B2 ... con sus colores...
+C 0xB7B6 ... y los pares, a cero
+C 0xB7B7 los colores
+C 0xB7BA 0x5A cuadros
+C 0xB7BE luego, con sus colores...
+C 0xB7CA ... y a caer
+L 0xB7CB colores_de_la_bola
+C 0xB7CB la fase 3...
+C 0xB7CE ... con los de 0xB7FA...
+C 0xB7D5 ... las demas, con los de 0xB809
+C 0xB7DB el dibujo desde 0x8F...
+C 0xB7DD ... por cinco
+C 0xB7E1 los cinco colores de ese dibujo
+C 0xB7E4 HL = el color del primer sprite (ix+0x25)
+C 0xB7EB cinco sprites
+C 0xB7ED el color...
+C 0xB7EF ... por la mascara de C (0xFF o 0)
+C 0xB7F1 el siguiente sprite, cinco bytes mas
+C 0xB7F7 detras, el color de un sexto a cero
+L 0xB818 bola_cayendo
+C 0xB818 la animacion
+C 0xB824 sin suelo: sigue cayendo
+C 0xB82D en el suelo, con sus colores...
+C 0xB832 ... (0x0E a 2)...
+C 0xB836 ... y apunta que ha caido
+C 0xB83E al paso 2
+L 0xB83F anima_la_bola
+C 0xB845 cada dos cuadros...
+C 0xB846 ... uno de cuatro...
+C 0xB848 ... de 0xB853
+C 0xB84E el dibujo
+B 0xB857 EL JEFE DE LA FASE 9 (clase 3): crea dos tipos 0x14 (las momias, por su dibujo), en (0x30, 0xC5) y (0xD0, 0xC5); luego espera a 0xCE15 para rematar (0xBE47). Pasos en 0xCE01.
+L 0xB857 jefe_de_la_fase_9
+C 0xB861 la primera, a la izquierda...
+C 0xB863 (0x30, 0xC5)
+C 0xB869 ... y la segunda, a la derecha
+C 0xB86B (0xD0, 0xC5)
+C 0xB874 las dos caidas?
+C 0xB877 (0xCE15)
+C 0xB878 no: sigue
+C 0xB879 si: a rematar
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -1391,13 +1586,9 @@ C 0xB5FB el paso en que va la cosa = 0x01
 C 0xB600 lee la X de Simon
 C 0xB603 compara con la x de la cosa
 C 0xB60E pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB611 lee la FASE (0 el patio, 1-18)
 C 0xB617 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-C 0xB61A lee la HABITACION dentro de la fase
-C 0xB620 de_mas_a: DE += A
 C 0xB630 hl_mas_a: HL += A
 C 0xB634 sube la cuenta de cuadros del paso
-C 0xB637 mira el bit 4 de la cuenta de cuadros del paso
 C 0xB63E guarda el dibujo de la cosa
 C 0xB6B6 despacha: salta a la entrada A de la tabla que va detras del call
 C 0xB6C8 despacha: salta a la entrada A de la tabla que va detras del call
@@ -1405,7 +1596,6 @@ C 0xB6FC crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0xB722 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0xB727 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0xB72C sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0xB736 lee el contador de cuadros
 C 0xB73B lee la vida de Simon
 C 0xB744 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0xB758 guarda la Y de Simon
@@ -1416,12 +1606,9 @@ C 0xB798 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xB79E pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xB7A1 lee el paso en que va la cosa
 C 0xB7A4 despacha: salta a la entrada A de la tabla que va detras del call
-C 0xB7AD lee el contador de cuadros
 C 0xB7C3 la cosa se mueve
 C 0xB7C7 sube el paso en que va la cosa
-C 0xB7CB lee la FASE (0 el patio, 1-18)
 C 0xB7D8 lee el dibujo de la cosa
-C 0xB7E1 de_mas_a: DE += A
 C 0xB81B lee la y de la cosa
 C 0xB81E lee la x de la cosa
 C 0xB821 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
