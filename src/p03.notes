@@ -6,7 +6,82 @@ L 0xAACD nace_el_dragon_de_huesos
 L 0xA9B7 mueve_el_dragon_de_huesos
 B 0xA9D8 PASO 0: cada tramo, dos puntos por cuadro hacia su x (0xAA67 dos veces sobre las x); al cabo de 0x20 cuadros, a por la primera altura.
 B 0xAA0B PASO 1: la boca cerrada (0x80/0x84); cada tramo, dos puntos por cuadro hacia su altura (las y), y cada 0x10-0x1F cuadros al azar (0xAA7D) otra altura: el registro siguiente de 0xAAAD, lo que se suma a la y de cada tramo.
-B 0xAA37 PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si lo que devuelve 0xA0E5 lleva el bit 7 de D, escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza. Luego, al paso 1.
+B 0xAA37 PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si Simon esta a su izquierda (0xA0E5 da la velocidad horizontal DE negativa), escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza, con esas velocidades hacia Simon. Luego, al paso 1.
+C 0xAA4D DE < 0: Simon a la izquierda, hacia donde mira la cabeza
+L 0xAA7D cuenta_para_otra_altura
+C 0xAA7D baja la cuenta de la altura
+C 0xAA81 al acabar, otra cuenta al azar...
+C 0xAA85 ... de 0x10 a 0x1F cuadros
+C 0xAA8A el registro siguiente, de ocho en ocho
+C 0xAA94 los cuatro bytes del registro
+C 0xAA9D DE = los destinos, en (ix+0x10)
+C 0xAAA2 cada altura, mas la y de donde nacio
+C 0xAAA5 el destino de los dos sprites del tramo
+C 0xAA69 el destino de este sprite
+C 0xAA6B ya esta?
+C 0xAA6E si no, un punto hacia alla
+C 0xAA76 el sprite siguiente: cinco bytes mas
+B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
+L 0xA0E5 apunta_a_simon
+L 0xA0E7 apunta_a_simon_con_a
+L 0xA0ED apunta_de_de_a_simon
+C 0xA0E5 la rapidez de siempre
+C 0xA0F5 la rapidez de la vuelta (aqui 0xCFF0 no es un tipo)
+C 0xA0F8 la direccion hacia Simon, de 0xA1A2
+C 0xA102 0x3F menos la direccion...
+C 0xA106 ... y los dos senos: el de la direccion, en C...
+C 0xA10F ... y el del complemento
+C 0xA114 la vertical: rapidez * seno / 32
+C 0xA11B Simon mas arriba: hacia arriba
+C 0xA126 la horizontal, igual
+C 0xA12D Simon a la izquierda: hacia la izquierda
+C 0xA130 HL = la vertical, DE = la horizontal
+L 0xA134 direccion_hacia_simon
+C 0xA134 0xCFF1: Simon mas arriba?
+C 0xA13C la distancia vertical, en positivo
+C 0xA141 si, esta mas arriba
+C 0xA143 0xCFF2: Simon a la izquierda?
+C 0xA145 la vertical, de 32 en 32 y por 8: la fila de la tabla
+C 0xA14D la distancia horizontal, en positivo
+C 0xA152 si, esta a la izquierda
+C 0xA153 la horizontal, de 32 en 32: columna
+C 0xA15B fila * 8 + columna, en la tabla de 0xA1A2
+C 0xA162 la direccion
+C 0xA16F a la izquierda: angulo + 0x80
+C 0xA171 una distancia hacia arriba y la otra no: el angulo, del reves
+C 0xA178 el angulo
+L 0xA184 rapidez_por_seno
+C 0xA184 la rapidez...
+C 0xA188 ... por el seno de E
+C 0xA18C y entre 32 (HL * 8, el byte alto)
+C 0xA194 en DE
+L 0xA196 multiplica_h_por_e
+C 0xA196 HL = H * E, bit a bit
+L 0xAC05 lanza_hacia_simon
+C 0xAC05 hacia donde este Simon...
+C 0xAC0B ... 0x280 a la derecha...
+C 0xAC10 ... o a la izquierda
+C 0xAC13 desde 0x18 por encima de Dracula
+C 0xAC1C el tipo de 0xA08E + 0x11: el 5, con HL de velocidad vertical
+L 0xAD18 borra_la_lista_de_d700
+C 0xAD1A la lista de 0xD700; el jr se salta el `ld b,7` de 0xAD26: B llega como la deje quien llama
+L 0xAD45 colores_de_dracula
+C 0xAD45 los ocho sprites
+C 0xAD47 D = 0 (el primer color), E = 0x25 (el color del primer sprite)
+L 0xAD5B esconde_a_dracula
+C 0xAD5B los ocho sprites a color 0
+L 0xAD61 esconde_los_pies_de_dracula
+C 0xAD61 los cuatro de abajo (del 4 al 7) a color 0
+L 0xAD6D color_de_la_tabla
+C 0xAD6D el color D de la tabla de HL
+L 0xAD72 pon_el_color
+C 0xAD72 en (ix+E)
+C 0xAD7A el siguiente color de la tabla
+C 0xAD7B y el del sprite siguiente
+L 0xADCC cuerpo_o_fondo
+C 0xADCC cuadro impar: el fondo (parpadeo al aparecer)
+C 0xADD5 el cuerpo del dibujo: 0x5B-0x5E dan 1-4
+C 0xADDA lo pinta 0xAD93 en el cuadro
 L 0xAA67 acerca_los_tramos
 B 0xAA67 Cada uno de los ocho sprites, un punto hacia su destino de (ix+0x10) (uno por tramo, repetido): DE recorre los destinos y HL la y o la x de los sprites, de cinco en cinco.
 L 0xAA8A otra_altura_de_los_tramos
@@ -149,18 +224,12 @@ C 0xA07B lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA0E7 lee la y de la cosa
 C 0xA0EA lee la x de la cosa
 C 0xA0EE lee la VUELTA (0, 1 o 2)
-C 0xA0F5 guarda el tipo de la cosa que se crea
 C 0xA117 lee la posicion de la cosa que se crea
-C 0xA11B niega_de: DE = -DE
 C 0xA11E guarda la ficha de la cosa que se crea
-C 0xA12D niega_de: DE = -DE
-C 0xA130 lee la ficha de la cosa que se crea
-C 0xA134 apunta a la posicion de la cosa que se crea
 C 0xA139 lee la Y de Simon
 C 0xA14A lee la X de Simon
 C 0xA15E hl_mas_a: HL += A
 C 0xA166 lee la posicion de la cosa que se crea
-C 0xA184 lee el tipo de la cosa que se crea
 C 0xA231 lee el paso en que va la cosa
 C 0xA23E sube el paso en que va la cosa
 C 0xA245 lee la VUELTA (0, 1 o 2)
@@ -453,9 +522,7 @@ C 0xABDD dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su de
 C 0xABE3 la cuenta de cuadros del paso = 0x04
 C 0xABE9 baja la cuenta de cuadros del paso
 C 0xABFF la cuenta de cuadros del paso = 0x1E
-C 0xAC05 lee la X de Simon
 C 0xAC08 compara con la x de la cosa
-C 0xAC13 lee la y de la cosa
 C 0xAC19 lee la x de la cosa
 C 0xAC1E crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 C 0xAC21 baja la cuenta de cuadros del paso
@@ -498,7 +565,6 @@ C 0xAD76 hl_mas_a: HL += A
 C 0xAD90 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0xAD9E palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0xADB9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
-C 0xADCC mira el bit 0 de la cuenta de cuadros del paso
 C 0xADD2 lee el dibujo de la cosa
 C 0xADDE la cosa se mueve
 C 0xADE5 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE

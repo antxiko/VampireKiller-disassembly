@@ -120,96 +120,100 @@ DATA_tablas_por_tipo:
 ; ======================================================================
 
 
-L_A0E5:
-	ld a,080h		;a0e5
-L_A0E7:
+
+; ----------------------------------------------------------------------
+; APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
+; ----------------------------------------------------------------------
+apunta_a_simon:
+	ld a,080h		;a0e5   ; la rapidez de siempre
+apunta_a_simon_con_a:
 	ld e,(ix+003h)		;a0e7   ; lee la y de la cosa
 	ld d,(ix+005h)		;a0ea   ; lee la x de la cosa
-L_A0ED:
+apunta_de_de_a_simon:
 	ld c,a			;a0ed
 	ld a,(0d012h)		;a0ee   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a0f1
 	add a,a			;a0f2
 	add a,a			;a0f3
 	add a,c			;a0f4
-	ld (0cff0h),a		;a0f5   ; guarda el tipo de la cosa que se crea
-	call L_A134		;a0f8
+	ld (0cff0h),a		;a0f5   ; la rapidez de la vuelta (aqui 0xCFF0 no es un tipo)
+	call direccion_hacia_simon		;a0f8   ; la direccion hacia Simon, de 0xA1A2
 	ld a,(0cff8h)		;a0fb
 	ld e,a			;a0fe
 	ld d,000h		;a0ff
 	ld a,e			;a101
-	sub 03fh		;a102
+	sub 03fh		;a102   ; 0x3F menos la direccion...
 	neg		;a104
-	ld hl,0a1e2h		;a106
+	ld hl,0a1e2h		;a106   ; ... y los dos senos: el de la direccion, en C...
 	push hl			;a109
 	add hl,de			;a10a
 	ld c,(hl)			;a10b
 	pop hl			;a10c
 	ld e,a			;a10d
 	add hl,de			;a10e
-	ld a,(hl)			;a10f
+	ld a,(hl)			;a10f   ; ... y el del complemento
 	ld (0cff7h),a		;a110
 	ld e,c			;a113
-	call L_A184		;a114
+	call rapidez_por_seno		;a114   ; la vertical: rapidez * seno / 32
 	ld a,(0cff1h)		;a117   ; lee la posicion de la cosa que se crea
 	and a			;a11a
-	call nz,niega_de		;a11b   ; niega_de: DE = -DE
+	call nz,niega_de		;a11b   ; Simon mas arriba: hacia arriba
 	ld (0cff3h),de		;a11e   ; guarda la ficha de la cosa que se crea
 	ld a,(0cff7h)		;a122
 	ld e,a			;a125
-	call L_A184		;a126
+	call rapidez_por_seno		;a126   ; la horizontal, igual
 	ld a,(0cff2h)		;a129
 	and a			;a12c
-	call nz,niega_de		;a12d   ; niega_de: DE = -DE
-	ld hl,(0cff3h)		;a130   ; lee la ficha de la cosa que se crea
+	call nz,niega_de		;a12d   ; Simon a la izquierda: hacia la izquierda
+	ld hl,(0cff3h)		;a130   ; HL = la vertical, DE = la horizontal
 	ret			;a133
-L_A134:
-	ld hl,0cff1h		;a134   ; apunta a la posicion de la cosa que se crea
+direccion_hacia_simon:
+	ld hl,0cff1h		;a134   ; 0xCFF1: Simon mas arriba?
 	ld (hl),000h		;a137
 	ld a,(0c425h)		;a139   ; lee la Y de Simon
-	sub e			;a13c
+	sub e			;a13c   ; la distancia vertical, en positivo
 	jr nc,L_A142		;a13d
 	neg		;a13f
-	inc (hl)			;a141
+	inc (hl)			;a141   ; si, esta mas arriba
 L_A142:
 	inc hl			;a142
-	ld (hl),000h		;a143
-	rra			;a145
+	ld (hl),000h		;a143   ; 0xCFF2: Simon a la izquierda?
+	rra			;a145   ; la vertical, de 32 en 32 y por 8: la fila de la tabla
 	rra			;a146
 	and 038h		;a147
 	ld e,a			;a149
 	ld a,(0c427h)		;a14a   ; lee la X de Simon
-	sub d			;a14d
+	sub d			;a14d   ; la distancia horizontal, en positivo
 	jr nc,L_A153		;a14e
 	neg		;a150
-	inc (hl)			;a152
+	inc (hl)			;a152   ; si, esta a la izquierda
 L_A153:
-	rra			;a153
+	rra			;a153   ; la horizontal, de 32 en 32: columna
 	rra			;a154
 	rra			;a155
 	rra			;a156
 	rra			;a157
 	and 007h		;a158
 	add a,e			;a15a
-	ld hl,0a1a2h		;a15b
+	ld hl,0a1a2h		;a15b   ; fila * 8 + columna, en la tabla de 0xA1A2
 	call 04061h		;a15e   ; hl_mas_a: HL += A
 	ld a,(hl)			;a161
-	ld (0cff8h),a		;a162
+	ld (0cff8h),a		;a162   ; la direccion
 	ld c,a			;a165
 	ld hl,(0cff1h)		;a166   ; lee la posicion de la cosa que se crea
 	ld a,h			;a169
 	ld b,000h		;a16a
 	and a			;a16c
 	jr z,L_A171		;a16d
-	ld b,080h		;a16f
+	ld b,080h		;a16f   ; a la izquierda: angulo + 0x80
 L_A171:
-	cp l			;a171
+	cp l			;a171   ; una distancia hacia arriba y la otra no: el angulo, del reves
 	ld a,c			;a172
 	jr z,L_A177		;a173
 	neg		;a175
 L_A177:
 	add a,b			;a177
-	ld (0cff9h),a		;a178
+	ld (0cff9h),a		;a178   ; el angulo
 	ret			;a17b
 niega_de:
 	ld a,d			;a17c
@@ -220,12 +224,12 @@ niega_de:
 	ld e,a			;a181
 	inc de			;a182
 	ret			;a183
-L_A184:
-	ld a,(0cff0h)		;a184   ; lee el tipo de la cosa que se crea
+rapidez_por_seno:
+	ld a,(0cff0h)		;a184   ; la rapidez...
 	ld h,a			;a187
-	call L_A196		;a188
+	call multiplica_h_por_e		;a188   ; ... por el seno de E
 	xor a			;a18b
-	add hl,hl			;a18c
+	add hl,hl			;a18c   ; y entre 32 (HL * 8, el byte alto)
 	adc a,a			;a18d
 	add hl,hl			;a18e
 	adc a,a			;a18f
@@ -233,10 +237,10 @@ L_A184:
 	adc a,a			;a191
 	ld l,h			;a192
 	ld h,a			;a193
-	ex de,hl			;a194
+	ex de,hl			;a194   ; en DE
 	ret			;a195
-L_A196:
-	ld b,008h		;a196
+multiplica_h_por_e:
+	ld b,008h		;a196   ; HL = H * E, bit a bit
 	ld l,000h		;a198
 	ld d,l			;a19a
 L_A19B:
@@ -1330,7 +1334,7 @@ L_A9D8:
 L_AA0B:
 	ld (ix+024h),080h		;aa0b
 	ld (ix+029h),084h		;aa0f
-	call L_AA7D		;aa13
+	call cuenta_para_otra_altura		;aa13
 	push ix		;aa16
 	pop hl			;aa18
 	ld e,l			;aa19
@@ -1352,7 +1356,7 @@ L_AA0B:
 	ret			;aa36
 
 ; ----------------------------------------------------------------------
-; PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si lo que devuelve 0xA0E5 lleva el bit 7 de D, escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza. Luego, al paso 1.
+; PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si Simon esta a su izquierda (0xA0E5 da la velocidad horizontal DE negativa), escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza, con esas velocidades hacia Simon. Luego, al paso 1.
 ; ----------------------------------------------------------------------
 L_AA37:
 	ld (ix+024h),070h		;aa37
@@ -1362,8 +1366,8 @@ L_AA37:
 	ld a,(ix+00ch)		;aa44   ; lee la cuenta de cuadros del paso
 	cp 008h		;aa47
 	ret nz			;aa49
-	call L_A0E5		;aa4a
-	bit 7,d		;aa4d
+	call apunta_a_simon		;aa4a
+	bit 7,d		;aa4d   ; DE < 0: Simon a la izquierda, hacia donde mira la cabeza
 	ret z			;aa4f
 	ld a,(ix+022h)		;aa50
 	add a,00ch		;aa53
@@ -1382,45 +1386,45 @@ L_AA5E:
 acerca_los_tramos:
 	ld b,008h		;aa67
 L_AA69:
-	ld a,(de)			;aa69
+	ld a,(de)			;aa69   ; el destino de este sprite
 	inc de			;aa6a
-	cp (hl)			;aa6b
+	cp (hl)			;aa6b   ; ya esta?
 	jr z,L_AA76		;aa6c
-	ld a,001h		;aa6e
+	ld a,001h		;aa6e   ; si no, un punto hacia alla
 	jr nc,L_AA74		;aa70
 	ld a,0ffh		;aa72
 L_AA74:
 	add a,(hl)			;aa74
 	ld (hl),a			;aa75
 L_AA76:
-	ld a,005h		;aa76
+	ld a,005h		;aa76   ; el sprite siguiente: cinco bytes mas
 	add a,l			;aa78
 	ld l,a			;aa79
 	djnz L_AA69		;aa7a
 	ret			;aa7c
-L_AA7D:
-	dec (ix+018h)		;aa7d
+cuenta_para_otra_altura:
+	dec (ix+018h)		;aa7d   ; baja la cuenta de la altura
 	ret nz			;aa80
-	ld a,r		;aa81
+	ld a,r		;aa81   ; al acabar, otra cuenta al azar...
 	and 00fh		;aa83
-	add a,010h		;aa85
+	add a,010h		;aa85   ; ... de 0x10 a 0x1F cuadros
 	ld (ix+018h),a		;aa87
 otra_altura_de_los_tramos:
-	ld a,(ix+019h)		;aa8a
+	ld a,(ix+019h)		;aa8a   ; el registro siguiente, de ocho en ocho
 	inc (ix+019h)		;aa8d
 	and 007h		;aa90
 	add a,a			;aa92
 	add a,a			;aa93
-	ld hl,0aaadh		;aa94
+	ld hl,0aaadh		;aa94   ; los cuatro bytes del registro
 	call 04061h		;aa97   ; hl_mas_a: HL += A
 	push ix		;aa9a
 	pop de			;aa9c
-	set 4,e		;aa9d
+	set 4,e		;aa9d   ; DE = los destinos, en (ix+0x10)
 	ld b,004h		;aa9f
 L_AAA1:
 	ld a,(hl)			;aaa1
-	add a,(ix+01ah)		;aaa2
-	ld (de),a			;aaa5
+	add a,(ix+01ah)		;aaa2   ; cada altura, mas la y de donde nacio
+	ld (de),a			;aaa5   ; el destino de los dos sprites del tramo
 	inc de			;aaa6
 	ld (de),a			;aaa7
 	inc de			;aaa8
@@ -1579,13 +1583,13 @@ L_ABAB:
 	ld c,000h		;abab
 	ld hl,0acaah		;abad
 	call dibujo_segun_simon		;abb0   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
-	call L_AD45		;abb3
+	call colores_de_dracula		;abb3
 	bit 0,(ix+00ch)		;abb6   ; mira el bit 0 de la cuenta de cuadros del paso
-	call nz,L_AD61		;abba
-	call L_ADCC		;abbd
+	call nz,esconde_los_pies_de_dracula		;abba
+	call cuerpo_o_fondo		;abbd
 	dec (ix+00ch)		;abc0   ; baja la cuenta de cuadros del paso
 	ret nz			;abc3
-	call L_AD45		;abc4
+	call colores_de_dracula		;abc4
 	call cuerpo_del_dibujo		;abc7
 	ld (ix+00ch),004h		;abca   ; la cuenta de cuadros del paso = 0x04
 	ld (ix+00eh),007h		;abce
@@ -1603,30 +1607,30 @@ L_ABE9:
 	dec (ix+00ch)		;abe9   ; baja la cuenta de cuadros del paso
 	ret nz			;abec
 	ld hl,00000h		;abed
-	call L_AC05		;abf0
+	call lanza_hacia_simon		;abf0
 	ld hl,00180h		;abf3
-	call L_AC05		;abf6
+	call lanza_hacia_simon		;abf6
 	ld hl,0fe80h		;abf9
-	call L_AC05		;abfc
+	call lanza_hacia_simon		;abfc
 	ld (ix+00ch),01eh		;abff   ; la cuenta de cuadros del paso = 0x1E
 	jr L_ABA7		;ac03
-L_AC05:
-	ld a,(0c427h)		;ac05   ; lee la X de Simon
+lanza_hacia_simon:
+	ld a,(0c427h)		;ac05   ; hacia donde este Simon...
 	cp (ix+005h)		;ac08   ; compara con la x de la cosa
-	ld de,00280h		;ac0b
+	ld de,00280h		;ac0b   ; ... 0x280 a la derecha...
 	jr nc,L_AC13		;ac0e
-	ld de,0fd80h		;ac10
+	ld de,0fd80h		;ac10   ; ... o a la izquierda
 L_AC13:
-	ld a,(ix+003h)		;ac13   ; lee la y de la cosa
+	ld a,(ix+003h)		;ac13   ; desde 0x18 por encima de Dracula
 	sub 018h		;ac16
 	ld c,a			;ac18
 	ld b,(ix+005h)		;ac19   ; lee la x de la cosa
-	ld a,011h		;ac1c
+	ld a,011h		;ac1c   ; el tipo de 0xA08E + 0x11: el 5, con HL de velocidad vertical
 	jp 09f6dh		;ac1e   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 L_AC21:
 	dec (ix+00ch)		;ac21   ; baja la cuenta de cuadros del paso
 	ret nz			;ac24
-	call L_AD5B		;ac25
+	call esconde_a_dracula		;ac25
 	ld a,005h		;ac28
 	ld (0ce0eh),a		;ac2a
 	ld a,(ix+003h)		;ac2d   ; lee la y de la cosa
@@ -1674,13 +1678,13 @@ L_AC7E:
 	ld c,000h		;ac7e
 	ld hl,0acaah		;ac80
 	call dibujo_segun_simon		;ac83   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
-	call L_AD45		;ac86
+	call colores_de_dracula		;ac86
 	bit 0,(ix+00ch)		;ac89   ; mira el bit 0 de la cuenta de cuadros del paso
-	call nz,L_AD5B		;ac8d
-	call L_ADCC		;ac90
+	call nz,esconde_a_dracula		;ac8d
+	call cuerpo_o_fondo		;ac90
 	dec (ix+00ch)		;ac93   ; baja la cuenta de cuadros del paso
 	ret nz			;ac96
-	call L_AD45		;ac97
+	call colores_de_dracula		;ac97
 	call cuerpo_del_dibujo		;ac9a
 	ld (ix+00ch),004h		;ac9d   ; la cuenta de cuadros del paso = 0x04
 	ld (ix+001h),003h		;aca1   ; el paso en que va la cosa = 0x03
@@ -1710,7 +1714,7 @@ L_ACAE:
 	ld (ix+00eh),a		;acbe
 	ld (ix+00ch),03ch		;acc1   ; la cuenta de cuadros del paso = 0x3C
 	inc (ix+001h)		;acc5   ; sube el paso en que va la cosa
-	call L_AD18		;acc8
+	call borra_la_lista_de_d700		;acc8
 	ld a,(ix+003h)		;accb   ; lee la y de la cosa
 	sub 02bh		;acce
 	ld e,a			;acd0
@@ -1743,9 +1747,9 @@ L_AD06:
 L_AD12:
 	ld de,00050h		;ad12
 	jp suma_a_la_velocidad_y		;ad15   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_AD18:
+borra_la_lista_de_d700:
 	push ix		;ad18
-	ld ix,0d700h		;ad1a
+	ld ix,0d700h		;ad1a   ; la lista de 0xD700; el jr se salta el `ld b,7` de 0xAD26: B llega como la deje quien llama
 	jr $+10		;ad1e
 
 ; ----------------------------------------------------------------------
@@ -1777,12 +1781,12 @@ dibujo_segun_simon:
 	inc c			;ad40
 	inc c			;ad41
 	jp dibujo_de_la_tabla		;ad42   ; dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
-L_AD45:
-	ld b,008h		;ad45
-	ld de,00025h		;ad47
+colores_de_dracula:
+	ld b,008h		;ad45   ; los ocho sprites
+	ld de,00025h		;ad47   ; D = 0 (el primer color), E = 0x25 (el color del primer sprite)
 L_AD4A:
 	ld hl,0ad53h		;ad4a
-	call L_AD6D		;ad4d
+	call color_de_la_tabla		;ad4d
 	djnz L_AD4A		;ad50
 	ret			;ad52
 
@@ -1798,31 +1802,31 @@ DATA_colores_AD53:
 ; ======================================================================
 
 
-L_AD5B:
-	ld b,008h		;ad5b
+esconde_a_dracula:
+	ld b,008h		;ad5b   ; los ocho sprites a color 0
 	ld e,025h		;ad5d
 	jr L_AD65		;ad5f
-L_AD61:
-	ld b,004h		;ad61
+esconde_los_pies_de_dracula:
+	ld b,004h		;ad61   ; los cuatro de abajo (del 4 al 7) a color 0
 	ld e,039h		;ad63
 L_AD65:
 	ld c,000h		;ad65
 L_AD67:
-	call L_AD72		;ad67
+	call pon_el_color		;ad67
 	djnz L_AD67		;ad6a
 	ret			;ad6c
-L_AD6D:
-	ld a,d			;ad6d
+color_de_la_tabla:
+	ld a,d			;ad6d   ; el color D de la tabla de HL
 	call 04061h		;ad6e   ; hl_mas_a: HL += A
 	ld c,(hl)			;ad71
-L_AD72:
-	push ix		;ad72
+pon_el_color:
+	push ix		;ad72   ; en (ix+E)
 	pop hl			;ad74
 	ld a,e			;ad75
 	call 04061h		;ad76   ; hl_mas_a: HL += A
 	ld (hl),c			;ad79
-	inc d			;ad7a
-	ld a,e			;ad7b
+	inc d			;ad7a   ; el siguiente color de la tabla
+	ld a,e			;ad7b   ; y el del sprite siguiente
 	add a,005h		;ad7c
 	ld e,a			;ad7e
 	ret			;ad7f
@@ -1882,15 +1886,15 @@ devuelve_el_fondo_de_dracula:
 	ld a,005h		;adc6
 	ld (0ce0eh),a		;adc8
 	ret			;adcb
-L_ADCC:
-	bit 0,(ix+00ch)		;adcc   ; mira el bit 0 de la cuenta de cuadros del paso
+cuerpo_o_fondo:
+	bit 0,(ix+00ch)		;adcc   ; cuadro impar: el fondo (parpadeo al aparecer)
 	jr nz,devuelve_el_fondo_de_dracula		;add0
 cuerpo_del_dibujo:
 	ld a,(ix+00bh)		;add2   ; lee el dibujo de la cosa
-	sub 05ah		;add5
+	sub 05ah		;add5   ; el cuerpo del dibujo: 0x5B-0x5E dan 1-4
 	cp 005h		;add7
 	ret nc			;add9
-	ld (0ce0eh),a		;adda
+	ld (0ce0eh),a		;adda   ; lo pinta 0xAD93 en el cuadro
 	ret			;addd
 L_ADDE:
 	ld (ix+006h),001h		;adde   ; la cosa se mueve
@@ -3387,7 +3391,7 @@ L_B985:
 	ld e,a			;b98a
 	ld d,(ix+005h)		;b98b   ; lee la x de la cosa
 	ld a,040h		;b98e
-	call L_A0ED		;b990
+	call apunta_de_de_a_simon		;b990
 	ld a,(ix+012h)		;b993
 	rrca			;b996
 	xor d			;b997
@@ -3698,7 +3702,7 @@ L_BBD4:
 	dec (ix+012h)		;bbd4
 	ret nz			;bbd7
 	call L_BBE1		;bbd8
-	call L_A0E5		;bbdb
+	call apunta_a_simon		;bbdb
 	jp 09f61h		;bbde
 L_BBE1:
 	ld (ix+012h),030h		;bbe1
@@ -4010,7 +4014,7 @@ L_BE0D:
 	dec (ix+015h)		;be0d
 	ret nz			;be10
 	ld (ix+015h),03ch		;be11
-	call L_A0E5		;be15
+	call apunta_a_simon		;be15
 	ld a,(ix+003h)		;be18   ; lee la y de la cosa
 	sub 010h		;be1b
 	ld c,a			;be1d
@@ -4134,7 +4138,7 @@ L_BEBE:
 	ld (0c427h),a		;bed1   ; guarda la X de Simon
 	ld a,b			;bed4
 	ld (0c425h),a		;bed5   ; guarda la Y de Simon
-	call L_A0E5		;bed8
+	call apunta_a_simon		;bed8
 	call pon_velocidad_x		;bedb   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;bede
 	call pon_velocidad_y		;bedf   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
@@ -4185,7 +4189,7 @@ L_BF29:
 	ld (ix+001h),004h		;bf3f   ; el paso en que va la cosa = 0x04
 	ret			;bf43
 L_BF44:
-	call L_A0E5		;bf44
+	call apunta_a_simon		;bf44
 	jp 09f61h		;bf47
 L_BF4A:
 	ld a,(ix+010h)		;bf4a
