@@ -5025,7 +5025,7 @@ crea_con_parametros:
 	ret			;9f82
 
 ; ----------------------------------------------------------------------
-; CREA UNA COSA EN LA LISTA DE 0xD700: el tipo pedido 0xCFF9 da el suyo en 0xA08E (0xFF da el 0x0C); busca una ficha libre de las ocho y dos sprites libres (con y = 0xE0) desde el 0x11 hacia abajo (entre dos solo, con 0xCE03), y la rellena con la posicion y las velocidades de 0xCFF1-0xCFF8.
+; CREA UNA COSA EN LA LISTA DE 0xD700: el tipo pedido 0xCFF9 da el suyo en 0xA08E (0xFF da el 0x0C); busca una ficha libre de las ocho y dos sprites libres (con y = 0xE0) desde el 0x1F hacia abajo (entre dos solo, con 0xCE03), y la rellena con la posicion y las velocidades de 0xCFF1-0xCFF8.
 ; ----------------------------------------------------------------------
 crea_en_lo_que_lanzan:
 	ld a,(0cff9h)		;9f83   ; el tipo pedido...
@@ -5056,7 +5056,7 @@ ficha_libre:
 	ld (ix+020h),c		;9faf   ; guarda cuantos sprites lleva la cosa
 	ld (ix+07fh),001h		;9fb2   ; (byte 0x7F)
 	ld (ix+07eh),001h		;9fb6   ; se para con el reloj
-	ld de,01100h		;9fba   ; desde el sprite 0x11...
+	ld de,01100h		;9fba   ; desde el sprite 0x1F (0x11 contando desde el 0x0E)...
 	ld hl,0d67ch		;9fbd   ; ... en la copia de los atributos, hacia abajo...
 	ld b,008h		;9fc0   ; ... ocho...
 	ld a,(0ce03h)		;9fc2   ; ... o dos con 0xCE03

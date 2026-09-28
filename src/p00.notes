@@ -1246,6 +1246,441 @@ C 0x5739 ... y la de 0xBFA1
 
 L 0x4D47 pinta_el_titulo
 
+L 0x5768 sube_la_bola_y_mas
+C 0x576B a 0xFF00...
+C 0x576E ... el rle de 0xA185 (la bola)
+C 0x5774 y a 0xF9C0 el de 0xA147
+B 0x5780 LA CARGA DE CADA HABITACION (p01:62FB): sin sprites; en las fases 1-18, la tabla de 0x9AB0 da, por habitacion, cuatro bytes: un guion de carga y una paleta.
+L 0x5780 carga_de_la_habitacion
+C 0x5786 la tabla de 0x9AB0...
+C 0x578C ... nada en el patio
+C 0x578F ... la de la fase...
+C 0x5797 ... cuatro bytes por habitacion
+C 0x57A0 el guion...
+C 0x57A5 ... se sigue
+C 0x57AA la paleta...
+C 0x57AE ... se pone
+L 0x57B1 carga_fin
+L 0x57B4 carga_el_guion_de_0x9fed
+L 0x57C0 sube_la_bola
+C 0x57C3 a 0xFA00 el rle de 0xB0AA
+C 0x57CC la paleta de 0xA01A en la fase 3...
+C 0x57D6 ... y la de 0xA021 en las demas
+B 0x57DF EL CUERPO DE DRACULA, a la pagina 1: dos dibujos de 32 filas (0xB5A1 y 0xB719), cada uno tal cual y volteado: (0, 0x80) y (0x40, 0x80) el primero, (0x20, 0x80) y (0x60, 0x80) el segundo.
+L 0x57DF sube_el_cuerpo_de_dracula
+C 0x57E2 el primero, a 0xE800
+C 0x57E8 tal cual en (0, 0x80)...
+C 0x57EE ... volteado...
+C 0x57F1 ... en (0x40, 0x80)
+C 0x57F7 el segundo
+C 0x57FD en (0x20, 0x80)...
+C 0x5806 ... y volteado en (0x60, 0x80)
+B 0x580F UN DIBUJO DE 32 x 32 A LA VRAM: 32 filas de 16 bytes de 0xE800 a DE, una linea (128 bytes) cada una.
+L 0x580F dibujo_de_32_a_la_vram
+C 0x580F 32 filas...
+C 0x5811 ... de 0xE800
+C 0x5817 16 bytes
+C 0x5820 la fila siguiente
+C 0x5825 la linea siguiente de la VRAM
+C 0x582D DIBUJO DE 32 FILAS, a 0xE800: por fila, cuantos ceros delante...
+C 0x582F (a 0xE800)
+L 0x5832 una_fila_del_dibujo
+C 0x5832 los ceros de delante...
+C 0x5835 (ninguno)
+L 0x583D los_bytes_de_la_fila
+C 0x583D 12 menos esos...
+C 0x5840 ... bytes tal cual
+C 0x5846 y cuatro ceros detras
+L 0x5849 cuatro_ceros
+L 0x5851 voltea_el_dibujo_de_32
+C 0x5851 cada fila de 0xE800...
+C 0x5854 ... de sus dos puntas...
+C 0x5857 ... 32 filas
+C 0x5859 ocho pares
+C 0x585E la fila siguiente...
+B 0x586C VOLTEA B PARES DE BYTES a 4 bits: cambia (HL) y (DE) con sus dos puntos cambiados de lado, HL hacia delante y DE hacia atras.
+L 0x586C voltea_b_pares
+C 0x586C el de HL, a guardar
+C 0x586F el de DE, con los nibbles cambiados...
+C 0x5874 ... a HL
+C 0x5875 el de HL, igual...
+C 0x587A ... a DE
+C 0x587B hacia el centro
+B 0x5880 LA SALA DE DRACULA (p01:6369, la habitacion especial 6): sus dibujos (banco 14), algunos tambien volteados de lado o de arriba abajo, y 8 + 4 dibujos de 16 x 16 en la fila 0xA0 de la pagina 1 (los 4 ultimos volteados).
+L 0x5880 sube_la_sala_de_dracula
+C 0x5883 los dibujos...
+C 0x5886 ... volteados de lado...
+C 0x5889 ... volteados de arriba abajo...
+C 0x588C ... ocho de 16 x 16...
+C 0x588F ... y cuatro volteados
+L 0x5895 dibujos_de_la_sala
+C 0x5895 8 en (0x30, 0)
+C 0x58A0 2 en (0x80, 0)
+C 0x58AB 2 en (0xC0, 0)
+C 0x58B6 1 en (0xE0, 0)
+C 0x58C1 0x6C en (0xF0, 0)
+L 0x58CC dibujos_volteados_de_lado
+C 0x58CC el de 0xAD7B en (0xE8, 0)
+C 0x58D7 los 0x6C de 0xAD9B desde (0x50, 0x20)
+C 0x58E2 los 2 de 0xACFB en (0x90, 0)
+L 0x58EA voltea_b_dibujos
+C 0x58ED uno, volteado
+C 0x58F1 el siguiente de la ROM
+C 0x58F6 el sitio siguiente
+L 0x58FD voltea_un_dibujo
+C 0x58FE a 0xE800...
+C 0x5906 ... se voltea...
+C 0x590A ... y a la VRAM
+L 0x5912 voltea_8x8
+C 0x5912 cada fila de cuatro bytes...
+C 0x5915 ... de sus dos puntas...
+C 0x5918 ... ocho filas
+C 0x591A dos pares
+C 0x591F la fila siguiente
+L 0x592A dibujos_volteados_de_arriba_abajo
+C 0x592A los dos de (0x90, 0), a (0xB0, 0)
+C 0x5935 los dos de (0x80, 0), a (0xA0, 0)
+C 0x5940 los dos de (0xC0, 0), a (0xD0, 0)
+L 0x5948 voltea_de_arriba_abajo
+C 0x594B uno, de la VRAM, volteado
+C 0x594F el sitio siguiente de destino...
+C 0x5954 ... y de origen
+L 0x595B el_dibujo_siguiente
+C 0x595B cuatro bytes (ocho puntos) a la derecha...
+C 0x5961 ... y al pasar del borde...
+C 0x5962 ... ocho lineas mas abajo (0x400)
+L 0x5969 lee_volteado
+C 0x5969 a 0xE800, con las filas al reves...
+C 0x596D ... ocho filas...
+C 0x5970 ... de cuatro bytes...
+C 0x5976 ... subiendo
+C 0x597A la linea siguiente de la VRAM
+C 0x5983 y de vuelta a la VRAM
+L 0x598B ocho_de_16
+C 0x598B ocho de 16 x 16 de 0xBBDB...
+C 0x598E ... en (0, 0xA0) de la pagina 1
+L 0x5996 cuatro_de_16_volteados
+C 0x5996 cuatro de 0xBDDB...
+C 0x599B ... desde (0x80, 0xA0)
+L 0x599E uno_de_16_volteado
+C 0x59A1 uno, volteado
+C 0x59A5 el siguiente de la ROM, 0x80 bytes
+C 0x59AA el sitio siguiente, dieciseis puntos a la derecha...
+C 0x59B2 ... o dieciseis lineas mas abajo
+L 0x59BC voltea_un_dibujo_de_16
+C 0x59BD a 0xE800...
+C 0x59C5 ... se voltea...
+C 0x59C9 ... y a la VRAM
+L 0x59D1 voltea_16x16
+C 0x59D1 cada fila de ocho bytes...
+C 0x59D4 ... de sus dos puntas...
+C 0x59D7 ... dieciseis filas
+C 0x59D9 cuatro pares
+L 0x59EC pon_la_paleta_de_dracula
+C 0x59EC la base...
+C 0x59F2 ... y la de 0xBF6F
+B 0x59FB LOS DIBUJOS DEL TITULO (banco 8): 0x11 desde (8, 0) de la pagina 1; con la fuente japonesa, 0x1E mas y el rle de 0xBBF6 (banco 13); si no, 0x59 mas.
+L 0x59FB sube_los_dibujos_del_titulo
+C 0x59FE 0x11 de 0xAC80...
+C 0x5A01 ... desde (8, 0)
+C 0x5A09 la fuente de la BIOS: japonesa?
+C 0x5A10 si: 0x1E de 0xAEA0...
+C 0x5A1B ... y el rle de 0xBBF6
+L 0x5A23 titulo_de_fuera_dibujos
+C 0x5A23 si no: 0x59 de 0xB260
+L 0x5A2B titulo_dibujos_fin
+
+L 0x5A2E a_que_habitacion_se_sale
+C 0x5A31 p13:B963
+L 0x5A37 salidas_de_esta_habitacion
+C 0x5A3A p13:B99A
+L 0x5A40 mira_la_puerta_de_la_fase
+C 0x5A43 p13:BB31
+B 0x5A49 LOS SECRETOS DEL BLOQUE: 0xE000-0xE47F a cero, la lista del bloque de tres fases copiada ahi (48 habitaciones de 0x18 bytes) y los vendedores apuntados en 0xDE00.
+L 0x5A49 los_secretos_del_bloque
+C 0x5A49 0x480 bytes a cero desde 0xE000
+C 0x5A56 la lista del bloque...
+C 0x5A59 ... y los vendedores
+B 0x5A5C COPIA LA LISTA DE SECRETOS (banco 14) a 0xE000: pares de bytes, con un tercero si el segundo es 0x7F; 0xFE pasa a la habitacion siguiente (0x18 bytes mas alla), 0xFF a la fase siguiente (0x180, 16 habitaciones) y 0x00 acaba.
+L 0x5A5C copia_los_secretos
+C 0x5A5F la lista del bloque
+C 0x5A62 a 0xE000
+L 0x5A65 una_fase_de_secretos
+L 0x5A66 una_habitacion_de_secretos
+L 0x5A67 un_secreto
+C 0x5A67 el byte...
+C 0x5A69 ... 0: acaba
+C 0x5A6B ... 0xFF: la fase siguiente
+C 0x5A6E ... 0xFE: la habitacion siguiente
+C 0x5A71 si no, dos bytes...
+C 0x5A76 ... y, si el segundo es 0x7F...
+C 0x5A7A ... un tercero
+L 0x5A7E habitacion_siguiente
+C 0x5A7E desde el principio de la habitacion...
+C 0x5A7F ... 0x18 bytes mas alla
+L 0x5A87 secretos_de_la_fase_siguiente
+C 0x5A87 desde el principio de la fase...
+C 0x5A8A ... 0x180 bytes mas alla
+L 0x5A93 secretos_copiados
+L 0x5A98 lista_del_bloque
+C 0x5A98 en el patio...
+C 0x5A9C ... la de 0x800C
+C 0x5AA0 si no, la del bloque...
+C 0x5AA3 ... de la tabla de 0x8000
+B 0x5AAF LOS VENDEDORES DEL BLOQUE en 0xDE00: cuatro bytes por habitacion (dos huecos de [lo que vende][visitas]), a cero, y en cada hueco lo que vende (0x5B0B) cada secreto 11x de la habitacion, dos como mucho; un bloque que se rompe con un tercer byte 11x cuenta tambien.
+L 0x5AAF los_vendedores_del_bloque
+C 0x5AAF 0xC0 bytes a cero desde 0xDE00
+C 0x5ABE las 48 habitaciones de 0xE000
+L 0x5AC3 vendedores_de_una_habitacion
+C 0x5AC6 sus huecos
+C 0x5AC9 la siguiente en 0xDE00, cuatro bytes...
+C 0x5ACF ... y en 0xE000, 0x18
+L 0x5AD7 busca_vendedores
+C 0x5AD7 ocho secretos, dos huecos
+L 0x5ADA mira_un_secreto
+C 0x5ADA su segundo byte
+C 0x5ADC un bloque (011)...
+C 0x5AE0 ... mira su tercer byte
+L 0x5AE2 es_un_vendedor
+C 0x5AE2 11x: un vendedor
+C 0x5AE8 lo que vende...
+C 0x5AEB ... de 0x5B0B, por los bits 5-2...
+C 0x5AF5 ... al hueco
+C 0x5AF7 (sus visitas, a cero)
+C 0x5AFA los dos huecos llenos: listo
+L 0x5AFC el_secreto_siguiente
+C 0x5AFC al primer byte del siguiente
+L 0x5B00 bloque_con_tercer_byte
+C 0x5B00 lo de dentro es 0x1F...
+C 0x5B05 (si no, nada)
+C 0x5B07 ... el tercer byte
+
+B 0x5B1B LAS COSAS DE LA HABITACION desde sus secretos (0xE000): velas y bloques a las cosas fijas de DE (0xC470, ocho de 16 bytes: [1][y][x][0][tamano: 0 vela, 1 antorcha del patio, 2 bloque pequeno, 3 grande][lo de dentro][el secreto: bajo, alto, bajo][tercer byte]); los objetos a la vista (p02:89FD), los cofres (p02:8A13) y los vendedores (p02:9179) salen aparte, salvo con el mapa del pergamino en pantalla (0xCF38), que solo quiere las fijas.
+L 0x5B1B las_cosas_de_la_habitacion
+C 0x5B1B los secretos de esta habitacion
+L 0x5B21 cosas_fijas_a_de
+C 0x5B21 ocho como mucho
+L 0x5B23 una_cosa_de_la_habitacion
+C 0x5B23 el primer byte: 0, no hay mas
+C 0x5B2B el segundo, su clase (bits 7-5):
+C 0x5B2E 000: un objeto a la vista
+C 0x5B30 1xx: un cofre o un vendedor
+C 0x5B35 si no, vela o bloque: una cosa fija, estado 1...
+C 0x5B3B ... su sitio...
+C 0x5B3E ... la y...
+C 0x5B41 ... la x...
+C 0x5B45 ... un 0...
+C 0x5B48 ... y el tamano, por su clase:
+C 0x5B4F una vela (001)...
+C 0x5B52 ... en el patio es la antorcha (1)...
+C 0x5B58 ... y si no, 0
+L 0x5B5A el_tamano
+C 0x5B5A (bloque pequeno 2, grande 3)
+C 0x5B5D lo de dentro (bits 4-0)
+C 0x5B63 el secreto, a apuntar
+C 0x5B6E 0x1F: el tercer byte...
+C 0x5B72 ... tambien
+L 0x5B75 la_cosa_siguiente
+C 0x5B76 la ficha siguiente, 16 bytes mas
+L 0x5B7C salta_el_secreto
+C 0x5B7C el secreto siguiente...
+C 0x5B80 ... con su tercer byte si lo lleva
+L 0x5B88 un_objeto_a_la_vista
+C 0x5B88 con el mapa del pergamino, no
+C 0x5B8E su sitio y lo que es...
+C 0x5B91 ... a la lista de objetos
+L 0x5B96 sitio_y_contenido
+C 0x5B96 D = la x, E = la y...
+C 0x5B9F ... B = lo de dentro
+L 0x5BA5 cofre_o_vendedor
+C 0x5BA5 con el mapa del pergamino, no
+C 0x5BAB 11x: un vendedor
+C 0x5BAF 10x: un cofre
+L 0x5BB7 un_vendedor
+C 0x5BBA su sitio
+C 0x5BBD B = lo que vende (bits 5-2)...
+C 0x5BC6 ... C = su clase (bits 1-0)
+L 0x5BCF secretos_de_esta_habitacion
+B 0x5BD2 LOS SECRETOS DE LA HABITACION A en 0xE000: la fase en su sitio del bloque (0x5C04, por 16 habitaciones) mas 0x18 bytes por habitacion.
+L 0x5BD2 secretos_de_la_habitacion
+C 0x5BD7 en el patio, desde 0xE000
+C 0x5BE0 la fila de la fase en el bloque (0, 0x18 o 0x30)...
+C 0x5BE8 ... por 16
+C 0x5BF3 la habitacion...
+C 0x5BF9 ... por 8...
+C 0x5BFE ... y por 3: 0x18 bytes cada una
+L 0x5C16 sitio_del_secreto
+C 0x5C16 el primer byte:
+C 0x5C18 C = la y (nibble alto)...
+C 0x5C1B ... B = la x (nibble bajo por 16)
+B 0x5C25 UN CUADRO DEL JUEGO (el estado 5 y la demostracion): lo de 0x6841 y 0x654B, el mapa del pergamino (que lo para todo mientras esta), la pausa con F1 (en la sala de Dracula repinta su cuerpo; 0xC40A y el efecto 0xFD), y luego los patrones de Simon, lo de 0x6AFF y 0x7837, el jefe, los enemigos, lo que lanzan, lo de 0x7D68, los bloques, los vendedores, los objetos, los cascotes, las trampas de cadena, las plataformas, la puerta de la fase y los sprites.
+L 0x5C25 un_cuadro_del_juego
+C 0x5C2B con 0xCE40...
+C 0x5C2F ... lo de 0x66BA
+C 0x5C32 el mapa del pergamino
+C 0x5C35 en pantalla: nada mas
+C 0x5C3A en una partida...
+C 0x5C41 ... F1?
+C 0x5C47 en la sala de Dracula...
+C 0x5C4C ... su cuerpo
+C 0x5C4F la pausa
+L 0x5C5C el_cuadro
+C 0x5C5C los patrones de Simon...
+C 0x5C62 ... lo de 0x7837...
+C 0x5C65 ... el jefe...
+C 0x5C68 ... los enemigos...
+C 0x5C6B ... lo que lanzan...
+C 0x5C6E ... lo de 0x7D68...
+C 0x5C74 ... los vendedores...
+C 0x5C71 ... los bloques...
+C 0x5C77 ... los objetos...
+C 0x5C7A ... los cascotes...
+C 0x5C7D ... las trampas de cadena...
+C 0x5C80 ... las plataformas...
+C 0x5C83 ... la puerta de la fase...
+C 0x5C86 ... y los sprites
+B 0x5C92 BUSCA UN GAME MASTER en las cuatro ranuras (y sus subranuras, si estan expandidas, por 0xFCC1): la firma de 0x5CE9 en 0x7FFA; 0xE600 = 0xFF si esta.
+L 0x5C92 busca_el_game_master
+L 0x5C98 mira_una_ranura
+L 0x5CB8 mira_las_subranuras
+L 0x5CCC mira_la_firma
+C 0x5CCC la firma...
+C 0x5CCF ... en 0x7FFA de la ranura C...
+C 0x5CD2 ... seis bytes
+L 0x5CEF la_ventana_del_game_master
+C 0x5CEF el fondo...
+C 0x5CF2 ... un marco...
+C 0x5CF7 ... y sus rotulos
+L 0x5CFD borra_la_ventana_del_game_master
+C 0x5CFD desde (0x20, 0x98)...
+C 0x5D00 ... 0xC0 x 0x38
+L 0x5D03 borra_un_rectangulo
+C 0x5D03 del color 0, en la pagina 0
+L 0x5D0E recuadro
+C 0x5D0E borrado y con un marco del color 0x0E
+L 0x5D61 opcion_1_la_fase
+C 0x5D61 su rotulo...
+C 0x5D67 ... y la fase que da, en (0xB0, 0xB8)
+L 0x5D82 opcion_2_las_vidas
+C 0x5D82 su rotulo...
+C 0x5D88 ... y las vidas que da, en (0xB8, 0xB8)
+L 0x5D90 rotulo_de_la_opcion
+L 0x5DA9 borra_la_linea_de_la_opcion
+C 0x5DA9 desde (0x24, 0xB0), 0xB8 x 0x18
+B 0x5DB2 UNA CIFRA DEL GAME MASTER: la tecla de un numero recien pulsada (filas 0 y 1 del teclado) entra por la derecha en 0xE60F (BCD), se pinta en 0xE602 y se pasa a binario en 0xE60E; 0xE615 dice que se ha tecleado.
+L 0x5DB2 una_cifra
+C 0x5DB2 alguna recien pulsada?
+C 0x5DB6 las del 0 al 7 (fila 0)...
+C 0x5DC3 ... y el 8 y el 9 (fila 1)
+L 0x5DCA la_cifra
+C 0x5DCA tecleado
+C 0x5DCF entra por la derecha
+C 0x5DD5 y se pinta
+L 0x5DE1 cual_bit
+C 0x5DE1 D = el primer bit a 1
+L 0x5DE7 teclas_de_numero
+C 0x5DE7 la fila 0 (del 0 al 7)...
+C 0x5DED ... y la 1 (8 y 9)...
+C 0x5DF7 ... recien pulsadas, en D...
+C 0x5E00 ... y E
+L 0x5E08 bcd_a_binario
+C 0x5E08 0xE60F en BCD...
+C 0x5E0D ... las decenas por diez...
+C 0x5E19 ... mas las unidades, a 0xE60E
+L 0x5E21 return_recien_pulsada
+C 0x5E21 la fila 7, el bit 7: RETURN
+B 0x5E31 LO QUE DA EL GAME MASTER al empezar (0xE604): el bit 0, la fase (de 0 a 18; si no, 0), la del marcador (hasta 0x18 en BCD) y su bloque (0x5E6A), desde la habitacion 0; el bit 1, las vidas.
+L 0x5E31 lo_que_da_el_game_master
+C 0x5E31 el bit 0...
+C 0x5E35 ... la fase, menos de 19...
+C 0x5E40 ... la del marcador...
+C 0x5E4B ... su bloque...
+C 0x5E58 ... desde la habitacion 0...
+C 0x5E5C ... y 0xC40D a 1
+L 0x5E60 las_vidas_del_game_master
+C 0x5E60 el bit 1: las vidas
+B 0x5E7D EL CURSOR DEL GAME MASTER: arriba o abajo entre las tres opciones (0xE60B), borrando el de antes (el caracter 0) y pintando el nuevo (0x4F) en la fila 0x28, en la columna de 0x5EB5.
+L 0x5E7D mueve_el_cursor
+C 0x5E7D arriba (+1) o abajo (-1)
+L 0x5E84 cursor_nuevo
+C 0x5E85 la opcion nueva...
+C 0x5E8B ... en la vuelta, la 0 o la 2
+L 0x5E96 pinta_el_cursor
+C 0x5E98 borra el de antes...
+C 0x5E9E ... y pinta el nuevo
+L 0x5EA2 borra_el_cursor
+C 0x5EA2 el caracter 0
+L 0x5EA6 el_cursor
+C 0x5EA6 el caracter 0x4F
+L 0x5EA8 caracter_en_la_opcion
+C 0x5EA8 la columna de la opcion...
+C 0x5EAF ... en la fila 0x28
+L 0x5EB8 lo_que_sale_en_la_habitacion
+C 0x5EB8 LO QUE SALE: no con 0xC440...
+C 0x5EBD ... ni con Simon en la pose 6...
+C 0x5EC3 ... ni con la puerta de la fase en los estados 2, 3 y 5
+C 0x5ED8 el byte de la habitacion en 0x85A6 (banco 14)
+C 0x5EF3 un bit por generador
+
+B 0x5F1D CREA UNA COSA del tipo C en (D = x, E = y) en la lista de 0xC800 (A y B, con 0x5F1F, a los bytes 0x0F y 0x1F): busca una ficha libre de las siete, sus sprites libres (tantos como dice 0x6058 por tipo, entre los catorce desde el 0x0E, en la copia de 0xD638), y la rellena: tipo, paso 0, posicion, colores (0x6084), vida (0x60E1) y el nacer de su tipo (0x5FCC).
+C 0x5F1D sin bytes 0x0F ni 0x1F
+C 0x5F1F A al byte 0x0F...
+C 0x5F22 ... y B al 0x1F
+C 0x5F26 aun no creada (0xCF31)
+C 0x5F32 una ficha libre de las siete de 0xC800
+C 0x5F3B libre?
+C 0x5F3E no: la siguiente
+C 0x5F41 (ninguna: no se crea)
+C 0x5F42 IX = la ficha
+C 0x5F48 cuantos sprites lleva, de 0x6058
+C 0x5F56 ninguno: a rellenar
+C 0x5F59 D = el sprite, contando desde el 0x0E; E = el de la ficha
+C 0x5F5C en la copia de los atributos...
+C 0x5F5F ... catorce
+C 0x5F61 libre (y = 0xE0)?
+C 0x5F66 si: ocupado (0xE1)...
+C 0x5F68 ... y apuntado en la ficha
+C 0x5F6B el siguiente de la ficha
+C 0x5F6C todos?
+L 0x5F6F sprite_siguiente
+C 0x5F6F el numero siguiente...
+C 0x5F70 ... cuatro bytes mas alla
+C 0x5F76 (no hay bastantes: no se crea)
+L 0x5F77 rellena_la_cosa
+C 0x5F77 creada (0xCF31)
+C 0x5F82 el tipo...
+C 0x5F84 ... el paso 0...
+C 0x5F8B ... la y...
+C 0x5F92 ... y la x
+C 0x5F97 los bytes 0x0F...
+C 0x5F9D ... y 0x1F
+C 0x5FA3 se para con el reloj
+C 0x5FAB (byte 0x0E a 7)
+C 0x5FAF los colores de sus sprites
+C 0x5FB5 su vida, de 0x60E1
+C 0x5FC5 y lo de nacer de su tipo
+C 0x5849 cuatro ceros detras de la fila
+C 0x5C98 la ranura C...
+C 0x5C9B ... expandida (bit 7 de 0xFCC1 + C)?
+C 0x5C9F no: mira la firma
+C 0x5CA2 (C = el numero de ranura)
+C 0x5CA4 la tiene: 0xFF
+C 0x5CA6 la ranura siguiente
+C 0x5CAA ninguna: 0
+C 0x5CB8 expandida: el bit 7...
+C 0x5CBA ... con la ranura...
+C 0x5CBC ... y sus cuatro subranuras
+C 0x5CBF mira la firma
+C 0x5CC3 la tiene: carry
+C 0x5CC4 la subranura siguiente (bits 2-3)
+C 0x5CCA ninguna: NC
+C 0x5CD4 un byte de la ranura C...
+C 0x5CD7 ... por RDSLT
+C 0x5CDD es el de la firma?
+C 0x5CDF no: NC
+C 0x5CE1 el siguiente
+C 0x5CE5 los seis: carry
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
 F 0x44E9 16
@@ -1691,24 +2126,18 @@ C 0x577D bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x5783 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x5789 lee la FASE (0 el patio, 1-18)
 C 0x5791 hl_mas_a: HL += A
-C 0x5797 lee la HABITACION dentro de la fase
 C 0x579C de_mas_a: DE += A
-C 0x57A5 guion_de_carga: interpreta un guion de carga de la VRAM (0xFF acaba)
-C 0x57AE pon_paleta: lista de [color][RB][G] hasta 0xFF
 C 0x57B1 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x57B4 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x57BA guion_de_carga: interpreta un guion de carga de la VRAM (0xFF acaba)
 C 0x57BD bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x57C0 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x57C9 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
-C 0x57CC lee la FASE (0 el patio, 1-18)
 C 0x57D9 pon_paleta: lista de [color][RB][G] hasta 0xFF
 C 0x57DC bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x57DF bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
 C 0x57E5 dibujo_de_32_filas: desempaqueta un dibujo de 32 filas a 0xE800
-C 0x57E8 apunta a el ESTADO del juego
 C 0x57FA dibujo_de_32_filas: desempaqueta un dibujo de 32 filas a 0xE800
-C 0x57FD apunta a el manejador del canal A del sonido
 C 0x580C bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x581A copia_a_la_vram: BC bytes de HL a la VRAM de DE
 C 0x5822 hl_mas_a: HL += A
@@ -1726,7 +2155,6 @@ C 0x590F sube_dibujos: B dibujos de 8x8 a 4 bits de HL a la VRAM de DE
 C 0x5923 de_mas_a: DE += A
 C 0x597C hl_mas_a: HL += A
 C 0x5988 sube_dibujos: B dibujos de 8x8 a 4 bits de HL a la VRAM de DE
-C 0x598E apunta a la FASE (0 el patio, 1-18)
 C 0x5993 sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 C 0x59CE sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 C 0x59E0 hl_mas_a: HL += A
@@ -1750,26 +2178,18 @@ C 0x5A46 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x5A5C bancos_14_15: pone el sonido (14 y 15) en 0x8000 y 0xA000
 C 0x5A81 de_mas_a: DE += A
 C 0x5A95 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-C 0x5A98 lee la FASE (0 el patio, 1-18)
-C 0x5AA0 lee el bloque de tres fases (0-5)
 C 0x5AA7 hl_mas_a: HL += A
 C 0x5AF2 hl_mas_a: HL += A
 C 0x5B1E apunta a los bloques que se rompen (ocho de 16 bytes)
-C 0x5B52 lee la FASE (0 el patio, 1-18)
 C 0x5BCF lee la HABITACION dentro de la fase
 C 0x5BDA lee la FASE (0 el patio, 1-18)
 C 0x5BE4 hl_mas_a: HL += A
-C 0x5C3A lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x5C59 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x5CAF guarda si hay un GAME MASTER en otra ranura
 C 0x5CFA rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x5D08 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-C 0x5D67 apunta a la fase del marcador que da el Game Master
-C 0x5D88 apunta a las vidas que da el Game Master
 C 0x5D95 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-C 0x5E35 lee la fase que da el Game Master
 C 0x5E3D guarda la FASE (0 el patio, 1-18)
-C 0x5E40 lee la fase del marcador que da el Game Master
 C 0x5E48 guarda la fase en BCD, la del marcador
 C 0x5E4E lee la FASE (0 el patio, 1-18)
 C 0x5E51 hl_mas_a: HL += A
@@ -1778,10 +2198,8 @@ C 0x5E59 guarda la HABITACION dentro de la fase
 C 0x5E63 lee las vidas que da el Game Master
 C 0x5E66 guarda las vidas
 C 0x5EAB hl_mas_a: HL += A
-C 0x5EC3 lee el estado de la puerta de la fase
 C 0x5ED1 el mapper: pone en 0x8000 el banco de A
 C 0x5ED4 guarda la copia del banco de 0x8000
-C 0x5ED8 lee la FASE (0 el patio, 1-18)
 C 0x5EDE palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x5EE1 lee la HABITACION dentro de la fase
 C 0x5EE4 de_mas_a: DE += A
@@ -1790,16 +2208,13 @@ C 0x5EEF guarda la copia del banco de 0x8000
 C 0x5F2B guarda el tipo de la cosa que se crea
 C 0x5F2E guarda la posicion de la cosa que se crea
 C 0x5F45 guarda la ficha de la cosa que se crea
-C 0x5F48 lee el tipo de la cosa que se crea
 C 0x5F4E hl_mas_a: HL += A
 C 0x5F52 guarda cuantos sprites lleva la cosa
 C 0x5F7C lee la ficha de la cosa que se crea
 C 0x5F7F lee el tipo de la cosa que se crea
 C 0x5F86 lee la posicion de la cosa que se crea
-C 0x5FB5 lee el tipo de la cosa que se crea
 C 0x5FBB de_mas_a: DE += A
 C 0x5FBF guarda la vida de la cosa
 C 0x5FC2 lee la ficha de la cosa que se crea
-C 0x5FC5 lee el tipo de la cosa
 C 0x5FC9 despacha: salta a la entrada A de la tabla que va detras del call
 # --- fin de las anotaciones de anota.py ---
