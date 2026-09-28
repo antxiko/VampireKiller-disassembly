@@ -21,6 +21,87 @@ C 0xAA69 el destino de este sprite
 C 0xAA6B ya esta?
 C 0xAA6E si no, un punto hacia alla
 C 0xAA76 el sprite siguiente: cinco bytes mas
+B 0xA222 EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con la VUELTA (0x28 - 8 * vuelta cuadros).
+L 0xA222 nace_el_tipo_0a
+L 0xA22E mueve_el_tipo_0a
+C 0xA225 la espera del paso 0
+C 0xA229 y la del parpadeo
+C 0xA231 paso 1: el parpadeo; paso 2: tras disparar
+C 0xA23A paso 0: espera...
+C 0xA241 ... y a parpadear 0x18 cuadros
+C 0xA24B la siguiente espera: 0x28 - 8 * vuelta
+C 0xA253 un color u otro, a cuadros alternos
+C 0xA264 la espera tras disparar
+L 0xA26B dispara_el_tipo_0a
+C 0xA26B sin velocidad vertical...
+C 0xA26E ... y 0x400 a la izquierda...
+C 0xA277 ... o a la derecha, segun mire
+C 0xA27A desde 0x14 por encima
+C 0xA283 el tipo 3 de la lista de 0xD700 (0xA08E + 0x0A)
+L 0xA28A colores_del_tipo_0a
+C 0xA28A los sprites pares del color 2, los impares del de A (con CC)
+C 0xA299 paso 2: espera y vuelve al 0 disparando otra vez
+L 0xA2A8 mira_a_simon_el_tipo_0a
+C 0xA2A8 el dibujo 5 (o 4)...
+C 0xA2B8 ... o el 7 (o 6) en la habitacion 4 de la fase 9
+C 0xA2C2 Simon a su izquierda: uno menos
+B 0xA2E0 EL HOMBRE PEZ (tipos 2 y 3; por su dibujo y porque sale del agua). Salta desde abajo (velocidad vertical -0x0B80) con dos salpicaduras (el tipo 0x20) y el efecto 8; al tocar suelo (el efecto 7) anda hacia Simon en tramos de 0xA4F3/0xA4F7, y el tipo 3 (bit 0 del tipo) se para cada tanto a escupir (0xA45A: el tipo 1 de la lista de 0xD700, a 0x300). Si cae por debajo de y = 0xC0, otras dos salpicaduras (el efecto 9) y se borra.
+L 0xA2C7 hombre_pez_al_acecho
+C 0xA2C7 (ix+0x1B): espera a que Simon este a su altura (0xA3A0)
+L 0xA2E0 nace_el_hombre_pez
+C 0xA2E0 mirando a Simon
+C 0xA2F1 salta: velocidad vertical -0x0B80
+C 0xA2F9 el efecto del salto
+C 0xA304 y dos salpicaduras (el tipo 0x20)
+L 0xA310 mueve_el_hombre_pez
+C 0xA310 la cuenta de cuadros
+C 0xA313 paso 1: anda; paso 2: escupe
+C 0xA31E paso 0, en el aire: mira a Simon hasta tocar suelo una vez
+C 0xA32D la gravedad
+C 0xA333 subiendo, nada mas
+C 0xA33E mirando a la derecha, la celda de delante
+C 0xA348 toca suelo?
+C 0xA34D si: el efecto de caer...
+C 0xA352 ... la y, a la celda
+C 0xA35A la espera hasta escupir: 0x30 - 4 * vuelta
+L 0xA366 a_andar_el_hombre_pez
+C 0xA37A sin velocidad vertical
+C 0xA380 sin suelo: cayendo hasta y = 0xC0
+C 0xA386 al agua: el efecto 9...
+C 0xA38B ... se borra y salpica dos veces
+C 0xA3A0 al acecho y sin arrancar todavia?
+C 0xA3AC el dibujo 0x12 y hecho tipo 3
+C 0xA3B8 arranca si Simon esta a su altura (de y - 8 a y + 8)
+C 0xA3CB el tipo 3 cuenta hasta escupir
+C 0xA3DE acaba el tramo?
+C 0xA3E3 otro tramo, de 0xA4F3
+C 0xA3EA hacia Simon: 0x180 a la izquierda...
+C 0xA3F9 ... o a la derecha
+C 0xA403 la animacion, una por lado
+C 0xA40F cada ocho cuadros, el paso siguiente
+C 0xA426 el tipo 3, con sus dibujos
+C 0xA42F la celda de delante
+C 0xA43E sin suelo delante?
+C 0xA442 se cae: al paso 0
+L 0xA45A escupe_el_hombre_pez
+C 0xA45A quieto 0x18 cuadros
+C 0xA463 a los 0x10, escupe
+C 0xA46A el dibujo de escupir: 0xA4AF, segun el lado y el momento
+C 0xA486 y a andar otra vez
+L 0xA492 escupe_hacia_donde_mira
+C 0xA492 0x300 a la derecha...
+C 0xA49E ... o a la izquierda
+C 0xA4A1 desde 0x14 por encima
+C 0xA4AA el tipo 1 de la lista de 0xD700 (0xA08E + 2)
+L 0xA4B3 mira_a_simon_el_hombre_pez
+C 0xA4B3 el tipo 2: dibujos 0x0B y 0x08
+C 0xA4BD el tipo 3: 0x12 y 0x0F
+C 0xA4CB Simon a su izquierda
+L 0xA4CF tramo_del_hombre_pez
+C 0xA4CF los tramos de 0xA4F3 o 0xA4F7...
+C 0xA4DB ... uno de cuatro, con la cuenta
+L 0xA4E8 sonido_si_simon_vive
+C 0xA4E8 el efecto A, salvo con Simon muerto (0xC420 = 6)
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -230,12 +311,10 @@ C 0xA139 lee la Y de Simon
 C 0xA14A lee la X de Simon
 C 0xA15E hl_mas_a: HL += A
 C 0xA166 lee la posicion de la cosa que se crea
-C 0xA231 lee el paso en que va la cosa
 C 0xA23E sube el paso en que va la cosa
 C 0xA245 lee la VUELTA (0, 1 o 2)
 C 0xA268 sube el paso en que va la cosa
 C 0xA271 mira el bit 0 de el dibujo de la cosa
-C 0xA27A lee la y de la cosa
 C 0xA280 lee la x de la cosa
 C 0xA285 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 C 0xA2A0 el paso en que va la cosa = 0x00
@@ -245,36 +324,25 @@ C 0xA2BA lee la X de Simon
 C 0xA2BD compara con la x de la cosa
 C 0xA2C3 guarda el dibujo de la cosa
 C 0xA2EB guarda si la cosa se mueve
-C 0xA2F1 la velocidad vertical = 0xF4
 C 0xA2F5 la velocidad vertical (parte baja) = 0x80
 C 0xA2FE lee la y de la cosa
 C 0xA301 lee la x de la cosa
 C 0xA307 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0xA30D crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0xA313 lee el paso en que va la cosa
 C 0xA32A pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA330 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-C 0xA333 mira el bit 7 de la velocidad vertical
 C 0xA338 lee la x de la cosa
 C 0xA33B lee la y de la cosa
-C 0xA348 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0xA352 lee la y de la cosa
 C 0xA357 guarda la y de la cosa
-C 0xA35A lee la VUELTA (0, 1 o 2)
 C 0xA372 el paso en que va la cosa = 0x01
 C 0xA37D pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xA380 lee la y de la cosa
-C 0xA38B borra_la_cosa: tipo a cero y sus sprites libres
 C 0xA38E lee la y de la cosa
 C 0xA391 lee la x de la cosa
 C 0xA397 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0xA39D crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0xA3AC el dibujo de la cosa = 0x12
 C 0xA3B0 lee la Y de Simon
 C 0xA3B4 el tipo de la cosa = 0x03
-C 0xA3B8 lee la y de la cosa
 C 0xA3C3 la cosa se mueve
-C 0xA3CB mira el bit 0 de el tipo de la cosa
 C 0xA3D6 sube el paso en que va la cosa
 C 0xA3ED lee la X de Simon
 C 0xA3F0 compara con la x de la cosa
@@ -282,26 +350,19 @@ C 0xA3FC pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA420 mira el bit 0 de el tipo de la cosa
 C 0xA428 hl_mas_a: HL += A
 C 0xA42C guarda el dibujo de la cosa
-C 0xA42F lee la x de la cosa
 C 0xA432 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xA43B lee la y de la cosa
-C 0xA43E choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0xA442 la velocidad vertical = 0x00
 C 0xA446 la velocidad vertical (parte baja) = 0x00
 C 0xA44A baja el paso en que va la cosa
-C 0xA45A la cosa se queda quieta
 C 0xA47E guarda el dibujo de la cosa
-C 0xA486 baja el paso en que va la cosa
 C 0xA48D la cosa se mueve
 C 0xA498 va hacia la izquierda? (bit 7 de la velocidad horizontal)
-C 0xA4A1 lee la y de la cosa
 C 0xA4A7 lee la x de la cosa
 C 0xA4AC crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 C 0xA4B7 mira el bit 0 de el tipo de la cosa
 C 0xA4C1 guarda el dibujo de la cosa
 C 0xA4C4 lee la X de Simon
 C 0xA4C7 compara con la x de la cosa
-C 0xA4CB guarda el dibujo de la cosa
 C 0xA4E0 hl_mas_a: HL += A
 C 0xA4F0 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0xA4FB la cosa se mueve

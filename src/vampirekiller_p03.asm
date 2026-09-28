@@ -272,67 +272,71 @@ DATA_arcotangente:
 ; ======================================================================
 
 
-L_A222:
-	call L_A2A8		;a222
-	ld (ix+010h),008h		;a225
-	ld (ix+011h),020h		;a229
+
+; ----------------------------------------------------------------------
+; EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con la VUELTA (0x28 - 8 * vuelta cuadros).
+; ----------------------------------------------------------------------
+nace_el_tipo_0a:
+	call mira_a_simon_el_tipo_0a		;a222
+	ld (ix+010h),008h		;a225   ; la espera del paso 0
+	ld (ix+011h),020h		;a229   ; y la del parpadeo
 	ret			;a22d
-L_A22E:
-	call L_A2A8		;a22e
-	ld a,(ix+001h)		;a231   ; lee el paso en que va la cosa
+mueve_el_tipo_0a:
+	call mira_a_simon_el_tipo_0a		;a22e
+	ld a,(ix+001h)		;a231   ; paso 1: el parpadeo; paso 2: tras disparar
 	dec a			;a234
 	jr z,L_A253		;a235
 	dec a			;a237
 	jr z,L_A299		;a238
-	dec (ix+010h)		;a23a
+	dec (ix+010h)		;a23a   ; paso 0: espera...
 	ret nz			;a23d
 	inc (ix+001h)		;a23e   ; sube el paso en que va la cosa
-	ld (ix+011h),018h		;a241
+	ld (ix+011h),018h		;a241   ; ... y a parpadear 0x18 cuadros
 	ld a,(0d012h)		;a245   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a248
 	add a,a			;a249
 	add a,a			;a24a
-	sub 028h		;a24b
+	sub 028h		;a24b   ; la siguiente espera: 0x28 - 8 * vuelta
 	neg		;a24d
 	ld (ix+010h),a		;a24f
 	ret			;a252
 L_A253:
-	ld a,04ch		;a253
+	ld a,04ch		;a253   ; un color u otro, a cuadros alternos
 	bit 0,(ix+011h)		;a255
 	jr z,L_A25D		;a259
 	ld a,048h		;a25b
 L_A25D:
-	call L_A28A		;a25d
+	call colores_del_tipo_0a		;a25d
 	dec (ix+011h)		;a260
 	ret nz			;a263
-	ld (ix+013h),012h		;a264
+	ld (ix+013h),012h		;a264   ; la espera tras disparar
 	inc (ix+001h)		;a268   ; sube el paso en que va la cosa
-L_A26B:
-	ld hl,00000h		;a26b
-	ld de,0fc00h		;a26e
+dispara_el_tipo_0a:
+	ld hl,00000h		;a26b   ; sin velocidad vertical...
+	ld de,0fc00h		;a26e   ; ... y 0x400 a la izquierda...
 	bit 0,(ix+00bh)		;a271   ; mira el bit 0 de el dibujo de la cosa
 	jr z,L_A27A		;a275
-	ld de,00400h		;a277
+	ld de,00400h		;a277   ; ... o a la derecha, segun mire
 L_A27A:
-	ld a,(ix+003h)		;a27a   ; lee la y de la cosa
+	ld a,(ix+003h)		;a27a   ; desde 0x14 por encima
 	sub 014h		;a27d
 	ld c,a			;a27f
 	ld b,(ix+005h)		;a280   ; lee la x de la cosa
-	ld a,00ah		;a283
+	ld a,00ah		;a283   ; el tipo 3 de la lista de 0xD700 (0xA08E + 0x0A)
 	call 09f6dh		;a285   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	ld a,04ch		;a288
-L_A28A:
-	ld (ix+025h),002h		;a28a
+colores_del_tipo_0a:
+	ld (ix+025h),002h		;a28a   ; los sprites pares del color 2, los impares del de A (con CC)
 	ld (ix+02ah),a		;a28e
 	ld (ix+02fh),002h		;a291
 	ld (ix+034h),a		;a295
 	ret			;a298
 L_A299:
-	call L_A2A8		;a299
+	call mira_a_simon_el_tipo_0a		;a299   ; paso 2: espera y vuelve al 0 disparando otra vez
 	dec (ix+013h)		;a29c
 	ret nz			;a29f
 	ld (ix+001h),000h		;a2a0   ; el paso en que va la cosa = 0x00
-	jr L_A26B		;a2a4
+	jr dispara_el_tipo_0a		;a2a4
 
 ; ----------------------------------------------------------------------
 ; DATOS dos_bytes_sueltos: dos bytes (0x3E 0x4C) entre dos rutinas que no lee
@@ -346,105 +350,109 @@ DATA_dos_bytes_sueltos:
 ; ======================================================================
 
 
-L_A2A8:
-	ld b,005h		;a2a8
+mira_a_simon_el_tipo_0a:
+	ld b,005h		;a2a8   ; el dibujo 5 (o 4)...
 	ld a,(0d000h)		;a2aa   ; lee la FASE (0 el patio, 1-18)
 	cp 009h		;a2ad
 	jr nz,L_A2BA		;a2af
 	ld a,(0d001h)		;a2b1   ; lee la HABITACION dentro de la fase
 	cp 004h		;a2b4
 	jr nz,L_A2BA		;a2b6
-	ld b,007h		;a2b8
+	ld b,007h		;a2b8   ; ... o el 7 (o 6) en la habitacion 4 de la fase 9
 L_A2BA:
 	ld a,(0c427h)		;a2ba   ; lee la X de Simon
 	cp (ix+005h)		;a2bd   ; compara con la x de la cosa
 	jr nc,L_A2C3		;a2c0
-	dec b			;a2c2
+	dec b			;a2c2   ; Simon a su izquierda: uno menos
 L_A2C3:
 	ld (ix+00bh),b		;a2c3   ; guarda el dibujo de la cosa
 	ret			;a2c6
-L_A2C7:
-	ld (ix+01bh),001h		;a2c7
+hombre_pez_al_acecho:
+	ld (ix+01bh),001h		;a2c7   ; (ix+0x1B): espera a que Simon este a su altura (0xA3A0)
 	xor a			;a2cb
 	ld (ix+01ch),a		;a2cc
 	ld (ix+012h),a		;a2cf
 	ld (ix+010h),002h		;a2d2
 	ld (ix+019h),a		;a2d6
 	ld (ix+015h),001h		;a2d9
-	jp L_A366		;a2dd
-L_A2E0:
-	call L_A4B3		;a2e0
+	jp a_andar_el_hombre_pez		;a2dd
+
+; ----------------------------------------------------------------------
+; EL HOMBRE PEZ (tipos 2 y 3; por su dibujo y porque sale del agua). Salta desde abajo (velocidad vertical -0x0B80) con dos salpicaduras (el tipo 0x20) y el efecto 8; al tocar suelo (el efecto 7) anda hacia Simon en tramos de 0xA4F3/0xA4F7, y el tipo 3 (bit 0 del tipo) se para cada tanto a escupir (0xA45A: el tipo 1 de la lista de 0xD700, a 0x300). Si cae por debajo de y = 0xC0, otras dos salpicaduras (el efecto 9) y se borra.
+; ----------------------------------------------------------------------
+nace_el_hombre_pez:
+	call mira_a_simon_el_hombre_pez		;a2e0   ; mirando a Simon
 	xor a			;a2e3
 	ld (ix+018h),a		;a2e4
 	ld (ix+01bh),a		;a2e7
 	inc a			;a2ea
 	ld (ix+006h),a		;a2eb   ; guarda si la cosa se mueve
 	ld (ix+019h),a		;a2ee
-	ld (ix+008h),0f4h		;a2f1   ; la velocidad vertical = 0xF4
+	ld (ix+008h),0f4h		;a2f1   ; salta: velocidad vertical -0x0B80
 	ld (ix+007h),080h		;a2f5   ; la velocidad vertical (parte baja) = 0x80
-	ld a,008h		;a2f9
-	call L_A4E8		;a2fb
+	ld a,008h		;a2f9   ; el efecto del salto
+	call sonido_si_simon_vive		;a2fb
 	ld e,(ix+003h)		;a2fe   ; lee la y de la cosa
 	ld d,(ix+005h)		;a301   ; lee la x de la cosa
-	ld c,020h		;a304
+	ld c,020h		;a304   ; y dos salpicaduras (el tipo 0x20)
 	push de			;a306
 	call 05f1dh		;a307   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop de			;a30a
 	ld c,020h		;a30b
 	jp 05f1dh		;a30d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_A310:
-	inc (ix+01dh)		;a310
-	ld a,(ix+001h)		;a313   ; lee el paso en que va la cosa
+mueve_el_hombre_pez:
+	inc (ix+01dh)		;a310   ; la cuenta de cuadros
+	ld a,(ix+001h)		;a313   ; paso 1: anda; paso 2: escupe
 	dec a			;a316
 	jp z,L_A3A0		;a317
 	dec a			;a31a
-	jp z,L_A45A		;a31b
-	bit 0,(ix+018h)		;a31e
+	jp z,escupe_el_hombre_pez		;a31b
+	bit 0,(ix+018h)		;a31e   ; paso 0, en el aire: mira a Simon hasta tocar suelo una vez
 	jr nz,L_A327		;a322
-	call L_A4B3		;a324
+	call mira_a_simon_el_hombre_pez		;a324
 L_A327:
 	ld de,00000h		;a327
 	call pon_velocidad_x		;a32a   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld de,00080h		;a32d
+	ld de,00080h		;a32d   ; la gravedad
 	call suma_a_la_velocidad_y		;a330   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-	bit 7,(ix+008h)		;a333   ; mira el bit 7 de la velocidad vertical
+	bit 7,(ix+008h)		;a333   ; subiendo, nada mas
 	ret nz			;a337
 	ld d,(ix+005h)		;a338   ; lee la x de la cosa
 	ld e,(ix+003h)		;a33b   ; lee la y de la cosa
-	bit 0,(ix+012h)		;a33e
+	bit 0,(ix+012h)		;a33e   ; mirando a la derecha, la celda de delante
 	jr z,L_A348		;a342
 	ld a,d			;a344
 	add a,008h		;a345
 	ld d,a			;a347
 L_A348:
-	call 07b98h		;a348   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+	call 07b98h		;a348   ; toca suelo?
 	jr nc,L_A380		;a34b
-	ld a,007h		;a34d
-	call L_A4E8		;a34f
-	ld a,(ix+003h)		;a352   ; lee la y de la cosa
+	ld a,007h		;a34d   ; si: el efecto de caer...
+	call sonido_si_simon_vive		;a34f
+	ld a,(ix+003h)		;a352   ; ... la y, a la celda
 	and 0f8h		;a355
 	ld (ix+003h),a		;a357   ; guarda la y de la cosa
-	ld a,(0d012h)		;a35a   ; lee la VUELTA (0, 1 o 2)
+	ld a,(0d012h)		;a35a   ; la espera hasta escupir: 0x30 - 4 * vuelta
 	add a,a			;a35d
 	add a,a			;a35e
 	sub 030h		;a35f
 	neg		;a361
 	ld (ix+010h),a		;a363
-L_A366:
+a_andar_el_hombre_pez:
 	ld (ix+011h),010h		;a366
 	ld (ix+014h),000h		;a36a
 	ld (ix+015h),001h		;a36e
 	ld (ix+001h),001h		;a372   ; el paso en que va la cosa = 0x01
 	ld (ix+013h),008h		;a376
-	ld de,00000h		;a37a
+	ld de,00000h		;a37a   ; sin velocidad vertical
 	jp pon_velocidad_y		;a37d   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_A380:
-	ld a,(ix+003h)		;a380   ; lee la y de la cosa
+	ld a,(ix+003h)		;a380   ; sin suelo: cayendo hasta y = 0xC0
 	cp 0c0h		;a383
 	ret c			;a385
-	ld a,009h		;a386
-	call L_A4E8		;a388
-	call 099f6h		;a38b   ; borra_la_cosa: tipo a cero y sus sprites libres
+	ld a,009h		;a386   ; al agua: el efecto 9...
+	call sonido_si_simon_vive		;a388
+	call 099f6h		;a38b   ; ... se borra y salpica dos veces
 	ld e,(ix+003h)		;a38e   ; lee la y de la cosa
 	ld d,(ix+005h)		;a391   ; lee la x de la cosa
 	ld c,020h		;a394
@@ -454,15 +462,15 @@ L_A380:
 	ld c,020h		;a39b
 	jp 05f1dh		;a39d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_A3A0:
-	bit 0,(ix+01bh)		;a3a0
+	bit 0,(ix+01bh)		;a3a0   ; al acecho y sin arrancar todavia?
 	jr z,L_A3CB		;a3a4
 	bit 0,(ix+01ch)		;a3a6
 	jr nz,L_A3CB		;a3aa
-	ld (ix+00bh),012h		;a3ac   ; el dibujo de la cosa = 0x12
+	ld (ix+00bh),012h		;a3ac   ; el dibujo 0x12 y hecho tipo 3
 	ld a,(0c425h)		;a3b0   ; lee la Y de Simon
 	ld b,a			;a3b3
 	ld (ix+000h),003h		;a3b4   ; el tipo de la cosa = 0x03
-	ld a,(ix+003h)		;a3b8   ; lee la y de la cosa
+	ld a,(ix+003h)		;a3b8   ; arranca si Simon esta a su altura (de y - 8 a y + 8)
 	sub 008h		;a3bb
 	cp b			;a3bd
 	ret nc			;a3be
@@ -472,7 +480,7 @@ L_A3A0:
 	ld (ix+006h),001h		;a3c3   ; la cosa se mueve
 	ld (ix+01ch),001h		;a3c7
 L_A3CB:
-	bit 0,(ix+000h)		;a3cb   ; mira el bit 0 de el tipo de la cosa
+	bit 0,(ix+000h)		;a3cb   ; el tipo 3 cuenta hasta escupir
 	jr z,L_A3DE		;a3cf
 	dec (ix+010h)		;a3d1
 	jr nz,L_A3DE		;a3d4
@@ -480,26 +488,26 @@ L_A3CB:
 	ld (ix+011h),018h		;a3d9
 	ret			;a3dd
 L_A3DE:
-	dec (ix+015h)		;a3de
+	dec (ix+015h)		;a3de   ; acaba el tramo?
 	jr nz,L_A403		;a3e1
-	call L_A4CF		;a3e3
+	call tramo_del_hombre_pez		;a3e3   ; otro tramo, de 0xA4F3
 	ld (ix+012h),000h		;a3e6
-	ld de,0fe80h		;a3ea
+	ld de,0fe80h		;a3ea   ; hacia Simon: 0x180 a la izquierda...
 	ld a,(0c427h)		;a3ed   ; lee la X de Simon
 	cp (ix+005h)		;a3f0   ; compara con la x de la cosa
 	jr c,L_A3FC		;a3f3
 	ld (ix+012h),001h		;a3f5
-	ld de,00180h		;a3f9
+	ld de,00180h		;a3f9   ; ... o a la derecha
 L_A3FC:
 	call pon_velocidad_x		;a3fc   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+013h),001h		;a3ff
 L_A403:
-	ld hl,0a452h		;a403
+	ld hl,0a452h		;a403   ; la animacion, una por lado
 	bit 0,(ix+012h)		;a406
 	jr z,L_A40F		;a40a
 	ld hl,0a456h		;a40c
 L_A40F:
-	dec (ix+013h)		;a40f
+	dec (ix+013h)		;a40f   ; cada ocho cuadros, el paso siguiente
 	jr nz,L_A42F		;a412
 	ld (ix+013h),008h		;a414
 	inc (ix+014h)		;a418
@@ -507,22 +515,22 @@ L_A40F:
 	and 001h		;a41e
 	bit 0,(ix+000h)		;a420   ; mira el bit 0 de el tipo de la cosa
 	jr z,L_A428		;a424
-	add a,002h		;a426
+	add a,002h		;a426   ; el tipo 3, con sus dibujos
 L_A428:
 	call 04061h		;a428   ; hl_mas_a: HL += A
 	ld a,(hl)			;a42b
 	ld (ix+00bh),a		;a42c   ; guarda el dibujo de la cosa
 L_A42F:
-	ld a,(ix+005h)		;a42f   ; lee la x de la cosa
+	ld a,(ix+005h)		;a42f   ; la celda de delante
 	bit 7,(ix+00ah)		;a432   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	jr nz,L_A43A		;a436
 	add a,008h		;a438
 L_A43A:
 	ld d,a			;a43a
 	ld e,(ix+003h)		;a43b   ; lee la y de la cosa
-	call 07b98h		;a43e   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+	call 07b98h		;a43e   ; sin suelo delante?
 	ret c			;a441
-	ld (ix+008h),000h		;a442   ; la velocidad vertical = 0x00
+	ld (ix+008h),000h		;a442   ; se cae: al paso 0
 	ld (ix+007h),000h		;a446   ; la velocidad vertical (parte baja) = 0x00
 	dec (ix+001h)		;a44a   ; baja el paso en que va la cosa
 	ld (ix+018h),001h		;a44d
@@ -541,14 +549,14 @@ DATA_dos_animaciones_A452:
 ; ======================================================================
 
 
-L_A45A:
-	ld (ix+006h),000h		;a45a   ; la cosa se queda quieta
+escupe_el_hombre_pez:
+	ld (ix+006h),000h		;a45a   ; quieto 0x18 cuadros
 	dec (ix+011h)		;a45e
 	jr z,L_A486		;a461
-	ld a,(ix+011h)		;a463
+	ld a,(ix+011h)		;a463   ; a los 0x10, escupe
 	cp 008h		;a466
-	jr z,L_A492		;a468
-	ld hl,0a4afh		;a46a
+	jr z,escupe_hacia_donde_mira		;a468
+	ld hl,0a4afh		;a46a   ; el dibujo de escupir: 0xA4AF, segun el lado y el momento
 	cp 010h		;a46d
 	jr c,L_A482		;a46f
 	ld c,000h		;a471
@@ -566,22 +574,22 @@ L_A482:
 	ld c,002h		;a482
 	jr L_A473		;a484
 L_A486:
-	dec (ix+001h)		;a486   ; baja el paso en que va la cosa
+	dec (ix+001h)		;a486   ; y a andar otra vez
 	ld (ix+010h),030h		;a489
 	ld (ix+006h),001h		;a48d   ; la cosa se mueve
 	ret			;a491
-L_A492:
-	ld hl,00000h		;a492
+escupe_hacia_donde_mira:
+	ld hl,00000h		;a492   ; 0x300 a la derecha...
 	ld de,00300h		;a495
 	bit 7,(ix+00ah)		;a498   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	jr z,L_A4A1		;a49c
-	ld de,0fd00h		;a49e
+	ld de,0fd00h		;a49e   ; ... o a la izquierda
 L_A4A1:
-	ld a,(ix+003h)		;a4a1   ; lee la y de la cosa
+	ld a,(ix+003h)		;a4a1   ; desde 0x14 por encima
 	sub 014h		;a4a4
 	ld c,a			;a4a6
 	ld b,(ix+005h)		;a4a7   ; lee la x de la cosa
-	ld a,002h		;a4aa
+	ld a,002h		;a4aa   ; el tipo 1 de la lista de 0xD700 (0xA08E + 2)
 	jp 09f6dh		;a4ac   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 
 ; ----------------------------------------------------------------------
@@ -596,34 +604,34 @@ DATA_cuatro_dibujos_A4AF:
 ; ======================================================================
 
 
-L_A4B3:
-	ld b,00bh		;a4b3
+mira_a_simon_el_hombre_pez:
+	ld b,00bh		;a4b3   ; el tipo 2: dibujos 0x0B y 0x08
 	ld c,008h		;a4b5
 	bit 0,(ix+000h)		;a4b7   ; mira el bit 0 de el tipo de la cosa
 	jr z,L_A4C1		;a4bb
-	ld b,012h		;a4bd
+	ld b,012h		;a4bd   ; el tipo 3: 0x12 y 0x0F
 	ld c,00fh		;a4bf
 L_A4C1:
 	ld (ix+00bh),b		;a4c1   ; guarda el dibujo de la cosa
 	ld a,(0c427h)		;a4c4   ; lee la X de Simon
 	cp (ix+005h)		;a4c7   ; compara con la x de la cosa
 	ret nc			;a4ca
-	ld (ix+00bh),c		;a4cb   ; guarda el dibujo de la cosa
+	ld (ix+00bh),c		;a4cb   ; Simon a su izquierda
 	ret			;a4ce
-L_A4CF:
-	ld hl,0a4f3h		;a4cf
+tramo_del_hombre_pez:
+	ld hl,0a4f3h		;a4cf   ; los tramos de 0xA4F3 o 0xA4F7...
 	bit 0,(ix+019h)		;a4d2
 	jr nz,L_A4DB		;a4d6
 	ld hl,0a4f7h		;a4d8
 L_A4DB:
-	ld a,(ix+01dh)		;a4db
+	ld a,(ix+01dh)		;a4db   ; ... uno de cuatro, con la cuenta
 	and 003h		;a4de
 	call 04061h		;a4e0   ; hl_mas_a: HL += A
 	ld a,(hl)			;a4e3
 	ld (ix+015h),a		;a4e4
 	ret			;a4e7
-L_A4E8:
-	ld c,a			;a4e8
+sonido_si_simon_vive:
+	ld c,a			;a4e8   ; el efecto A, salvo con Simon muerto (0xC420 = 6)
 	ld a,(0c420h)		;a4e9
 	cp 006h		;a4ec
 	ret z			;a4ee
@@ -3403,7 +3411,7 @@ L_B985:
 	ld a,014h		;b9a4
 	call 09f6dh		;b9a6   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	ld a,00ah		;b9a9
-	call L_A4E8		;b9ab
+	call sonido_si_simon_vive		;b9ab
 	dec (ix+001h)		;b9ae   ; baja el paso en que va la cosa
 	ld (ix+006h),001h		;b9b1   ; la cosa se mueve
 	ret			;b9b5
