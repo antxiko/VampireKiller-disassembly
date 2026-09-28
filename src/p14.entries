@@ -12,3 +12,9 @@
 #
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
 0x8964   # p00:403B call
+0x8A5D   # p00:5213: ld hl,0x8A5D / ld (0xC01A),hl (la musica de la pausa)
+0x8A64   # p00:5106: ld hl,0x8A64 / ld (0xC010),hl (canal A de la musica)
+0x8A6B   # p00:510C: ld hl,0x8A6B / ld (0xC012),hl (canal B)
+0x8A72   # p00:5112: ld hl,0x8A72 / ld (0xC014),hl (canal C)
+0x8C95   # p00:52AF: ld hl,0x8C95 / ld (0xC018),hl
+0x8C9C   # p00:519B: ld hl,0x8C9C / ld (0xC016),hl (efecto de sonido)

@@ -1,0 +1,14 @@
+# Semillas a mano: 'pNN 0xADDR b6000 b8000 bA000  # por que'.
+# Son destinos que el trazador no puede ver porque se guardan en RAM y se
+# saltan con `jp (hl)`. Cada una lleva la instruccion que la escribe.
+#
+# El reproductor de sonido (banco 14, con el 15 detras) llama cada cuadro a
+# un manejador por canal: `ld hl,(0xC010+2n) / jp (hl)` en p14:89CD, y el de
+# efectos por (0xC018) y (0xC01A) en p14:89F9 y p14:89F2.
+p14 0x89CE 1 14 15  # p14:8990 y p00:508F: ld hl,0x89CE / ld (0xC010..0xC016),hl (canal en reposo)
+p14 0x8A64 1 14 15  # p00:5106: ld hl,0x8A64 / ld (0xC010),hl (canal A de la musica)
+p14 0x8A6B 1 14 15  # p00:510C: ld hl,0x8A6B / ld (0xC012),hl (canal B)
+p14 0x8A72 1 14 15  # p00:5112: ld hl,0x8A72 / ld (0xC014),hl (canal C)
+p14 0x8C9C 1 14 15  # p00:519B: ld hl,0x8C9C / ld (0xC016),hl (efecto de sonido)
+p14 0x8A5D 1 14 15  # p00:5213: ld hl,0x8A5D / ld (0xC01A),hl (la musica de la pausa)
+p14 0x8C95 1 14 15  # p00:52AF: ld hl,0x8C95 / ld (0xC018),hl
