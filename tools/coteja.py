@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from graficos import (Cartucho, habitacion, FILA_DE_LA_HABITACION, FILAS_PINTADAS,  # noqa: E402
                       ANCHO_DE_LINEA)
-from secretos import pinta_secretos  # noqa: E402
+from secretos import pinta_secretos, DONDE_ESTAN_LAS_TRAMPAS  # noqa: E402
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORK = os.path.join(RAIZ, "work")
@@ -45,14 +45,23 @@ def habitaciones(cart, detalle=False):
         d = _lee(ruta)
         pal = _lee(ruta[:-5] + ".pal")
         paleta = [((pal[2 * k] >> 4) & 7, pal[2 * k + 1] & 7, pal[2 * k] & 7) for k in range(16)]
-        # cuatro montajes: las velas en sus dos pasos, con y sin los objetos a
-        # la vista (0xCF38 decide si salen); cada byte vale si lo da alguno
-        variantes = []
-        for paso in (0, 1):
-            for con_objetos in (True, False):
-                v = habitacion(cart, fase, hab)
-                pinta_secretos(cart, v, fase, hab, paso, con_objetos)
-                variantes.append(v)
+        # los montajes: las velas en sus dos pasos -solos o uno encima del
+        # otro-, con y sin los objetos a la vista (0xCF38 decide si salen);
+        # cada byte vale si lo da alguno. Las trampas de (6,1) se mueven: vale
+        # el primer cuadro, de 0 a 60 desde que se entra, que da el volcado
+        pe = _pantalla(d)
+        cuadros = range(61) if (fase, hab) == DONDE_ESTAN_LAS_TRAMPAS else [None]
+        for cuadro in cuadros:
+            variantes = []
+            for pasos in ((0,), (1,), (0, 1), (1, 0)):
+                for con_objetos in (True, False):
+                    v = habitacion(cart, fase, hab)
+                    pinta_secretos(cart, v, fase, hab, pasos, con_objetos, cuadro)
+                    variantes.append(v)
+            ps = [_pantalla(v.v) for v in variantes]
+            malas = [a for a in range(len(pe)) if all(pe[a] != p[a] for p in ps)]
+            if not malas:
+                break
         v0 = variantes[0]
         dp = sum(1 for k in range(16) if paleta[k] != v0.paleta[k])
         # p00:54E4 lee 0x48 bytes de RAM para el quinto dibujo de 0xB800: ese
@@ -60,9 +69,8 @@ def habitaciones(cart, detalle=False):
         d1 = sum(1 for a in range(0x8000, 0x10000) if v0.tocado[a] and v0.v[a] != d[a]
                  and not (0x77 <= (a - 0x8000) // ANCHO_DE_LINEA <= 0x7F
                           and 32 <= (a - 0x8000) % ANCHO_DE_LINEA < 40))
-        pe = _pantalla(d)
-        ps = [_pantalla(v.v) for v in variantes]
-        malas = [a for a in range(len(pe)) if all(pe[a] != p[a] for p in ps)]
+        if cuadro is not None and detalle:
+            print("  fase %2d hab %2d: las trampas, en el cuadro %d" % (fase, hab, cuadro))
         d0 = len(malas)
         vistos += 1
         if dp or d1 or d0:

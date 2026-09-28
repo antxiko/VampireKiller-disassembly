@@ -362,11 +362,121 @@ def pinta_la_habitacion(vram, celdas):
                                    vram.punto(1, x0 + x, y0 + y))
 
 
+# ------------------------------------------------------------ la sala de Dracula
+HABITACION_ESPECIAL_DE_CADA_FASE = 0x636F   # banco 1: nibble alto la habitacion, bajo la clase
+B1415 = (1, 14, 15)
+PALETA_DE_DRACULA = 0xBF6F           # banco 10, p00:59EC
+
+
+def clase_especial(cart, fase, habitacion):
+    """p01:6333: la clase de la habitacion especial (0 si no lo es)."""
+    b = cart.leer(HABITACION_ESPECIAL_DE_CADA_FASE + fase, B123)
+    return b & 0x0F if b >> 4 == habitacion else 0
+
+
+def _espejo(fila):
+    """p00:586C: una fila de puntos a 4 bits vuelta del reves."""
+    return bytes(((b << 4) | (b >> 4)) & 0xFF for b in reversed(fila))
+
+
+def _siguiente_dibujo(dest, paso, alto):
+    """p00:595B (paso 4, alto 4) y p00:59AA (paso 8, alto 8): un dibujo a la
+    derecha y, al borde, `alto` * 2 lineas mas abajo."""
+    e = ((dest & 0xFF) + paso) & 0x7F
+    if e:
+        return (dest & 0xFF00) | e
+    return (((dest >> 8) + alto) & (0x100 - alto)) << 8
+
+
+def _escribe_dibujo(vram, dest, datos, ancho):
+    for fila in range(len(datos) // ancho):
+        for k in range(ancho):
+            vram.escribe(dest + fila * ANCHO_DE_LINEA + k, datos[fila * ancho + k])
+
+
+def _lee_de_la_rom(cart, bancos, hl, n):
+    return bytes(cart.leer(hl + k, bancos) for k in range(n))
+
+
+def _dibujo_de_32_filas(cart, hl):
+    """p00:582D: 32 filas de 16 bytes; cada una trae cuantos ceros van delante
+    y luego los 12 - n bytes del dibujo; cuatro ceros al final."""
+    fuera = bytearray()
+    for _ in range(32):
+        n = cart.leer(hl, B111213)
+        hl += 1
+        fuera += bytes(n) + _lee_de_la_rom(cart, B111213, hl, 12 - n) + bytes(4)
+        hl += 12 - n
+    return bytes(fuera)
+
+
+def carga_la_sala_de_dracula(cart, vram):
+    """La habitacion especial de clase 6 (p01:6363), entre el montaje y la
+    pintada: otra paleta y otros dibujos en la pagina 1, muchos de ellos
+    espejados en RAM antes de subirlos.
+
+      p00:59EC  la paleta base (0xBF88) y encima la de 0xBF6F.
+      p00:5880  del banco 15: dibujos de 8x8 tal cual (p00:5895) y del reves
+                (p00:58CC), tres pares volteados de arriba abajo desde la
+                VRAM (p00:592A), y ocho dibujos de 16x16 (p00:598B) mas cuatro
+                del reves (p00:5996) en la fila 0xA0, donde estaban las
+                puertas.
+      p00:57DF  dos dibujos de 32x32 (0xB5A1 y 0xB719 del banco 13) en la
+                fila 0x80, cada uno tal cual y del reves."""
+    pon_paleta(cart, B910, PALETA_BASE, vram)
+    pon_paleta(cart, B910, PALETA_DE_DRACULA, vram)
+    for hl, n, dest in ((0xABFB, 8, 0x8018), (0xACFB, 2, 0x8040), (0xAD3B, 2, 0x8060),
+                        (0xAD7B, 1, 0x8070), (0xAD9B, 0x6C, 0x8078)):
+        sube_dibujos(cart, B1415, hl, dest, n, vram)
+    ram = bytes(32)                   # 0xE800: el ultimo dibujo espejado
+    for hl, n, dest in ((0xAD7B, 1, 0x8074), (0xAD9B, 0x6C, 0x9028), (0xACFB, 2, 0x8048)):
+        for _ in range(n):
+            d = _lee_de_la_rom(cart, B1415, hl, 32)
+            ram = b"".join(_espejo(d[4 * f:4 * f + 4]) for f in range(8))
+            _escribe_dibujo(vram, dest, ram, 4)
+            hl += 32
+            dest = _siguiente_dibujo(dest, 4, 4)
+    # p00:5969 deja las filas desde 0xE818 hacia atras, de cuatro en cuatro:
+    # la 0 en 0xE818 y la 7 en 0xE7FC, fuera del dibujo. Lo que sube son las
+    # filas 6 a 0 y, abajo, los cuatro bytes que ya habia en 0xE81C
+    for de, dest in ((0x8048, 0x8058), (0x8040, 0x8050), (0x8060, 0x8068)):
+        for _ in range(2):
+            filas = [bytes(vram.v[de + f * ANCHO_DE_LINEA:de + f * ANCHO_DE_LINEA + 4]) for f in range(8)]
+            ram = b"".join(reversed(filas[:7])) + ram[28:32]
+            _escribe_dibujo(vram, dest, ram, 4)
+            de, dest = _siguiente_dibujo(de, 4, 4), _siguiente_dibujo(dest, 4, 4)
+    sube_dibujos_de_16(cart, B1415, 0xBBDB, 0xD000, 8, vram)
+    dest = 0xD040
+    for k in range(4):
+        d = _lee_de_la_rom(cart, B1415, 0xBDDB + 0x80 * k, 0x80)
+        _escribe_dibujo(vram, dest, b"".join(_espejo(d[8 * f:8 * f + 8]) for f in range(16)), 8)
+        dest = _siguiente_dibujo(dest, 8, 8)
+    for hl, dest in ((0xB5A1, 0xC000), (0xB719, 0xC010)):
+        d = _dibujo_de_32_filas(cart, hl)
+        _escribe_dibujo(vram, dest, d, 16)
+        _escribe_dibujo(vram, dest + 0x20, b"".join(_espejo(d[16 * f:16 * f + 16]) for f in range(32)), 16)
+
+
+def remata_la_sala_de_dracula(vram):
+    """p01:632D, con la habitacion ya pintada: cuatro trozos de 16x16 de la
+    fila 0xA0 a (0x70, 0x80) (p01:6914) y otros dos a (0x68, 0x58) y
+    (0x88, 0x58) (p01:69A0), con HMMM."""
+    for (sx, sy), (dx, dy) in (((0x40, 0xA0), (0x70, 0x80)), ((0x80, 0xA0), (0x80, 0x80)),
+                               ((0x50, 0xA0), (0x70, 0x90)), ((0x90, 0xA0), (0x80, 0x90)),
+                               ((0x20, 0xA0), (0x68, 0x58)), ((0x30, 0xA0), (0x88, 0x58))):
+        for j in range(16):
+            for i in range(16):
+                vram.pon_punto(0, dx + i, dy + j, vram.punto(1, sx + i, sy + j))
+
+
 def habitacion(cart, fase, habitacion, vram=None):
     """La VRAM con la fase cargada y la habitacion montada y pintada."""
     vram = vram or carga_la_fase(cart, fase)
     carga_la_habitacion(cart, fase, habitacion, vram)
-    pinta_la_habitacion(vram, monta_la_habitacion(cart, fase, habitacion))
+    celdas = monta_la_habitacion(cart, fase, habitacion)
+    if clase_especial(cart, fase, habitacion) == 6:
+        carga_la_sala_de_dracula(cart, vram)
+    pinta_la_habitacion(vram, celdas)
     return vram
 
 

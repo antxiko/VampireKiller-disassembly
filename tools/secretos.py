@@ -44,7 +44,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from graficos import (Cartucho, B123, B111213, cuantas_habitaciones,  # noqa: E402
-                      PAGINA_1, ANCHO_DE_LINEA)
+                      PAGINA_1, ANCHO_DE_LINEA, clase_especial, remata_la_sala_de_dracula)
 
 B14 = (1, 14, 15)
 LISTAS_DE_CADA_BLOQUE = 0x8000       # banco 14
@@ -194,15 +194,74 @@ def pinta_puerta_de_la_fase(cart, vram, fase, habitacion):
     return True
 
 
-def pinta_secretos(cart, vram, fase, habitacion, paso_de_las_velas=0, con_objetos=True):
+# ------------------------------------------------------------ las trampas
+TRAMPAS = 0x8FBD                     # banco 2: tres registros de seis bytes
+DONDE_ESTAN_LAS_TRAMPAS = (6, 1)     # p02:8F9F: fase 6, habitacion 1
+PIEZA_DE_LA_TRAMPA = (0x80, 0x70)    # pagina 1: cadena (0x9A80) y pinchos (0x9A90)
+
+
+def trampas(cart):
+    """p02:8FA7: [tipo, y, x, ritmo, cuenta, recorrido, pasos]: tipo 1 baja
+    y 2 sube."""
+    return [[cart.leer(TRAMPAS + 6 * k + i, B123) for i in range(6)] + [0] for k in range(3)]
+
+
+def mueve_las_trampas(vram, regs):
+    """p02:8FEA, un cuadro: la cuenta sube; bajando se mueve si ritmo & cuenta
+    es cero (cada cuadro o uno si y otro no), subiendo uno de cada cuatro. Al
+    moverse va 4 lineas y copia con HMMM los 32 x 16 de la pieza a (x, y - 4):
+    arriba el trozo de cadena, que la alarga, y abajo cuatro lineas en negro,
+    que borran al subir. Tras `recorrido` pasos, da la vuelta."""
+    for r in regs:
+        r[4] = (r[4] + 1) & 0xFF
+        if r[0] == 1:
+            if r[3] & r[4]:
+                continue
+            paso = 4
+        else:
+            if r[4] & 3:
+                continue
+            paso = -4
+        r[1] = (r[1] + paso) & 0xFF
+        r[6] += 1
+        if r[6] == r[5]:
+            r[6] = 0
+            r[0] ^= 3
+        x0, y0 = PIEZA_DE_LA_TRAMPA
+        for j in range(16):
+            for i in range(32):
+                vram.pon_punto(0, r[2] + i, r[1] - 4 + j, vram.punto(1, x0 + i, y0 + j))
+
+
+def pinta_las_trampas(cart, vram, fase, habitacion, cuadros=None):
+    """Las trampas tras `cuadros` cuadros; sin cuadros, cada una en lo mas bajo
+    de su recorrido (la primera vez que da la vuelta)."""
+    if (fase, habitacion) != DONDE_ESTAN_LAS_TRAMPAS:
+        return
+    regs = trampas(cart)
+    if cuadros is not None:
+        for _ in range(cuadros):
+            mueve_las_trampas(vram, regs)
+        return
+    for k in range(3):
+        r = [regs[k]]
+        while r[0][0] == 1:
+            mueve_las_trampas(vram, r)
+
+
+def pinta_secretos(cart, vram, fase, habitacion, pasos_de_las_velas=(0,), con_objetos=True,
+                   cuadros_de_las_trampas=None):
     """Todo lo de la habitacion sobre la pantalla ya montada. Devuelve la
-    lista."""
+    lista. Las velas se pintan con transparencia encima del paso anterior:
+    `pasos_de_las_velas` es la secuencia de dibujos que llevan (la antorcha
+    del patio deja asi algun punto del otro)."""
     lista = secretos(cart, fase, habitacion)
     for e in lista:
         if e["que"] == "objeto" and con_objetos:
             pinta_objeto(vram, e["tipo"], e["x"], e["y"])
         elif e["que"] == "vela":
-            pinta_vela(vram, e["x"], e["y"], paso_de_las_velas, antorcha=fase == 0)
+            for paso in pasos_de_las_velas:
+                pinta_vela(vram, e["x"], e["y"], paso, antorcha=fase == 0)
         elif e["que"] == "bloque":
             pinta_bloque(cart, vram, fase, e["tamano"], e["x"], e["y"])
         elif e["que"] == "cofre":
@@ -210,6 +269,9 @@ def pinta_secretos(cart, vram, fase, habitacion, paso_de_las_velas=0, con_objeto
         elif e["que"] == "puerta":
             pinta_puerta(vram, e["x"], e["y"])
     pinta_puerta_de_la_fase(cart, vram, fase, habitacion)
+    if clase_especial(cart, fase, habitacion) == 6:
+        remata_la_sala_de_dracula(vram)
+    pinta_las_trampas(cart, vram, fase, habitacion, cuadros_de_las_trampas)
     return lista
 
 
