@@ -438,7 +438,7 @@ DATA_habitacion_especial_de_cada_fase:
 
 
 L_6382:
-	ld hl,0c470h		;6382
+	ld hl,0c470h		;6382   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 	ld de,0c471h		;6385
 	ld (hl),000h		;6388
 	ld bc,0028fh		;638a
@@ -4491,7 +4491,7 @@ L_7FB7:
 	ld a,(0c422h)		;7fb7
 	cp 003h		;7fba
 	ret nz			;7fbc
-	ld hl,0c470h		;7fbd
+	ld hl,0c470h		;7fbd   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 	ld b,008h		;7fc0
 L_7FC2:
 	ld a,(hl)			;7fc2

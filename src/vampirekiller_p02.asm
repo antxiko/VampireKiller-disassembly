@@ -1109,86 +1109,90 @@ L_8663:
 	add a,c			;866e
 	cp h			;866f   ; carry: delante de Simon
 	ret			;8670
+
+; ----------------------------------------------------------------------
+; LOS BLOQUES QUE SE ROMPEN. La lista de 0xC470 (ocho de 16 bytes, que monta p00:5B1E con la lista de la habitacion) son los bloques que se pueden romper: [estado][y][x][roto][tamano (1 pequeno, 3 grande)][...][golpes]. Al romperse se borran del mapa de la habitacion (0x873A copia celdas vacias de 0xE480 o 0xE4A0), saltan dos cascotes (0xC5A6) y, si guardaba algo, sale (0x898A).
+; ----------------------------------------------------------------------
 L_8671:
-	ld bc,00800h		;8671
-	ld hl,0c470h		;8674
+	ld bc,00800h		;8671   ; ocho, y C cuenta cual es
+	ld hl,0c470h		;8674   ; los bloques que se rompen
 L_8677:
 	push bc			;8677
 	push hl			;8678
 	push hl			;8679
-	pop ix		;867a
-	ld a,(hl)			;867c
+	pop ix		;867a   ; IX = el bloque
+	ld a,(hl)			;867c   ; su estado
 	ld b,a			;867d
 	or a			;867e
-	call nz,L_868C		;867f
+	call nz,L_868C		;867f   ; puesto: a mirarlo
 	pop hl			;8682
 	pop bc			;8683
-	inc c			;8684
+	inc c			;8684   ; el numero de bloque
 	ld a,l			;8685
-	add a,010h		;8686
+	add a,010h		;8686   ; el siguiente, 16 bytes mas alla
 	ld l,a			;8688
 	djnz L_8677		;8689
 	ret			;868b
 L_868C:
-	ld (hl),002h		;868c
+	ld (hl),002h		;868c   ; estado 2: roto
 	inc l			;868e
-	ld e,(hl)			;868f
+	ld e,(hl)			;868f   ; su y
 	inc l			;8690
-	ld d,(hl)			;8691
+	ld d,(hl)			;8691   ; su x
 	inc l			;8692
-	ld a,(hl)			;8693
+	ld a,(hl)			;8693   ; ya estaba roto?
 	or a			;8694
-	jp nz,L_87BA		;8695
+	jp nz,L_87BA		;8695   ; si: a quitar lo que quede
 	inc l			;8698
-	ld a,(hl)			;8699
+	ld a,(hl)			;8699   ; su tamano
 	ex af,af'			;869a
 	inc l			;869b
-	inc l			;869c
-	inc (hl)			;869d
-	ld a,b			;869e
+	inc l			;869c   ; sus golpes...
+	inc (hl)			;869d   ; ... uno mas
+	ld a,b			;869e   ; el estado de antes era 1?
 	cp 001h		;869f
 	jr nz,L_86B3		;86a1
-	ex af,af'			;86a3
+	ex af,af'			;86a3   ; el tamano
 	push af			;86a4
 	push de			;86a5
-	call L_873A		;86a6
+	call L_873A		;86a6   ; borra el bloque del mapa
 	pop de			;86a9
 	pop af			;86aa
-	cp 002h		;86ab
+	cp 002h		;86ab   ; pequeno?
 	jp c,L_86BB		;86ad
 	jp L_86CA		;86b0
 L_86B3:
-	ld a,(hl)			;86b3
-	and 003h		;86b4
-	ret nz			;86b6
+	ld a,(hl)			;86b3   ; los golpes...
+	and 003h		;86b4   ; ... cada cuatro...
+	ret nz			;86b6   ; ... se mira
 	ex af,af'			;86b7
-	cp 002h		;86b8
-	ret nc			;86ba
+	cp 002h		;86b8   ; pequeno?
+	ret nc			;86ba   ; grande: nada
 L_86BB:
 	or a			;86bb
-	ld a,000h		;86bc
+	ld a,000h		;86bc   ; que sale de un bloque pequeno: 0...
 	jr z,L_86C2		;86be
-	ld a,002h		;86c0
+	ld a,002h		;86c0   ; ... o 2
 L_86C2:
-	bit 3,(hl)		;86c2
+	bit 3,(hl)		;86c2   ; el bit 3 de los golpes
 	jr z,L_86C7		;86c4
-	inc a			;86c6
+	inc a			;86c6   ; uno mas
 L_86C7:
-	jp L_898A		;86c7
+	jp L_898A		;86c7   ; crea lo que salga
 L_86CA:
-	ld b,a			;86ca
+	ld b,a			;86ca   ; B = el tamano
 	ld a,(0d002h)		;86cb   ; lee el bloque de tres fases (0-5)
-	or a			;86ce
-	ld hl,08792h		;86cf
+	or a			;86ce   ; en el primer bloque de fases...
+	ld hl,08792h		;86cf   ; ... los dibujos de 0x8792
 	jr z,L_86D7		;86d2
-	ld hl,087a6h		;86d4
+	ld hl,087a6h		;86d4   ; ... y en los demas, los de 0x87A6
 L_86D7:
 	ld a,b			;86d7
-	ld bc,01002h		;86d8
+	ld bc,01002h		;86d8   ; pequeno: 2 x 2 dibujos
 	cp 002h		;86db
 	jr z,L_86E7		;86dd
-	ld bc,02004h		;86df
-	ld a,004h		;86e2
+	ld bc,02004h		;86df   ; grande: 4 x 4
+	ld a,004h		;86e2   ; desde el cuarto
 	call 04061h		;86e4   ; hl_mas_a: HL += A
 L_86E7:
 	push bc			;86e7
@@ -1197,117 +1201,117 @@ L_86E7:
 	push bc			;86ea
 	push hl			;86eb
 	push de			;86ec
-	call L_877C		;86ed
+	call L_877C		;86ed   ; pinta el bloque roto
 	pop de			;86f0
-	call 07d2fh		;86f1   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call 07d2fh		;86f1   ; su celda en el mapa
 	pop de			;86f4
 	pop bc			;86f5
 	ex de,hl			;86f6
-	call L_88B7		;86f7
+	call L_88B7		;86f7   ; y la pone en el mapa de la habitacion
 	pop hl			;86fa
 	pop de			;86fb
 	ld e,d			;86fc
-	ld a,(0c702h)		;86fd
+	ld a,(0c702h)		;86fd   ; el bit 0 de 0xC702...
 	rra			;8700
-	ret nc			;8701
+	ret nc			;8701   ; ... si no, nada
 L_8702:
-	ld c,00eh		;8702
+	ld c,00eh		;8702   ; un marco de color 0x0E alrededor
 	jp 048dch		;8704
 L_8707:
-	ld a,(0c702h)		;8707
+	ld a,(0c702h)		;8707   ; el bit 0 de 0xC702...
 	rra			;870a
-	ret nc			;870b
+	ret nc			;870b   ; ... si no, nada
 L_870C:
-	ld bc,00800h		;870c
-	ld hl,0c470h		;870f
+	ld bc,00800h		;870c   ; los ocho bloques
+	ld hl,0c470h		;870f   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 L_8712:
 	push bc			;8712
 	push hl			;8713
-	ld a,(hl)			;8714
+	ld a,(hl)			;8714   ; roto?
 	cp 002h		;8715
 	jr nz,L_8730		;8717
 	inc l			;8719
-	ld e,(hl)			;871a
+	ld e,(hl)			;871a   ; su y
 	inc l			;871b
-	ld d,(hl)			;871c
+	ld d,(hl)			;871c   ; su x
 	inc l			;871d
 	inc l			;871e
-	ld a,(hl)			;871f
-	cp 002h		;8720
+	ld a,(hl)			;871f   ; su tamano
+	cp 002h		;8720   ; pequeno no
 	jr c,L_8730		;8722
 	ex de,hl			;8724
-	ld de,01010h		;8725
+	ld de,01010h		;8725   ; 0x10 x 0x10...
 	jr z,L_872D		;8728
-	ld de,02020h		;872a
+	ld de,02020h		;872a   ; ... o 0x20 x 0x20
 L_872D:
-	call L_8702		;872d
+	call L_8702		;872d   ; su marco
 L_8730:
 	pop hl			;8730
 	pop bc			;8731
-	inc c			;8732
+	inc c			;8732   ; el siguiente
 	ld a,l			;8733
-	add a,010h		;8734
+	add a,010h		;8734   ; 16 bytes mas alla
 	ld l,a			;8736
 	djnz L_8712		;8737
 	ret			;8739
 L_873A:
-	cp 003h		;873a
-	ld hl,0e4a0h		;873c
+	cp 003h		;873a   ; grande?
+	ld hl,0e4a0h		;873c   ; las celdas vacias de un bloque grande
 	jr z,L_8757		;873f
-	ld hl,0e480h		;8741
+	ld hl,0e480h		;8741   ; las de uno pequeno
 L_8744:
 	push hl			;8744
 	push bc			;8745
-	call 07d2fh		;8746   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call 07d2fh		;8746   ; la celda del bloque en el mapa
 	pop bc			;8749
 	pop de			;874a
-	ld a,c			;874b
+	ld a,c			;874b   ; cuatro bytes...
 	add a,a			;874c
 	add a,a			;874d
-	call 04066h		;874e   ; de_mas_a: DE += A
-	ld bc,00202h		;8751
+	call 04066h		;874e   ; ... por bloque
+	ld bc,00202h		;8751   ; 2 x 2 celdas
 	jp L_876C		;8754
 L_8757:
 	push hl			;8757
 	push bc			;8758
-	call 07d2fh		;8759   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call 07d2fh		;8759   ; la celda
 	pop bc			;875c
 	pop de			;875d
-	ld a,c			;875e
+	ld a,c			;875e   ; dieciseis bytes...
 	add a,a			;875f
 	add a,a			;8760
 	add a,a			;8761
 	add a,a			;8762
-	call 04066h		;8763   ; de_mas_a: DE += A
-	ld bc,00404h		;8766
+	call 04066h		;8763   ; ... por bloque
+	ld bc,00404h		;8766   ; 4 x 4 celdas
 	jp L_876C		;8769
 L_876C:
-	push bc			;876c
+	push bc			;876c   ; una fila de C celdas
 	ld b,000h		;876d
 	push hl			;876f
 	ldir		;8770
 	pop hl			;8772
 	pop bc			;8773
-	ld a,020h		;8774
+	ld a,020h		;8774   ; la fila siguiente del mapa, 32 mas alla
 	call 04061h		;8776   ; hl_mas_a: HL += A
-	djnz L_876C		;8779
+	djnz L_876C		;8779   ; B filas
 	ret			;877b
 L_877C:
-	push bc			;877c
+	push bc			;877c   ; pinta C x B dibujos de la lista de HL
 	push de			;877d
 	ld b,c			;877e
 L_877F:
-	ld a,(hl)			;877f
+	ld a,(hl)			;877f   ; el dibujo
 	inc hl			;8780
-	call 04b0bh		;8781
-	call 04b4fh		;8784
-	djnz L_877F		;8787
+	call 04b0bh		;8781   ; a la pantalla
+	call 04b4fh		;8784   ; la posicion siguiente
+	djnz L_877F		;8787   ; C por fila
 	pop de			;8789
-	ld a,e			;878a
+	ld a,e			;878a   ; la fila siguiente, 8 puntos mas abajo
 	add a,008h		;878b
 	ld e,a			;878d
 	pop bc			;878e
-	djnz L_877C		;878f
+	djnz L_877C		;878f   ; B filas
 	ret			;8791
 
 ; ----------------------------------------------------------------------
@@ -1326,56 +1330,56 @@ DATA_dos_tablas_de_veinte:
 
 
 L_87BA:
-	ld (hl),000h		;87ba
+	ld (hl),000h		;87ba   ; fuera del todo
 	inc l			;87bc
-	ld (ix+000h),000h		;87bd   ; el tipo de la cosa = 0x00
-	ld a,(hl)			;87c1
+	ld (ix+000h),000h		;87bd   ; y la cosa que llevaba, borrada
+	ld a,(hl)			;87c1   ; su tamano
 	inc l			;87c2
-	ld b,(hl)			;87c3
-	cp 002h		;87c4
+	ld b,(hl)			;87c3   ; B
+	cp 002h		;87c4   ; pequeno?
 	jp nc,L_87D2		;87c6
-	call L_884A		;87c9
-	call L_8874		;87cc
+	call L_884A		;87c9   ; las celdas vacias del pequeno
+	call L_8874		;87cc   ; y su marca, a cero
 	jp L_898F		;87cf
 L_87D2:
-	push bc			;87d2
+	push bc			;87d2   ; el grande:
 	push de			;87d3
 	push bc			;87d4
 	ld c,a			;87d5
-	ld a,00eh		;87d6
+	ld a,00eh		;87d6   ; efecto 0x0E (se rompe)
 	call 0509fh		;87d8   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,c			;87db
 	pop bc			;87dc
-	cp 002h		;87dd
+	cp 002h		;87dd   ; el tamano 2?
 	jr z,L_87E9		;87df
-	call L_885E		;87e1
-	call L_8899		;87e4
+	call L_885E		;87e1   ; las celdas de 4 x 4
+	call L_8899		;87e4   ; al mapa
 	jr L_87EF		;87e7
 L_87E9:
-	call L_884A		;87e9
-	call L_887D		;87ec
+	call L_884A		;87e9   ; las de 2 x 2
+	call L_887D		;87ec   ; al mapa
 L_87EF:
 	ld a,(ix+005h)		;87ef   ; lee la x de la cosa
-	cp 01fh		;87f2
+	cp 01fh		;87f2   ; 0x1F?
 	jr z,L_8814		;87f4
-	cp 018h		;87f6
+	cp 018h		;87f6   ; 0x18?
 	jr z,L_883E		;87f8
-	call L_8874		;87fa
+	call L_8874		;87fa   ; la marca, a cero
 	pop de			;87fd
 	pop bc			;87fe
-	ld a,b			;87ff
+	ld a,b			;87ff   ; sale algo?
 	or a			;8800
 	jr z,L_8811		;8801
 	ld a,(ix+004h)		;8803   ; lee la fraccion de la x de la cosa
-	cp 003h		;8806
+	cp 003h		;8806   ; 3...
 	jr nz,L_880E		;8808
-	ld a,e			;880a
+	ld a,e			;880a   ; ... 0x10 mas abajo
 	add a,010h		;880b
 	ld e,a			;880d
 L_880E:
-	call L_89E3		;880e
+	call L_89E3		;880e   ; lo que sale
 L_8811:
-	jp L_88C7		;8811
+	jp L_88C7		;8811   ; y los cascotes
 L_8814:
 	pop de			;8814
 	pop bc			;8815
@@ -1383,75 +1387,75 @@ L_8814:
 	ld b,a			;8819
 	ld h,(ix+007h)		;881a   ; lee la velocidad vertical (parte baja)
 	ld l,(ix+008h)		;881d   ; lee la velocidad vertical
-	and 0c0h		;8820
-	cp 0c0h		;8822
+	and 0c0h		;8820   ; los dos bits altos...
+	cp 0c0h		;8822   ; ... a uno?
 	ld a,b			;8824
 	jr z,L_8831		;8825
-	and 01fh		;8827
+	and 01fh		;8827   ; no: los cinco de abajo
 	ld b,a			;8829
-	ld a,e			;882a
+	ld a,e			;882a   ; 0x10 mas abajo
 	add a,010h		;882b
 	ld e,a			;882d
-	jp L_8A13		;882e
+	jp L_8A13		;882e   ; sale una cosa
 L_8831:
-	ld c,a			;8831
+	ld c,a			;8831   ; si: los bits 2-5
 	and 03ch		;8832
 	rrca			;8834
 	rrca			;8835
-	ld b,a			;8836
+	ld b,a			;8836   ; B
 	ld a,c			;8837
-	and 003h		;8838
-	ld c,a			;883a
-	jp L_9179		;883b
+	and 003h		;8838   ; los dos de abajo
+	ld c,a			;883a   ; C
+	jp L_9179		;883b   ; sale lo otro
 L_883E:
 	ld b,a			;883e
 	pop de			;883f
 	pop bc			;8840
 	ld h,(ix+007h)		;8841   ; lee la velocidad vertical (parte baja)
 	ld l,(ix+008h)		;8844   ; lee la velocidad vertical
-	jp L_89FD		;8847
+	jp L_89FD		;8847   ; sale lo de HL
 L_884A:
-	ld hl,0e480h		;884a
+	ld hl,0e480h		;884a   ; las celdas vacias de 2 x 2
 L_884D:
 	push bc			;884d
 	push de			;884e
-	ld a,c			;884f
+	ld a,c			;884f   ; cuatro bytes por...
 	add a,a			;8850
 	add a,a			;8851
 	call 04061h		;8852   ; hl_mas_a: HL += A
-	ld bc,00202h		;8855
-	call L_877C		;8858
+	ld bc,00202h		;8855   ; 2 x 2
+	call L_877C		;8858   ; a la pantalla
 	pop de			;885b
 	pop bc			;885c
 	ret			;885d
 L_885E:
-	ld hl,0e4a0h		;885e
+	ld hl,0e4a0h		;885e   ; las de 4 x 4
 L_8861:
 	push bc			;8861
 	push de			;8862
-	ld a,c			;8863
+	ld a,c			;8863   ; dieciseis bytes por...
 	add a,a			;8864
 	add a,a			;8865
 	add a,a			;8866
 	add a,a			;8867
 	call 04061h		;8868   ; hl_mas_a: HL += A
-	ld bc,00404h		;886b
-	call L_877C		;886e
+	ld bc,00404h		;886b   ; 4 x 4
+	call L_877C		;886e   ; a la pantalla
 	pop de			;8871
 	pop bc			;8872
 	ret			;8873
 L_8874:
 	ld h,(ix+007h)		;8874   ; lee la velocidad vertical (parte baja)
 	ld l,(ix+008h)		;8877   ; lee la velocidad vertical
-	ld (hl),000h		;887a
+	ld (hl),000h		;887a   ; la marca del bloque, a cero
 	ret			;887c
 L_887D:
-	ld hl,0e480h		;887d
+	ld hl,0e480h		;887d   ; las celdas de 2 x 2
 	push bc			;8880
 	push de			;8881
 	push hl			;8882
 	push bc			;8883
-	call 07d2fh		;8884   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call 07d2fh		;8884   ; su celda
 	pop bc			;8887
 	pop de			;8888
 	ld a,c			;8889
@@ -1459,19 +1463,19 @@ L_887D:
 	add a,a			;888b
 	call 04066h		;888c   ; de_mas_a: DE += A
 	ex de,hl			;888f
-	ld bc,00202h		;8890
-	call L_88B7		;8893
+	ld bc,00202h		;8890   ; 2 x 2
+	call L_88B7		;8893   ; al mapa
 	pop de			;8896
 	pop bc			;8897
 	ret			;8898
 L_8899:
-	ld hl,0e4a0h		;8899
+	ld hl,0e4a0h		;8899   ; las de 4 x 4
 L_889C:
 	push bc			;889c
 	push de			;889d
 	push hl			;889e
 	push bc			;889f
-	call 07d2fh		;88a0   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	call 07d2fh		;88a0   ; su celda
 	pop bc			;88a3
 	pop de			;88a4
 	ld a,c			;88a5
@@ -1481,107 +1485,109 @@ L_889C:
 	add a,a			;88a9
 	call 04066h		;88aa   ; de_mas_a: DE += A
 	ex de,hl			;88ad
-	ld bc,00404h		;88ae
-	call L_88B7		;88b1
+	ld bc,00404h		;88ae   ; 4 x 4
+	call L_88B7		;88b1   ; al mapa
 	pop de			;88b4
 	pop bc			;88b5
 	ret			;88b6
 L_88B7:
-	push bc			;88b7
+	push bc			;88b7   ; una fila de C bytes
 	ld b,000h		;88b8
 	push de			;88ba
 	ldir		;88bb
 	pop de			;88bd
 	pop bc			;88be
-	ld a,020h		;88bf
+	ld a,020h		;88bf   ; la fila siguiente, 32 mas alla
 	call 04066h		;88c1   ; de_mas_a: DE += A
-	djnz L_88B7		;88c4
+	djnz L_88B7		;88c4   ; B filas
 	ret			;88c6
 L_88C7:
-	ld hl,0c5a6h		;88c7
-	ld bc,00201h		;88ca
+	ld hl,0c5a6h		;88c7   ; los dos cascotes de 0xC5A6
+	ld bc,00201h		;88ca   ; el primero con el tipo 1 (a la derecha)
 L_88CD:
-	ld (hl),c			;88cd
+	ld (hl),c			;88cd   ; tipo
 	inc l			;88ce
-	ld (hl),e			;88cf
+	ld (hl),e			;88cf   ; y
 	inc l			;88d0
-	ld (hl),d			;88d1
+	ld (hl),d			;88d1   ; x
 	inc l			;88d2
-	ld c,084h		;88d3
-	djnz L_88CD		;88d5
+	ld c,084h		;88d3   ; el segundo, 0x84 (bit 7: a la izquierda)
+	djnz L_88CD		;88d5   ; dos
 	ret			;88d7
 L_88D8:
-	ld b,002h		;88d8
-	ld hl,0c5a6h		;88da
+	ld b,002h		;88d8   ; mueve los dos cascotes
+	ld hl,0c5a6h		;88da   ; apunta a los dos cascotes (tres bytes cada uno)
 L_88DD:
 	push bc			;88dd
 	push hl			;88de
-	ld a,(hl)			;88df
+	ld a,(hl)			;88df   ; su tipo
 	ld b,a			;88e0
 	or a			;88e1
-	jr z,L_88EA		;88e2
-	call L_88F2		;88e4
-	call L_893B		;88e7
+	jr z,L_88EA		;88e2   ; no hay
+	call L_88F2		;88e4   ; lo mueve
+	call L_893B		;88e7   ; y lo pinta
 L_88EA:
 	pop hl			;88ea
-	inc l			;88eb
+	inc l			;88eb   ; el siguiente, 3 bytes mas alla
 	inc l			;88ec
 	inc l			;88ed
 	pop bc			;88ee
 	djnz L_88DD		;88ef
 	ret			;88f1
 L_88F2:
-	and 07fh		;88f2
+	and 07fh		;88f2   ; el tipo sin el bit del lado
 	ld c,a			;88f4
 	inc l			;88f5
 	inc l			;88f6
-	ld a,(hl)			;88f7
-	bit 7,b		;88f8
+	ld a,(hl)			;88f7   ; su x
+	bit 7,b		;88f8   ; a la izquierda?
 	jr nz,L_8903		;88fa
-	add a,002h		;88fc
-	jr c,L_8922		;88fe
+	add a,002h		;88fc   ; a la derecha, 2 por cuadro
+	jr c,L_8922		;88fe   ; se salio
 	ld (hl),a			;8900
 	jr L_8908		;8901
 L_8903:
-	sub 002h		;8903
-	jr c,L_8922		;8905
+	sub 002h		;8903   ; a la izquierda, 2 por cuadro
+	jr c,L_8922		;8905   ; se salio
 	ld (hl),a			;8907
 L_8908:
 	dec l			;8908
 	dec l			;8909
-	ld a,c			;890a
+	ld a,c			;890a   ; el paso de la caida...
 	inc a			;890b
-	ld de,l8928h		;890c
+	ld de,l8928h		;890c   ; ... en la curva de 0x892A
 	call 04066h		;890f   ; de_mas_a: DE += A
-	ld a,(de)			;8912
-	inc (hl)			;8913
-	or a			;8914
+	ld a,(de)			;8912   ; lo que baja
+	inc (hl)			;8913   ; un paso mas
+	or a			;8914   ; el 0 del final?
 	jr nz,L_891A		;8915
-	dec (hl)			;8917
-	ld a,00ah		;8918
+	dec (hl)			;8917   ; se queda en el ultimo paso...
+	ld a,00ah		;8918   ; ... y cae de 10 en 10
 L_891A:
 	inc l			;891a
-	add a,(hl)			;891b
+	add a,(hl)			;891b   ; a la y
 	ld (hl),a			;891c
-	cp 0d4h		;891d
+	cp 0d4h		;891d   ; se salio por abajo?
 	jr nc,L_8923		;891f
 	ret			;8921
 L_8922:
-	dec l			;8922
+	dec l			;8922   ; fuera:
 L_8923:
-	ld (hl),0e0h		;8923
+	ld (hl),0e0h		;8923   ; y fuera de la pantalla
 	dec l			;8925
-	ld (hl),000h		;8926
+	ld (hl),000h		;8926   ; el tipo a cero
 L_8928:
 	inc l			;8928
 	ret			;8929
 
 ; ----------------------------------------------------------------------
-; DATOS curva_sin_usar: 17 desplazamientos (-6, -4, ... +6 y un 0) con forma
-;   de curva de salto que no nombra ninguna instruccion; su direccion no
-;   aparece como palabra en el cartucho
+; DATOS curva_de_los_cascotes: la caida de los dos cascotes que saltan al
+;   romper un bloque (0xC5A6, tres bytes cada uno): p02:890C lee desde 0x8928
+;   + su tipo + 1 (el 1 o el 4) y p02:8913 sube el paso hasta dar con el 0
+;   final; desde ahi cae de 10 en 10 (p02:8918). El listado escribe esa base
+;   como `l8928h` porque 0x8928 cae dentro de codigo
 ;   0x892a..0x893b  (17 bytes)
-DATA_curva_sin_usar:
+DATA_curva_de_los_cascotes:
 	defb 0fah,0fch,0fch,0fch,0feh,0feh,0ffh,0ffh,001h,001h,002h,002h,004h,004h,004h,006h	; 892a  ................
 	defb 000h	; 893a
 
@@ -1591,26 +1597,26 @@ DATA_curva_sin_usar:
 
 
 L_893B:
-	ld hl,0c5a7h		;893b
-	ld de,0d628h		;893e
-	ld b,002h		;8941
+	ld hl,0c5a7h		;893b   ; los dos cascotes a sprites
+	ld de,0d628h		;893e   ; en la tabla de sprites de 0xD628
+	ld b,002h		;8941   ; dos
 L_8943:
 	push bc			;8943
 	push hl			;8944
-	ld bc,002ffh		;8945
-	ld a,0e0h		;8948
+	ld bc,002ffh		;8945   ; cada uno, dos sprites
+	ld a,0e0h		;8948   ; el patron 0xE0
 L_894A:
 	push hl			;894a
-	ldi		;894b
+	ldi		;894b   ; y y x
 	ldi		;894d
-	ld (de),a			;894f
+	ld (de),a			;894f   ; el patron
 	inc de			;8950
 	inc de			;8951
-	ld a,0e4h		;8952
+	ld a,0e4h		;8952   ; el segundo, 0xE4
 	pop hl			;8954
 	djnz L_894A		;8955
 	pop hl			;8957
-	inc hl			;8958
+	inc hl			;8958   ; el siguiente cascote
 	inc hl			;8959
 	inc hl			;895a
 	pop bc			;895b
@@ -3647,7 +3653,7 @@ L_9609:
 	ld hl,0cffdh		;962a
 	cp (hl)			;962d
 	jr nz,L_9634		;962e
-	ld ix,0c470h		;9630
+	ld ix,0c470h		;9630   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 L_9634:
 	ld b,008h		;9634
 L_9636:
@@ -4277,10 +4283,12 @@ L_9B33:
 	ret			;9b33
 
 ; ----------------------------------------------------------------------
-; DATOS tabla_sin_usar: 44 bytes (0x00, 0x10, 0x18, 0x20) que no nombra
-;   ninguna instruccion; su direccion no aparece como palabra en el cartucho
+; DATOS altura_de_lo_que_suelta: un byte por tipo de cosa (1-44): cuanto mas
+;   arriba de ella sale lo que suelta al morir; p02:9B25 lee desde 0x9B33 + el
+;   tipo de 0xCFF0 y p02:9B2E se lo resta a su y antes de crear la cosa 0x26.
+;   El listado escribe la base como `l9b33h` porque 0x9B33 es un `ret`
 ;   0x9b34..0x9b60  (44 bytes)
-DATA_tabla_sin_usar:
+DATA_altura_de_lo_que_suelta:
 	defb 010h,010h,010h,000h,000h,010h,000h,000h,010h,010h,010h,000h,000h,000h,018h,010h	; 9b34  ................
 	defb 020h,018h,018h,018h,018h,018h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 9b44   ...............
 	defb 010h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 9b54  ............

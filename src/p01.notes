@@ -123,6 +123,7 @@ C 0x6321 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 C 0x6343 lee la FASE (0 el patio, 1-18)
 C 0x6349 hl_mas_a: HL += A
 C 0x634C lee la HABITACION dentro de la fase
+C 0x6382 apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x63D8 guarda la Y de Simon
 C 0x63DB guarda la X de Simon
 C 0x63F3 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
@@ -624,5 +625,6 @@ C 0x7F56 lee el tipo de la cosa
 C 0x7F67 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7F88 lee el tipo de la cosa
 C 0x7F9B sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7FBD apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x7FD8 sonido: arranca la musica o el efecto A (bit 7 = musica)
 # --- fin de las anotaciones de anota.py ---

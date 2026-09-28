@@ -4040,7 +4040,7 @@ DATA_dieciseis_valores:
 
 L_5B1B:
 	call L_5BCF		;5b1b
-	ld de,0c470h		;5b1e
+	ld de,0c470h		;5b1e   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 L_5B21:
 	ld b,008h		;5b21
 L_5B23:

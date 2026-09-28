@@ -44,7 +44,7 @@ def main(argv):
         for b in CODIGO:
             fl = filas[b]
             for k, (d, t) in enumerate(fl):
-                for x in re.findall(r"\b0([0-9a-f]{4})h\b|\bL_([0-9A-F]{4})\b|DATA_([0-9A-F]{4})", t):
+                for x in re.findall(r"\b0([0-9a-f]{4})h\b|\bL_([0-9A-F]{4})\b|DATA_([0-9A-F]{4})|\bl([0-9a-f]{4})h\b", t):
                     v = int(next(y for y in x if y), 16)
                     if a - 2 <= v < f:
                         ctx = "; ".join("%04x %s" % z for z in fl[max(0, k - 2):k + 4])

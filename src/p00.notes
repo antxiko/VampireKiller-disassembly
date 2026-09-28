@@ -996,6 +996,7 @@ C 0x5A98 lee la FASE (0 el patio, 1-18)
 C 0x5AA0 lee el bloque de tres fases (0-5)
 C 0x5AA7 hl_mas_a: HL += A
 C 0x5AF2 hl_mas_a: HL += A
+C 0x5B1E apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x5B52 lee la FASE (0 el patio, 1-18)
 C 0x5BCF lee la HABITACION dentro de la fase
 C 0x5BDA lee la FASE (0 el patio, 1-18)

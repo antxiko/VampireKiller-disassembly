@@ -329,6 +329,177 @@ C 0x8664 lejos
 C 0x8666 0x20 de alto mas
 C 0x866D la distancia en y
 C 0x866F carry: delante de Simon
+B 0x8671 LOS BLOQUES QUE SE ROMPEN. La lista de 0xC470 (ocho de 16 bytes, que monta p00:5B1E con la lista de la habitacion) son los bloques que se pueden romper: [estado][y][x][roto][tamano (1 pequeno, 3 grande)][...][golpes]. Al romperse se borran del mapa de la habitacion (0x873A copia celdas vacias de 0xE480 o 0xE4A0), saltan dos cascotes (0xC5A6) y, si guardaba algo, sale (0x898A).
+C 0x8671 ocho, y C cuenta cual es
+C 0x8674 los bloques que se rompen
+C 0x867A IX = el bloque
+C 0x867C su estado
+C 0x867F puesto: a mirarlo
+C 0x8684 el numero de bloque
+C 0x8686 el siguiente, 16 bytes mas alla
+C 0x868C estado 2: roto
+C 0x868F su y
+C 0x8691 su x
+C 0x8693 ya estaba roto?
+C 0x8695 si: a quitar lo que quede
+C 0x8699 su tamano
+C 0x869C sus golpes...
+C 0x869D ... uno mas
+C 0x869E el estado de antes era 1?
+C 0x86A3 el tamano
+C 0x86A6 borra el bloque del mapa
+C 0x86AB pequeno?
+C 0x86B3 los golpes...
+C 0x86B4 ... cada cuatro...
+C 0x86B6 ... se mira
+C 0x86B8 pequeno?
+C 0x86BA grande: nada
+C 0x86BC que sale de un bloque pequeno: 0...
+C 0x86C0 ... o 2
+C 0x86C2 el bit 3 de los golpes
+C 0x86C6 uno mas
+C 0x86C7 crea lo que salga
+C 0x86CA B = el tamano
+C 0x86CE en el primer bloque de fases...
+C 0x86CF ... los dibujos de 0x8792
+C 0x86D4 ... y en los demas, los de 0x87A6
+C 0x86D8 pequeno: 2 x 2 dibujos
+C 0x86DF grande: 4 x 4
+C 0x86E2 desde el cuarto
+C 0x86ED pinta el bloque roto
+C 0x86F1 su celda en el mapa
+C 0x86F7 y la pone en el mapa de la habitacion
+C 0x86FD el bit 0 de 0xC702...
+C 0x8701 ... si no, nada
+C 0x8702 un marco de color 0x0E alrededor
+C 0x8707 el bit 0 de 0xC702...
+C 0x870B ... si no, nada
+C 0x870C los ocho bloques
+C 0x8714 roto?
+C 0x871A su y
+C 0x871C su x
+C 0x871F su tamano
+C 0x8720 pequeno no
+C 0x8725 0x10 x 0x10...
+C 0x872A ... o 0x20 x 0x20
+C 0x872D su marco
+C 0x8732 el siguiente
+C 0x8734 16 bytes mas alla
+C 0x873A grande?
+C 0x873C las celdas vacias de un bloque grande
+C 0x8741 las de uno pequeno
+C 0x8746 la celda del bloque en el mapa
+C 0x874B cuatro bytes...
+C 0x874E ... por bloque
+C 0x8751 2 x 2 celdas
+C 0x8759 la celda
+C 0x875E dieciseis bytes...
+C 0x8763 ... por bloque
+C 0x8766 4 x 4 celdas
+C 0x876C una fila de C celdas
+C 0x8774 la fila siguiente del mapa, 32 mas alla
+C 0x8779 B filas
+C 0x877C pinta C x B dibujos de la lista de HL
+C 0x877F el dibujo
+C 0x8781 a la pantalla
+C 0x8784 la posicion siguiente
+C 0x8787 C por fila
+C 0x878A la fila siguiente, 8 puntos mas abajo
+C 0x878F B filas
+C 0x87BA fuera del todo
+C 0x87BD y la cosa que llevaba, borrada
+C 0x87C1 su tamano
+C 0x87C3 B
+C 0x87C4 pequeno?
+C 0x87C9 las celdas vacias del pequeno
+C 0x87CC y su marca, a cero
+C 0x87D2 el grande:
+C 0x87D6 efecto 0x0E (se rompe)
+C 0x87DD el tamano 2?
+C 0x87E1 las celdas de 4 x 4
+C 0x87E4 al mapa
+C 0x87E9 las de 2 x 2
+C 0x87EC al mapa
+C 0x87F2 0x1F?
+C 0x87F6 0x18?
+C 0x87FA la marca, a cero
+C 0x87FF sale algo?
+C 0x8806 3...
+C 0x880A ... 0x10 mas abajo
+C 0x880E lo que sale
+C 0x8811 y los cascotes
+C 0x8820 los dos bits altos...
+C 0x8822 ... a uno?
+C 0x8827 no: los cinco de abajo
+C 0x882A 0x10 mas abajo
+C 0x882E sale una cosa
+C 0x8831 si: los bits 2-5
+C 0x8836 B
+C 0x8838 los dos de abajo
+C 0x883A C
+C 0x883B sale lo otro
+C 0x8847 sale lo de HL
+C 0x884A las celdas vacias de 2 x 2
+C 0x884F cuatro bytes por...
+C 0x8855 2 x 2
+C 0x8858 a la pantalla
+C 0x885E las de 4 x 4
+C 0x8863 dieciseis bytes por...
+C 0x886B 4 x 4
+C 0x886E a la pantalla
+C 0x887A la marca del bloque, a cero
+C 0x887D las celdas de 2 x 2
+C 0x8884 su celda
+C 0x8890 2 x 2
+C 0x8893 al mapa
+C 0x8899 las de 4 x 4
+C 0x88A0 su celda
+C 0x88AE 4 x 4
+C 0x88B1 al mapa
+C 0x88B7 una fila de C bytes
+C 0x88BF la fila siguiente, 32 mas alla
+C 0x88C4 B filas
+C 0x88C7 los dos cascotes de 0xC5A6
+C 0x88CA el primero con el tipo 1 (a la derecha)
+C 0x88CD tipo
+C 0x88CF y
+C 0x88D1 x
+C 0x88D3 el segundo, 0x84 (bit 7: a la izquierda)
+C 0x88D5 dos
+C 0x88D8 mueve los dos cascotes
+C 0x88DF su tipo
+C 0x88E2 no hay
+C 0x88E4 lo mueve
+C 0x88E7 y lo pinta
+C 0x88EB el siguiente, 3 bytes mas alla
+C 0x88F2 el tipo sin el bit del lado
+C 0x88F7 su x
+C 0x88F8 a la izquierda?
+C 0x88FC a la derecha, 2 por cuadro
+C 0x88FE se salio
+C 0x8903 a la izquierda, 2 por cuadro
+C 0x8905 se salio
+C 0x890A el paso de la caida...
+C 0x890C ... en la curva de 0x892A
+C 0x8912 lo que baja
+C 0x8913 un paso mas
+C 0x8914 el 0 del final?
+C 0x8917 se queda en el ultimo paso...
+C 0x8918 ... y cae de 10 en 10
+C 0x891B a la y
+C 0x891D se salio por abajo?
+C 0x8922 fuera:
+C 0x8923 y fuera de la pantalla
+C 0x8926 el tipo a cero
+C 0x893B los dos cascotes a sprites
+C 0x893E en la tabla de sprites de 0xD628
+C 0x8941 dos
+C 0x8945 cada uno, dos sprites
+C 0x8948 el patron 0xE0
+C 0x894B y y x
+C 0x894F el patron
+C 0x8952 el segundo, 0xE4
+C 0x8958 el siguiente cascote
 
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
@@ -343,7 +514,7 @@ D 0x830D 0x8318 once_valores  once bytes, uno por tipo de cosa (desde el 1), que
 F 0x830D 16
 D 0x8792 0x87BA dos_tablas_de_veinte  dos tablas de 20 bytes que elige p02:86CB: la de 0x8792 en el primer bloque de fases (0xD002 = 0) y la de 0x87A6 en los demas
 F 0x8792 16
-D 0x892A 0x893B curva_sin_usar  17 desplazamientos (-6, -4, ... +6 y un 0) con forma de curva de salto que no nombra ninguna instruccion; su direccion no aparece como palabra en el cartucho
+D 0x892A 0x893B curva_de_los_cascotes  la caida de los dos cascotes que saltan al romper un bloque (0xC5A6, tres bytes cada uno): p02:890C lee desde 0x8928 + su tipo + 1 (el 1 o el 4) y p02:8913 sube el paso hasta dar con el 0 final; desde ahi cae de 10 en 10 (p02:8918). El listado escribe esa base como `l8928h` porque 0x8928 cae dentro de codigo
 F 0x892A 16
 D 0x8CBD 0x8CC1 cuatro_valores_por_cuadro  cuatro bytes que p02:8C9E elige con los dos bits bajos del contador de cuadros (0xC003)
 F 0x8CBD 16
@@ -371,7 +542,7 @@ D 0x9874 0x9890 dibujo_de_8x7  28 bytes, 8 x 7 puntos a 4 bits, que p02:9865 man
 F 0x9874 16
 D 0x98AC 0x98E5 tres_bytes_por_fase  19 registros de tres bytes, uno por fase, que p02:9859 indexa con fase * 3
 F 0x98AC 16
-D 0x9B34 0x9B60 tabla_sin_usar  44 bytes (0x00, 0x10, 0x18, 0x20) que no nombra ninguna instruccion; su direccion no aparece como palabra en el cartucho
+D 0x9B34 0x9B60 altura_de_lo_que_suelta  un byte por tipo de cosa (1-44): cuanto mas arriba de ella sale lo que suelta al morir; p02:9B25 lee desde 0x9B33 + el tipo de 0xCFF0 y p02:9B2E se lo resta a su y antes de crear la cosa 0x26. El listado escribe la base como `l9b33h` porque 0x9B33 es un `ret`
 F 0x9B34 16
 D 0x9C59 0x9C5D cuatro_valores_por_cuadro_2  cuatro bytes que p02:9C1E elige con los dos bits bajos del contador de cuadros; son los mismos cuatro que 0x8CBD
 F 0x9C59 16
@@ -524,13 +695,8 @@ C 0x8634 apunta a los usos que le quedan a lo que para golpes
 C 0x866A lee la Y de Simon
 C 0x86CB lee el bloque de tres fases (0-5)
 C 0x86E4 hl_mas_a: HL += A
-C 0x86F1 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x8746 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x874E de_mas_a: DE += A
-C 0x8759 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x8763 de_mas_a: DE += A
+C 0x870F apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x8776 hl_mas_a: HL += A
-C 0x87BD el tipo de la cosa = 0x00
 C 0x87D8 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x87EF lee la x de la cosa
 C 0x8803 lee la fraccion de la x de la cosa
@@ -543,11 +709,10 @@ C 0x8852 hl_mas_a: HL += A
 C 0x8868 hl_mas_a: HL += A
 C 0x8874 lee la velocidad vertical (parte baja)
 C 0x8877 lee la velocidad vertical
-C 0x8884 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x888C de_mas_a: DE += A
-C 0x88A0 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x88AA de_mas_a: DE += A
 C 0x88C1 de_mas_a: DE += A
+C 0x88DA apunta a los dos cascotes (tres bytes cada uno)
 C 0x890F de_mas_a: DE += A
 C 0x8987 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x8A2D lee el arma que lleva Simon (0, ninguna)
@@ -669,6 +834,7 @@ C 0x95E8 lee la FASE (0 el patio, 1-18)
 C 0x95EE hl_mas_a: HL += A
 C 0x960C lee la FASE (0 el patio, 1-18)
 C 0x9627 lee la HABITACION dentro de la fase
+C 0x9630 apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x9673 hl_mas_a: HL += A
 C 0x967A lee la FASE (0 el patio, 1-18)
 C 0x9680 palabra_de_la_tabla: DE = la palabra A de la tabla de DE

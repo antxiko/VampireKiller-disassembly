@@ -144,6 +144,8 @@ RAM = {
     0xC42C: ("el lado al que mira Simon (0 derecha)", "p02:8186: con la cosa a su derecha, 0 es mirarla; p01:6402 lo saca del bit 0 de la tabla de salida"),
     0xC42E: ("la pose de arriba de Simon", "p01:785C elige por ella en 0x7985"),
     0xC42F: ("la pose de abajo de Simon", "p01:787E elige por ella en 0x79D5"),
+    0xC470: ("los bloques que se rompen (ocho de 16 bytes)", "p02:868C los rompe y los borra del mapa; los pone p00:5B1E"),
+    0xC5A6: ("los dos cascotes (tres bytes cada uno)", "p02:88C7 los lanza al romperse un bloque"),
     0xC5AC: ("el estado de la puerta de la fase", "p13:BB5D lo pone a 4 o a 0xFF"),
     0xC5AD: ("donde esta la puerta de la fase", "p13:BB52"),
     0xC5B2: ("el paso a otra habitacion", "p13:BBBA"),
