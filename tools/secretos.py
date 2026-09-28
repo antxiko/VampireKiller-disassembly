@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+"""Lo que cada habitacion esconde, leido de la lista del banco 14 y pintado
+como lo pinta el juego.
+
+  p14:8000  seis punteros, uno por bloque de tres fases, a su lista, que
+            p00:5A67 copia a 0xE000: 0xFE pasa a la habitacion siguiente,
+            0xFF a la fase siguiente y 0x00 acaba; el patio tiene la suya en
+            0x800C. Cada entrada son dos bytes -y otro mas si el segundo es
+            0x7F- y p00:5B1B (con 0xD001 y la fila de 0x5C04) la recorre al
+            entrar:
+    byte 1    la posicion: la y en el nibble alto, la x en el bajo, por 16
+              (p00:5C16).
+    byte 2    los bits 7-5 dicen que es:
+      000     un OBJETO a la vista, del tipo de los bits 0-4 (p00:5B88 ->
+              p02:89FD: la lista de 0xC500). No siempre esta: 0xCF38 lo
+              impide.
+      001     una VELA: al romperla sale lo de los bits 0-4 (p00:5B5A, tamano
+              0 en la lista de 0xC470; en el patio, tamano 1: la antorcha).
+      010/011 un BLOQUE que se rompe, pequeno (2 x 2 dibujos) o grande
+              (4 x 4), con lo de los bits 0-4 dentro; 0x1F es que lo dice el
+              tercer byte.
+      10x     un COFRE (p02:8A13: el objeto 0x19) con lo de los bits 0-4.
+      11x     una PUERTA cerrada (p02:9179, dos por habitacion en 0xC5B5 y
+              0xC5C5): la abre el objeto que dicen los bits 5-2 en la tabla
+              de 0x5B0B, y los bits 1-0 son su clase.
+  p02:8CC1  los objetos se pintan con LMMM y transparencia desde la pagina 1:
+            el dibujo A -el tipo menos uno- esta en la fila 0x50 (los dieciseis
+            primeros) o en la 0x60, columna A * 16. Las velas, que no son
+            objetos, salen de la fila 0x70: dos dibujos que se turnan (y la
+            antorcha del patio, el cuarto).
+  p02:86CA  los bloques se pintan con los dibujos de 0x8792 (bloque de fases
+            0) o 0x87A6: cuatro para el pequeno y dieciseis para el grande.
+  p02:924C  las puertas cerradas, 32 x 32 de la pagina 1 (96, 0xA0), con
+            transparencia.
+  p13:BB37  LA PUERTA DE LA FASE: tres bytes por fase en 0xBB61 -la habitacion
+            (bit 7: cerrada), la y y la x- y, cuando se entra en esa habitacion,
+            p00:53FC la pinta desde la ROM: seis piezas de 8x8 (0x5421) en
+            columna, por HMMC.
+
+Uso:  secretos.py <fase>       lista lo que esconde cada habitacion
+"""
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from graficos import (Cartucho, B123, B111213, cuantas_habitaciones,  # noqa: E402
+                      PAGINA_1, ANCHO_DE_LINEA)
+
+B14 = (1, 14, 15)
+LISTAS_DE_CADA_BLOQUE = 0x8000       # banco 14
+LISTA_DEL_PATIO = 0x800C             # banco 14, la fase 0
+DIECISEIS_VALORES = 0x5B0B           # banco 0: lo que abre cada puerta
+DIBUJOS_DE_LOS_BLOQUES = {0: 0x8792, 1: 0x87A6}   # banco 2, p02:86CF
+FILA_DE_LOS_OBJETOS = (0x50, 0x60)   # p02:8CC1
+FILA_DE_LAS_VELAS = 0x70
+COLUMNA_DE_LA_ANTORCHA = 48          # el cuarto dibujo de la fila 0x70
+PUERTA_CERRADA = (96, 0xA0)          # p02:925E con A = 3
+TIPO_DEL_COFRE = 0x19
+PUERTA_DE_CADA_FASE = 0xBB61         # banco 13
+PIEZAS_DE_LA_PUERTA = 0x5421         # banco 0, seis punteros
+
+
+def bloque_de(fase):
+    return (fase - 1) // 3 if fase else 0
+
+
+def _entradas(cart, a):
+    """Las entradas de una lista desde `a`: [[(b1, b2, b3)...] por
+    habitacion], por fase."""
+    fases, hab, ent = [], [], []
+    while True:
+        b = cart.leer(a, B14)
+        a += 1
+        if b == 0x00:
+            hab.append(ent)
+            fases.append(hab)
+            return fases
+        if b == 0xFE:
+            hab.append(ent)
+            ent = []
+        elif b == 0xFF:
+            hab.append(ent)
+            fases.append(hab)
+            hab, ent = [], []
+        else:
+            b2 = cart.leer(a, B14)
+            a += 1
+            b3 = None
+            if b2 == 0x7F:                    # p00:5A67: solo con 0x7F hay tercer byte
+                b3 = cart.leer(a, B14)
+                a += 1
+            ent.append((b, b2, b3))
+
+
+def lista_del_bloque(cart, bloque):
+    return _entradas(cart, cart.palabra(LISTAS_DE_CADA_BLOQUE + 2 * bloque, B14))
+
+
+def decodifica(cart, b1, b2, b3):
+    """Una entrada, como diccionario."""
+    x, y = (b1 & 0x0F) * 16, b1 & 0xF0
+    clase, bajo = b2 >> 5, b2 & 0x1F
+    e = dict(x=x, y=y, bytes=(b1, b2, b3))
+    if clase == 0:
+        e.update(que="objeto", tipo=bajo)
+    elif clase == 1:
+        e.update(que="vela", contenido=bajo)
+    elif clase in (2, 3):
+        e.update(que="bloque", tamano=clase, contenido=b3 if bajo == 0x1F else bajo)
+    elif clase in (4, 5):
+        e.update(que="cofre", contenido=bajo)
+    else:
+        e.update(que="puerta", llave=cart.leer(DIECISEIS_VALORES + ((b2 >> 2) & 0x0F), B123),
+                 clase=b2 & 3)
+    return e
+
+
+def secretos(cart, fase, habitacion):
+    """Lo que esconde una habitacion: lista de entradas decodificadas."""
+    if fase == 0:
+        lista = _entradas(cart, LISTA_DEL_PATIO)[0]
+    else:
+        lista = lista_del_bloque(cart, bloque_de(fase))[(fase - 1) % 3]
+    if habitacion >= len(lista):
+        return []
+    return [decodifica(cart, *e) for e in lista[habitacion]]
+
+
+def puerta_de_la_fase(cart, fase):
+    """p13:BB37: (habitacion, cerrada, x, y) de la puerta de salida."""
+    q = PUERTA_DE_CADA_FASE + 3 * fase
+    b = cart.leer(q, B111213)
+    return b & 0x0F, bool(b & 0x80), cart.leer(q + 2, B111213), cart.leer(q + 1, B111213)
+
+
+# ------------------------------------------------------------ pintar
+def _lmmm(vram, x0, y0, x, y, ancho, alto):
+    """p00:49DB con TIMP: de la pagina 1 a la 0, el color 0 no se copia."""
+    for j in range(alto):
+        for i in range(ancho):
+            c = vram.punto(1, x0 + i, y0 + j)
+            if c:
+                vram.pon_punto(0, x + i, y + j, c)
+
+
+def pinta_objeto(vram, tipo, x, y):
+    """p02:8CC1: el dibujo `tipo - 1`, 16 x 16."""
+    a = tipo - 1
+    if a < 16:
+        _lmmm(vram, a * 16, FILA_DE_LOS_OBJETOS[0], x, y, 16, 16)
+    else:
+        _lmmm(vram, (a - 16) * 16, FILA_DE_LOS_OBJETOS[1], x, y, 16, 16)
+
+
+def pinta_vela(vram, x, y, paso=0, antorcha=False):
+    """Dos dibujos que se turnan: el 0 y el 1 de la fila 0x70 para la vela, el
+    2 y el 3 para la antorcha del patio."""
+    x0 = (COLUMNA_DE_LA_ANTORCHA - 16 + 16 * paso) if antorcha else 16 * paso
+    _lmmm(vram, x0, FILA_DE_LAS_VELAS, x, y, 16, 16)
+
+
+def pinta_bloque(cart, vram, fase, tamano, x, y):
+    """p02:86CA: 2 x 2 o 4 x 4 dibujos del decorado, copiados con HMMM."""
+    t = DIBUJOS_DE_LOS_BLOQUES[0 if bloque_de(fase) == 0 else 1]
+    n = 2 if tamano == 2 else 4
+    if n == 4:
+        t += 4
+    for f in range(n):
+        for c in range(n):
+            k = cart.leer(t + n * f + c, B123)
+            x0, y0 = (k & 0x1F) * 8, (k >> 5) * 8
+            for j in range(8):
+                for i in range(8):
+                    vram.pon_punto(0, x + 8 * c + i, y + 8 * f + j, vram.punto(1, x0 + i, y0 + j))
+
+
+def pinta_puerta(vram, x, y):
+    _lmmm(vram, PUERTA_CERRADA[0], PUERTA_CERRADA[1], x, y, 32, 32)
+
+
+def pinta_puerta_de_la_fase(cart, vram, fase, habitacion):
+    """p00:53FC: las seis piezas en columna, si la puerta esta en esta
+    habitacion. Devuelve si la ha pintado."""
+    hab, cerrada, x, y = puerta_de_la_fase(cart, fase)
+    if hab != habitacion or not cerrada:
+        return False
+    for k in range(6):
+        a = cart.palabra(PIEZAS_DE_LA_PUERTA + 2 * k, B123)
+        for j in range(8):
+            for i in range(4):
+                b = cart.leer(a + 4 * j + i, B123)
+                vram.pon_punto(0, x + 2 * i, y + 8 * k + j, b >> 4)
+                vram.pon_punto(0, x + 2 * i + 1, y + 8 * k + j, b & 0x0F)
+    return True
+
+
+def pinta_secretos(cart, vram, fase, habitacion, paso_de_las_velas=0, con_objetos=True):
+    """Todo lo de la habitacion sobre la pantalla ya montada. Devuelve la
+    lista."""
+    lista = secretos(cart, fase, habitacion)
+    for e in lista:
+        if e["que"] == "objeto" and con_objetos:
+            pinta_objeto(vram, e["tipo"], e["x"], e["y"])
+        elif e["que"] == "vela":
+            pinta_vela(vram, e["x"], e["y"], paso_de_las_velas, antorcha=fase == 0)
+        elif e["que"] == "bloque":
+            pinta_bloque(cart, vram, fase, e["tamano"], e["x"], e["y"])
+        elif e["que"] == "cofre":
+            pinta_objeto(vram, TIPO_DEL_COFRE, e["x"], e["y"])
+        elif e["que"] == "puerta":
+            pinta_puerta(vram, e["x"], e["y"])
+    pinta_puerta_de_la_fase(cart, vram, fase, habitacion)
+    return lista
+
+
+def main():
+    cart = Cartucho()
+    fase = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    print("puerta de la fase:", puerta_de_la_fase(cart, fase))
+    for h in range(cuantas_habitaciones(cart, fase)):
+        print("fase %d habitacion %d:" % (fase, h))
+        for e in secretos(cart, fase, h):
+            print("   ", e)
+
+
+if __name__ == "__main__":
+    main()
