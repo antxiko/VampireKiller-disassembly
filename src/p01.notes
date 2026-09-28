@@ -1370,6 +1370,183 @@ C 0x7D1E ... la 0x0C?
 C 0x7D21 o encima...
 C 0x7D29 ... y 8 a la izquierda
 
+C 0x7D2F CELDA DEL MAPA de (E = y, D = x): la fila, (y - 0x10) / 8...
+C 0x7D37 ... por 32...
+C 0x7D3F ... mas la columna, x / 8...
+C 0x7D49 ... en el mapa de 0xD100
+C 0x7D4D A = la celda...
+C 0x7D4F ... y 0 pasado 0xD400
+L 0x7D57 celda_dentro
+C 0x7D58 (la misma cuenta otra vez)
+L 0x7D65 celda_leida
+L 0x7D66 celda_fin
+B 0x7D68 LOS CHOQUES, cada cuadro (p00:5C6E), mientras no se sale de la habitacion: los enemigos y lo que lanzan contra Simon, los objetos que coge, y el latigo (contra enemigos, lo que lanzan y los bloques) o, con un arma que se lanza, una espera en su lugar; y luego las armas y lo demas de p02.
+L 0x7D68 los_choques
+C 0x7D68 saliendo de la habitacion: nada
+C 0x7D6D los enemigos tocan a Simon...
+C 0x7D70 ... lo que lanzan tambien...
+C 0x7D73 ... los objetos...
+C 0x7D79 con el latigo...
+C 0x7D80 ... contra los enemigos...
+C 0x7D83 ... contra lo que lanzan...
+C 0x7D86 ... y contra los bloques
+L 0x7D8B espera_en_vez_del_latigo
+L 0x7D8E los_choques_de_p02
+C 0x7D91 las armas contra lo que lanzan
+L 0x7DA0 una_espera
+C 0x7DA0 0x64 vueltas...
+L 0x7DA2 espera_de_4
+C 0x7DA3 ... de cuatro
+L 0x7DA5 espera_vuelta
+B 0x7DAD EL LATIGO CONTRA LOS ENEMIGOS, con el latigo extendido (0xC422 = 3): a cada uno que se puede golpear (bit 0 de su byte 0x0E), si le alcanza (p02:827C), el efecto 0x0C y un golpe por latigazo; los jefes (0x11-0x17) por 0x7DFF; los demas pierden 1 de vida (2 con el latigo de cadena) y al acabarla dan sus puntos y se van.
+L 0x7DAD latigo_contra_los_enemigos
+C 0x7DAD el latigo extendido?
+C 0x7DB3 las siete de 0xC800
+L 0x7DB9 latigo_contra_uno
+C 0x7DB9 puesta?
+C 0x7DBF se puede golpear (bit 0)?
+C 0x7DC6 le alcanza el latigo?
+L 0x7DCC latigo_siguiente
+C 0x7DCC la siguiente, 0x80 bytes mas
+L 0x7DD4 latigazo
+C 0x7DD4 el efecto 0x0C
+C 0x7DD9 uno por latigazo
+C 0x7DDD un jefe (0x11-0x17)?
+L 0x7DE6 quita_vida
+C 0x7DE6 con el de cadena...
+C 0x7DEC ... uno mas
+C 0x7DEF uno menos
+C 0x7DF4 aun con vida (sin pasar de cero)?
+L 0x7DF9 muere_el_enemigo
+C 0x7DF9 sus puntos...
+C 0x7DFC ... y se va
+L 0x7DFF latigo_contra_un_jefe
+C 0x7DFF el 0x12 fuera de su sala...
+C 0x7E06 ... es un enemigo mas
+L 0x7E0C quita_vida_al_jefe
+C 0x7E0C la barra ENEMY baja
+C 0x7E0F vacia (o pasada)?
+L 0x7E17 cae_el_jefe
+C 0x7E17 0x14 cuadros en 0xC445...
+C 0x7E1C ... el efecto 0x1C...
+C 0x7E21 ... sus puntos...
+C 0x7E24 ... el jefe caido (0xCE15)...
+C 0x7E29 ... y mueren las cosas
+B 0x7E2C LO QUE QUITA EL LATIGO A UN JEFE: por el tipo (0x11-0x17), de 0x7E59 con el de cuero o el arma 2, o de 0x7E60 con las demas; al 0x17, con un arma que se lanza, la cuarta parte.
+L 0x7E2C golpe_al_jefe
+C 0x7E2C con el de cuero...
+C 0x7E35 ... o la daga, 0x7E59
+C 0x7E39 las demas, 0x7E60
+L 0x7E3C golpe_del_tipo
+C 0x7E3C por el tipo, desde 0x11
+C 0x7E46 el 0x17...
+C 0x7E4B ... con un arma que se lanza...
+C 0x7E52 ... la cuarta parte
+L 0x7E56 a_la_barra
+C 0x7E56 menos vida al enemigo
+B 0x7E67 LOS ENEMIGOS TOCAN A SIMON (salvo con el respiro, invencible o del estado 5 en adelante; con el anillo, 0xC434, siempre): a cada uno que toca (bit 1 de su byte 0x0E, p02:8290), el corazon (0x24) y lo que sueltan (0x26) se cogen, la bola (0x22) acaba la fase (0xCE11), y los demas, con el anillo mueren (efecto 0x0D) y sin el golpean a Simon (estado 5, desde su lado, y el dano de p02:816C).
+L 0x7E67 tocan_a_simon
+C 0x7E67 con el anillo, siempre
+C 0x7E6D con el respiro...
+C 0x7E72 ... invencible...
+C 0x7E77 ... o golpeado o muerto: no
+L 0x7E7D tocan_los_enemigos
+C 0x7E7D las siete de 0xC800
+L 0x7E83 toca_uno
+C 0x7E83 puesta?
+C 0x7E89 puede tocar (bit 1)?
+C 0x7E91 toca a Simon?
+C 0x7E97 el corazon...
+C 0x7E9F ... y lo que sueltan: se cogen
+C 0x7EA4 la bola...
+C 0x7EA8 ... cogida (0xCE11)
+L 0x7EB0 toca_un_enemigo
+C 0x7EB0 con el anillo...
+C 0x7EB6 ... sus puntos...
+C 0x7EB9 ... se va...
+C 0x7EBC ... y el efecto 0x0D
+L 0x7EC1 simon_golpeado_por
+C 0x7EC1 golpeado: estado 5...
+C 0x7ECA ... sin latigo
+C 0x7ECD el lado: al contrario de hacia donde va la cosa
+C 0x7ED9 el dano
+L 0x7EDC toca_siguiente
+L 0x7EE4 lo_que_lanzan_toca_a_simon
+C 0x7EE4 con el anillo, siempre
+C 0x7EEA con el respiro...
+C 0x7EEF ... invencible...
+C 0x7EF4 ... o golpeado o muerto: no
+L 0x7EFA toca_lo_lanzado
+C 0x7EFA las ocho de 0xD700
+L 0x7F00 toca_uno_lanzado
+C 0x7F01 puesta y no una llama (0x0C)?
+C 0x7F0B toca a Simon?
+C 0x7F10 se borra
+C 0x7F14 con el anillo: 100 puntos
+C 0x7F1B si no, golpeado...
+C 0x7F27 ... desde su lado...
+C 0x7F33 ... uno de vida (dos, el tipo 9)
+L 0x7F30 lado_del_golpe
+L 0x7F3D quita_la_vida
+L 0x7F40 toca_lanzado_siguiente
+L 0x7F49 latigo_contra_lo_que_lanzan
+C 0x7F49 el latigo extendido?
+C 0x7F4F las ocho de 0xD700
+L 0x7F55 latigo_contra_un_lanzado
+C 0x7F56 puesta y no una llama?
+C 0x7F60 le alcanza?
+C 0x7F65 el efecto 0x0C...
+C 0x7F6A ... 100 puntos...
+C 0x7F6D ... y se vuelve llama
+L 0x7F70 latigo_lanzado_siguiente
+L 0x7F79 armas_contra_lo_que_lanzan
+C 0x7F79 hay un arma lanzada?
+C 0x7F82 las ocho de 0xD700
+L 0x7F88 arma_contra_un_lanzado
+C 0x7F88 puesta y no una llama?
+C 0x7F93 le da un arma (IY)?
+C 0x7F99 el efecto 0x0C
+C 0x7F9E la daga se gasta
+C 0x7FA9 100 puntos...
+C 0x7FAC ... y se vuelve llama
+L 0x7FAF arma_lanzado_siguiente
+B 0x7FB7 EL LATIGO CONTRA LOS BLOQUES que se rompen (0xC470), con el latigo extendido: a cada uno que alcanza (p02:8450), un golpe mas (byte 3) y el efecto 0x0C.
+L 0x7FB7 latigo_contra_los_bloques
+C 0x7FB7 el latigo extendido?
+C 0x7FBD los ocho de 0xC470
+L 0x7FC2 latigo_contra_un_bloque
+C 0x7FC2 puesto?
+C 0x7FC8 le alcanza?
+C 0x7FCF un golpe mas (byte 3)
+C 0x7FD6 el efecto 0x0C
+L 0x7FDB bloque_siguiente
+C 0x7FDB el siguiente, 16 bytes mas
+B 0x7FE2 SIMON COGE LOS OBJETOS (0xC500), sin estar golpeando: los que tiene delante (p02:8230) pasan de paso (sigue en el banco 2).
+L 0x7FE2 coge_los_objetos
+C 0x7FE2 golpeando: no
+C 0x7FE7 los ocho de 0xC500
+L 0x7FEC coge_uno
+C 0x7FEE a la vista (bit 7)?
+C 0x7FF3 lo toca?
+C 0x7FF9 el paso siguiente (byte 3)
+L 0x6B24 simon_lo_demas
+C 0x6B24 los bordes...
+C 0x6B27 ... las cuentas...
+C 0x6B2A ... la invencibilidad...
+C 0x6B2D ... el reloj...
+C 0x6B30 ... 0xC445...
+C 0x6B33 ... el destello del borde...
+C 0x6B36 ... y las poses con escudo
+C 0x75B7 8 en las 16 lineas del primero...
+C 0x75BA ... y 0 en las del segundo
+C 0x7851 la y...
+C 0x7852 ... a 0xE0...
+C 0x7853 ... cuatro bytes mas alla
+
+C 0x7DA5 un push y un pop...
+C 0x7DA7 ... cuatro veces: solo gastan tiempo
+C 0x7DAA (se hace en lugar de los choques del latigo)
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
 F 0x6058 16
@@ -1768,37 +1945,12 @@ C 0x7CF9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa 
 C 0x7D1B celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7D23 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x7D45 hl_mas_a: HL += A
-C 0x7D68 lee el lado por el que se sale de la habitacion
-C 0x7D79 lee el arma que lleva Simon (0, ninguna)
-C 0x7DB9 lee el tipo de la cosa
 C 0x7DD6 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7DDD lee el tipo de la cosa
-C 0x7DE6 lee el arma que lleva Simon (0, ninguna)
-C 0x7DEC baja la vida de la cosa
-C 0x7DEF baja la vida de la cosa
-C 0x7DF4 lee la vida de la cosa
-C 0x7DFF lee el tipo de la cosa
-C 0x7E0F lee la vida del enemigo (barra ENEMY)
 C 0x7E1E sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7E2F lee el arma que lleva Simon (0, ninguna)
-C 0x7E3C lee el tipo de la cosa
 C 0x7E42 hl_mas_a: HL += A
-C 0x7E4B lee el arma que lleva Simon (0, ninguna)
-C 0x7E72 lee la cuenta de la INVENCIBILIDAD
-C 0x7E83 lee el tipo de la cosa
-C 0x7E97 lee el tipo de la cosa
 C 0x7EBE sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7ECD lee la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x7EEF lee la cuenta de la INVENCIBILIDAD
-C 0x7F01 lee el tipo de la cosa
-C 0x7F10 borra_la_cosa: tipo a cero y sus sprites libres
-C 0x7F27 lee la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x7F33 lee el tipo de la cosa
-C 0x7F56 lee el tipo de la cosa
 C 0x7F67 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7F88 lee el tipo de la cosa
 C 0x7F9B sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7FBD apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x7FD8 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7FE7 apunta a los objetos que salen (ocho de 16 bytes)
 # --- fin de las anotaciones de anota.py ---

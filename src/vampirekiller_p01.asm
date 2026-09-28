@@ -1533,20 +1533,20 @@ L_6B0C:
 	call el_estado_de_simon		;6b0f
 	ld a,(0c5ach)		;6b12   ; la puerta de la fase...
 	cp 002h		;6b15
-	jr z,L_6B24		;6b17
+	jr z,simon_lo_demas		;6b17
 	cp 003h		;6b19
-	jr z,L_6B24		;6b1b
+	jr z,simon_lo_demas		;6b1b
 	cp 005h		;6b1d
-	jr z,L_6B24		;6b1f
+	jr z,simon_lo_demas		;6b1f
 	call latigo_y_armas		;6b21   ; ... si no esta abriendose
-L_6B24:
-	call los_bordes		;6b24
-	call cuentas_de_simon		;6b27
-	call cuenta_de_la_invencibilidad		;6b2a
-	call cuenta_del_reloj		;6b2d
-	call cuenta_de_0xc445		;6b30
-	call destello_del_borde		;6b33
-	jp poses_con_escudo		;6b36
+simon_lo_demas:
+	call los_bordes		;6b24   ; los bordes...
+	call cuentas_de_simon		;6b27   ; ... las cuentas...
+	call cuenta_de_la_invencibilidad		;6b2a   ; ... la invencibilidad...
+	call cuenta_del_reloj		;6b2d   ; ... el reloj...
+	call cuenta_de_0xc445		;6b30   ; ... 0xC445...
+	call destello_del_borde		;6b33   ; ... el destello del borde...
+	jp poses_con_escudo		;6b36   ; ... y las poses con escudo
 
 ; ----------------------------------------------------------------------
 ; LOS ESTADOS DE SIMON (0xC420, subestado en 0xC421): 0 de pie o andando, 1 saltando, 2 agachado, 3 en la escalera, 4 cayendo, 5-7 los de 0x6F85, 0x7093 y 0x70FB.
@@ -3140,9 +3140,9 @@ colores_2_y_0x4c:
 	ld de,0d490h		;75b2
 	ld b,010h		;75b5
 colores_del_frasco:
-	ld (hl),008h		;75b7
+	ld (hl),008h		;75b7   ; 8 en las 16 lineas del primero...
 	xor a			;75b9
-	ld (de),a			;75ba
+	ld (de),a			;75ba   ; ... y 0 en las del segundo
 	inc hl			;75bb
 	inc de			;75bc
 	djnz colores_del_frasco		;75bd
@@ -3572,9 +3572,9 @@ sprites_de_simon:
 fuera_desde_el_4:
 	ld a,0e0h		;784f
 un_sprite_fuera:
-	ld (de),a			;7851
-	inc de			;7852
-	inc de			;7853
+	ld (de),a			;7851   ; la y...
+	inc de			;7852   ; ... a 0xE0...
+	inc de			;7853   ; ... cuatro bytes mas alla
 	inc de			;7854
 	inc de			;7855
 	djnz un_sprite_fuera		;7856
@@ -4222,177 +4222,189 @@ celda_0x0c:
 	xor a			;7d2d
 	ret			;7d2e
 celda_del_mapa:
-	ld a,e			;7d2f
+	ld a,e			;7d2f   ; CELDA DEL MAPA de (E = y, D = x): la fila, (y - 0x10) / 8...
 	sub 010h		;7d30
 	and 0f8h		;7d32
 	rrca			;7d34
 	rrca			;7d35
 	rrca			;7d36
-	add a,a			;7d37
+	add a,a			;7d37   ; ... por 32...
 	add a,a			;7d38
 	add a,a			;7d39
 	ld h,000h		;7d3a
 	ld l,a			;7d3c
 	add hl,hl			;7d3d
 	add hl,hl			;7d3e
-	ld a,d			;7d3f
+	ld a,d			;7d3f   ; ... mas la columna, x / 8...
 	and 0f8h		;7d40
 	rrca			;7d42
 	rrca			;7d43
 	rrca			;7d44
 	call 04061h		;7d45   ; hl_mas_a: HL += A
 	push de			;7d48
-	ld de,0d100h		;7d49
+	ld de,0d100h		;7d49   ; ... en el mapa de 0xD100
 	add hl,de			;7d4c
-	ld a,(hl)			;7d4d
+	ld a,(hl)			;7d4d   ; A = la celda...
 	ld e,a			;7d4e
-	ld a,h			;7d4f
+	ld a,h			;7d4f   ; ... y 0 pasado 0xD400
 	cp 0d4h		;7d50
 	ld a,000h		;7d52
-	jr nc,L_7D57		;7d54
+	jr nc,celda_dentro		;7d54
 	ld a,e			;7d56
-L_7D57:
+celda_dentro:
 	ld e,a			;7d57
-	ld a,h			;7d58
+	ld a,h			;7d58   ; (la misma cuenta otra vez)
 	ld a,0d4h		;7d59
 	inc a			;7d5b
 	cp h			;7d5c
-	jr nc,L_7D65		;7d5d
+	jr nc,celda_leida		;7d5d
 	cp 000h		;7d5f
 	ld a,000h		;7d61
-	jr c,L_7D66		;7d63
-L_7D65:
+	jr c,celda_fin		;7d63
+celda_leida:
 	ld a,e			;7d65
-L_7D66:
+celda_fin:
 	pop de			;7d66
 	ret			;7d67
-L_7D68:
-	ld a,(0c41bh)		;7d68   ; lee el lado por el que se sale de la habitacion
+
+; ----------------------------------------------------------------------
+; LOS CHOQUES, cada cuadro (p00:5C6E), mientras no se sale de la habitacion: los enemigos y lo que lanzan contra Simon, los objetos que coge, y el latigo (contra enemigos, lo que lanzan y los bloques) o, con un arma que se lanza, una espera en su lugar; y luego las armas y lo demas de p02.
+; ----------------------------------------------------------------------
+los_choques:
+	ld a,(0c41bh)		;7d68   ; saliendo de la habitacion: nada
 	and a			;7d6b
 	ret nz			;7d6c
-	call L_7E67		;7d6d
-	call L_7EE4		;7d70
-	call L_7FE2		;7d73
+	call tocan_a_simon		;7d6d   ; los enemigos tocan a Simon...
+	call lo_que_lanzan_toca_a_simon		;7d70   ; ... lo que lanzan tambien...
+	call coge_los_objetos		;7d73   ; ... los objetos...
 	call 085a6h		;7d76
-	ld a,(0c416h)		;7d79   ; lee el arma que lleva Simon (0, ninguna)
+	ld a,(0c416h)		;7d79   ; con el latigo...
 	cp 002h		;7d7c
-	jr nc,L_7D8B		;7d7e
-	call L_7DAD		;7d80
-	call L_7F49		;7d83
-	call L_7FB7		;7d86
-	jr L_7D8E		;7d89
-L_7D8B:
-	call L_7DA0		;7d8b
-L_7D8E:
+	jr nc,espera_en_vez_del_latigo		;7d7e
+	call latigo_contra_los_enemigos		;7d80   ; ... contra los enemigos...
+	call latigo_contra_lo_que_lanzan		;7d83   ; ... contra lo que lanzan...
+	call latigo_contra_los_bloques		;7d86   ; ... y contra los bloques
+	jr los_choques_de_p02		;7d89
+espera_en_vez_del_latigo:
+	call una_espera		;7d8b
+los_choques_de_p02:
 	call 0801eh		;7d8e
-	call L_7F79		;7d91
+	call armas_contra_lo_que_lanzan		;7d91   ; las armas contra lo que lanzan
 	call 080a6h		;7d94
 	call 080dch		;7d97
 	call 0811bh		;7d9a
 	jp 08610h		;7d9d
-L_7DA0:
-	ld b,064h		;7da0
-L_7DA2:
+una_espera:
+	ld b,064h		;7da0   ; 0x64 vueltas...
+espera_de_4:
 	push bc			;7da2
-	ld b,004h		;7da3
-L_7DA5:
-	push bc			;7da5
+	ld b,004h		;7da3   ; ... de cuatro
+espera_vuelta:
+	push bc			;7da5   ; un push y un pop...
 	pop bc			;7da6
-	djnz L_7DA5		;7da7
+	djnz espera_vuelta		;7da7   ; ... cuatro veces: solo gastan tiempo
 	pop bc			;7da9
-	djnz L_7DA2		;7daa
+	djnz espera_de_4		;7daa   ; (se hace en lugar de los choques del latigo)
 	ret			;7dac
-L_7DAD:
-	ld a,(0c422h)		;7dad
+
+; ----------------------------------------------------------------------
+; EL LATIGO CONTRA LOS ENEMIGOS, con el latigo extendido (0xC422 = 3): a cada uno que se puede golpear (bit 0 de su byte 0x0E), si le alcanza (p02:827C), el efecto 0x0C y un golpe por latigazo; los jefes (0x11-0x17) por 0x7DFF; los demas pierden 1 de vida (2 con el latigo de cadena) y al acabarla dan sus puntos y se van.
+; ----------------------------------------------------------------------
+latigo_contra_los_enemigos:
+	ld a,(0c422h)		;7dad   ; el latigo extendido?
 	cp 003h		;7db0
 	ret nz			;7db2
-	ld ix,0c800h		;7db3
+	ld ix,0c800h		;7db3   ; las siete de 0xC800
 	ld b,007h		;7db7
-L_7DB9:
-	ld a,(ix+000h)		;7db9   ; lee el tipo de la cosa
+latigo_contra_uno:
+	ld a,(ix+000h)		;7db9   ; puesta?
 	and a			;7dbc
-	jr z,L_7DCC		;7dbd
-	ld a,(ix+00eh)		;7dbf
+	jr z,latigo_siguiente		;7dbd
+	ld a,(ix+00eh)		;7dbf   ; se puede golpear (bit 0)?
 	rra			;7dc2
-	jr nc,L_7DCC		;7dc3
+	jr nc,latigo_siguiente		;7dc3
 	push bc			;7dc5
-	call 0827ch		;7dc6
+	call 0827ch		;7dc6   ; le alcanza el latigo?
 	pop bc			;7dc9
-	jr c,L_7DD4		;7dca
-L_7DCC:
-	ld de,00080h		;7dcc
+	jr c,latigazo		;7dca
+latigo_siguiente:
+	ld de,00080h		;7dcc   ; la siguiente, 0x80 bytes mas
 	add ix,de		;7dcf
-	djnz L_7DB9		;7dd1
+	djnz latigo_contra_uno		;7dd1
 	ret			;7dd3
-L_7DD4:
-	ld a,00ch		;7dd4
+latigazo:
+	ld a,00ch		;7dd4   ; el efecto 0x0C
 	call 0509fh		;7dd6   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	res 0,(ix+00eh)		;7dd9
-	ld a,(ix+000h)		;7ddd   ; lee el tipo de la cosa
+	res 0,(ix+00eh)		;7dd9   ; uno por latigazo
+	ld a,(ix+000h)		;7ddd   ; un jefe (0x11-0x17)?
 	sub 011h		;7de0
 	cp 007h		;7de2
-	jr c,L_7DFF		;7de4
-L_7DE6:
-	ld a,(0c416h)		;7de6   ; lee el arma que lleva Simon (0, ninguna)
+	jr c,latigo_contra_un_jefe		;7de4
+quita_vida:
+	ld a,(0c416h)		;7de6   ; con el de cadena...
 	and a			;7de9
 	jr z,L_7DEF		;7dea
-	dec (ix+00dh)		;7dec   ; baja la vida de la cosa
+	dec (ix+00dh)		;7dec   ; ... uno mas
 L_7DEF:
-	dec (ix+00dh)		;7def   ; baja la vida de la cosa
-	jr z,L_7DF9		;7df2
-	ld a,(ix+00dh)		;7df4   ; lee la vida de la cosa
+	dec (ix+00dh)		;7def   ; uno menos
+	jr z,muere_el_enemigo		;7df2
+	ld a,(ix+00dh)		;7df4   ; aun con vida (sin pasar de cero)?
 	rla			;7df7
 	ret nc			;7df8
-L_7DF9:
-	call 081abh		;7df9
-	jp 09a3eh		;7dfc
-L_7DFF:
-	ld a,(ix+000h)		;7dff   ; lee el tipo de la cosa
+muere_el_enemigo:
+	call 081abh		;7df9   ; sus puntos...
+	jp 09a3eh		;7dfc   ; ... y se va
+latigo_contra_un_jefe:
+	ld a,(ix+000h)		;7dff   ; el 0x12 fuera de su sala...
 	cp 012h		;7e02
-	jr nz,L_7E0C		;7e04
-	ld a,(0ce00h)		;7e06
+	jr nz,quita_vida_al_jefe		;7e04
+	ld a,(0ce00h)		;7e06   ; ... es un enemigo mas
 	and a			;7e09
-	jr z,L_7DE6		;7e0a
-L_7E0C:
-	call L_7E2C		;7e0c
-	ld a,(0c418h)		;7e0f   ; lee la vida del enemigo (barra ENEMY)
+	jr z,quita_vida		;7e0a
+quita_vida_al_jefe:
+	call golpe_al_jefe		;7e0c   ; la barra ENEMY baja
+	ld a,(0c418h)		;7e0f   ; vacia (o pasada)?
 	and a			;7e12
-	jr z,L_7E17		;7e13
+	jr z,cae_el_jefe		;7e13
 	rla			;7e15
 	ret nc			;7e16
-L_7E17:
-	ld a,014h		;7e17
+cae_el_jefe:
+	ld a,014h		;7e17   ; 0x14 cuadros en 0xC445...
 	ld (0c445h),a		;7e19
-	ld a,01ch		;7e1c
+	ld a,01ch		;7e1c   ; ... el efecto 0x1C...
 	call 0509fh		;7e1e   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	call 081abh		;7e21
-	ld a,001h		;7e24
+	call 081abh		;7e21   ; ... sus puntos...
+	ld a,001h		;7e24   ; ... el jefe caido (0xCE15)...
 	ld (0ce15h),a		;7e26
-	jp mueren_las_cosas		;7e29
-L_7E2C:
-	ld hl,07e59h		;7e2c
+	jp mueren_las_cosas		;7e29   ; ... y mueren las cosas
+
+; ----------------------------------------------------------------------
+; LO QUE QUITA EL LATIGO A UN JEFE: por el tipo (0x11-0x17), de 0x7E59 con el de cuero o el arma 2, o de 0x7E60 con las demas; al 0x17, con un arma que se lanza, la cuarta parte.
+; ----------------------------------------------------------------------
+golpe_al_jefe:
+	ld hl,07e59h		;7e2c   ; con el de cuero...
 	ld a,(0c416h)		;7e2f   ; lee el arma que lleva Simon (0, ninguna)
 	and a			;7e32
-	jr z,L_7E3C		;7e33
-	cp 002h		;7e35
-	jr z,L_7E3C		;7e37
-	ld hl,07e60h		;7e39
-L_7E3C:
-	ld a,(ix+000h)		;7e3c   ; lee el tipo de la cosa
+	jr z,golpe_del_tipo		;7e33
+	cp 002h		;7e35   ; ... o la daga, 0x7E59
+	jr z,golpe_del_tipo		;7e37
+	ld hl,07e60h		;7e39   ; las demas, 0x7E60
+golpe_del_tipo:
+	ld a,(ix+000h)		;7e3c   ; por el tipo, desde 0x11
 	ld c,a			;7e3f
 	sub 011h		;7e40
 	call 04061h		;7e42   ; hl_mas_a: HL += A
 	ld b,(hl)			;7e45
-	ld a,c			;7e46
+	ld a,c			;7e46   ; el 0x17...
 	cp 017h		;7e47
-	jr nz,L_7E56		;7e49
-	ld a,(0c416h)		;7e4b   ; lee el arma que lleva Simon (0, ninguna)
+	jr nz,a_la_barra		;7e49
+	ld a,(0c416h)		;7e4b   ; ... con un arma que se lanza...
 	cp 002h		;7e4e
-	jr c,L_7E56		;7e50
-	srl b		;7e52
+	jr c,a_la_barra		;7e50
+	srl b		;7e52   ; ... la cuarta parte
 	srl b		;7e54
-L_7E56:
-	jp 0463ch		;7e56
+a_la_barra:
+	jp 0463ch		;7e56   ; menos vida al enemigo
 
 ; ----------------------------------------------------------------------
 ; DATOS dos_tablas_de_siete: dos tablas de siete bytes que p01:7E2C (o 7E39,
@@ -4406,231 +4418,243 @@ DATA_dos_tablas_de_siete:
 ; ======================================================================
 
 
-L_7E67:
-	ld a,(0c434h)		;7e67
+
+; ----------------------------------------------------------------------
+; LOS ENEMIGOS TOCAN A SIMON (salvo con el respiro, invencible o del estado 5 en adelante; con el anillo, 0xC434, siempre): a cada uno que toca (bit 1 de su byte 0x0E, p02:8290), el corazon (0x24) y lo que sueltan (0x26) se cogen, la bola (0x22) acaba la fase (0xCE11), y los demas, con el anillo mueren (efecto 0x0D) y sin el golpean a Simon (estado 5, desde su lado, y el dano de p02:816C).
+; ----------------------------------------------------------------------
+tocan_a_simon:
+	ld a,(0c434h)		;7e67   ; con el anillo, siempre
 	and a			;7e6a
-	jr nz,L_7E7D		;7e6b
-	ld a,(0c42dh)		;7e6d
+	jr nz,tocan_los_enemigos		;7e6b
+	ld a,(0c42dh)		;7e6d   ; con el respiro...
 	and a			;7e70
 	ret nz			;7e71
-	ld a,(0c43ah)		;7e72   ; lee la cuenta de la INVENCIBILIDAD
+	ld a,(0c43ah)		;7e72   ; ... invencible...
 	and a			;7e75
 	ret nz			;7e76
-	ld a,(0c420h)		;7e77
+	ld a,(0c420h)		;7e77   ; ... o golpeado o muerto: no
 	cp 005h		;7e7a
 	ret nc			;7e7c
-L_7E7D:
-	ld ix,0c800h		;7e7d
+tocan_los_enemigos:
+	ld ix,0c800h		;7e7d   ; las siete de 0xC800
 	ld b,007h		;7e81
-L_7E83:
-	ld a,(ix+000h)		;7e83   ; lee el tipo de la cosa
+toca_uno:
+	ld a,(ix+000h)		;7e83   ; puesta?
 	and a			;7e86
-	jr z,L_7EDC		;7e87
-	ld a,(ix+00eh)		;7e89
+	jr z,toca_siguiente		;7e87
+	ld a,(ix+00eh)		;7e89   ; puede tocar (bit 1)?
 	rra			;7e8c
 	rra			;7e8d
-	jr nc,L_7EDC		;7e8e
+	jr nc,toca_siguiente		;7e8e
 	push bc			;7e90
-	call 08290h		;7e91
+	call 08290h		;7e91   ; toca a Simon?
 	pop bc			;7e94
-	jr nc,L_7EDC		;7e95
-	ld a,(ix+000h)		;7e97   ; lee el tipo de la cosa
+	jr nc,toca_siguiente		;7e95
+	ld a,(ix+000h)		;7e97   ; el corazon...
 	cp 024h		;7e9a
 	jp z,09a3eh		;7e9c
-	cp 026h		;7e9f
+	cp 026h		;7e9f   ; ... y lo que sueltan: se cogen
 	jp z,09a3eh		;7ea1
-	cp 022h		;7ea4
-	jr nz,L_7EB0		;7ea6
-	ld a,001h		;7ea8
+	cp 022h		;7ea4   ; la bola...
+	jr nz,toca_un_enemigo		;7ea6
+	ld a,001h		;7ea8   ; ... cogida (0xCE11)
 	ld (0ce11h),a		;7eaa
 	jp 09a3eh		;7ead
-L_7EB0:
-	ld a,(0c434h)		;7eb0
+toca_un_enemigo:
+	ld a,(0c434h)		;7eb0   ; con el anillo...
 	and a			;7eb3
-	jr z,L_7EC1		;7eb4
-	call 081abh		;7eb6
-	call 09a3eh		;7eb9
-	ld a,00dh		;7ebc
+	jr z,simon_golpeado_por		;7eb4
+	call 081abh		;7eb6   ; ... sus puntos...
+	call 09a3eh		;7eb9   ; ... se va...
+	ld a,00dh		;7ebc   ; ... y el efecto 0x0D
 	jp 0509fh		;7ebe   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7EC1:
-	ld a,005h		;7ec1
+simon_golpeado_por:
+	ld a,005h		;7ec1   ; golpeado: estado 5...
 	ld (0c420h),a		;7ec3
 	xor a			;7ec6
 	ld (0c423h),a		;7ec7
-	ld (0c422h),a		;7eca
-	ld a,(ix+00ah)		;7ecd   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld (0c422h),a		;7eca   ; ... sin latigo
+	ld a,(ix+00ah)		;7ecd   ; el lado: al contrario de hacia donde va la cosa
 	rla			;7ed0
 	ld a,001h		;7ed1
 	jr nc,L_7ED6		;7ed3
 	xor a			;7ed5
 L_7ED6:
 	ld (0c43ch),a		;7ed6
-	jp 0816ch		;7ed9
-L_7EDC:
+	jp 0816ch		;7ed9   ; el dano
+toca_siguiente:
 	ld de,00080h		;7edc
 	add ix,de		;7edf
-	djnz L_7E83		;7ee1
+	djnz toca_uno		;7ee1
 	ret			;7ee3
-L_7EE4:
-	ld a,(0c434h)		;7ee4
+lo_que_lanzan_toca_a_simon:
+	ld a,(0c434h)		;7ee4   ; con el anillo, siempre
 	and a			;7ee7
-	jr nz,L_7EFA		;7ee8
-	ld a,(0c42dh)		;7eea
+	jr nz,toca_lo_lanzado		;7ee8
+	ld a,(0c42dh)		;7eea   ; con el respiro...
 	and a			;7eed
 	ret nz			;7eee
-	ld a,(0c43ah)		;7eef   ; lee la cuenta de la INVENCIBILIDAD
+	ld a,(0c43ah)		;7eef   ; ... invencible...
 	and a			;7ef2
 	ret nz			;7ef3
-	ld a,(0c420h)		;7ef4
+	ld a,(0c420h)		;7ef4   ; ... o golpeado o muerto: no
 	cp 005h		;7ef7
 	ret nc			;7ef9
-L_7EFA:
-	ld ix,0d700h		;7efa
+toca_lo_lanzado:
+	ld ix,0d700h		;7efa   ; las ocho de 0xD700
 	ld b,008h		;7efe
-L_7F00:
+toca_uno_lanzado:
 	push bc			;7f00
-	ld a,(ix+000h)		;7f01   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;7f01   ; puesta y no una llama (0x0C)?
 	and a			;7f04
-	jr z,L_7F40		;7f05
+	jr z,toca_lanzado_siguiente		;7f05
 	cp 00ch		;7f07
-	jr z,L_7F40		;7f09
-	call 0824ch		;7f0b
-	jr nc,L_7F40		;7f0e
-	call 099f6h		;7f10   ; borra_la_cosa: tipo a cero y sus sprites libres
+	jr z,toca_lanzado_siguiente		;7f09
+	call 0824ch		;7f0b   ; toca a Simon?
+	jr nc,toca_lanzado_siguiente		;7f0e
+	call 099f6h		;7f10   ; se borra
 	pop bc			;7f13
-	ld a,(0c434h)		;7f14
+	ld a,(0c434h)		;7f14   ; con el anillo: 100 puntos
 	and a			;7f17
 	jp nz,0822ah		;7f18
-	ld a,005h		;7f1b
+	ld a,005h		;7f1b   ; si no, golpeado...
 	ld (0c420h),a		;7f1d
 	xor a			;7f20
 	ld (0c423h),a		;7f21
 	ld (0c422h),a		;7f24
-	ld a,(ix+00ah)		;7f27   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld a,(ix+00ah)		;7f27   ; ... desde su lado...
 	rla			;7f2a
 	ld a,001h		;7f2b
-	jr nc,L_7F30		;7f2d
+	jr nc,lado_del_golpe		;7f2d
 	xor a			;7f2f
-L_7F30:
+lado_del_golpe:
 	ld (0c43ch),a		;7f30
-	ld a,(ix+000h)		;7f33   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;7f33   ; ... uno de vida (dos, el tipo 9)
 	cp 009h		;7f36
 	ld b,001h		;7f38
-	jr nz,L_7F3D		;7f3a
+	jr nz,quita_la_vida		;7f3a
 	inc b			;7f3c
-L_7F3D:
+quita_la_vida:
 	jp 0462bh		;7f3d
-L_7F40:
+toca_lanzado_siguiente:
 	pop bc			;7f40
 	ld de,00080h		;7f41
 	add ix,de		;7f44
-	djnz L_7F00		;7f46
+	djnz toca_uno_lanzado		;7f46
 	ret			;7f48
-L_7F49:
-	ld a,(0c422h)		;7f49
+latigo_contra_lo_que_lanzan:
+	ld a,(0c422h)		;7f49   ; el latigo extendido?
 	cp 003h		;7f4c
 	ret nz			;7f4e
-	ld ix,0d700h		;7f4f
+	ld ix,0d700h		;7f4f   ; las ocho de 0xD700
 	ld b,008h		;7f53
-L_7F55:
+latigo_contra_un_lanzado:
 	push bc			;7f55
-	ld a,(ix+000h)		;7f56   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;7f56   ; puesta y no una llama?
 	and a			;7f59
-	jr z,L_7F70		;7f5a
+	jr z,latigo_lanzado_siguiente		;7f5a
 	cp 00ch		;7f5c
-	jr z,L_7F70		;7f5e
-	call 08270h		;7f60
-	jr nc,L_7F70		;7f63
-	ld a,00ch		;7f65
+	jr z,latigo_lanzado_siguiente		;7f5e
+	call 08270h		;7f60   ; le alcanza?
+	jr nc,latigo_lanzado_siguiente		;7f63
+	ld a,00ch		;7f65   ; el efecto 0x0C...
 	call 0509fh		;7f67   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	call 0822ah		;7f6a
-	call 09a1ah		;7f6d
-L_7F70:
+	call 0822ah		;7f6a   ; ... 100 puntos...
+	call 09a1ah		;7f6d   ; ... y se vuelve llama
+latigo_lanzado_siguiente:
 	pop bc			;7f70
 	ld de,00080h		;7f71
 	add ix,de		;7f74
-	djnz L_7F55		;7f76
+	djnz latigo_contra_un_lanzado		;7f76
 	ret			;7f78
-L_7F79:
-	ld a,(0c450h)		;7f79
+armas_contra_lo_que_lanzan:
+	ld a,(0c450h)		;7f79   ; hay un arma lanzada?
 	ld b,a			;7f7c
 	ld a,(0c460h)		;7f7d
 	or b			;7f80
 	ret z			;7f81
-	ld ix,0d700h		;7f82
+	ld ix,0d700h		;7f82   ; las ocho de 0xD700
 	ld b,008h		;7f86
-L_7F88:
-	ld a,(ix+000h)		;7f88   ; lee el tipo de la cosa
+arma_contra_un_lanzado:
+	ld a,(ix+000h)		;7f88   ; puesta y no una llama?
 	and a			;7f8b
-	jr z,L_7FAF		;7f8c
+	jr z,arma_lanzado_siguiente		;7f8c
 	cp 00ch		;7f8e
-	jr z,L_7FAF		;7f90
+	jr z,arma_lanzado_siguiente		;7f90
 	push bc			;7f92
-	call 08258h		;7f93
+	call 08258h		;7f93   ; le da un arma (IY)?
 	pop bc			;7f96
-	jr nc,L_7FAF		;7f97
-	ld a,00ch		;7f99
+	jr nc,arma_lanzado_siguiente		;7f97
+	ld a,00ch		;7f99   ; el efecto 0x0C
 	call 0509fh		;7f9b   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,(iy+001h)		;7f9e
+	ld a,(iy+001h)		;7f9e   ; la daga se gasta
 	cp 002h		;7fa1
 	push iy		;7fa3
 	pop hl			;7fa5
 	call z,quita_la_ficha		;7fa6
-	call 0822ah		;7fa9
-	jp 09a1ah		;7fac
-L_7FAF:
+	call 0822ah		;7fa9   ; 100 puntos...
+	jp 09a1ah		;7fac   ; ... y se vuelve llama
+arma_lanzado_siguiente:
 	ld de,00080h		;7faf
 	add ix,de		;7fb2
-	djnz L_7F88		;7fb4
+	djnz arma_contra_un_lanzado		;7fb4
 	ret			;7fb6
-L_7FB7:
-	ld a,(0c422h)		;7fb7
+
+; ----------------------------------------------------------------------
+; EL LATIGO CONTRA LOS BLOQUES que se rompen (0xC470), con el latigo extendido: a cada uno que alcanza (p02:8450), un golpe mas (byte 3) y el efecto 0x0C.
+; ----------------------------------------------------------------------
+latigo_contra_los_bloques:
+	ld a,(0c422h)		;7fb7   ; el latigo extendido?
 	cp 003h		;7fba
 	ret nz			;7fbc
-	ld hl,0c470h		;7fbd   ; apunta a los bloques que se rompen (ocho de 16 bytes)
+	ld hl,0c470h		;7fbd   ; los ocho de 0xC470
 	ld b,008h		;7fc0
-L_7FC2:
-	ld a,(hl)			;7fc2
+latigo_contra_un_bloque:
+	ld a,(hl)			;7fc2   ; puesto?
 	and a			;7fc3
-	jr z,L_7FDB		;7fc4
+	jr z,bloque_siguiente		;7fc4
 	push hl			;7fc6
 	push bc			;7fc7
-	call 08450h		;7fc8
+	call 08450h		;7fc8   ; le alcanza?
 	pop bc			;7fcb
 	pop hl			;7fcc
-	jr nc,L_7FDB		;7fcd
-	inc l			;7fcf
+	jr nc,bloque_siguiente		;7fcd
+	inc l			;7fcf   ; un golpe mas (byte 3)
 	inc l			;7fd0
 	inc l			;7fd1
 	inc (hl)			;7fd2
 	dec l			;7fd3
 	dec l			;7fd4
 	dec l			;7fd5
-	ld a,00ch		;7fd6
+	ld a,00ch		;7fd6   ; el efecto 0x0C
 	call 0509fh		;7fd8   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7FDB:
-	ld a,010h		;7fdb
+bloque_siguiente:
+	ld a,010h		;7fdb   ; el siguiente, 16 bytes mas
 	add a,l			;7fdd
 	ld l,a			;7fde
-	djnz L_7FC2		;7fdf
+	djnz latigo_contra_un_bloque		;7fdf
 	ret			;7fe1
-L_7FE2:
-	ld a,(0c422h)		;7fe2
+
+; ----------------------------------------------------------------------
+; SIMON COGE LOS OBJETOS (0xC500), sin estar golpeando: los que tiene delante (p02:8230) pasan de paso (sigue en el banco 2).
+; ----------------------------------------------------------------------
+coge_los_objetos:
+	ld a,(0c422h)		;7fe2   ; golpeando: no
 	and a			;7fe5
 	ret nz			;7fe6
-	ld hl,0c500h		;7fe7   ; apunta a los objetos que salen (ocho de 16 bytes)
+	ld hl,0c500h		;7fe7   ; los ocho de 0xC500
 	ld b,008h		;7fea
-L_7FEC:
+coge_uno:
 	push bc			;7fec
 	push hl			;7fed
-	ld a,(hl)			;7fee
+	ld a,(hl)			;7fee   ; a la vista (bit 7)?
 	rla			;7fef
 	jr nc,$+37		;7ff0
 	push hl			;7ff2
-	call 08230h		;7ff3
+	call 08230h		;7ff3   ; lo toca?
 	pop hl			;7ff6
 	jr nc,$+30		;7ff7
-	inc l			;7ff9
+	inc l			;7ff9   ; el paso siguiente (byte 3)
 	inc l			;7ffa
 	inc l			;7ffb
 	inc (hl)			;7ffc
