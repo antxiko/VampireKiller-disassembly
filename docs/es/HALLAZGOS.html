@@ -1,0 +1,108 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hallazgos — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html" style=color:var(--tinta)>Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../FINDINGS.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="hallazgos">Hallazgos</h1>
+<p>Lo que apareció al desmontar el cartucho. Cada cosa lleva la dirección donde se puede comprobar.</p>
+<h2 id="las-puertas-cerradas-son-vendedores-y-no-siempre-venden">Las puertas cerradas son vendedores, y no siempre venden</h2>
+<p>Las 16 puertas blancas del castillo, y otros 17 secretos escondidos en bloques, son <b>33 vendedores</b> (p02:9179). Cada uno vende una cosa (tabla 0x5B0B), pero lo que pasa al entrar depende de su <b>clase</b> (dos bits del secreto) y de <b>cuántas veces se le ha visitado</b>: la tabla 0x9300 da ocho visitas por clase (p02:92BB). Un vendedor de clase 3 no abre la tienda hasta la quinta visita; uno de clase 2 puede quitar cinco corazones; todos se van en la octava. La tabla entera está en <a href="EL-JUEGO.html#los-vendedores">El juego</a>.</p>
+<h2 id="un-vendedor-puede-subir-la-dificultad-por-encima-del-final">Un vendedor puede subir la dificultad por encima del final</h2>
+<p>La «vuelta», 0xD012, acorta las esperas de los enemigos y afina su puntería (p03:A0E5, p03:A35A, p03:A65A). El final del juego la sube de una en una <b>hasta 2</b> (p01:6701: <code>cp 3</code> / <code>jr nc</code>). Los vendedores de clase 1, en la cuarta visita, la suben <b>hasta 3</b> (p02:9333: <code>cp 3</code> / <code>ret z</code> / <code>inc</code>). Con siete vendedores de clase 1 en el castillo, una partida puede llegar a una vuelta que el final nunca da. Está leído en el código; qué pasa con la vuelta 3 no se ha probado en el emulador.</p>
+<h2 id="dracula-es-un-sprite-y-un-dibujo-del-vdp">Drácula es un sprite y un dibujo del VDP</h2>
+<p>La cabeza de Drácula es un sprite, pero el cuerpo no cabe: el cartucho guarda el fondo en la página 1 (0x80, 0x80) y copia el cuerpo desde la página 1 a la pantalla con LMMM y transparencia (p03:AD80, p03:AD93). Cuando cambia de dibujo, 0x5C se pinta <b>encima</b> de 0x5B sin devolver el fondo. Cotejado a cero en los cuatro dibujos (<code>coteja.py dracula</code>).</p>
+<h2 id="la-sala-de-dracula-sale-con-una-fila-corrida">La sala de Drácula sale con una fila corrida</h2>
+<p>Los dibujos volteados de la sala del retrato pasan por p00:5969, que los escribe en RAM fila a fila <b>hacia atrás</b> desde 0xE818, de cuatro en cuatro. La fila 0 cae en 0xE818 y la 7 en 0xE7FC, fuera del dibujo: lo que se sube son las filas 6 a 0 y, abajo, los cuatro bytes que ya había en 0xE81C. El juego lo pinta así, y <code>tools/graficos.py</code> lo reproduce así; con eso, la sala coteja a cero.</p>
+<h2 id="un-dibujo-que-sale-de-la-ram">Un dibujo que sale de la RAM</h2>
+<p>p00:54E4 sube 640 bytes de dibujos desde 0xBDC8. El cartucho acaba en 0xBFFF: los últimos <b>0x48 bytes se leen de 0xC000 en adelante, que es la RAM</b>. Van a la página 1 de la VRAM (x 64-79, filas 0x77-0x7F), en el quinto dibujo de esa tanda. No salen de la ROM, así que el cotejo los excluye.</p>
+<h2 id="con-un-game-master-otra-pausa-y-un-menu">Con un Game Master, otra pausa y un menú</h2>
+<p>La pausa normal es F1 (el estado 0x0B). Pero el cartucho busca además en las cuatro ranuras la firma del <em>Konami&#x27;s Game Master</em> (p00:5C92, en 0x7FFA) y guarda en 0xE600 si está. Solo con él:</p>
+<ul><li>STOP congela el juego <b>desde la interrupción</b>, sonido incluido (p00:40C5), y con eso puesto la tecla <code>;</code> avanza <b>un cuadro</b>;</li><li>tras el GAME OVER aparece <b>F5 CONTINUE</b> (p00:42EC);</li><li>desde el título se entra en su <b>menú</b> (el estado 0x0D), que elige la fase (p00:5E4B).</li></ul>
+<h2 id="lo-que-recoge-simon-casi-todo-es-un-bit">Lo que recoge Simon: casi todo es un bit</h2>
+<p>De los 25 objetos que maneja p02:8D3E (y las cinco armas, desde el 0x1A), muchos solo ponen un bit o una cuenta: el anillo (0xC434, que <b>mata al tocar</b> mientras dura), el reloj de arena, el lazo que alarga las cuentas, las botas, las alas, los libros, el bastón. Por eso sus nombres en este listado son los de <b>su dibujo</b> (fila 0x50 o 0x60 de la página 1), no los de su efecto.</p>
+<p>El pergamino (0x0F) da <b>tres usos del mapa</b> (0xC70F): con F2 se borra el sitio de juego y se pintan todas las habitaciones de la fase, Simon y una flecha a la salida (p02:9552; las teclas, en p00:4B9D).</p>
+<h2 id="dos-salidas-sin-vuelta-que-no-son-caidas">Dos salidas sin vuelta que no son caídas</h2>
+<p>De las 22 salidas de ida del castillo (0xB9D3), todas son caídas o la entrada al jefe, menos dos: la habitación 11 de la fase 13 sale por la izquierda a la 9, y la 10 de la fase 17 a la 11, y ninguna de las dos vuelve (<code>coteja.py mapa</code>).</p>
+<h2 id="el-mismo-armazon-que-otros-cartuchos-de-konami">El mismo armazón que otros cartuchos de Konami</h2>
+<p>La interrupción corre todo el juego (p00:4028, por H.TIMI: INIT deja el Z80 en un <code>jr $</code>), el despachador de 0x406B lee su tabla de destinos pegada detrás del <code>call</code>, y el banco de cada ranura se guarda en 0xF0F2 y 0xF0F3 para devolverlo tras la interrupción. Lo que cambia aquí es <b>dónde</b> va cada banco: 1, 4 y 11 siempre en 0x6000; 2, 5, 7, 9, 12 y 14 en 0x8000; y el resto en 0xA000. Ni uno solo se mapea en dos sitios (39 escrituras al mapper, <code>tools/reconocimiento.py</code>).</p>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> en Jap&oacute;n) lo public&oacute; Konami para MSX2 en 1986; su n&uacute;mero de cat&aacute;logo es RC-744 y son 128 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>

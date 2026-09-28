@@ -158,9 +158,31 @@ test:
 	@echo "=================================================================="
 	@python3 -m unittest discover -s tests -v
 
+# Las imagenes de docs/imagenes, dibujadas desde la ROM con las tablas del
+# cartucho (ninguna es una captura), y su cotejo contra los volcados de
+# openMSX de work/ (tools/lanza_*.sh los hacen, un emulador cada vez).
+imagenes: $(ROM)
+	python3 tools/titulo.py
+	python3 tools/mapa.py
+	python3 tools/simon.py
+	python3 tools/enemigos.py
+	python3 tools/dracula.py
+
+coteja: $(ROM)
+	python3 tools/coteja.py
+
+# La web: las paginas se escriben en markdown y se convierten con md2html.py;
+# la portada la monta make_web.py con lo de tools/contenido_web.py.
+web: $(ROM)
+	python3 tools/md2html.py docs en
+	python3 tools/md2html.py docs/es es
+	python3 tools/make_web.py docs/imagenes docs/index.html en
+	python3 tools/make_web.py docs/imagenes docs/es/index.html es
+	python3 tools/check_enlaces.py docs
+
 clean:
 	rm -f $(WORK)/p*.trace.json $(WORK)/p*.blocks $(WORK)/p*.out.bin \
 	      $(WORK)/vampirekiller_reensamblada.rom $(WORK)/pasmo.err
 
 .PHONY: all comprueba reconoce paginas semillas trace listado verify \
-        sanity densidad test clean
+        sanity densidad test imagenes coteja web clean

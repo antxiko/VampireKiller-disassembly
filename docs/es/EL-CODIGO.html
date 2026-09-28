@@ -1,0 +1,110 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El código — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html" style=color:var(--tinta)>El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../THE-CODE.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="el-codigo">El código</h1>
+<h2 id="todo-corre-en-la-interrupcion">Todo corre en la interrupción</h2>
+<p>INIT (0x4075) prepara la máquina, engancha H.TIMI y deja el Z80 en un <code>jr $</code>. Desde entonces todo el juego corre en <b>p00:4028</b>, una vez por cuadro:</p>
+<ol><li>la pausa del Game Master, si lo hay (p00:40C5);</li><li>el sonido, con los bancos 14 y 15 puestos;</li><li>si no se está ya dentro (el semáforo de 0xC005), la <b>máquina de estados</b>.</li></ol>
+<p>Al acabar devuelve los bancos que guardan 0xF0F2 y 0xF0F3.</p>
+<h2 id="el-despachador">El despachador</h2>
+<p>p00:406B es el despachador de Konami: la tabla de destinos va <b>pegada detrás del <code>call</code></b>. Saca de la pila la dirección de vuelta, que es la base de la tabla, y salta al destino número A. El listado marca cada una de esas tablas como datos y nombra sus destinos.</p>
+<h2 id="los-estados-del-juego">Los estados del juego</h2>
+<p>0xC000 es el estado y 0xC001 el subestado (tabla de 0x4161, p00:417D):</p>
+<table><tr><th>estado</th><th>qué es</th></tr><tr><td>0</td><td>la presentación (el telón de Konami)</td></tr><tr><td>1</td><td>el título</td></tr><tr><td>2</td><td>la demostración</td></tr><tr><td>3</td><td>empieza la partida</td></tr><tr><td>4</td><td>empieza una vida</td></tr><tr><td>5</td><td>el juego</td></tr><tr><td>6</td><td>Simon muere</td></tr><tr><td>7</td><td>GAME OVER (con F5 CONTINUE si hay Game Master)</td></tr><tr><td>8</td><td>bloque acabado, tras el jefe</td></tr><tr><td>9</td><td>cambio de habitación</td></tr><tr><td>0x0A</td><td>fase acabada (la puerta)</td></tr><tr><td>0x0B</td><td>la pausa (F1)</td></tr><tr><td>0x0C</td><td>la tienda</td></tr><tr><td>0x0D</td><td>el menú del Game Master</td></tr></table>
+<p>El subestado va en B y cada <code>djnz</code> salta al siguiente: lo primero tras el primer <code>djnz</code> es el subestado 1, y lo último, el 0.</p>
+<h2 id="simon">Simon</h2>
+<p>0xC420 es el estado de Simon (p01:6B39): 0 de pie o andando, 1 saltando, 2 agachado, 3 en la escalera, 4 cayendo, 5 golpeado (p01:6F85), 6 muere (p01:7093) y 7 se va <b>por un paso</b>: agachado encima de un paso y con el salto, Simon pasa a la habitación que dice 0xC5B4 (p01:70FB, p01:6DA9). Los choques con el decorado están en p01:7D68. El látigo y las cinco armas tienen su propia ficha (0xC450 y 0xC460).</p>
+<h2 id="una-habitacion">Una habitación</h2>
+<p>Al entrar (estado 9, p01:62F5):</p>
+<ul><li>la habitación sale de 0x6013 (banco 11) con el número de 0x6000[fase] más el de la habitación: 48 bloques;</li><li>cada bloque son 16 dibujos (0x7EBB[fase], bancos 11 a 13), y se dejan en el búfer 0xD100;</li><li>se pinta desde 0xD140 en la página 0: 22 filas de dibujos, desde la y 32;</li><li>su guion (0x9AB0) pone su paleta y sube los patrones de sus enemigos;</li><li>p00:5B1B recorre sus secretos (0xE000): las velas y los bloques pasan a 0xC470; los objetos, a 0xC500; los vendedores, a p02:9179;</li><li>se crean sus enemigos (0x8668 del banco 14, p01:6181);</li><li>p01:6321 enciende la pantalla.</li></ul>
+<h2 id="los-enemigos">Los enemigos</h2>
+<p>Cada enemigo es una ficha de la lista 0xC800. Al crearlo, p00:5F48 le pone sus sprites (0x6058 + tipo), sus colores (0x6084) y su vida (0x60E1). Cada cuadro, el código de su tipo (banco 3, por el despachador) lo mueve, y p01:6445 lo compone con la tabla de 0xB473: [dy][dx][patrón] por sprite. El dragón de huesos (0x0E) no pasa por ahí: coloca sus sprites él mismo. El tipo 0x17 no lleva sprites.</p>
+<p>Lo que lanzan va en otra lista, 0xD700 (p02:9E5C), con sus propios tipos.</p>
+<h2 id="el-sonido">El sonido</h2>
+<p>p00:509F recibe el número en A: 0 calla todo, 0x80-0xFA es una música (tres canales del PSG, tabla 0x8DC9 del banco 14: <b>16 músicas</b>) y 1-0x7F un efecto (<b>29</b>, en 0x8D8F). Un efecto solo suena si su número no es menor que el del que ya suena (0xC096 hace de prioridad). La partitura (p14:8BB4) tiene órdenes desde 0xD0: 0xDx pone el tempo, 0xE0-0xE5 la octava…</p>
+<h2 id="como-esta-hecho-el-listado">Cómo está hecho el listado</h2>
+<ul><li><code>tools/bancos.py</code> traza <b>el cartucho entero</b> llevando la cuenta de qué banco hay en cada hueco; de ahí salen las llamadas que cruzan el mapper (<code>src/pNN.entries</code>) y las tablas del despachador (<code>src/pNN.nocode</code>).</li><li><code>tools/z80trace.py</code> sigue el flujo de cada banco desde esas entradas.</li><li><code>src/pNN.notes</code> guarda las etiquetas, los comentarios y los rangos de datos, anclados a dirección; <code>tools/mkasm.py</code> los mezcla con el trazado y escribe <code>src/vampirekiller_pNN.asm</code>.</li><li><code>make verify</code> reensambla los dieciséis bancos con Pasmo y la ROM entera, y compara los sha256.</li></ul>
+<p>La densidad: <b>49,4 %</b> de las 14.502 instrucciones llevan comentario, y las 1.909 rutinas pasan todas del 10 % (<code>make densidad</code>).</p>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> en Jap&oacute;n) lo public&oacute; Konami para MSX2 en 1986; su n&uacute;mero de cat&aacute;logo es RC-744 y son 128 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>

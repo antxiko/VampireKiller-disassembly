@@ -1,0 +1,133 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The game — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html" style=color:var(--tinta)>The game</a><a href="THE-CARTRIDGE.html">The cartridge</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html">Findings</a><a href="IN-THE-EMULATOR.html">In the emulator</a><a href="OPEN-QUESTIONS.html">Open questions</a><a href="es/EL-JUEGO.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="the-game">The game</h1>
+<p>Simon Belmont walks into Dracula&#x27;s castle with a whip and has to reach him. The castle is <b>19 stages</b>: the courtyard at the gate (stage 0) and eighteen more, grouped in <b>six blocks of three</b>. Each block ends with a boss. That makes <b>156 rooms</b>, and each one is seen whole: there is no scrolling here, you go from one room to the next through the sides, the top and the bottom.</p>
+<p>Every picture on this page is <b>drawn from the bytes of the ROM</b> with the tools in <code>tools/</code>, which follow the cartridge&#x27;s own steps, and checked against openMSX dumps (MSX2, <code>C-BIOS_MSX2_EU</code>). Under each one it says which table it comes from.</p>
+<h2 id="the-title-screen">The title screen</h2>
+<p><img src="imagenes/titulo.png" alt="The European title screen"></p>
+<p>The same cartridge carries <b>two titles</b>: <em>Vampire Killer</em> and <em>悪魔城ドラキュラ</em> (<em>Akumajō Dracula</em>). It picks one by reading BIOS byte 0x002B, the one that says which country the computer is from (p00:4D9E). Both come from the cartridge and both are checked: <code>coteja.py titulo</code>, 4 dumps (curtain and title, on a European and a Japanese machine) with <b>0 bytes different</b> on screen and in the palette.</p>
+<p><img src="imagenes/titulo_japon.png" alt="The Japanese title screen"></p>
+<p>Before the title, the Konami logo is drawn on page 1 of the VRAM and p01:624C copies it to page 0 one line at a time, like a curtain.</p>
+<p><img src="imagenes/konami.png" alt="The Konami logo"></p>
+<h2 id="the-castle">The castle</h2>
+<p><img src="imagenes/castillo.png" alt="The castle&#x27;s 156 rooms"></p>
+<p>The 19 stages in place, each on its own grid. A room is <b>8 × 6 blocks of 32 × 32</b> pixels (bank 11: 156 pointers from 0x6013), and each block is 4 × 4 tiles of 8 × 8 (0x7EBB, one per stage). Of its 24 rows of tiles, 22 are drawn, from y 32 (under the status bar): the first two are never seen. The tiles are uploaded to page 1 of the VRAM when the stage starts, 191 per stage from banks 4 to 8 (table 0x5742), and the palette is built in layers: the scene&#x27;s, the base, the stage&#x27;s and the room&#x27;s (0x9AB0).</p>
+<p><b>Check</b>: <code>coteja.py habitaciones</code> compares the 156 rooms with 156 openMSX dumps, one per room: <b>0 with differences</b>. The probe (<code>tools/omsx_habitacion.tcl</code>) sets the stage and the room in RAM and dumps the VRAM when the cartridge switches the screen on.</p>
+<p>Each room&#x27;s exits are at 0xB9D3 (bank 13): one nibble per side. <code>coteja.py mapa</code> walks them all: 22 are one-way, and all of them are drops or the way into the boss except two, (13, 11) → 9 and (17, 10) → 11.</p>
+<h3 id="a-stage-with-what-it-hides">A stage, with what it hides</h3>
+<p>Each stage has its own sheet (<code>docs/imagenes/fase_00.png</code> to <code>fase_18.png</code>), with the secrets marked. This is stage 1:</p>
+<p><img src="imagenes/fase_01.png" alt="Stage 1, with its secrets"></p>
+<p>What each room hides is in a list in bank 14 (0x8000, one pointer per block of three stages). Each entry carries the position and, in the top three bits of the second byte, what it is. The whole castle has <b>620</b>:</p>
+<table><tr><th>what</th><th>how many</th><th>how it is drawn</th></tr><tr><td>candles</td><td>365</td><td>row 0x70 of page 1, two frames taking turns</td></tr><tr><td>breakable blocks</td><td>92</td><td>4 × 4 tiles from 0x8792 or 0x87A6 (p02:86CA)</td></tr><tr><td>items in plain sight</td><td>76</td><td>rows 0x50 and 0x60 of page 1, with transparency</td></tr><tr><td>chests</td><td>71</td><td>item 0x19</td></tr><tr><td>doors with a vendor</td><td>16</td><td>32 × 32 from page 1 (96, 0xA0)</td></tr></table>
+<p>What comes out of a candle or a block, or out of a chest, is in the low bits. The most common: 129 hearts, 100 big hearts, 77 keys and 21 white keys. In 52 places what comes out is <b>an enemy</b> (type 0x15: p02:8AD0 takes it from the table at 0x8AF0).</p>
+<p>Each stage&#x27;s exit door is at 0xBB61 (bank 13): room, y and x. The cartridge draws it from the ROM, six 8 × 8 pieces one under the other.</p>
+<h3 id="the-vendors">The vendors</h3>
+<p>Behind 16 doors, and inside 17 blocks, there are <b>33 vendors</b>. Each one sells one thing (0x5B0B): full life, dagger, boomerang cross, shield, flask, staff, hourglass, the candle that marks the blocks… But <b>they do not always sell</b>: what happens depends on their class (two bits of the secret) and on how many times you have visited. That is the table at 0x9300, eight visits per class (p02:92BB); from the eighth on, the last one repeats:</p>
+<table><tr><th>class</th><th>vendors</th><th>visit 1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr><tr><td>0</td><td>10</td><td>shop</td><td>+5 ♥ or nothing</td><td>+5 ♥ or nothing</td><td>+5 ♥ or nothing</td><td>−5 ♥ or nothing</td><td>−5 ♥ or nothing</td><td>nothing</td><td>leaves</td></tr><tr><td>1</td><td>7</td><td>shop</td><td>+5 ♥</td><td>+5 ♥</td><td>loop +1</td><td>nothing</td><td>nothing</td><td>nothing</td><td>leaves</td></tr><tr><td>2</td><td>6</td><td>+5 or −5 ♥</td><td>+5 or −5 ♥</td><td>shop</td><td>nothing</td><td>nothing</td><td>nothing</td><td>loop −1</td><td>leaves</td></tr><tr><td>3</td><td>10</td><td>nothing</td><td>nothing</td><td>nothing</td><td>nothing</td><td>shop</td><td>+5 ♥</td><td>nothing</td><td>leaves</td></tr></table>
+<p>Where it says &quot;or&quot;, the cartridge draws lots with the Z80&#x27;s R register. The &quot;loop&quot; is 0xD012: it shortens the enemies&#x27; waits and sharpens their aim (p03:A0E5, p03:A35A, p03:A65A).</p>
+<h2 id="simon">Simon</h2>
+<p><img src="imagenes/simon.png" alt="Simon in his five pairs of legs and body"></p>
+<p>Simon is two halves: <b>legs</b> (0xC42E) and <b>body</b> (0xC42F), each with its own 16 × 16 mode 2 sprites, coloured line by line. There are 40 leg frames and 36 body frames (tables at p01:7985 and p01:79D5), and the code combines them according to what he is doing: walking, crouching, jumping, climbing stairs, whipping.</p>
+<p><img src="imagenes/simon_poses.png" alt="Simon&#x27;s legs and bodies"></p>
+<p><b>Check</b>: <code>coteja.py simon</code>, 156 dumps, <b>0 with differences</b> (in 11 Simon is one frame further on and in 5 he still has the previous pose&#x27;s patterns: those are checked against that pose).</p>
+<h2 id="the-enemies">The enemies</h2>
+<p><img src="imagenes/enemigos.png" alt="The enemies, in their frames"></p>
+<p>One row per type. The things in each room are at 0x8668 (bank 14): type and position. When it creates one, the cartridge reads how many sprites it has (0x6058), in which colours (0x6084) and how much life (0x60E1); every frame, its drawing picks in 0xB473 (bank 6) where each sprite goes. The frames in each row are the ones seen in openMSX (250 frames per room), and each one is checked against its table: <code>coteja.py enemigos</code> gives <b>58,430 samples with their drawing</b>, 959 with another frame&#x27;s, 257 read halfway and 98 halfway through being created; <b>none unexplained</b>.</p>
+<p>The names go <b>by the drawing</b>; where the drawing does not settle it, it is described:</p>
+<table><tr><th>type</th><th>what it is</th><th>stages</th><th>life</th></tr><tr><td>0x01</td><td>purple-robed figure with its arms up</td><td>1, 2</td><td>1</td></tr><tr><td>0x02</td><td>fishman</td><td>2</td><td>1</td></tr><tr><td>0x03</td><td>hunched red creature</td><td>10</td><td>2</td></tr><tr><td>0x04</td><td>blue outline</td><td>1, 2</td><td>1</td></tr><tr><td>0x05</td><td>panther</td><td>1, 3</td><td>1</td></tr><tr><td>0x06</td><td>knight with a spear</td><td>4, 5</td><td>4</td></tr><tr><td>0x07</td><td>flying white head</td><td>6</td><td>2</td></tr><tr><td>0x08</td><td>the same, orange</td><td>4</td><td>1</td></tr><tr><td>0x09</td><td>red skeleton that falls apart</td><td>13, 14</td><td>2</td></tr><tr><td>0x0A</td><td>pillar of skulls</td><td>6, 8, 9</td><td>8</td></tr><tr><td>0x0B</td><td>skeleton</td><td>7, 8, 9, 13, 17</td><td>4</td></tr><tr><td>0x0C</td><td>bat</td><td>7, 8</td><td>1</td></tr><tr><td>0x0D</td><td>hunchback</td><td>7, 9, 11, 13, 17, 18</td><td>1</td></tr><tr><td>0x0E</td><td>bone dragon</td><td>11, 12</td><td>12</td></tr><tr><td>0x0F</td><td>eagle</td><td>11</td><td>8</td></tr><tr><td>0x10</td><td>orange knight</td><td>14, 15, 17, 18</td><td>8</td></tr><tr><td>0x1F</td><td>blue outline, with other frames</td><td>3, 4</td><td>1</td></tr><tr><td>0x20</td><td>bubbles</td><td>2, 10</td><td>1</td></tr><tr><td>0x23</td><td>hunchback the eagle brings</td><td>11</td><td>1</td></tr></table>
+<p>Type 0x21 (stage 10) has its row, but it comes out empty: see <a href="OPEN-QUESTIONS.html">Open questions</a>.</p>
+<h3 id="the-bone-dragon">The bone dragon</h3>
+<p>Type 0x0E does not use the 0xB473 table: its eight sprites are placed with tables of their own in bank 3: pattern and colour (0xAB0E), x (0xAB1E) and eight height records (0xAAAD). In the check, 1,347 samples fall on one height record and 649 between two; none unexplained.</p>
+<h2 id="the-six-bosses">The six bosses</h2>
+<table><tr><th>block</th><th>stage</th><th>boss</th><th>type</th><th>life</th></tr><tr><td>1</td><td>3</td><td>giant bat</td><td>0x12</td><td>16</td></tr><tr><td>2</td><td>6</td><td>Medusa</td><td>0x13</td><td>16</td></tr><tr><td>3</td><td>9</td><td>two mummies</td><td>0x14</td><td>16</td></tr><tr><td>4</td><td>12</td><td>Frankenstein&#x27;s monster, with a hunchback (0x18)</td><td>0x15</td><td>32</td></tr><tr><td>5</td><td>15</td><td>Death</td><td>0x16</td><td>32</td></tr><tr><td>6</td><td>18</td><td>Dracula</td><td>0x11</td><td>32</td></tr></table>
+<p>They are on the enemies sheet, each in its row. After the boss, game state 8 moves on to the next block.</p>
+<h3 id="dracula-whole">Dracula, whole</h3>
+<p><img src="imagenes/dracula.png" alt="Dracula in the portrait room, in his four standing frames"></p>
+<p>Dracula does not fit in sprites. The <b>head</b> is a sprite, but the <b>body</b> is drawn by the VDP: the cartridge saves the background at (0x80, 0x80) of page 1 and copies the body onto the screen from page 1 (x 0, 32, 64 or 96, y 0x80) with LMMM and transparency (p03:AD80, p03:AD93). <b>Check</b>: <code>coteja.py dracula</code>, 4 dumps (one per frame), 0 bytes different on screen, saved background, sprites and patterns.</p>
+<h2 id="what-they-throw">What they throw</h2>
+<p><img src="imagenes/lo_que_lanzan.png" alt="What the enemies throw"></p>
+<p>What the enemies throw goes in <b>another list</b>, the one at 0xD700, with its own type numbers (p02:9E5C; the parameters of each, at 0xA08F): fireballs (from the giant bat, the pillar of skulls, Dracula and in the monster&#x27;s room), the skeleton&#x27;s bones, Medusa&#x27;s snakes, Death&#x27;s sickles and the orange knight&#x27;s axes.</p>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> in Japan) was published by Konami for the MSX2 in 1986; its catalogue number is RC-744 and it is 128 KB. All rights in the game remain with their holders. This is preservation, study and documentation work, and the cartridge image is not distributed.</p></footer></div>

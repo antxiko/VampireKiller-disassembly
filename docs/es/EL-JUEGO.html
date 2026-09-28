@@ -1,0 +1,133 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El juego — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html" style=color:var(--tinta)>El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../THE-GAME.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="el-juego">El juego</h1>
+<p>Simon Belmont entra en el castillo de Drácula con un látigo y tiene que llegar hasta él. El castillo son <b>19 fases</b>: el patio de la entrada (la fase 0) y dieciocho más, agrupadas en <b>seis bloques de tres</b>. Cada bloque acaba con un jefe. En total, <b>156 habitaciones</b>, y cada una se ve entera: aquí no hay desplazamiento, se pasa de una habitación a otra por los lados, por arriba y por abajo.</p>
+<p>Todas las imágenes de esta página están <b>dibujadas desde los bytes de la ROM</b> con las herramientas de <code>tools/</code>, que siguen los pasos del propio cartucho, y cotejadas contra volcados de openMSX (MSX2, <code>C-BIOS_MSX2_EU</code>). Debajo de cada una se dice de qué tabla sale.</p>
+<h2 id="la-pantalla-de-titulo">La pantalla de título</h2>
+<p><img src="../imagenes/titulo.png" alt="La pantalla de título europea"></p>
+<p>El mismo cartucho lleva <b>dos títulos</b>: <em>Vampire Killer</em> y <em>悪魔城ドラキュラ</em> (<em>Akumajō Dracula</em>). Elige uno leyendo el byte 0x002B de la BIOS, el que dice de qué país es el ordenador (p00:4D9E). Los dos salen del cartucho y los dos están cotejados: <code>coteja.py titulo</code>, 4 volcados (telón y título, en máquina europea y japonesa) con <b>0 bytes distintos</b> en pantalla y paleta.</p>
+<p><img src="../imagenes/titulo_japon.png" alt="La pantalla de título japonesa"></p>
+<p>Antes del título, el logotipo de Konami se pinta en la página 1 de la VRAM y p01:624C lo va copiando a la página 0 línea a línea, como un telón.</p>
+<p><img src="../imagenes/konami.png" alt="El logotipo de Konami"></p>
+<h2 id="el-castillo">El castillo</h2>
+<p><img src="../imagenes/castillo.png" alt="Las 156 habitaciones del castillo"></p>
+<p>Las 19 fases en su sitio, cada una con su rejilla. Una habitación son <b>8 × 6 bloques de 32 × 32</b> puntos (banco 11: 156 punteros desde 0x6013), y cada bloque, 4 × 4 dibujos de 8 × 8 (0x7EBB, uno por fase). De sus 24 filas de dibujos se pintan 22, desde la y 32 (debajo del marcador): las dos primeras no se ven. Los dibujos se suben a la página 1 de la VRAM al entrar en la fase, 191 por fase desde los bancos 4 a 8 (tabla 0x5742), y la paleta se monta por capas: la de la escena, la base, la de la fase y la de la habitación (0x9AB0).</p>
+<p><b>Cotejo</b>: <code>coteja.py habitaciones</code> compara las 156 habitaciones con 156 volcados de openMSX, uno por habitación: <b>0 con diferencias</b>. La sonda (<code>tools/omsx_habitacion.tcl</code>) pone la fase y la habitación en la RAM y vuelca la VRAM cuando el cartucho enciende la pantalla.</p>
+<p>Las salidas de cada habitación están en 0xB9D3 (banco 13): un nibble por lado. <code>coteja.py mapa</code> las recorre todas: 22 son de ida sin vuelta, y todas son caídas o la entrada al jefe menos dos, (13, 11) → 9 y (17, 10) → 11.</p>
+<h3 id="una-fase-con-lo-que-esconde">Una fase, con lo que esconde</h3>
+<p>Cada fase tiene su lámina (<code>docs/imagenes/fase_00.png</code> a <code>fase_18.png</code>), con los secretos marcados. Esta es la fase 1:</p>
+<p><img src="../imagenes/fase_01.png" alt="La fase 1, con sus secretos"></p>
+<p>Lo que esconde cada habitación está en una lista del banco 14 (0x8000, un puntero por bloque de tres fases). Cada entrada lleva la posición y, en los tres bits altos del segundo byte, qué es. En todo el castillo hay <b>620</b>:</p>
+<table><tr><th>qué</th><th>cuántos</th><th>cómo se pinta</th></tr><tr><td>velas</td><td>365</td><td>fila 0x70 de la página 1, dos dibujos que se turnan</td></tr><tr><td>bloques que se rompen</td><td>92</td><td>4 × 4 dibujos de 0x8792 o 0x87A6 (p02:86CA)</td></tr><tr><td>objetos a la vista</td><td>76</td><td>filas 0x50 y 0x60 de la página 1, con transparencia</td></tr><tr><td>cofres</td><td>71</td><td>el objeto 0x19</td></tr><tr><td>puertas con vendedor</td><td>16</td><td>32 × 32 de la página 1 (96, 0xA0)</td></tr></table>
+<p>Lo que sale al romper una vela o un bloque, o al abrir un cofre, lo dicen los bits bajos. Lo más repetido: 129 corazones, 100 corazones grandes, 77 llaves y 21 llaves blancas. En 52 sitios lo que sale es <b>un enemigo</b> (el tipo 0x15: p02:8AD0 lo saca de la tabla de 0x8AF0).</p>
+<p>La puerta de salida de cada fase está en 0xBB61 (banco 13): habitación, y y x. El cartucho la pinta desde la ROM, seis piezas de 8 × 8 una debajo de otra.</p>
+<h3 id="los-vendedores">Los vendedores</h3>
+<p>Tras 16 puertas, y dentro de 17 bloques, hay <b>33 vendedores</b>. Cada uno vende una cosa (0x5B0B): vida llena, daga, cruz que vuelve, escudo, frasco, bastón, reloj de arena, la vela que marca los bloques… Pero <b>no siempre venden</b>: lo que pasa depende de su clase (dos bits del secreto) y de cuántas veces se le ha visitado. Es la tabla de 0x9300, ocho visitas por clase (p02:92BB); de la octava en adelante se repite la última:</p>
+<table><tr><th>clase</th><th>vendedores</th><th>visita 1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr><tr><td>0</td><td>10</td><td>tienda</td><td>+5 ♥ o nada</td><td>+5 ♥ o nada</td><td>+5 ♥ o nada</td><td>−5 ♥ o nada</td><td>−5 ♥ o nada</td><td>nada</td><td>se va</td></tr><tr><td>1</td><td>7</td><td>tienda</td><td>+5 ♥</td><td>+5 ♥</td><td>vuelta +1</td><td>nada</td><td>nada</td><td>nada</td><td>se va</td></tr><tr><td>2</td><td>6</td><td>+5 o −5 ♥</td><td>+5 o −5 ♥</td><td>tienda</td><td>nada</td><td>nada</td><td>nada</td><td>vuelta −1</td><td>se va</td></tr><tr><td>3</td><td>10</td><td>nada</td><td>nada</td><td>nada</td><td>nada</td><td>tienda</td><td>+5 ♥</td><td>nada</td><td>se va</td></tr></table>
+<p>Donde dice «o», el cartucho lo sortea con el registro R del Z80. La «vuelta» es 0xD012: acorta las esperas de los enemigos y afina su puntería (p03:A0E5, p03:A35A, p03:A65A).</p>
+<h2 id="simon">Simon</h2>
+<p><img src="../imagenes/simon.png" alt="Simon en sus cinco parejas de piernas y cuerpo"></p>
+<p>Simon son dos mitades: <b>piernas</b> (0xC42E) y <b>cuerpo</b> (0xC42F), cada una con sus sprites de 16 × 16 en modo 2, con el color por línea. Hay 40 dibujos de piernas y 36 de cuerpo (tablas p01:7985 y p01:79D5), y el código los combina según lo que hace: andar, agacharse, saltar, subir escaleras, azotar.</p>
+<p><img src="../imagenes/simon_poses.png" alt="Las piernas y los cuerpos de Simon"></p>
+<p><b>Cotejo</b>: <code>coteja.py simon</code>, 156 volcados, <b>0 con diferencias</b> (en 11 Simon está un cuadro más allá y en 5 aún lleva los patrones de la pose anterior: se comprueban contra esa).</p>
+<h2 id="los-enemigos">Los enemigos</h2>
+<p><img src="../imagenes/enemigos.png" alt="Los enemigos, en sus dibujos"></p>
+<p>Una fila por tipo. Las cosas de cada habitación están en 0x8668 (banco 14): tipo y posición. Al crear una, el cartucho lee cuántos sprites lleva (0x6058), de qué color (0x6084) y cuánta vida (0x60E1); cada cuadro, su dibujo elige en 0xB473 (banco 6) dónde va cada sprite. Los cuadros de cada fila son los que se vieron en openMSX (250 cuadros por habitación), y cada uno se coteja con su tabla: <code>coteja.py enemigos</code> da <b>58.430 muestras con su dibujo</b>, 959 con el de otro cuadro, 257 leídas a medias y 98 a medio crear; <b>ninguna sin explicar</b>.</p>
+<p>Los nombres son <b>por el dibujo</b>; donde el dibujo no lo deja claro, se describe:</p>
+<table><tr><th>tipo</th><th>qué es</th><th>fases</th><th>vida</th></tr><tr><td>0x01</td><td>figura de túnica morada con los brazos en alto</td><td>1, 2</td><td>1</td></tr><tr><td>0x02</td><td>hombre pez</td><td>2</td><td>1</td></tr><tr><td>0x03</td><td>criatura roja encorvada</td><td>10</td><td>2</td></tr><tr><td>0x04</td><td>silueta azul</td><td>1, 2</td><td>1</td></tr><tr><td>0x05</td><td>pantera</td><td>1, 3</td><td>1</td></tr><tr><td>0x06</td><td>caballero con lanza</td><td>4, 5</td><td>4</td></tr><tr><td>0x07</td><td>cabeza blanca que vuela</td><td>6</td><td>2</td></tr><tr><td>0x08</td><td>la misma, naranja</td><td>4</td><td>1</td></tr><tr><td>0x09</td><td>esqueleto rojo que se desmonta</td><td>13, 14</td><td>2</td></tr><tr><td>0x0A</td><td>columna de calaveras</td><td>6, 8, 9</td><td>8</td></tr><tr><td>0x0B</td><td>esqueleto</td><td>7, 8, 9, 13, 17</td><td>4</td></tr><tr><td>0x0C</td><td>murciélago</td><td>7, 8</td><td>1</td></tr><tr><td>0x0D</td><td>jorobado</td><td>7, 9, 11, 13, 17, 18</td><td>1</td></tr><tr><td>0x0E</td><td>dragón de huesos</td><td>11, 12</td><td>12</td></tr><tr><td>0x0F</td><td>águila</td><td>11</td><td>8</td></tr><tr><td>0x10</td><td>caballero naranja</td><td>14, 15, 17, 18</td><td>8</td></tr><tr><td>0x1F</td><td>silueta azul, con otros dibujos</td><td>3, 4</td><td>1</td></tr><tr><td>0x20</td><td>burbujas</td><td>2, 10</td><td>1</td></tr><tr><td>0x23</td><td>jorobado que trae el águila</td><td>11</td><td>1</td></tr></table>
+<p>El tipo 0x21 (fase 10) tiene su fila, pero sale vacía: ver <a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a>.</p>
+<h3 id="el-dragon-de-huesos">El dragón de huesos</h3>
+<p>El tipo 0x0E no usa la tabla 0xB473: sus ocho sprites se colocan con tablas propias del banco 3: patrón y color (0xAB0E), x (0xAB1E) y ocho registros de alturas (0xAAAD). En el cotejo, 1.347 muestras caen en un registro de alturas y 649 entre dos; ninguna sin explicar.</p>
+<h2 id="los-seis-jefes">Los seis jefes</h2>
+<table><tr><th>bloque</th><th>fase</th><th>jefe</th><th>tipo</th><th>vida</th></tr><tr><td>1</td><td>3</td><td>murciélago gigante</td><td>0x12</td><td>16</td></tr><tr><td>2</td><td>6</td><td>Medusa</td><td>0x13</td><td>16</td></tr><tr><td>3</td><td>9</td><td>dos momias</td><td>0x14</td><td>16</td></tr><tr><td>4</td><td>12</td><td>el monstruo de Frankenstein, con un jorobado (0x18)</td><td>0x15</td><td>32</td></tr><tr><td>5</td><td>15</td><td>la Muerte</td><td>0x16</td><td>32</td></tr><tr><td>6</td><td>18</td><td>Drácula</td><td>0x11</td><td>32</td></tr></table>
+<p>Están en la hoja de los enemigos, en su fila. Tras el jefe, el estado 8 del juego pasa al bloque siguiente.</p>
+<h3 id="dracula-entero">Drácula entero</h3>
+<p><img src="../imagenes/dracula.png" alt="Drácula en la sala del retrato, en sus cuatro dibujos de pie"></p>
+<p>Drácula no cabe en sprites. La <b>cabeza</b> sí es sprite, pero el <b>cuerpo</b> lo dibuja el VDP: el cartucho guarda el fondo en (0x80, 0x80) de la página 1 y copia en la pantalla el cuerpo desde la página 1 (x 0, 32, 64 o 96, y 0x80) con LMMM y transparencia (p03:AD80, p03:AD93). <b>Cotejo</b>: <code>coteja.py dracula</code>, 4 volcados (uno por dibujo), 0 bytes distintos en pantalla, fondo guardado, sprites y patrones.</p>
+<h2 id="lo-que-lanzan">Lo que lanzan</h2>
+<p><img src="../imagenes/lo_que_lanzan.png" alt="Lo que lanzan los enemigos"></p>
+<p>Lo que lanzan los enemigos va en <b>otra lista</b>, la de 0xD700, con sus propios números de tipo (p02:9E5C; los parámetros de cada uno, en 0xA08F): bolas de fuego (del murciélago gigante, de la columna de calaveras, de Drácula y en la sala del monstruo), los huesos del esqueleto, las serpientes de Medusa, las hoces de la Muerte y las hachas del caballero naranja.</p>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> en Jap&oacute;n) lo public&oacute; Konami para MSX2 en 1986; su n&uacute;mero de cat&aacute;logo es RC-744 y son 128 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>

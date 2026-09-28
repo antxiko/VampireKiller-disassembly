@@ -1,0 +1,101 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El cartucho — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html" style=color:var(--tinta)>El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../THE-CARTRIDGE.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="el-cartucho">El cartucho</h1>
+<table><tr><th></th><th></th></tr><tr><td>título</td><td><em>Vampire Killer</em> / <em>Akumajō Dracula</em> (Konami, 1986)</td></tr><tr><td>número</td><td>RC-744</td></tr><tr><td>máquina</td><td>MSX2 (V9938, 128 KB de VRAM), SCREEN 5</td></tr><tr><td>tamaño</td><td>131.072 bytes: 16 bancos de 8 KB</td></tr><tr><td>mapper</td><td>Konami sin SCC (Konami4)</td></tr><tr><td>sonido</td><td>PSG, tres canales</td></tr><tr><td>sha256</td><td><code>99eabaaeb2b6c02220e131043d5a6401d0d8c5f413d89204547adcc04d65e7e2</code></td></tr></table>
+<h2 id="el-mapper">El mapper</h2>
+<p>El banco 0 está <b>fijo</b> en 0x4000-0x5FFF. Los otros tres huecos se eligen escribiendo el número de banco en 0x6000, 0x8000 y 0xA000. No hay ni una escritura a 0x5000, 0x7000, 0x9000 ni 0xB000, los registros del mapper con SCC: por eso es Konami4.</p>
+<p>Hay <b>39 escrituras</b> al mapper (<code>tools/reconocimiento.py</code>), y ningún banco aparece en dos huecos distintos. Así que cada banco tiene una sola dirección donde se ejecuta, y el listado se puede partir en dieciséis módulos, uno por banco, cada uno con su <code>org</code>:</p>
+<table><tr><th>hueco</th><th>bancos</th></tr><tr><td>0x4000 (fijo)</td><td>0</td></tr><tr><td>0x6000</td><td>1, 4, 11</td></tr><tr><td>0x8000</td><td>2, 5, 7, 9, 12, 14</td></tr><tr><td>0xA000</td><td>3, 6, 8, 10, 13, 15</td></tr></table>
+<p>Se cargan de tres en tres (<code>ld a,N</code> / <code>inc a</code> / <code>inc a</code>: 1-2-3, 4-5-6, 11-12-13) o de dos en dos (7-8, 9-10, 14-15). El banco de cada hueco se guarda en 0xF0F2 y 0xF0F3, y la interrupción lo devuelve al acabar (p00:4042).</p>
+<h2 id="que-hay-en-cada-banco">Qué hay en cada banco</h2>
+<table><tr><th>banco</th><th>código</th><th>qué lleva</th></tr><tr><td>0</td><td>7.173 B</td><td>el arranque, la interrupción, los estados del juego, la VRAM, el marcador, los secretos al entrar</td></tr><tr><td>1</td><td>6.996 B</td><td>montar la habitación, los sprites, Simon y sus choques, el final</td></tr><tr><td>2</td><td>6.987 B</td><td>los objetos, los vendedores, los enemigos (lista 0xC800) y lo que lanzan (0xD700), el mapa del pergamino</td></tr><tr><td>3</td><td>7.400 B</td><td>cada tipo de enemigo y los jefes, Drácula incluido</td></tr><tr><td>4, 5, 6</td><td>—</td><td>los dibujos de las fases 0 a 12; el 6, además, cómo se compone cada enemigo (0xB473)</td></tr><tr><td>7, 8</td><td>—</td><td>los dibujos de las fases 13 a 18</td></tr><tr><td>9</td><td>—</td><td>los dibujos de siempre (p00:5670), el guion de cada habitación y paletas</td></tr><tr><td>10</td><td>—</td><td>paletas por habitación y fase, gráficos comprimidos</td></tr><tr><td>11</td><td>—</td><td>las 156 habitaciones (0x6013)</td></tr><tr><td>12, 13</td><td>211 B</td><td>los bloques de 32 × 32; en el 13, a qué habitación se sale (p13:B963) y la puerta de cada fase</td></tr><tr><td>14</td><td>1.019 B</td><td>lo que esconde cada habitación (0x8000), sus enemigos (0x8668) y el <b>sonido</b>: 16 músicas (0x8DC9) y 29 efectos</td></tr><tr><td>15</td><td>—</td><td>las partituras</td></tr></table>
+<p>En total, <b>29.786 bytes de código y 101.286 de datos</b>: el 100 % del cartucho asignado (<code>make sanity</code>).</p>
+<h2 id="la-vram">La VRAM</h2>
+<p>El juego corre en <b>SCREEN 5</b>: 256 puntos de ancho, 16 colores de una paleta de 512 (p00:4B61). La <b>página 1</b> de la VRAM es el almacén: ahí se suben al entrar en la fase los 191 dibujos de 8 × 8 del decorado, los objetos de 16 × 16 (filas 0x50, 0x60 y 0x70) y las cinco puertas de 32 × 32 (fila 0xA0). La página 0 es la pantalla: la habitación se pinta desde el búfer 0xD100, y los objetos, las puertas y Drácula se copian desde la página 1 con las órdenes del VDP (LMMM, HMMM, HMMC).</p>
+<p>Los sprites son de <b>modo 2</b> (16 × 16, color por línea). Como el VDP no pinta más de ocho en una línea, p01:6560 <b>rota su orden cada cuadro</b> al copiarlos a la VRAM, para que el parpadeo se reparta. Así la tabla de la VRAM casi nunca está en el orden de la RAM (0xD400 y 0xD600), y el cotejo de Simon se hace contra la RAM.</p>
+<h2 id="la-ram-que-importa">La RAM que importa</h2>
+<table><tr><th>dirección</th><th>qué es</th></tr><tr><td>0xC000 / 0xC001</td><td>el estado del juego y su subestado</td></tr><tr><td>0xC413</td><td>hay una vida en marcha</td></tr><tr><td>0xC415</td><td>la vida de Simon (0x20 llena)</td></tr><tr><td>0xC420-0xC46F</td><td>Simon: estado (0xC420), y (0xC425), x (0xC427), piernas (0xC42E), cuerpo (0xC42F)</td></tr><tr><td>0xC434</td><td>la cuenta del anillo</td></tr><tr><td>0xC800</td><td>la lista de enemigos</td></tr><tr><td>0xD000 / 0xD001 / 0xD002</td><td>fase, habitación y bloque de tres fases</td></tr><tr><td>0xD012</td><td>la vuelta (0-3)</td></tr><tr><td>0xD700</td><td>lo que lanzan los enemigos</td></tr><tr><td>0xE000</td><td>los secretos de la fase, copiados del banco 14</td></tr><tr><td>0xE600</td><td>0xFF si hay un Game Master en otra ranura</td></tr></table>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> en Jap&oacute;n) lo public&oacute; Konami para MSX2 en 1986; su n&uacute;mero de cat&aacute;logo es RC-744 y son 128 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>

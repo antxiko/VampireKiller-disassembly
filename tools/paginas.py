@@ -1,43 +1,29 @@
 #!/usr/bin/env python3
 """La regla banco -> direccion del MegaROM, compartida por todas las herramientas.
 
-Penguin Adventure / Yume Tairiku Adventure es un cartucho de 128 KB con el
-mapper Konami SIN SCC (Konami4): 16 bancos de 8 KB. El banco de 0x4000-0x5FFF
-es FIJO -no hay registro para el- y los otros tres se eligen escribiendo el
-numero de banco en 0x6000 (para 0x6000-0x7FFF), 0x8000 (para 0x8000-0x9FFF) y
-0xA000 (para 0xA000-0xBFFF).
+Vampire Killer / Akumajo Dracula es un cartucho de 128 KB con el mapper Konami
+SIN SCC (Konami4): 16 bancos de 8 KB. El banco de 0x4000-0x5FFF es FIJO -no hay
+registro para el- y los otros tres se eligen escribiendo el numero de banco en
+0x6000 (para 0x6000-0x7FFF), 0x8000 (para 0x8000-0x9FFF) y 0xA000 (para
+0xA000-0xBFFF).
 
 Lo que dice la ROM (tools/reconocimiento.py lo vuelve a medir cada vez):
-
   - NO hay ni una escritura a 0x5000, 0x7000, 0x9000 ni 0xB000, que son los
     registros del OTRO mapper de Konami, el que lleva SCC. Por eso este es
     Konami4 y no Konami5.
-
-  - Los bancos se reparten DE TRES EN TRES. La rutina que cambia de modulo
-    entra con A = el primer banco del trio y hace `ld (0x6000),a` / `inc a` /
-    `ld (0x8000),a` / `inc a` / `ld (0xA000),a`: los 24 KB de 0x6000 a 0xBFFF
-    se llenan de golpe con N, N+1 y N+2. Los trios que aparecen son 1-2-3,
-    4-5-6 y 7-8-9.
-
-  - Los bancos altos se meten de dos en dos, sin el primer paso: 10-11, 12-13
-    y 14-15 van solo a 0x8000 y 0xA000, dejando en 0x6000 lo que hubiera.
-
-  - Ni un solo banco aparece en dos registros distintos. La cuenta completa de
-    las 512 escrituras:
-
-        0x6000   banco 1 (55)   banco 4 (16)   banco 7 (43)
-        0x8000   banco 2 (87)   banco 5 (16)   banco 8 (43)
-                 banco 10 (21)  banco 12 (28)  banco 14 (2)
-        0xA000   banco 3 (87)   banco 6 (16)   banco 9 (43)
-                 banco 11 (21)  banco 13 (28)  banco 15 (2)
-
+  - Hay 39 escrituras a los registros: 6 a 0x6000, 17 a 0x8000 y 16 a
+    0xA000. Dos de ellas (p00:4042 y p00:4048) devuelven el banco que guardan
+    las copias 0xF0F2 y 0xF0F3; las otras 37 llevan el numero en el codigo.
+  - Los trios se meten con `ld a,N` / `inc a` / `inc a`: 1-2-3, 4-5-6 y
+    11-12-13 llenan de golpe 0x6000-0xBFFF. Las parejas 7-8, 9-10 y 14-15 van
+    solo a 0x8000 y 0xA000. Y hay escrituras sueltas (p01:6451 el banco 6,
+    p01:6746 el 8, p01:6750 el 5...) que respetan la misma ranura.
+  - Ni un solo banco aparece en dos registros distintos:
+        0x6000   bancos 1, 4, 11
+        0x8000   bancos 2, 5, 7, 9, 12, 14
+        0xA000   bancos 3, 6, 8, 10, 13, 15
   De ahi sale la tabla de abajo: cada banco tiene UNA sola direccion donde se
   ejecuta, y los 16 estan cubiertos.
-
-        banco 0                        -> 0x4000  (fijo, sin registro)
-        bancos 1, 4, 7                 -> 0x6000
-        bancos 2, 5, 8, 10, 12, 14     -> 0x8000
-        bancos 3, 6, 9, 11, 13, 15     -> 0xA000
 
   Si alguna vez aparece un banco mapeado en otra ranura, esta regla deja de
   valer para ESE banco y habra que partirlo en dos modulos.

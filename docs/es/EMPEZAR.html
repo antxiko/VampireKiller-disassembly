@@ -1,0 +1,98 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Empezar — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html" style=color:var(--tinta)>Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html">Preguntas abiertas</a><a href="../GETTING-STARTED.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
+<h1 id="empezar">Empezar</h1>
+<p>Para reproducir este desensamblado hace falta Python 3 (con Pillow para las imágenes), GNU make y <a href="https://pasmo.speccy.org/">Pasmo</a>. La imagen del cartucho <b>no viaja en este repositorio</b>: cada cual pone la suya.</p>
+<pre><code>vampirekiller.rom    131.072 bytes
+sha256               99eabaaeb2b6c02220e131043d5a6401d0d8c5f413d89204547adcc04d65e7e2</code></pre>
+<p>Con el fichero en la raíz del repositorio:</p>
+<pre><code>make            # listado, verificación, coherencia y tests</code></pre>
+<h2 id="que-hace-cada-paso">Qué hace cada paso</h2>
+<table><tr><th>orden</th><th>qué hace</th></tr><tr><td><code>make comprueba</code></td><td>comprueba el sha256 de la ROM</td></tr><tr><td><code>make listado</code></td><td>genera los dieciséis <code>.asm</code> desde el binario, las notas y las semillas</td></tr><tr><td><code>make verify</code></td><td>reensambla cada banco y la ROM entera, y compara los sha256</td></tr><tr><td><code>make sanity</code></td><td>comprueba que no queda un solo byte sin asignar a código o a datos</td></tr><tr><td><code>make test</code></td><td>los tests</td></tr><tr><td><code>make densidad</code></td><td>cuántas instrucciones llevan comentario, banco a banco</td></tr><tr><td><code>make imagenes</code></td><td>dibuja los PNG de <code>docs/imagenes/</code> desde la ROM</td></tr><tr><td><code>make coteja</code></td><td>coteja las imágenes con los volcados de openMSX de <code>work/</code></td></tr><tr><td><code>make web</code></td><td>genera las páginas HTML y comprueba los enlaces</td></tr></table>
+<p><code>make verify</code> es el que decide: tiene que imprimir dieciséis veces <code>OK: reproducible byte a byte</code>, una por banco, y al final <code>OK: la ROM entera reproducible byte a byte</code>.</p>
+<p><code>make coteja</code> necesita los volcados de openMSX, que no viajan en el repositorio: se hacen con los lanzadores de <a href="EN-EL-EMULADOR.html">En el emulador</a>.</p>
+<h2 id="donde-esta-cada-cosa">Dónde está cada cosa</h2>
+<ul><li><code>src/vampirekiller_pNN.asm</code>: el listado, uno por banco. <b>Se genera</b>: no se edita a mano.</li><li><code>src/pNN.notes</code>: las etiquetas (<code>L</code>), los comentarios de línea (<code>C</code>), los rangos de datos (<code>D</code>) y los encabezados de rutina (<code>B</code>). Esto <b>sí</b> se edita.</li><li><code>src/pNN.entries</code> y <code>src/pNN.nocode</code>: las entradas de cada banco y las tablas que no son código, sacadas del trazado del cartucho entero (<code>make semillas</code>).</li><li><code>tools/</code>: el trazador, el generador del listado y las herramientas que dibujan y cotejan.</li><li><code>docs/</code>: esta web, en inglés en la raíz y en castellano en <code>docs/es/</code>.</li></ul>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> en Jap&oacute;n) lo public&oacute; Konami para MSX2 en 1986; su n&uacute;mero de cat&aacute;logo es RC-744 y son 128 KB. Todos los derechos sobre el juego siguen siendo de sus titulares. Este trabajo es de preservaci&oacute;n, estudio y documentaci&oacute;n, y la imagen del cartucho no se distribuye.</p></footer></div>

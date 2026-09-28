@@ -1,0 +1,110 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The code — Vampire Killer (Konami, 1986)</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-CARTRIDGE.html">The cartridge</a><a href="THE-CODE.html" style=color:var(--tinta)>The code</a><a href="FINDINGS.html">Findings</a><a href="IN-THE-EMULATOR.html">In the emulator</a><a href="OPEN-QUESTIONS.html">Open questions</a><a href="es/EL-CODIGO.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
+<h1 id="the-code">The code</h1>
+<h2 id="everything-runs-in-the-interrupt">Everything runs in the interrupt</h2>
+<p>INIT (0x4075) sets up the machine, hooks H.TIMI and leaves the Z80 on a <code>jr $</code>. From then on the whole game runs in <b>p00:4028</b>, once per frame:</p>
+<ol><li>the Game Master&#x27;s pause, if there is one (p00:40C5);</li><li>the sound, with banks 14 and 15 in place;</li><li>unless it is already inside (the semaphore at 0xC005), the <b>state machine</b>.</li></ol>
+<p>When it is done it puts back the banks kept at 0xF0F2 and 0xF0F3.</p>
+<h2 id="the-dispatcher">The dispatcher</h2>
+<p>p00:406B is Konami&#x27;s dispatcher: the jump table sits <b>right after the <code>call</code></b>. It pops the return address, which is the base of the table, and jumps to entry number A. The listing marks each of those tables as data and names their targets.</p>
+<h2 id="the-game-states">The game states</h2>
+<p>0xC000 is the state and 0xC001 the sub-state (table at 0x4161, p00:417D):</p>
+<table><tr><th>state</th><th>what it is</th></tr><tr><td>0</td><td>the intro (Konami&#x27;s curtain)</td></tr><tr><td>1</td><td>the title</td></tr><tr><td>2</td><td>the demo</td></tr><tr><td>3</td><td>a game starts</td></tr><tr><td>4</td><td>a life starts</td></tr><tr><td>5</td><td>playing</td></tr><tr><td>6</td><td>Simon dies</td></tr><tr><td>7</td><td>GAME OVER (with F5 CONTINUE if there is a Game Master)</td></tr><tr><td>8</td><td>block cleared, after the boss</td></tr><tr><td>9</td><td>room change</td></tr><tr><td>0x0A</td><td>stage cleared (the door)</td></tr><tr><td>0x0B</td><td>the pause (F1)</td></tr><tr><td>0x0C</td><td>the shop</td></tr><tr><td>0x0D</td><td>the Game Master&#x27;s menu</td></tr></table>
+<p>The sub-state goes in B and each <code>djnz</code> jumps to the next one: the first thing after the first <code>djnz</code> is sub-state 1, and the last, 0.</p>
+<h2 id="simon">Simon</h2>
+<p>0xC420 is Simon&#x27;s state (p01:6B39): 0 standing or walking, 1 jumping, 2 crouching, 3 on the stairs, 4 falling, 5 hit (p01:6F85), 6 dies (p01:7093) and 7 goes <b>through a passage</b>: crouching on top of a passage and pressing jump, Simon goes to the room 0xC5B4 names (p01:70FB, p01:6DA9). The collisions with the background are at p01:7D68. The whip and the five weapons have their own records (0xC450 and 0xC460).</p>
+<h2 id="a-room">A room</h2>
+<p>On entering (state 9, p01:62F5):</p>
+<ul><li>the room comes from 0x6013 (bank 11) with the number at 0x6000[stage] plus the room&#x27;s own: 48 blocks;</li><li>each block is 16 tiles (0x7EBB[stage], banks 11 to 13), and they are left in the buffer at 0xD100;</li><li>it is drawn from 0xD140 onto page 0: 22 rows of tiles, from y 32;</li><li>its script (0x9AB0) sets its palette and uploads its enemies&#x27; patterns;</li><li>p00:5B1B walks its secrets (0xE000): candles and blocks go to 0xC470; items, to 0xC500; vendors, to p02:9179;</li><li>its enemies are created (0x8668 in bank 14, p01:6181);</li><li>p01:6321 switches the screen on.</li></ul>
+<h2 id="the-enemies">The enemies</h2>
+<p>Each enemy is a record in the list at 0xC800. When creating it, p00:5F48 gives it its sprites (0x6058 + type), its colours (0x6084) and its life (0x60E1). Every frame, its type&#x27;s code (bank 3, through the dispatcher) moves it, and p01:6445 puts it together with the table at 0xB473: [dy][dx][pattern] per sprite. The bone dragon (0x0E) does not go through there: it places its sprites itself. Type 0x17 has no sprites.</p>
+<p>What they throw goes in another list, 0xD700 (p02:9E5C), with its own types.</p>
+<h2 id="the-sound">The sound</h2>
+<p>p00:509F takes the number in A: 0 silences everything, 0x80-0xFA is a tune (three PSG channels, table 0x8DC9 in bank 14: <b>16 tunes</b>) and 1-0x7F an effect (<b>29</b>, at 0x8D8F). An effect only plays if its number is not lower than the one already playing (0xC096 acts as the priority). The score (p14:8BB4) has commands from 0xD0 up: 0xDx sets the tempo, 0xE0-0xE5 the octave…</p>
+<h2 id="how-the-listing-is-made">How the listing is made</h2>
+<ul><li><code>tools/bancos.py</code> traces <b>the whole cartridge</b> keeping track of which bank is in each window; that gives the calls that cross the mapper (<code>src/pNN.entries</code>) and the dispatcher&#x27;s tables (<code>src/pNN.nocode</code>).</li><li><code>tools/z80trace.py</code> follows each bank&#x27;s flow from those entries.</li><li><code>src/pNN.notes</code> keeps the labels, the comments and the data ranges, anchored to addresses; <code>tools/mkasm.py</code> merges them with the trace and writes <code>src/vampirekiller_pNN.asm</code>.</li><li><code>make verify</code> reassembles the sixteen banks with Pasmo and the whole ROM, and compares the sha256.</li></ul>
+<p>The density: <b>49.4%</b> of the 14,502 instructions carry a comment, and all 1,909 routines are above 10% (<code>make densidad</code>).</p>
+<footer><p><em>Vampire Killer</em> (<em>Akumaj&#333; Dracula</em> in Japan) was published by Konami for the MSX2 in 1986; its catalogue number is RC-744 and it is 128 KB. All rights in the game remain with their holders. This is preservation, study and documentation work, and the cartridge image is not distributed.</p></footer></div>
