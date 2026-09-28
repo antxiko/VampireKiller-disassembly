@@ -174,6 +174,38 @@ RAM16 = {
     0xD000: "la fase (0xD000) y la habitacion (0xD001) de un tiron",
 }
 
+# Los campos de la ficha de cada cosa (IX apunta a ella: 0xC800 + 0x80 * n y
+# 0xD700 + 0x80 * n, p02:999F y p01:7806). De donde sale cada uno:
+#   0      p00:5F82 escribe el tipo de 0xCFF0; p02:99F6 lo pone a cero al borrarla
+#   1      se despacha por el (`ld a,(ix+1) / call 0x406B`) y `inc (ix+1)` pasa al
+#          siguiente paso
+#   2-5    p02:99B9 les suma las velocidades: (ix+2,3) + (ix+7,8), (ix+4,5) + (ix+9,10);
+#          p02:99E5 borra la cosa por (ix+3) > 0xE4 (se sale por abajo) y por (ix+5)
+#          fuera de 7..0xF0 (por los lados)
+#   6      p02:99B9 no la mueve si vale cero
+#   7-8    la gravedad de 0xA549 se suma aqui, con tope 0x07FF
+#   11     p01:6458 lo usa para elegir la composicion de sprites de 0xB473
+#   12     `dec (ix+0x0C) / ret nz` en todos los pasos que esperan
+#   32     p00:5F52: cuantos sprites lleva (tabla de 0x6058)
+#   33-37  cinco bytes por sprite: p00:6048 pone el hueco de sprite en 33 + 5k,
+#          p01:6476 la y, la x y el patron en 34, 35 y 36, y 0x6029 el color en 37
+CAMPOS = {
+    0x00: "el tipo de la cosa",
+    0x01: "el paso en que va la cosa",
+    0x02: "la fraccion de la y de la cosa",
+    0x03: "la y de la cosa",
+    0x04: "la fraccion de la x de la cosa",
+    0x05: "la x de la cosa",
+    0x06: "si la cosa se mueve",
+    0x07: "la velocidad vertical (parte baja)",
+    0x08: "la velocidad vertical",
+    0x09: "la velocidad horizontal (parte baja)",
+    0x0A: "la velocidad horizontal (el bit 7, hacia la izquierda)",
+    0x0B: "el dibujo de la cosa",
+    0x0C: "la cuenta de cuadros del paso",
+    0x20: "cuantos sprites lleva la cosa",
+}
+
 REGISTROS_MAPPER = {0x6000: "0x6000", 0x8000: "0x8000", 0xA000: "0xA000"}
 
 
@@ -202,6 +234,11 @@ def a_mano(b):
     return cs, ls
 
 
+def num(txt):
+    txt = txt.strip()
+    return int(txt[:-1], 16) if txt.endswith("h") else int(txt, 0)
+
+
 def valor(txt):
     txt = txt.strip()
     return int(txt[:-1], 16) if txt.endswith("h") else int(txt, 0)
@@ -212,7 +249,25 @@ def por_nombre():
     return {}
 
 
-def comentario(b, filas, k):
+def fichas_de(filas):
+    """Para cada instruccion, si IX apunta ahi a la ficha de una cosa.
+
+    Se da por buena salvo en los tramos (de etiqueta a `ret`/`jp`) en los que
+    IX se carga con una direccion del cartucho (`ld ix,0x558E`...), que son
+    tablas y no fichas.
+    """
+    fuera, malo = {}, False
+    for k, (a, t) in enumerate(filas):
+        m = re.match(r"ld ix,0([0-9a-f]{4})h$", t)
+        if m:
+            malo = int(m.group(1), 16) < 0xC000
+        fuera[k] = not malo
+        if t.startswith(("ret", "jp ")) and not re.match(r"ret [a-z]", t):
+            malo = False
+    return fuera
+
+
+def comentario(b, filas, k, fichas):
     a, t = filas[k]
     # llamadas y saltos a rutinas con nombre
     m = re.match(r"(call|jp)\s+(?:(?:nz|z|nc|c|po|pe|p|m),)?(?:L_([0-9A-F]{4})|0([0-9a-f]{4})h|([a-z_][a-z0-9_]*))$", t)
@@ -230,6 +285,37 @@ def comentario(b, filas, k):
             if aa == dest and (bb == b or ORG[bb] == 0x4000 or not (ORG[b] <= dest < ORG[b] + 0x2000)):
                 if bb == 0 or ORG[bb] <= dest < ORG[bb] + 0x2000:
                     return "%s: %s" % (nom, que)
+    # los campos de la ficha de la cosa
+    if b in (0, 1, 2, 3) and fichas.get(k, False):
+        mm = re.search(r"\(ix\+0?([0-9a-f]+)h?\)", t)
+        if mm:
+            n = int(mm.group(1), 16)
+            que = CAMPOS.get(n)
+            if que:
+                op = t.split()[0]
+                if n == 0x0A and op == "bit" and t.startswith("bit 7"):
+                    return "va hacia la izquierda? (bit 7 de la velocidad horizontal)"
+                if op == "ld" and t.startswith("ld (ix"):
+                    v = t.split(",", 1)[1]
+                    if re.match(r"^[a-z]$", v):
+                        return "guarda %s" % que
+                    v = "0x%02X" % num(v) if re.match(r"^[0-9a-f]+h$", v) else v
+                    if n == 0x06:
+                        return "la cosa se mueve" if v != "0x00" else "la cosa se queda quieta"
+                    return "%s = %s" % (que, v)
+                if op == "ld":
+                    return "lee %s" % que
+                if op in ("inc", "dec"):
+                    return ("sube " if op == "inc" else "baja ") + que
+                if op == "bit":
+                    return "mira el bit %s de %s" % (t.split()[1].split(",")[0], que)
+                if op in ("set", "res"):
+                    return "%s el bit %s de %s" % ("pone a uno" if op == "set" else "pone a cero",
+                                                   t.split()[1].split(",")[0], que)
+                if op in ("cp", "sub", "add", "adc", "sbc", "and", "or", "xor"):
+                    return {"cp": "compara con ", "sub": "le resta ", "add": "le suma ",
+                            "adc": "le suma ", "sbc": "le resta ", "and": "AND con ", "or": "OR con ",
+                            "xor": "XOR con "}[op] + que
     # cambios de banco
     m = re.match(r"ld \(0(6000|8000|a000)h\),a$", t)
     if m:
@@ -260,6 +346,7 @@ def main(argv):
     for b in BANCOS:
         filas = listado(b)
         cs, ls = a_mano(b)
+        fichas = fichas_de(filas)
         lineas = []
         for (bb, aa), (nom, que) in sorted(RUTINAS.items()):
             if bb == b and aa not in ls:
@@ -268,7 +355,7 @@ def main(argv):
         for k, (a, t) in enumerate(filas):
             if a in cs:
                 continue
-            c = comentario(b, filas, k)
+            c = comentario(b, filas, k, fichas)
             if c:
                 lineas.append("C 0x%04X %s" % (a, c))
                 n += 1

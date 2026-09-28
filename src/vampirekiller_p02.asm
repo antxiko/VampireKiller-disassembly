@@ -57,7 +57,7 @@ L_801E:
 	ld ix,0c800h		;8027
 	ld b,007h		;802b
 L_802D:
-	ld a,(ix+000h)		;802d
+	ld a,(ix+000h)		;802d   ; lee el tipo de la cosa
 	and a			;8030
 	jr z,L_8040		;8031
 	ld a,(ix+00eh)		;8033
@@ -89,7 +89,7 @@ DATA_cuatro_valores:
 L_804C:
 	ld a,00ch		;804c
 	call 0509fh		;804e   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,(ix+000h)		;8051
+	ld a,(ix+000h)		;8051   ; lee el tipo de la cosa
 	sub 011h		;8054
 	cp 007h		;8056
 	jr c,L_8088		;8058
@@ -116,7 +116,7 @@ L_8078:
 	res 0,(ix+00eh)		;8083
 	ret			;8087
 L_8088:
-	ld a,(ix+000h)		;8088
+	ld a,(ix+000h)		;8088   ; lee el tipo de la cosa
 	cp 012h		;808b
 	jr nz,L_8095		;808d
 	ld a,(0ce00h)		;808f
@@ -136,15 +136,15 @@ L_80A6:
 	ld ix,0c470h		;80a6
 	ld b,008h		;80aa
 L_80AC:
-	ld a,(ix+000h)		;80ac
+	ld a,(ix+000h)		;80ac   ; lee el tipo de la cosa
 	and a			;80af
 	jr z,L_80D4		;80b0
 	push bc			;80b2
 	call L_8460		;80b3
 	pop bc			;80b6
 	jr nc,L_80D4		;80b7
-	inc (ix+003h)		;80b9
-	ld a,(ix+004h)		;80bc
+	inc (ix+003h)		;80b9   ; sube la y de la cosa
+	ld a,(ix+004h)		;80bc   ; lee la fraccion de la x de la cosa
 	ld (0c433h),a		;80bf
 	ld a,(iy+001h)		;80c2
 	dec a			;80c5
@@ -255,7 +255,7 @@ L_8163:
 	djnz L_8120		;8169
 	ret			;816b
 L_816C:
-	ld a,(ix+000h)		;816c
+	ld a,(ix+000h)		;816c   ; lee el tipo de la cosa
 	dec a			;816f
 	add a,a			;8170
 	ld hl,081ceh		;8171
@@ -266,7 +266,7 @@ L_816C:
 	bit 4,a		;817c
 	jr z,L_8193		;817e
 	ld a,(0c427h)		;8180   ; lee la X de Simon
-	sub (ix+005h)		;8183
+	sub (ix+005h)		;8183   ; le resta la x de la cosa
 	ld a,(0c42ch)		;8186   ; lee el lado al que mira Simon
 	jr nc,L_8190		;8189
 	and a			;818b
@@ -292,7 +292,7 @@ L_8198:
 L_81A8:
 	jp 0462bh		;81a8
 L_81AB:
-	ld a,(ix+000h)		;81ab
+	ld a,(ix+000h)		;81ab   ; lee el tipo de la cosa
 	ld b,a			;81ae
 	dec a			;81af
 	add a,a			;81b0
@@ -343,8 +343,8 @@ L_8230:
 	ld hl,01008h		;823a
 	jp L_847A		;823d
 L_8240:
-	ld d,(ix+005h)		;8240
-	ld e,(ix+004h)		;8243
+	ld d,(ix+005h)		;8240   ; lee la x de la cosa
+	ld e,(ix+004h)		;8243   ; lee la fraccion de la x de la cosa
 	ld hl,01008h		;8246
 	jp L_847A		;8249
 L_824C:
@@ -489,14 +489,14 @@ DATA_tabla_82AA:
 
 
 L_82B8:
-	ld a,(ix+000h)		;82b8
+	ld a,(ix+000h)		;82b8   ; lee el tipo de la cosa
 	dec a			;82bb
 	ld hl,082cbh		;82bc
 	call 04061h		;82bf   ; hl_mas_a: HL += A
 	ld a,(hl)			;82c2
 	dec a			;82c3
-	ld b,(ix+005h)		;82c4
-	ld c,(ix+003h)		;82c7
+	ld b,(ix+005h)		;82c4   ; lee la x de la cosa
+	ld c,(ix+003h)		;82c7   ; lee la y de la cosa
 	ret			;82ca
 
 ; ----------------------------------------------------------------------
@@ -514,13 +514,13 @@ DATA_un_byte_de_cada_tipo:
 
 
 L_82FB:
-	ld a,(ix+000h)		;82fb
+	ld a,(ix+000h)		;82fb   ; lee el tipo de la cosa
 	dec a			;82fe
 	ld hl,0830dh		;82ff
 	call 04061h		;8302   ; hl_mas_a: HL += A
 	ld a,(hl)			;8305
-	ld b,(ix+005h)		;8306
-	ld c,(ix+003h)		;8309
+	ld b,(ix+005h)		;8306   ; lee la x de la cosa
+	ld c,(ix+003h)		;8309   ; lee la y de la cosa
 	ret			;830c
 
 ; ----------------------------------------------------------------------
@@ -750,16 +750,16 @@ L_8450:
 	ld hl,01008h		;845a
 	jp L_84A7		;845d
 L_8460:
-	ld a,(ix+004h)		;8460
+	ld a,(ix+004h)		;8460   ; lee la fraccion de la x de la cosa
 	cp 002h		;8463
 	ld hl,01008h		;8465
 	jr c,L_846D		;8468
 	ld hl,02010h		;846a
 L_846D:
-	ld a,(ix+001h)		;846d
+	ld a,(ix+001h)		;846d   ; lee el paso en que va la cosa
 	add a,h			;8470
 	ld e,a			;8471
-	ld a,(ix+002h)		;8472
+	ld a,(ix+002h)		;8472   ; lee la fraccion de la y de la cosa
 	add a,l			;8475
 	ld d,a			;8476
 	jp L_84F0		;8477
@@ -1050,7 +1050,7 @@ L_8610:
 	ld b,008h		;861a
 L_861C:
 	push bc			;861c
-	ld a,(ix+000h)		;861d
+	ld a,(ix+000h)		;861d   ; lee el tipo de la cosa
 	and a			;8620
 	jr z,L_8642		;8621
 	cp 00ch		;8623
@@ -1319,7 +1319,7 @@ DATA_dos_tablas_de_veinte:
 L_87BA:
 	ld (hl),000h		;87ba
 	inc l			;87bc
-	ld (ix+000h),000h		;87bd
+	ld (ix+000h),000h		;87bd   ; el tipo de la cosa = 0x00
 	ld a,(hl)			;87c1
 	inc l			;87c2
 	ld b,(hl)			;87c3
@@ -1346,7 +1346,7 @@ L_87E9:
 	call L_884A		;87e9
 	call L_887D		;87ec
 L_87EF:
-	ld a,(ix+005h)		;87ef
+	ld a,(ix+005h)		;87ef   ; lee la x de la cosa
 	cp 01fh		;87f2
 	jr z,L_8814		;87f4
 	cp 018h		;87f6
@@ -1357,7 +1357,7 @@ L_87EF:
 	ld a,b			;87ff
 	or a			;8800
 	jr z,L_8811		;8801
-	ld a,(ix+004h)		;8803
+	ld a,(ix+004h)		;8803   ; lee la fraccion de la x de la cosa
 	cp 003h		;8806
 	jr nz,L_880E		;8808
 	ld a,e			;880a
@@ -1370,10 +1370,10 @@ L_8811:
 L_8814:
 	pop de			;8814
 	pop bc			;8815
-	ld a,(ix+009h)		;8816
+	ld a,(ix+009h)		;8816   ; lee la velocidad horizontal (parte baja)
 	ld b,a			;8819
-	ld h,(ix+007h)		;881a
-	ld l,(ix+008h)		;881d
+	ld h,(ix+007h)		;881a   ; lee la velocidad vertical (parte baja)
+	ld l,(ix+008h)		;881d   ; lee la velocidad vertical
 	and 0c0h		;8820
 	cp 0c0h		;8822
 	ld a,b			;8824
@@ -1398,8 +1398,8 @@ L_883E:
 	ld b,a			;883e
 	pop de			;883f
 	pop bc			;8840
-	ld h,(ix+007h)		;8841
-	ld l,(ix+008h)		;8844
+	ld h,(ix+007h)		;8841   ; lee la velocidad vertical (parte baja)
+	ld l,(ix+008h)		;8844   ; lee la velocidad vertical
 	jp L_89FD		;8847
 L_884A:
 	ld hl,0e480h		;884a
@@ -1432,8 +1432,8 @@ L_8861:
 	pop bc			;8872
 	ret			;8873
 L_8874:
-	ld h,(ix+007h)		;8874
-	ld l,(ix+008h)		;8877
+	ld h,(ix+007h)		;8874   ; lee la velocidad vertical (parte baja)
+	ld l,(ix+008h)		;8877   ; lee la velocidad vertical
 	ld (hl),000h		;887a
 	ret			;887c
 L_887D:
@@ -1794,10 +1794,10 @@ L_8A63:
 	djnz L_8A53		;8a6a
 	ret			;8a6c
 L_8A6D:
-	ld e,(ix+001h)		;8a6d
-	ld d,(ix+002h)		;8a70
+	ld e,(ix+001h)		;8a6d   ; lee el paso en que va la cosa
+	ld d,(ix+002h)		;8a70   ; lee la fraccion de la y de la cosa
 	ex af,af'			;8a73
-	ld a,(ix+003h)		;8a74
+	ld a,(ix+003h)		;8a74   ; lee la y de la cosa
 	dec a			;8a77
 	jp z,L_8BDF		;8a78
 	ex af,af'			;8a7b
@@ -1828,12 +1828,12 @@ DATA_tabla_de_p02_8A80:
 
 
 L_8A99:
-	inc (ix+006h)		;8a99
-	ld a,(ix+006h)		;8a9c
+	inc (ix+006h)		;8a99   ; sube si la cosa se mueve
+	ld a,(ix+006h)		;8a9c   ; lee si la cosa se mueve
 	and 00fh		;8a9f
 	ret nz			;8aa1
 	inc (hl)			;8aa2
-	ld a,(ix+004h)		;8aa3
+	ld a,(ix+004h)		;8aa3   ; lee la fraccion de la x de la cosa
 	or a			;8aa6
 	jp z,L_8B1B		;8aa7
 	cp 015h		;8aaa
@@ -1844,13 +1844,13 @@ L_8A99:
 	jr z,L_8AB7		;8ab3
 	ld a,002h		;8ab5
 L_8AB7:
-	ld (ix+005h),a		;8ab7
+	ld (ix+005h),a		;8ab7   ; guarda la x de la cosa
 	ret nz			;8aba
-	ld (ix+006h),000h		;8abb
-	ld (ix+009h),002h		;8abf
-	ld (ix+00ah),000h		;8ac3
-	ld (ix+00bh),000h		;8ac7
-	ld (ix+00ch),020h		;8acb
+	ld (ix+006h),000h		;8abb   ; la cosa se queda quieta
+	ld (ix+009h),002h		;8abf   ; la velocidad horizontal (parte baja) = 0x02
+	ld (ix+00ah),000h		;8ac3   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0x00
+	ld (ix+00bh),000h		;8ac7   ; el dibujo de la cosa = 0x00
+	ld (ix+00ch),020h		;8acb   ; la cuenta de cuadros del paso = 0x20
 	ret			;8acf
 L_8AD0:
 	ld a,(0d002h)		;8ad0   ; lee el bloque de tres fases (0-5)
@@ -1895,21 +1895,21 @@ L_8AF8:
 	sub 001h		;8b05
 	cp 009h		;8b07
 	jr c,L_8B68		;8b09
-	ld a,(ix+004h)		;8b0b
+	ld a,(ix+004h)		;8b0b   ; lee la fraccion de la x de la cosa
 	dec a			;8b0e
 	jp z,L_8B22		;8b0f
-	ld a,(ix+001h)		;8b12
+	ld a,(ix+001h)		;8b12   ; lee el paso en que va la cosa
 	add a,008h		;8b15
-	ld (ix+001h),a		;8b17
+	ld (ix+001h),a		;8b17   ; guarda el paso en que va la cosa
 	ret			;8b1a
 L_8B1B:
-	ld (ix+005h),0ffh		;8b1b
+	ld (ix+005h),0ffh		;8b1b   ; la x de la cosa = 0xFF
 	jp L_8BC7		;8b1f
 L_8B22:
 	push ix		;8b22
 	pop hl			;8b24
 	inc l			;8b25
-	inc (ix+006h)		;8b26
+	inc (ix+006h)		;8b26   ; sube si la cosa se mueve
 	ld a,(0c003h)		;8b29   ; lee el contador de cuadros
 	rra			;8b2c
 	jr nc,L_8B30		;8b2d
@@ -1917,36 +1917,36 @@ L_8B22:
 L_8B30:
 	inc l			;8b30
 	ld d,(hl)			;8b31
-	ld e,(ix+008h)		;8b32
+	ld e,(ix+008h)		;8b32   ; lee la velocidad vertical
 	ex de,hl			;8b35
-	ld b,(ix+009h)		;8b36
-	ld c,(ix+00ah)		;8b39
+	ld b,(ix+009h)		;8b36   ; lee la velocidad horizontal (parte baja)
+	ld c,(ix+00ah)		;8b39   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	add hl,bc			;8b3c
 	ex de,hl			;8b3d
-	ld (ix+008h),e		;8b3e
+	ld (ix+008h),e		;8b3e   ; guarda la velocidad vertical
 	ld (hl),d			;8b41
 	ld h,b			;8b42
 	ld l,c			;8b43
-	ld b,(ix+00bh)		;8b44
-	ld c,(ix+00ch)		;8b47
+	ld b,(ix+00bh)		;8b44   ; lee el dibujo de la cosa
+	ld c,(ix+00ch)		;8b47   ; lee la cuenta de cuadros del paso
 	and a			;8b4a
 	sbc hl,bc		;8b4b
-	ld (ix+009h),h		;8b4d
-	ld (ix+00ah),l		;8b50
-	ld a,(ix+006h)		;8b53
+	ld (ix+009h),h		;8b4d   ; guarda la velocidad horizontal (parte baja)
+	ld (ix+00ah),l		;8b50   ; guarda la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld a,(ix+006h)		;8b53   ; lee si la cosa se mueve
 	sub 020h		;8b56
 	ret nz			;8b58
-	ld (ix+006h),a		;8b59
+	ld (ix+006h),a		;8b59   ; guarda si la cosa se mueve
 	ld a,b			;8b5c
 	cpl			;8b5d
-	ld (ix+00bh),a		;8b5e
+	ld (ix+00bh),a		;8b5e   ; guarda el dibujo de la cosa
 	ld a,c			;8b61
 	neg		;8b62
-	ld (ix+00ch),a		;8b64
+	ld (ix+00ch),a		;8b64   ; guarda la cuenta de cuadros del paso
 	ret			;8b67
 L_8B68:
-	ld (ix+005h),0ffh		;8b68
-	inc (ix+000h)		;8b6c
+	ld (ix+005h),0ffh		;8b68   ; la x de la cosa = 0xFF
+	inc (ix+000h)		;8b6c   ; sube el tipo de la cosa
 	ret			;8b6f
 L_8B70:
 	ld a,e			;8b70
@@ -1957,58 +1957,58 @@ L_8B70:
 	add a,004h		;8b77
 	and 0f8h		;8b79
 	ld d,a			;8b7b
-	ld (ix+001h),e		;8b7c
-	ld (ix+002h),d		;8b7f
+	ld (ix+001h),e		;8b7c   ; guarda el paso en que va la cosa
+	ld (ix+002h),d		;8b7f   ; guarda la fraccion de la y de la cosa
 	push de			;8b82
 	call L_8CD8		;8b83
 	pop de			;8b86
-	ld a,(ix+004h)		;8b87
+	ld a,(ix+004h)		;8b87   ; lee la fraccion de la x de la cosa
 	dec a			;8b8a
 	call L_8CC1		;8b8b
-	ld a,(ix+004h)		;8b8e
+	ld a,(ix+004h)		;8b8e   ; lee la fraccion de la x de la cosa
 	sub 017h		;8b91
 	cp 003h		;8b93
 	ld a,008h		;8b95
 	jr nc,L_8B9B		;8b97
 	ld a,0ffh		;8b99
 L_8B9B:
-	ld (ix+006h),a		;8b9b
-	inc (ix+000h)		;8b9e
+	ld (ix+006h),a		;8b9b   ; guarda si la cosa se mueve
+	inc (ix+000h)		;8b9e   ; sube el tipo de la cosa
 	ret			;8ba1
 L_8BA2:
 	set 7,(hl)		;8ba2
-	ld a,(ix+003h)		;8ba4
+	ld a,(ix+003h)		;8ba4   ; lee la y de la cosa
 	cp 002h		;8ba7
 	jp z,L_8C44		;8ba9
 	push de			;8bac
-	ld a,(ix+004h)		;8bad
+	ld a,(ix+004h)		;8bad   ; lee la fraccion de la x de la cosa
 	dec a			;8bb0
 	call L_8CC1		;8bb1
 	pop de			;8bb4
-	ld a,(ix+006h)		;8bb5
+	ld a,(ix+006h)		;8bb5   ; lee si la cosa se mueve
 	inc a			;8bb8
 	ret z			;8bb9
 	ld a,(0c003h)		;8bba   ; lee el contador de cuadros
 	and 00fh		;8bbd
 	ret nz			;8bbf
-	dec (ix+006h)		;8bc0
+	dec (ix+006h)		;8bc0   ; baja si la cosa se mueve
 	ret nz			;8bc3
 	call L_8CE6		;8bc4
 L_8BC7:
-	ld (ix+000h),000h		;8bc7
+	ld (ix+000h),000h		;8bc7   ; el tipo de la cosa = 0x00
 	ret			;8bcb
 L_8BCC:
-	inc (ix+006h)		;8bcc
-	ld a,(ix+006h)		;8bcf
+	inc (ix+006h)		;8bcc   ; sube si la cosa se mueve
+	ld a,(ix+006h)		;8bcf   ; lee si la cosa se mueve
 	and 01fh		;8bd2
 	ret nz			;8bd4
 	ld (hl),002h		;8bd5
-	ld a,(ix+004h)		;8bd7
+	ld a,(ix+004h)		;8bd7   ; lee la fraccion de la x de la cosa
 	or a			;8bda
 	jp z,L_8B1B		;8bdb
 	ret			;8bde
 L_8BDF:
-	ld (ix+003h),000h		;8bdf
+	ld (ix+003h),000h		;8bdf   ; la y de la cosa = 0x00
 	call L_8F68		;8be3
 	ret nz			;8be6
 	ld a,(hl)			;8be7
@@ -2018,12 +2018,12 @@ L_8BDF:
 	jr nz,L_8BF3		;8bee
 	call L_8CE6		;8bf0
 L_8BF3:
-	ld a,(ix+004h)		;8bf3
+	ld a,(ix+004h)		;8bf3   ; lee la fraccion de la x de la cosa
 	cp 019h		;8bf6
 	jr z,L_8C14		;8bf8
-	ld (ix+005h),0ffh		;8bfa
+	ld (ix+005h),0ffh		;8bfa   ; la x de la cosa = 0xFF
 	call L_8D29		;8bfe
-	ld a,(ix+004h)		;8c01
+	ld a,(ix+004h)		;8c01   ; lee la fraccion de la x de la cosa
 	cp 017h		;8c04
 	jr z,L_8C0B		;8c06
 	cp 018h		;8c08
@@ -2035,7 +2035,7 @@ L_8C0B:
 	ret			;8c13
 L_8C14:
 	ld a,(ix+00dh)		;8c14
-	ld (ix+004h),a		;8c17
+	ld (ix+004h),a		;8c17   ; guarda la fraccion de la x de la cosa
 	call L_8C2F		;8c1a
 	ld a,(0c700h)		;8c1d
 	or a			;8c20
@@ -2047,35 +2047,35 @@ L_8C14:
 	call L_8EC9		;8c2a
 	jr L_8C0B		;8c2d
 L_8C2F:
-	ld a,(ix+001h)		;8c2f
+	ld a,(ix+001h)		;8c2f   ; lee el paso en que va la cosa
 	sub 008h		;8c32
-	ld (ix+001h),a		;8c34
-	ld (ix+000h),005h		;8c37
-	ld (ix+006h),000h		;8c3b
-	ld (ix+005h),002h		;8c3f
+	ld (ix+001h),a		;8c34   ; guarda el paso en que va la cosa
+	ld (ix+000h),005h		;8c37   ; el tipo de la cosa = 0x05
+	ld (ix+006h),000h		;8c3b   ; la cosa se queda quieta
+	ld (ix+005h),002h		;8c3f   ; la x de la cosa = 0x02
 	ret			;8c43
 L_8C44:
-	ld (ix+003h),000h		;8c44
-	ld a,(ix+004h)		;8c48
+	ld (ix+003h),000h		;8c44   ; la y de la cosa = 0x00
+	ld a,(ix+004h)		;8c48   ; lee la fraccion de la x de la cosa
 	cp 00ah		;8c4b
 	jr nz,L_8C58		;8c4d
-	ld (ix+004h),00bh		;8c4f
+	ld (ix+004h),00bh		;8c4f   ; la fraccion de la x de la cosa = 0x0B
 	call L_8CE6		;8c53
 	jr L_8C2F		;8c56
 L_8C58:
 	cp 00bh		;8c58
 	ret nz			;8c5a
-	ld (ix+006h),001h		;8c5b
+	ld (ix+006h),001h		;8c5b   ; la cosa se mueve
 	ret			;8c5f
 L_8C60:
-	ld a,(ix+004h)		;8c60
+	ld a,(ix+004h)		;8c60   ; lee la fraccion de la x de la cosa
 	cp 019h		;8c63
 	ret z			;8c65
-	ld a,(ix+000h)		;8c66
+	ld a,(ix+000h)		;8c66   ; lee el tipo de la cosa
 	and 00fh		;8c69
 	cp 004h		;8c6b
 	ret z			;8c6d
-	ld a,(ix+005h)		;8c6e
+	ld a,(ix+005h)		;8c6e   ; lee la x de la cosa
 	or a			;8c71
 	jr z,L_8C7E		;8c72
 	dec a			;8c74
@@ -2107,12 +2107,12 @@ L_8C96:
 	call 04061h		;8ca1   ; hl_mas_a: HL += A
 	ld c,(hl)			;8ca4
 L_8CA5:
-	ld a,(ix+001h)		;8ca5
+	ld a,(ix+001h)		;8ca5   ; lee el paso en que va la cosa
 L_8CA8:
 	ld hl,0d628h		;8ca8
 	ld (hl),a			;8cab
 	inc hl			;8cac
-	ld a,(ix+002h)		;8cad
+	ld a,(ix+002h)		;8cad   ; lee la fraccion de la y de la cosa
 	ld (hl),a			;8cb0
 	inc hl			;8cb1
 	ld (hl),b			;8cb2
@@ -2155,14 +2155,14 @@ L_8CD8:
 	push bc			;8cd8
 	call 07d2fh		;8cd9   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;8cdc
-	ld (ix+007h),c		;8cdd
+	ld (ix+007h),c		;8cdd   ; guarda la velocidad vertical (parte baja)
 	ld hl,0e520h		;8ce0
 	jp L_8744		;8ce3
 L_8CE6:
 	push ix		;8ce6
 	push de			;8ce8
 	push de			;8ce9
-	ld c,(ix+007h)		;8cea
+	ld c,(ix+007h)		;8cea   ; lee la velocidad vertical (parte baja)
 	ld hl,0e520h		;8ced
 	push bc			;8cf0
 	push hl			;8cf1
@@ -2200,7 +2200,7 @@ L_8D12:
 	pop ix		;8d26
 	ret			;8d28
 L_8D29:
-	ld a,(ix+004h)		;8d29
+	ld a,(ix+004h)		;8d29   ; lee la fraccion de la x de la cosa
 L_8D2C:
 	ld hl,0509fh		;8d2c
 	push hl			;8d2f
@@ -2568,7 +2568,7 @@ L_8F55:
 	jp L_8EE6		;8f65
 L_8F68:
 	push hl			;8f68
-	ld a,(ix+004h)		;8f69
+	ld a,(ix+004h)		;8f69   ; lee la fraccion de la x de la cosa
 	cp 019h		;8f6c
 	jr nz,L_8F83		;8f6e
 	ld hl,0c700h		;8f70
@@ -2691,11 +2691,11 @@ L_9004:
 	sub (hl)			;9009
 	jr nz,L_9015		;900a
 	ld (hl),a			;900c
-	ld a,(ix+000h)		;900d
+	ld a,(ix+000h)		;900d   ; lee el tipo de la cosa
 	xor 003h		;9010
-	ld (ix+000h),a		;9012
+	ld (ix+000h),a		;9012   ; guarda el tipo de la cosa
 L_9015:
-	ld (ix+001h),e		;9015
+	ld (ix+001h),e		;9015   ; guarda el paso en que va la cosa
 	ld a,e			;9018
 	sub 004h		;9019
 	ld e,a			;901b
@@ -3019,7 +3019,7 @@ L_91D8:
 	jr z,L_9229		;91e7
 	ret			;91e9
 L_91EA:
-	ld (ix+009h),c		;91ea
+	ld (ix+009h),c		;91ea   ; guarda la velocidad horizontal (parte baja)
 	ld (hl),082h		;91ed
 	jp L_924C		;91ef
 L_91F2:
@@ -3042,8 +3042,8 @@ L_91F2:
 	inc (hl)			;9208
 	call L_92BB		;9209
 L_920C:
-	ld (ix+00ah),020h		;920c
-	ld (ix+000h),003h		;9210
+	ld (ix+00ah),020h		;920c   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0x20
+	ld (ix+000h),003h		;9210   ; el tipo de la cosa = 0x03
 	ret			;9214
 L_9215:
 	ld a,006h		;9215
@@ -3052,13 +3052,13 @@ L_9215:
 	ld (0c70bh),a		;921c
 	jr L_920C		;921f
 L_9221:
-	ld a,(ix+009h)		;9221
+	ld a,(ix+009h)		;9221   ; lee la velocidad horizontal (parte baja)
 	call L_944F		;9224
 	inc hl			;9227
 	ret			;9228
 L_9229:
-	dec (ix+00ah)		;9229
-	ld a,(ix+00ah)		;922c
+	dec (ix+00ah)		;9229   ; baja la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld a,(ix+00ah)		;922c   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	push af			;922f
 	rra			;9230
 	ld a,002h		;9231
@@ -3072,7 +3072,7 @@ L_9238:
 	ret nz			;923e
 	ld a,(0c70bh)		;923f
 	call L_925E		;9242
-	ld (ix+000h),082h		;9245
+	ld (ix+000h),082h		;9245   ; el tipo de la cosa = 0x82
 	jp L_92A7		;9249
 L_924C:
 	push de			;924c
@@ -3165,7 +3165,7 @@ DATA_tabla_92AD:
 
 L_92BB:
 	ld de,09300h		;92bb
-	ld a,(ix+005h)		;92be
+	ld a,(ix+005h)		;92be   ; lee la x de la cosa
 	add a,a			;92c1
 	add a,a			;92c2
 	add a,a			;92c3
@@ -3221,7 +3221,7 @@ DATA_tres_tablas_pequenas:
 L_9327:
 	ld a,0ffh		;9327
 	ld (0c40ch),a		;9329
-	ld a,(ix+009h)		;932c
+	ld a,(ix+009h)		;932c   ; lee la velocidad horizontal (parte baja)
 	ld (0c703h),a		;932f
 	ret			;9332
 L_9333:
@@ -3250,21 +3250,21 @@ L_934E:
 	ld b,005h		;9353
 	jp 045a0h		;9355
 L_9358:
-	ld (ix+000h),000h		;9358
+	ld (ix+000h),000h		;9358   ; el tipo de la cosa = 0x00
 	call L_9378		;935c
 	ld hl,0e580h		;935f
 	call L_889C		;9362
-	ld h,(ix+007h)		;9365
-	ld l,(ix+008h)		;9368
+	ld h,(ix+007h)		;9365   ; lee la velocidad vertical (parte baja)
+	ld l,(ix+008h)		;9368   ; lee la velocidad vertical
 	ld (hl),000h		;936b
 	ld a,010h		;936d
 	call 0509fh		;936f   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld de,05000h		;9372
 	jp 044ech		;9375
 L_9378:
-	ld e,(ix+001h)		;9378
-	ld d,(ix+002h)		;937b
-	ld c,(ix+009h)		;937e
+	ld e,(ix+001h)		;9378   ; lee el paso en que va la cosa
+	ld d,(ix+002h)		;937b   ; lee la fraccion de la y de la cosa
+	ld c,(ix+009h)		;937e   ; lee la velocidad horizontal (parte baja)
 	ld hl,0e580h		;9381
 	jp L_8861		;9384
 L_9387:
@@ -3642,10 +3642,10 @@ L_9609:
 L_9634:
 	ld b,008h		;9634
 L_9636:
-	ld a,(ix+000h)		;9636
+	ld a,(ix+000h)		;9636   ; lee el tipo de la cosa
 	and a			;9639
 	jr z,L_9644		;963a
-	ld a,(ix+004h)		;963c
+	ld a,(ix+004h)		;963c   ; lee la fraccion de la x de la cosa
 	cp 003h		;963f
 	call z,L_964C		;9641
 L_9644:
@@ -3654,9 +3654,9 @@ L_9644:
 	djnz L_9636		;9649
 	ret			;964b
 L_964C:
-	ld a,(ix+001h)		;964c
+	ld a,(ix+001h)		;964c   ; lee el paso en que va la cosa
 	sub 010h		;964f
-	ld h,(ix+002h)		;9651
+	ld h,(ix+002h)		;9651   ; lee la fraccion de la y de la cosa
 	rra			;9654
 	rra			;9655
 	rra			;9656
@@ -3925,7 +3925,7 @@ L_98EC:
 	ld ix,0c800h		;98ec
 	ld b,007h		;98f0
 L_98F2:
-	ld a,(ix+000h)		;98f2
+	ld a,(ix+000h)		;98f2   ; lee el tipo de la cosa
 	and a			;98f5
 	jr z,L_9908		;98f6
 	push bc			;98f8
@@ -3950,7 +3950,7 @@ L_9918:
 	ld b,007h		;991c
 L_991E:
 	push bc			;991e
-	ld a,(ix+000h)		;991f
+	ld a,(ix+000h)		;991f   ; lee el tipo de la cosa
 	and a			;9922
 	call nz,06445h		;9923
 	ld de,00080h		;9926
@@ -3968,7 +3968,7 @@ L_992F:
 	scf			;9939
 	ret			;993a
 L_993B:
-	ld a,(ix+000h)		;993b
+	ld a,(ix+000h)		;993b   ; lee el tipo de la cosa
 	dec a			;993e
 	call 0406bh		;993f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -4048,36 +4048,36 @@ L_99B5:
 	djnz L_99AF		;99b6
 	ret			;99b8
 L_99B9:
-	ld a,(ix+006h)		;99b9
+	ld a,(ix+006h)		;99b9   ; lee si la cosa se mueve
 	and a			;99bc
 	ret z			;99bd
-	ld e,(ix+007h)		;99be
-	ld d,(ix+008h)		;99c1
-	ld l,(ix+002h)		;99c4
-	ld h,(ix+003h)		;99c7
+	ld e,(ix+007h)		;99be   ; lee la velocidad vertical (parte baja)
+	ld d,(ix+008h)		;99c1   ; lee la velocidad vertical
+	ld l,(ix+002h)		;99c4   ; lee la fraccion de la y de la cosa
+	ld h,(ix+003h)		;99c7   ; lee la y de la cosa
 	add hl,de			;99ca
-	ld (ix+002h),l		;99cb
-	ld (ix+003h),h		;99ce
-	ld e,(ix+009h)		;99d1
-	ld d,(ix+00ah)		;99d4
-	ld l,(ix+004h)		;99d7
-	ld h,(ix+005h)		;99da
+	ld (ix+002h),l		;99cb   ; guarda la fraccion de la y de la cosa
+	ld (ix+003h),h		;99ce   ; guarda la y de la cosa
+	ld e,(ix+009h)		;99d1   ; lee la velocidad horizontal (parte baja)
+	ld d,(ix+00ah)		;99d4   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
+	ld l,(ix+004h)		;99d7   ; lee la fraccion de la x de la cosa
+	ld h,(ix+005h)		;99da   ; lee la x de la cosa
 	add hl,de			;99dd
-	ld (ix+004h),l		;99de
-	ld (ix+005h),h		;99e1
+	ld (ix+004h),l		;99de   ; guarda la fraccion de la x de la cosa
+	ld (ix+005h),h		;99e1   ; guarda la x de la cosa
 	ret			;99e4
 L_99E5:
-	ld a,(ix+003h)		;99e5
+	ld a,(ix+003h)		;99e5   ; lee la y de la cosa
 	cp 0e4h		;99e8
 	jr nc,borra_la_cosa		;99ea
-	ld a,(ix+005h)		;99ec
+	ld a,(ix+005h)		;99ec   ; lee la x de la cosa
 	cp 0f1h		;99ef
 	jr nc,borra_la_cosa		;99f1
 	cp 007h		;99f3
 	ret nc			;99f5
 borra_la_cosa:
 	xor a			;99f6
-	ld (ix+000h),a		;99f7
+	ld (ix+000h),a		;99f7   ; guarda el tipo de la cosa
 	ld (ix+00eh),a		;99fa
 	push ix		;99fd
 	pop hl			;99ff
@@ -4104,8 +4104,8 @@ L_9A07:
 	ret			;9a19
 L_9A1A:
 	call borra_la_cosa		;9a1a   ; borra_la_cosa: tipo a cero y sus sprites libres
-	ld c,(ix+003h)		;9a1d
-	ld b,(ix+005h)		;9a20
+	ld c,(ix+003h)		;9a1d   ; lee la y de la cosa
+	ld b,(ix+005h)		;9a20   ; lee la x de la cosa
 	ld hl,00000h		;9a23
 	ld e,l			;9a26
 	ld d,h			;9a27
@@ -4146,7 +4146,7 @@ L_9A58:
 	inc (hl)			;9a69
 	ret			;9a6a
 L_9A6B:
-	ld a,(ix+000h)		;9a6b
+	ld a,(ix+000h)		;9a6b   ; lee el tipo de la cosa
 	ld (0cff0h),a		;9a6e   ; guarda el tipo de la cosa que se crea
 	cp 022h		;9a71
 	jp z,L_9A8D		;9a73
@@ -4179,7 +4179,7 @@ L_9A99:
 	scf			;9aa1
 	ret			;9aa2
 L_9AA3:
-	ld (ix+001h),008h		;9aa3
+	ld (ix+001h),008h		;9aa3   ; el paso en que va la cosa = 0x08
 	scf			;9aa7
 	ret			;9aa8
 L_9AA9:
@@ -4226,8 +4226,8 @@ L_9ABE:
 	ld b,001h		;9af0
 	ret			;9af2
 L_9AF3:
-	ld e,(ix+003h)		;9af3
-	ld d,(ix+005h)		;9af6
+	ld e,(ix+003h)		;9af3   ; lee la y de la cosa
+	ld d,(ix+005h)		;9af6   ; lee la x de la cosa
 	ld b,004h		;9af9
 L_9AFB:
 	push bc			;9afb
@@ -4260,10 +4260,10 @@ L_9B22:
 	ld a,(0cff0h)		;9b22   ; lee el tipo de la cosa que se crea
 	ld hl,l9b33h		;9b25
 	call 04061h		;9b28   ; hl_mas_a: HL += A
-	ld a,(ix+003h)		;9b2b
+	ld a,(ix+003h)		;9b2b   ; lee la y de la cosa
 	sub (hl)			;9b2e
 	ld e,a			;9b2f
-	ld d,(ix+005h)		;9b30
+	ld d,(ix+005h)		;9b30   ; lee la x de la cosa
 L_9B33:
 	ret			;9b33
 
@@ -4282,62 +4282,62 @@ DATA_tabla_sin_usar:
 
 
 L_9B60:
-	ld (ix+00bh),085h		;9b60
-	ld (ix+00ch),010h		;9b64
+	ld (ix+00bh),085h		;9b60   ; el dibujo de la cosa = 0x85
+	ld (ix+00ch),010h		;9b64   ; la cuenta de cuadros del paso = 0x10
 	ld (ix+00eh),000h		;9b68
 	ld (ix+07eh),000h		;9b6c
 	ret			;9b70
 L_9B71:
-	ld a,(ix+000h)		;9b71
+	ld a,(ix+000h)		;9b71   ; lee el tipo de la cosa
 	ld (0cff0h),a		;9b74   ; guarda el tipo de la cosa que se crea
-	ld a,(ix+00ch)		;9b77
+	ld a,(ix+00ch)		;9b77   ; lee la cuenta de cuadros del paso
 	and 004h		;9b7a
 	ld c,085h		;9b7c
 	jr z,L_9B81		;9b7e
 	inc c			;9b80
 L_9B81:
-	ld (ix+00bh),c		;9b81
-	dec (ix+00ch)		;9b84
+	ld (ix+00bh),c		;9b81   ; guarda el dibujo de la cosa
+	dec (ix+00ch)		;9b84   ; baja la cuenta de cuadros del paso
 	ret nz			;9b87
 	call borra_la_cosa		;9b88   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld a,(ix+01fh)		;9b8b
 	and a			;9b8e
 	ret z			;9b8f
 	ld c,024h		;9b90
-	ld e,(ix+003h)		;9b92
-	ld d,(ix+005h)		;9b95
+	ld e,(ix+003h)		;9b92   ; lee la y de la cosa
+	ld d,(ix+005h)		;9b95   ; lee la x de la cosa
 	jp 05f1dh		;9b98   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_9B9B:
 	ld (ix+00eh),002h		;9b9b
-	ld (ix+00ch),001h		;9b9f
-	ld (ix+006h),001h		;9ba3
+	ld (ix+00ch),001h		;9b9f   ; la cuenta de cuadros del paso = 0x01
+	ld (ix+006h),001h		;9ba3   ; la cosa se mueve
 	ld de,00080h		;9ba7
 	call 0a55dh		;9baa   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00200h		;9bad
 	call 0a56ch		;9bb0   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+011h),0ffh		;9bb3
 	ld (ix+010h),0e0h		;9bb7
-	ld (ix+00bh),000h		;9bbb
+	ld (ix+00bh),000h		;9bbb   ; el dibujo de la cosa = 0x00
 	ld (ix+07eh),000h		;9bbf
 	ret			;9bc3
 L_9BC4:
-	ld (ix+00ch),014h		;9bc4
-	ld (ix+006h),000h		;9bc8
+	ld (ix+00ch),014h		;9bc4   ; la cuenta de cuadros del paso = 0x14
+	ld (ix+006h),000h		;9bc8   ; la cosa se queda quieta
 	ld (ix+00eh),002h		;9bcc
-	ld (ix+00bh),001h		;9bd0
+	ld (ix+00bh),001h		;9bd0   ; el dibujo de la cosa = 0x01
 	ld (ix+07eh),000h		;9bd4
 	ret			;9bd8
 L_9BD9:
 	call L_9C5D		;9bd9
 	jr c,L_9C03		;9bdc
-	inc (ix+00ch)		;9bde
+	inc (ix+00ch)		;9bde   ; sube la cuenta de cuadros del paso
 	ld e,(ix+010h)		;9be1
 	ld d,(ix+011h)		;9be4
 	call 0a564h		;9be7
-	ld a,(ix+00ch)		;9bea
+	ld a,(ix+00ch)		;9bea   ; lee la cuenta de cuadros del paso
 	sub 020h		;9bed
 	ret nz			;9bef
-	ld (ix+00ch),a		;9bf0
+	ld (ix+00ch),a		;9bf0   ; guarda la cuenta de cuadros del paso
 	ld e,(ix+010h)		;9bf3
 	ld d,(ix+011h)		;9bf6
 	call 0a17ch		;9bf9   ; niega_de: DE = -DE
@@ -4349,11 +4349,11 @@ L_9C03:
 	ld b,001h		;9c06
 	ld hl,00410h		;9c08
 L_9C0B:
-	ld a,(ix+003h)		;9c0b
+	ld a,(ix+003h)		;9c0b   ; lee la y de la cosa
 	sub l			;9c0e
 	and 0f8h		;9c0f
 	ld e,a			;9c11
-	ld a,(ix+005h)		;9c12
+	ld a,(ix+005h)		;9c12   ; lee la x de la cosa
 	sub h			;9c15
 	add a,004h		;9c16
 	and 0f8h		;9c18
@@ -4366,18 +4366,18 @@ L_9C1E:
 	call 04061h		;9c26   ; hl_mas_a: HL += A
 	ld a,(hl)			;9c29
 	ld (ix+025h),a		;9c2a
-	ld a,(ix+001h)		;9c2d
+	ld a,(ix+001h)		;9c2d   ; lee el paso en que va la cosa
 	and a			;9c30
 	jr nz,L_9C46		;9c31
-	dec (ix+00ch)		;9c33
+	dec (ix+00ch)		;9c33   ; baja la cuenta de cuadros del paso
 	ret nz			;9c36
-	inc (ix+001h)		;9c37
+	inc (ix+001h)		;9c37   ; sube el paso en que va la cosa
 	ld de,00000h		;9c3a
 	call 0a56ch		;9c3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00800h		;9c40
 	jp 0a55dh		;9c43   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_9C46:
-	ld (ix+006h),001h		;9c46
+	ld (ix+006h),001h		;9c46   ; la cosa se mueve
 	call L_9C5D		;9c4a
 	ret nc			;9c4d
 	call borra_la_cosa		;9c4e   ; borra_la_cosa: tipo a cero y sus sprites libres
@@ -4398,8 +4398,8 @@ DATA_cuatro_valores_por_cuadro_2:
 
 
 L_9C5D:
-	ld e,(ix+003h)		;9c5d
-	ld d,(ix+005h)		;9c60
+	ld e,(ix+003h)		;9c5d   ; lee la y de la cosa
+	ld d,(ix+005h)		;9c60   ; lee la x de la cosa
 	jp 07b98h		;9c63   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 L_9C66:
 	ld (ix+00eh),000h		;9c66
@@ -4410,9 +4410,9 @@ L_9C66:
 	ld c,015h		;9c73
 	ld (ix+025h),00bh		;9c75
 L_9C79:
-	ld (ix+00bh),c		;9c79
-	ld (ix+00ch),01eh		;9c7c
-	ld (ix+006h),001h		;9c80
+	ld (ix+00bh),c		;9c79   ; guarda el dibujo de la cosa
+	ld (ix+00ch),01eh		;9c7c   ; la cuenta de cuadros del paso = 0x1E
+	ld (ix+006h),001h		;9c80   ; la cosa se mueve
 	ld (ix+07eh),000h		;9c84
 	ld hl,0cf30h		;9c88
 	inc (hl)			;9c8b
@@ -4727,7 +4727,7 @@ L_9E31:
 	ld ix,0d700h		;9e31
 	ld b,008h		;9e35
 L_9E37:
-	ld a,(ix+000h)		;9e37
+	ld a,(ix+000h)		;9e37   ; lee el tipo de la cosa
 	and a			;9e3a
 	jr z,L_9E50		;9e3b
 	push bc			;9e3d
@@ -4745,7 +4745,7 @@ L_9E50:
 	djnz L_9E37		;9e55
 	ret			;9e57
 L_9E58:
-	ld a,(ix+000h)		;9e58
+	ld a,(ix+000h)		;9e58   ; lee el tipo de la cosa
 	dec a			;9e5b
 	call 0406bh		;9e5c   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -4776,17 +4776,17 @@ DATA_tabla_9E5F:
 L_9E77:
 	ret			;9e77
 L_9E78:
-	inc (ix+00ch)		;9e78
-	bit 1,(ix+00ch)		;9e7b
+	inc (ix+00ch)		;9e78   ; sube la cuenta de cuadros del paso
+	bit 1,(ix+00ch)		;9e7b   ; mira el bit 1 de la cuenta de cuadros del paso
 	ld a,027h		;9e7f
 	jr z,L_9E84		;9e81
 	inc a			;9e83
 L_9E84:
-	bit 7,(ix+00ah)		;9e84
+	bit 7,(ix+00ah)		;9e84   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	jr nz,L_9E8C		;9e88
 	add a,002h		;9e8a
 L_9E8C:
-	ld (ix+00bh),a		;9e8c
+	ld (ix+00bh),a		;9e8c   ; guarda el dibujo de la cosa
 	ret			;9e8f
 L_9E90:
 	ld e,(ix+012h)		;9e90
@@ -4796,16 +4796,16 @@ L_9E90:
 	add hl,de			;9e9c
 	ld (ix+010h),l		;9e9d
 	ld (ix+011h),h		;9ea0
-	ld a,(ix+00ch)		;9ea3
-	inc (ix+00ch)		;9ea6
+	ld a,(ix+00ch)		;9ea3   ; lee la cuenta de cuadros del paso
+	inc (ix+00ch)		;9ea6   ; sube la cuenta de cuadros del paso
 	and 004h		;9ea9
 	ld c,039h		;9eab
 	jr z,L_9EB0		;9ead
 	inc c			;9eaf
 L_9EB0:
-	ld (ix+00bh),c		;9eb0
+	ld (ix+00bh),c		;9eb0   ; guarda el dibujo de la cosa
 	ld de,00030h		;9eb3
-	ld a,(ix+003h)		;9eb6
+	ld a,(ix+003h)		;9eb6   ; lee la y de la cosa
 	cp (ix+011h)		;9eb9
 	jr c,L_9EC1		;9ebc
 	ld de,0ffd0h		;9ebe
@@ -4814,13 +4814,13 @@ L_9EC1:
 L_9EC4:
 	ret			;9ec4
 L_9EC5:
-	inc (ix+00ch)		;9ec5
-	ld a,(ix+00ch)		;9ec8
+	inc (ix+00ch)		;9ec5   ; sube la cuenta de cuadros del paso
+	ld a,(ix+00ch)		;9ec8   ; lee la cuenta de cuadros del paso
 	rra			;9ecb
 	rra			;9ecc
 	and 003h		;9ecd
 	add a,063h		;9ecf
-	ld (ix+00bh),a		;9ed1
+	ld (ix+00bh),a		;9ed1   ; guarda el dibujo de la cosa
 	bit 7,(ix+010h)		;9ed4
 	ld de,00018h		;9ed8
 	jr nz,L_9EE0		;9edb
@@ -4842,61 +4842,61 @@ L_9EED:
 	add a,l			;9ef9
 	ld l,a			;9efa
 	ld a,(hl)			;9efb
-	sub (ix+005h)		;9efc
+	sub (ix+005h)		;9efc   ; le resta la x de la cosa
 	add a,010h		;9eff
 	cp 020h		;9f01
 	ret nc			;9f03
 	jp borra_la_cosa		;9f04   ; borra_la_cosa: tipo a cero y sus sprites libres
 L_9F07:
-	ld a,(ix+00ch)		;9f07
+	ld a,(ix+00ch)		;9f07   ; lee la cuenta de cuadros del paso
 	inc a			;9f0a
 	cp 00ch		;9f0b
 	jr c,L_9F10		;9f0d
 	xor a			;9f0f
 L_9F10:
-	ld (ix+00ch),a		;9f10
+	ld (ix+00ch),a		;9f10   ; guarda la cuenta de cuadros del paso
 	rra			;9f13
 	rra			;9f14
 	and 003h		;9f15
 	add a,04bh		;9f17
-	ld (ix+00bh),a		;9f19
+	ld (ix+00bh),a		;9f19   ; guarda el dibujo de la cosa
 	ld de,00050h		;9f1c
 	jp 0a549h		;9f1f   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 L_9F22:
-	ld a,(ix+00ch)		;9f22
+	ld a,(ix+00ch)		;9f22   ; lee la cuenta de cuadros del paso
 	rra			;9f25
 	rra			;9f26
 	and 003h		;9f27
 	add a,07dh		;9f29
-	ld (ix+00bh),a		;9f2b
-	ld a,(ix+001h)		;9f2e
+	ld (ix+00bh),a		;9f2b   ; guarda el dibujo de la cosa
+	ld a,(ix+001h)		;9f2e   ; lee el paso en que va la cosa
 	dec a			;9f31
 	jr z,L_9F4C		;9f32
-	dec (ix+00ch)		;9f34
+	dec (ix+00ch)		;9f34   ; baja la cuenta de cuadros del paso
 	ret nz			;9f37
 	ld a,040h		;9f38
 	call 0a0e7h		;9f3a
 	call 0a56ch		;9f3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;9f40
 	call 0a55dh		;9f41   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld (ix+00ch),01eh		;9f44
-	inc (ix+001h)		;9f48
+	ld (ix+00ch),01eh		;9f44   ; la cuenta de cuadros del paso = 0x1E
+	inc (ix+001h)		;9f48   ; sube el paso en que va la cosa
 	ret			;9f4b
 L_9F4C:
-	dec (ix+00ch)		;9f4c
+	dec (ix+00ch)		;9f4c   ; baja la cuenta de cuadros del paso
 	ret nz			;9f4f
 	ld de,00000h		;9f50
 	call 0a56ch		;9f53   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	call 0a55dh		;9f56   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld (ix+00ch),03ch		;9f59
-	ld (ix+001h),e		;9f5d
+	ld (ix+00ch),03ch		;9f59   ; la cuenta de cuadros del paso = 0x3C
+	ld (ix+001h),e		;9f5d   ; guarda el paso en que va la cosa
 	ret			;9f60
 L_9F61:
-	ld a,(ix+003h)		;9f61
+	ld a,(ix+003h)		;9f61   ; lee la y de la cosa
 	sub 010h		;9f64
 	ld c,a			;9f66
-	ld b,(ix+005h)		;9f67
-	ld a,(ix+000h)		;9f6a
+	ld b,(ix+005h)		;9f67   ; lee la x de la cosa
+	ld a,(ix+000h)		;9f6a   ; lee el tipo de la cosa
 crea_con_parametros:
 	ld (0cff9h),a		;9f6d
 	ld (0cff1h),bc		;9f70   ; guarda la posicion de la cosa que se crea
@@ -4932,7 +4932,7 @@ L_9FA7:
 	pop ix		;9fa8
 	ld (0cff3h),hl		;9faa   ; guarda la ficha de la cosa que se crea
 	ld c,002h		;9fad
-	ld (ix+020h),c		;9faf
+	ld (ix+020h),c		;9faf   ; guarda cuantos sprites lleva la cosa
 	ld (ix+07fh),001h		;9fb2
 	ld (ix+07eh),001h		;9fb6
 	ld de,01100h		;9fba

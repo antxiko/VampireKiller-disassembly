@@ -92,6 +92,8 @@ L 0x7B88 mira_el_suelo
 L 0x7B98 choca_con_el_decorado
 L 0x7C5E es_pared
 L 0x7D2F celda_del_mapa
+C 0x6029 lee cuantos sprites lleva la cosa
+C 0x602E lee el tipo de la cosa
 C 0x6031 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x6034 lee la ficha de la cosa que se crea
 C 0x6049 lee la ficha de la cosa que se crea
@@ -130,11 +132,17 @@ C 0x6409 hl_mas_a: HL += A
 C 0x6411 guarda la Y de Simon
 C 0x6415 guarda la X de Simon
 C 0x641B guarda el lado al que mira Simon
+C 0x6445 lee el tipo de la cosa
 C 0x6451 el mapper: pone en 0xA000 el banco de A
 C 0x6454 guarda la copia del banco de 0xA000
+C 0x6458 lee el dibujo de la cosa
 C 0x645E palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x6478 le suma la y de la cosa
+C 0x647E le suma la x de la cosa
 C 0x648F el mapper: pone en 0xA000 el banco de A
 C 0x6492 guarda la copia del banco de 0xA000
+C 0x64AB le suma la y de la cosa
+C 0x64B4 le suma la x de la cosa
 C 0x64C5 el mapper: pone en 0xA000 el banco de A
 C 0x64C8 guarda la copia del banco de 0xA000
 C 0x6559 lee el estado de la puerta de la fase
@@ -205,21 +213,44 @@ C 0x698F copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRA
 C 0x699D copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x69AB copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x69B9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x69C3 la cosa se mueve
+C 0x69C7 el dibujo de la cosa = 0x5A
 C 0x69D4 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x69D7 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x69DE pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x69E1 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x6A1A hl_mas_a: HL += A
 C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x6A44 la cosa se queda quieta
 C 0x6A4F lee el contador de cuadros
 C 0x6A5A crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x6A5D la cosa se mueve
+C 0x6A61 la cuenta de cuadros del paso = 0x08
+C 0x6A69 el dibujo de la cosa = 0x02
 C 0x6A70 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x6A7D palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x6A80 lee la X de Simon
+C 0x6A83 le resta la x de la cosa
 C 0x6A86 niega_de: DE = -DE
 C 0x6A89 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0x6A9C lee el paso en que va la cosa
 C 0x6AA4 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
+C 0x6AA7 lee el paso en que va la cosa
 C 0x6AAA despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6AB7 baja la cuenta de cuadros del paso
+C 0x6ABB el dibujo de la cosa = 0xA5
+C 0x6ABF la cuenta de cuadros del paso = 0x08
+C 0x6AC3 sube el paso en que va la cosa
+C 0x6AC7 baja la cuenta de cuadros del paso
+C 0x6ACB va hacia la izquierda? (bit 7 de la velocidad horizontal)
+C 0x6AD4 guarda el dibujo de la cosa
+C 0x6AD7 la cuenta de cuadros del paso = 0x08
+C 0x6ADB sube el paso en que va la cosa
+C 0x6ADF baja la cuenta de cuadros del paso
+C 0x6AE3 la cuenta de cuadros del paso = 0x18
+C 0x6AE7 sube el paso en que va la cosa
+C 0x6AF1 baja la cuenta de cuadros del paso
+C 0x6AF5 sube el paso en que va la cosa
 C 0x6B12 lee el estado de la puerta de la fase
 C 0x6B3F despacha: salta a la entrada A de la tabla que va detras del call
 C 0x6B52 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
@@ -343,6 +374,8 @@ C 0x7176 guarda los corazones, en BCD
 C 0x7191 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x71B2 lee los corazones, en BCD
 C 0x71B8 guarda los corazones, en BCD
+C 0x71CC lee el paso en que va la cosa
+C 0x71D4 guarda el tipo de la cosa
 C 0x71EF despacha: salta a la entrada A de la tabla que va detras del call
 C 0x7209 guarda la pose de arriba de Simon
 C 0x721D guarda la pose de abajo de Simon
@@ -354,26 +387,108 @@ C 0x7240 apunta a la pose de abajo de Simon
 C 0x725A apunta a la pose de abajo de Simon
 C 0x7280 guarda la pose de abajo de Simon
 C 0x7283 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x7292 lee el tipo de la cosa
+C 0x729A guarda si la cosa se mueve
 C 0x729D lee el lado al que mira Simon
+C 0x72A0 guarda la velocidad vertical
+C 0x72A6 guarda el paso en que va la cosa
+C 0x72BD lee el paso en que va la cosa
+C 0x72CE lee el paso en que va la cosa
 C 0x72D3 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x72DE lee el contador de cuadros
+C 0x72EB guarda si la cosa se mueve
 C 0x72F5 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x72F8 lee el tipo de la cosa
 C 0x72FC despacha: salta a la entrada A de la tabla que va detras del call
 C 0x730C lee la Y de Simon
+C 0x7316 guarda la fraccion de la x de la cosa
+C 0x731A guarda la fraccion de la y de la cosa
+C 0x731D lee el paso en que va la cosa
+C 0x7328 lee la velocidad vertical
+C 0x7331 guarda la y de la cosa
 C 0x7334 lee la X de Simon
+C 0x7337 guarda la x de la cosa
+C 0x733D lee la x de la cosa
+C 0x7346 sube la velocidad vertical (parte baja)
+C 0x7349 lee la velocidad vertical (parte baja)
+C 0x734F sube el tipo de la cosa
+C 0x7352 la velocidad vertical (parte baja) = 0x00
+C 0x7359 sube el tipo de la cosa
+C 0x735C sube el tipo de la cosa
+C 0x735F lee la velocidad vertical
+C 0x7369 guarda la y de la cosa
+C 0x736C la velocidad vertical (parte baja) = 0x00
+C 0x7379 lee la x de la cosa
+C 0x7382 sube la velocidad vertical (parte baja)
+C 0x7385 lee la velocidad vertical (parte baja)
+C 0x738F lee la velocidad vertical
+C 0x7395 baja la y de la cosa
+C 0x7399 sube la y de la cosa
+C 0x73A4 lee el tipo de la cosa
 C 0x73B3 lee la Y de Simon
+C 0x73BD guarda la fraccion de la x de la cosa
+C 0x73C1 guarda la fraccion de la y de la cosa
+C 0x73C4 lee la velocidad vertical
+C 0x73CE guarda la y de la cosa
 C 0x73D1 lee la X de Simon
+C 0x73D4 guarda la x de la cosa
+C 0x73D7 la cosa se mueve
+C 0x73DE lee la velocidad vertical (parte baja)
 C 0x73E4 hl_mas_a: HL += A
+C 0x73E7 lee la fraccion de la x de la cosa
+C 0x73ED guarda la fraccion de la x de la cosa
+C 0x73F0 sube la velocidad vertical (parte baja)
+C 0x73F3 lee la velocidad vertical (parte baja)
+C 0x73FA baja la velocidad vertical (parte baja)
+C 0x73FD lee la x de la cosa
+C 0x7400 lee la fraccion de la x de la cosa
 C 0x7403 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0x7407 sube el tipo de la cosa
+C 0x740B guarda la fraccion de la y de la cosa
+C 0x740E guarda la y de la cosa
+C 0x7411 guarda la velocidad vertical (parte baja)
 C 0x7416 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7419 lee el contador de cuadros
+C 0x7427 guarda si la cosa se mueve
+C 0x742A sube la velocidad vertical (parte baja)
+C 0x742D lee la velocidad vertical (parte baja)
+C 0x7436 lee el tipo de la cosa
 C 0x7440 lee la Y de Simon
+C 0x744A guarda la fraccion de la x de la cosa
+C 0x744E guarda la fraccion de la y de la cosa
+C 0x7451 lee la velocidad vertical
+C 0x745F guarda la y de la cosa
+C 0x7462 guarda si la cosa se mueve
 C 0x7465 lee la X de Simon
+C 0x7468 guarda la x de la cosa
+C 0x746B sube el tipo de la cosa
 C 0x7470 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7473 lee el contador de cuadros
+C 0x747F guarda si la cosa se mueve
 C 0x7489 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7496 lee el tipo de la cosa
 C 0x749A despacha: salta a la entrada A de la tabla que va detras del call
+C 0x74A9 lee la x de la cosa
+C 0x74AC lee la fraccion de la x de la cosa
+C 0x74BB lee la fraccion de la x de la cosa
+C 0x74BE le suma la fraccion de la y de la cosa
+C 0x74C1 guarda la fraccion de la x de la cosa
+C 0x74C4 lee la x de la cosa
+C 0x74C7 le suma la y de la cosa
+C 0x74CA guarda la x de la cosa
+C 0x74CE lee la fraccion de la x de la cosa
+C 0x74D7 lee la x de la cosa
 C 0x74DF lee el arma que lleva Simon (0, ninguna)
+C 0x7535 lee el tipo de la cosa
+C 0x7548 lee la fraccion de la x de la cosa
+C 0x754F lee la x de la cosa
+C 0x7556 lee si la cosa se mueve
+C 0x755C lee la fraccion de la x de la cosa
+C 0x7563 lee la x de la cosa
+C 0x756A lee si la cosa se mueve
+C 0x757E lee el paso en que va la cosa
+C 0x75A3 lee el paso en que va la cosa
+C 0x75A9 lee el tipo de la cosa
 C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7624 apunta a la pose de arriba de Simon
@@ -409,6 +524,8 @@ C 0x77D4 apunta a la X de Simon
 C 0x77ED guarda el lado por el que se sale de la habitacion
 C 0x77F2 lee la FASE (0 el patio, 1-18)
 C 0x77FD sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x780C lee el tipo de la cosa
+C 0x7826 lee el tipo de la cosa
 C 0x783A lee el estado de la puerta de la fase
 C 0x7844 lee el arma que lleva Simon (0, ninguna)
 C 0x7858 lee la pose de arriba de Simon
@@ -489,16 +606,28 @@ C 0x7D23 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa 
 C 0x7D45 hl_mas_a: HL += A
 C 0x7D68 lee el lado por el que se sale de la habitacion
 C 0x7D79 lee el arma que lleva Simon (0, ninguna)
+C 0x7DB9 lee el tipo de la cosa
 C 0x7DD6 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7DDD lee el tipo de la cosa
 C 0x7DE6 lee el arma que lleva Simon (0, ninguna)
+C 0x7DFF lee el tipo de la cosa
 C 0x7E0F lee la vida del enemigo (barra ENEMY)
 C 0x7E1E sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7E2F lee el arma que lleva Simon (0, ninguna)
+C 0x7E3C lee el tipo de la cosa
 C 0x7E42 hl_mas_a: HL += A
 C 0x7E4B lee el arma que lleva Simon (0, ninguna)
+C 0x7E83 lee el tipo de la cosa
+C 0x7E97 lee el tipo de la cosa
 C 0x7EBE sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7ECD lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x7F01 lee el tipo de la cosa
 C 0x7F10 borra_la_cosa: tipo a cero y sus sprites libres
+C 0x7F27 lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x7F33 lee el tipo de la cosa
+C 0x7F56 lee el tipo de la cosa
 C 0x7F67 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7F88 lee el tipo de la cosa
 C 0x7F9B sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7FD8 sonido: arranca la musica o el efecto A (bit 7 = musica)
 # --- fin de las anotaciones de anota.py ---

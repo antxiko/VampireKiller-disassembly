@@ -100,18 +100,29 @@ F 0x9E5F 2
 # --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
 L 0x99F6 borra_la_cosa
 L 0x9F6D crea_con_parametros
+C 0x802D lee el tipo de la cosa
 C 0x804E sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x8051 lee el tipo de la cosa
 C 0x8062 hl_mas_a: HL += A
+C 0x8088 lee el tipo de la cosa
 C 0x8098 lee la vida del enemigo (barra ENEMY)
+C 0x80AC lee el tipo de la cosa
+C 0x80B9 sube la y de la cosa
+C 0x80BC lee la fraccion de la x de la cosa
 C 0x80D1 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x80E8 lee el arma que lleva Simon (0, ninguna)
 C 0x8118 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x8135 lee el arma que lleva Simon (0, ninguna)
 C 0x8160 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x816C lee el tipo de la cosa
 C 0x8174 hl_mas_a: HL += A
 C 0x8180 lee la X de Simon
+C 0x8183 le resta la x de la cosa
 C 0x8186 lee el lado al que mira Simon
+C 0x81AB lee el tipo de la cosa
 C 0x81B4 hl_mas_a: HL += A
+C 0x8240 lee la x de la cosa
+C 0x8243 lee la fraccion de la x de la cosa
 C 0x824F despacha: salta a la entrada A de la tabla que va detras del call
 C 0x825B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8267 despacha: salta a la entrada A de la tabla que va detras del call
@@ -119,8 +130,17 @@ C 0x8273 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x827F despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8293 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x82A7 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x82B8 lee el tipo de la cosa
 C 0x82BF hl_mas_a: HL += A
+C 0x82C4 lee la x de la cosa
+C 0x82C7 lee la y de la cosa
+C 0x82FB lee el tipo de la cosa
 C 0x8302 hl_mas_a: HL += A
+C 0x8306 lee la x de la cosa
+C 0x8309 lee la y de la cosa
+C 0x8460 lee la fraccion de la x de la cosa
+C 0x846D lee el paso en que va la cosa
+C 0x8472 lee la fraccion de la y de la cosa
 C 0x847E lee la X de Simon
 C 0x849A lee la Y de Simon
 C 0x84A7 lee el arma que lleva Simon (0, ninguna)
@@ -139,6 +159,7 @@ C 0x85E1 lee la Y de Simon
 C 0x85ED lee la X de Simon
 C 0x85FD lee la Y de Simon
 C 0x8609 lee la X de Simon
+C 0x861D lee el tipo de la cosa
 C 0x8631 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x864F lee el lado al que mira Simon
 C 0x865A lee la X de Simon
@@ -151,9 +172,19 @@ C 0x874E de_mas_a: DE += A
 C 0x8759 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x8763 de_mas_a: DE += A
 C 0x8776 hl_mas_a: HL += A
+C 0x87BD el tipo de la cosa = 0x00
 C 0x87D8 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x87EF lee la x de la cosa
+C 0x8803 lee la fraccion de la x de la cosa
+C 0x8816 lee la velocidad horizontal (parte baja)
+C 0x881A lee la velocidad vertical (parte baja)
+C 0x881D lee la velocidad vertical
+C 0x8841 lee la velocidad vertical (parte baja)
+C 0x8844 lee la velocidad vertical
 C 0x8852 hl_mas_a: HL += A
 C 0x8868 hl_mas_a: HL += A
+C 0x8874 lee la velocidad vertical (parte baja)
+C 0x8877 lee la velocidad vertical
 C 0x8884 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x888C de_mas_a: DE += A
 C 0x88A0 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
@@ -162,19 +193,86 @@ C 0x88C1 de_mas_a: DE += A
 C 0x890F de_mas_a: DE += A
 C 0x8987 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x8A2D lee el arma que lleva Simon (0, ninguna)
+C 0x8A6D lee el paso en que va la cosa
+C 0x8A70 lee la fraccion de la y de la cosa
+C 0x8A74 lee la y de la cosa
 C 0x8A84 hl_mas_a: HL += A
+C 0x8A99 sube si la cosa se mueve
+C 0x8A9C lee si la cosa se mueve
+C 0x8AA3 lee la fraccion de la x de la cosa
+C 0x8AB7 guarda la x de la cosa
+C 0x8ABB la cosa se queda quieta
+C 0x8ABF la velocidad horizontal (parte baja) = 0x02
+C 0x8AC3 la velocidad horizontal (el bit 7, hacia la izquierda) = 0x00
+C 0x8AC7 el dibujo de la cosa = 0x00
+C 0x8ACB la cuenta de cuadros del paso = 0x20
 C 0x8AD0 lee el bloque de tres fases (0-5)
 C 0x8ADE hl_mas_a: HL += A
 C 0x8AE8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x8B02 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x8B0B lee la fraccion de la x de la cosa
+C 0x8B12 lee el paso en que va la cosa
+C 0x8B17 guarda el paso en que va la cosa
+C 0x8B1B la x de la cosa = 0xFF
+C 0x8B26 sube si la cosa se mueve
 C 0x8B29 lee el contador de cuadros
+C 0x8B32 lee la velocidad vertical
+C 0x8B36 lee la velocidad horizontal (parte baja)
+C 0x8B39 lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x8B3E guarda la velocidad vertical
+C 0x8B44 lee el dibujo de la cosa
+C 0x8B47 lee la cuenta de cuadros del paso
+C 0x8B4D guarda la velocidad horizontal (parte baja)
+C 0x8B50 guarda la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x8B53 lee si la cosa se mueve
+C 0x8B59 guarda si la cosa se mueve
+C 0x8B5E guarda el dibujo de la cosa
+C 0x8B64 guarda la cuenta de cuadros del paso
+C 0x8B68 la x de la cosa = 0xFF
+C 0x8B6C sube el tipo de la cosa
+C 0x8B7C guarda el paso en que va la cosa
+C 0x8B7F guarda la fraccion de la y de la cosa
+C 0x8B87 lee la fraccion de la x de la cosa
+C 0x8B8E lee la fraccion de la x de la cosa
+C 0x8B9B guarda si la cosa se mueve
+C 0x8B9E sube el tipo de la cosa
+C 0x8BA4 lee la y de la cosa
+C 0x8BAD lee la fraccion de la x de la cosa
+C 0x8BB5 lee si la cosa se mueve
 C 0x8BBA lee el contador de cuadros
+C 0x8BC0 baja si la cosa se mueve
+C 0x8BC7 el tipo de la cosa = 0x00
+C 0x8BCC sube si la cosa se mueve
+C 0x8BCF lee si la cosa se mueve
+C 0x8BD7 lee la fraccion de la x de la cosa
+C 0x8BDF la y de la cosa = 0x00
+C 0x8BF3 lee la fraccion de la x de la cosa
+C 0x8BFA la x de la cosa = 0xFF
+C 0x8C01 lee la fraccion de la x de la cosa
+C 0x8C17 guarda la fraccion de la x de la cosa
+C 0x8C2F lee el paso en que va la cosa
+C 0x8C34 guarda el paso en que va la cosa
+C 0x8C37 el tipo de la cosa = 0x05
+C 0x8C3B la cosa se queda quieta
+C 0x8C3F la x de la cosa = 0x02
+C 0x8C44 la y de la cosa = 0x00
+C 0x8C48 lee la fraccion de la x de la cosa
+C 0x8C4F la fraccion de la x de la cosa = 0x0B
+C 0x8C5B la cosa se mueve
+C 0x8C60 lee la fraccion de la x de la cosa
+C 0x8C66 lee el tipo de la cosa
+C 0x8C6E lee la x de la cosa
 C 0x8C7E lee el contador de cuadros
 C 0x8C99 lee el contador de cuadros
 C 0x8CA1 hl_mas_a: HL += A
+C 0x8CA5 lee el paso en que va la cosa
+C 0x8CAD lee la fraccion de la y de la cosa
 C 0x8CD9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x8CDD guarda la velocidad vertical (parte baja)
+C 0x8CEA lee la velocidad vertical (parte baja)
 C 0x8CF2 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x8D05 hl_mas_a: HL += A
+C 0x8D29 lee la fraccion de la x de la cosa
 C 0x8D3B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8D76 guarda el arma que lleva Simon (0, ninguna)
 C 0x8E94 guarda el arma que lleva Simon (0, ninguna)
@@ -182,8 +280,12 @@ C 0x8E9A lee el arma que lleva Simon (0, ninguna)
 C 0x8F0B hl_mas_a: HL += A
 C 0x8F52 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x8F5A lee el contador de cuadros
+C 0x8F69 lee la fraccion de la x de la cosa
 C 0x8F7D sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x8F9F lee la fase (0xD000) y la habitacion (0xD001) de un tiron
+C 0x900D lee el tipo de la cosa
+C 0x9012 guarda el tipo de la cosa
+C 0x9015 guarda el paso en que va la cosa
 C 0x9024 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x903B lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 C 0x9067 hl_mas_a: HL += A
@@ -194,13 +296,28 @@ C 0x9165 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRA
 C 0x916A guarda el estado de la puerta de la fase
 C 0x916E apunta a el estado de la puerta de la fase
 C 0x91A7 hl_mas_a: HL += A
+C 0x91EA guarda la velocidad horizontal (parte baja)
+C 0x920C la velocidad horizontal (el bit 7, hacia la izquierda) = 0x20
+C 0x9210 el tipo de la cosa = 0x03
+C 0x9221 lee la velocidad horizontal (parte baja)
+C 0x9229 baja la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x922C lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x9245 el tipo de la cosa = 0x82
 C 0x92AA despacha: salta a la entrada A de la tabla que va detras del call
+C 0x92BE lee la x de la cosa
 C 0x92C4 de_mas_a: DE += A
 C 0x92CF de_mas_a: DE += A
 C 0x92F8 hl_mas_a: HL += A
+C 0x932C lee la velocidad horizontal (parte baja)
 C 0x9346 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x9350 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x9358 el tipo de la cosa = 0x00
+C 0x9365 lee la velocidad vertical (parte baja)
+C 0x9368 lee la velocidad vertical
 C 0x936F sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x9378 lee el paso en que va la cosa
+C 0x937B lee la fraccion de la y de la cosa
+C 0x937E lee la velocidad horizontal (parte baja)
 C 0x9391 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x93A1 hl_mas_a: HL += A
 C 0x93C5 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
@@ -220,6 +337,10 @@ C 0x95E8 lee la FASE (0 el patio, 1-18)
 C 0x95EE hl_mas_a: HL += A
 C 0x960C lee la FASE (0 el patio, 1-18)
 C 0x9627 lee la HABITACION dentro de la fase
+C 0x9636 lee el tipo de la cosa
+C 0x963C lee la fraccion de la x de la cosa
+C 0x964C lee el paso en que va la cosa
+C 0x9651 lee la fraccion de la y de la cosa
 C 0x9673 hl_mas_a: HL += A
 C 0x967A lee la FASE (0 el patio, 1-18)
 C 0x9680 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
@@ -234,32 +355,87 @@ C 0x9841 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 C 0x9853 lee la FASE (0 el patio, 1-18)
 C 0x985C hl_mas_a: HL += A
 C 0x9871 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
+C 0x98F2 lee el tipo de la cosa
+C 0x991F lee el tipo de la cosa
+C 0x993B lee el tipo de la cosa
 C 0x993F despacha: salta a la entrada A de la tabla que va detras del call
+C 0x99B9 lee si la cosa se mueve
+C 0x99BE lee la velocidad vertical (parte baja)
+C 0x99C1 lee la velocidad vertical
+C 0x99C4 lee la fraccion de la y de la cosa
+C 0x99C7 lee la y de la cosa
+C 0x99CB guarda la fraccion de la y de la cosa
+C 0x99CE guarda la y de la cosa
+C 0x99D1 lee la velocidad horizontal (parte baja)
+C 0x99D4 lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x99D7 lee la fraccion de la x de la cosa
+C 0x99DA lee la x de la cosa
+C 0x99DE guarda la fraccion de la x de la cosa
+C 0x99E1 guarda la x de la cosa
+C 0x99E5 lee la y de la cosa
+C 0x99EC lee la x de la cosa
+C 0x99F7 guarda el tipo de la cosa
 C 0x9A1A borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9A1D lee la y de la cosa
+C 0x9A20 lee la x de la cosa
 C 0x9A2C crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 C 0x9A4E borra_la_cosa: tipo a cero y sus sprites libres
 C 0x9A5D crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x9A6B lee el tipo de la cosa
 C 0x9A6E guarda el tipo de la cosa que se crea
 C 0x9A8D borra_la_cosa: tipo a cero y sus sprites libres
 C 0x9A9A borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9AA3 el paso en que va la cosa = 0x08
 C 0x9AC5 lee el tipo de la cosa que se crea
+C 0x9AF3 lee la y de la cosa
+C 0x9AF6 lee la x de la cosa
 C 0x9B19 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9B22 lee el tipo de la cosa que se crea
 C 0x9B28 hl_mas_a: HL += A
+C 0x9B2B lee la y de la cosa
+C 0x9B30 lee la x de la cosa
+C 0x9B60 el dibujo de la cosa = 0x85
+C 0x9B64 la cuenta de cuadros del paso = 0x10
+C 0x9B71 lee el tipo de la cosa
 C 0x9B74 guarda el tipo de la cosa que se crea
+C 0x9B77 lee la cuenta de cuadros del paso
+C 0x9B81 guarda el dibujo de la cosa
+C 0x9B84 baja la cuenta de cuadros del paso
 C 0x9B88 borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9B92 lee la y de la cosa
+C 0x9B95 lee la x de la cosa
 C 0x9B98 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x9B9F la cuenta de cuadros del paso = 0x01
+C 0x9BA3 la cosa se mueve
 C 0x9BAA pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x9BB0 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0x9BBB el dibujo de la cosa = 0x00
+C 0x9BC4 la cuenta de cuadros del paso = 0x14
+C 0x9BC8 la cosa se queda quieta
+C 0x9BD0 el dibujo de la cosa = 0x01
+C 0x9BDE sube la cuenta de cuadros del paso
+C 0x9BEA lee la cuenta de cuadros del paso
+C 0x9BF0 guarda la cuenta de cuadros del paso
 C 0x9BF9 niega_de: DE = -DE
 C 0x9C03 borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9C0B lee la y de la cosa
+C 0x9C12 lee la x de la cosa
 C 0x9C21 lee el contador de cuadros
 C 0x9C26 hl_mas_a: HL += A
+C 0x9C2D lee el paso en que va la cosa
+C 0x9C33 baja la cuenta de cuadros del paso
+C 0x9C37 sube el paso en que va la cosa
 C 0x9C3D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9C43 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0x9C46 la cosa se mueve
 C 0x9C4E borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9C5D lee la y de la cosa
+C 0x9C60 lee la x de la cosa
 C 0x9C63 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 C 0x9C6C lee la FASE (0 el patio, 1-18)
+C 0x9C79 guarda el dibujo de la cosa
+C 0x9C7C la cuenta de cuadros del paso = 0x1E
+C 0x9C80 la cosa se mueve
 C 0x9C9C pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9CA0 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x9CA6 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
@@ -280,18 +456,48 @@ C 0x9DB8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9DF1 lee la X de Simon
 C 0x9E0B crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9E16 lee la X de Simon
+C 0x9E37 lee el tipo de la cosa
+C 0x9E58 lee el tipo de la cosa
 C 0x9E5C despacha: salta a la entrada A de la tabla que va detras del call
+C 0x9E78 sube la cuenta de cuadros del paso
+C 0x9E7B mira el bit 1 de la cuenta de cuadros del paso
+C 0x9E84 va hacia la izquierda? (bit 7 de la velocidad horizontal)
+C 0x9E8C guarda el dibujo de la cosa
+C 0x9EA3 lee la cuenta de cuadros del paso
+C 0x9EA6 sube la cuenta de cuadros del paso
+C 0x9EB0 guarda el dibujo de la cosa
+C 0x9EB6 lee la y de la cosa
 C 0x9EC1 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
+C 0x9EC5 sube la cuenta de cuadros del paso
+C 0x9EC8 lee la cuenta de cuadros del paso
+C 0x9ED1 guarda el dibujo de la cosa
+C 0x9EFC le resta la x de la cosa
 C 0x9F04 borra_la_cosa: tipo a cero y sus sprites libres
+C 0x9F07 lee la cuenta de cuadros del paso
+C 0x9F10 guarda la cuenta de cuadros del paso
+C 0x9F19 guarda el dibujo de la cosa
 C 0x9F1F suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
+C 0x9F22 lee la cuenta de cuadros del paso
+C 0x9F2B guarda el dibujo de la cosa
+C 0x9F2E lee el paso en que va la cosa
+C 0x9F34 baja la cuenta de cuadros del paso
 C 0x9F3D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9F41 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0x9F44 la cuenta de cuadros del paso = 0x1E
+C 0x9F48 sube el paso en que va la cosa
+C 0x9F4C baja la cuenta de cuadros del paso
 C 0x9F53 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9F56 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0x9F59 la cuenta de cuadros del paso = 0x3C
+C 0x9F5D guarda el paso en que va la cosa
+C 0x9F61 lee la y de la cosa
+C 0x9F67 lee la x de la cosa
+C 0x9F6A lee el tipo de la cosa
 C 0x9F70 guarda la posicion de la cosa que se crea
 C 0x9F8F hl_mas_a: HL += A
 C 0x9F94 guarda el tipo de la cosa que se crea
 C 0x9FAA guarda la ficha de la cosa que se crea
+C 0x9FAF guarda cuantos sprites lleva la cosa
 C 0x9FE0 lee la ficha de la cosa que se crea
 C 0x9FE3 lee el tipo de la cosa que se crea
 C 0x9FEA lee la posicion de la cosa que se crea

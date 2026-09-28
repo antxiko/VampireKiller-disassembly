@@ -290,13 +290,35 @@ C 0x4E0F guarda la vida de Simon
 C 0x4E14 guarda la vida del enemigo (barra ENEMY)
 C 0x4E23 lee el lado por el que se sale de la habitacion
 C 0x4EA4 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x4EA7 la cosa se mueve
+C 0x4EAB el dibujo de la cosa = 0x94
+C 0x4EB4 guarda la velocidad vertical
+C 0x4EB7 guarda la velocidad vertical (parte baja)
 C 0x4EBD pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x4EC5 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x4ECD crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x4ED6 mira el bit 0 de el tipo de la cosa
 C 0x4EE2 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x4EE6 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0x4EE9 la cosa se mueve
+C 0x4EED el dibujo de la cosa = 0x92
+C 0x4F09 el dibujo de la cosa = 0x92
+C 0x4F12 el dibujo de la cosa = 0x93
 C 0x4F1C crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x4F1F el dibujo de la cosa = 0x98
+C 0x4F24 guarda el paso en que va la cosa
+C 0x4F30 la cosa se mueve
+C 0x4F35 lee el paso en que va la cosa
+C 0x4F3F la velocidad horizontal (el bit 7, hacia la izquierda) = 0xFF
+C 0x4F43 la velocidad horizontal (parte baja) = 0x80
+C 0x4F47 guarda la velocidad vertical
+C 0x4F4A guarda la velocidad vertical (parte baja)
+C 0x4F4D lee la x de la cosa
+C 0x4F53 sube el paso en que va la cosa
+C 0x4F57 la cosa se queda quieta
+C 0x4F5B el dibujo de la cosa = 0x97
 C 0x4F77 hl_mas_a: HL += A
+C 0x4F7B guarda el dibujo de la cosa
 C 0x4F86 lee la FASE (0 el patio, 1-18)
 C 0x4F8A lee la HABITACION dentro de la fase
 C 0x4FAF guarda el destino del montaje de la habitacion
@@ -423,6 +445,8 @@ C 0x54E7 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x54ED bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x54F4 apunta a la FASE (0 el patio, 1-18)
 C 0x5504 de_mas_a: DE += A
+C 0x5524 AND con el tipo de la cosa
+C 0x5533 AND con el tipo de la cosa
 C 0x5557 sube_un_dibujo: un dibujo de 8x8 a 4 bits (32 bytes) de HL a la VRAM de DE
 C 0x555C de_mas_a: DE += A
 C 0x5593 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
@@ -548,6 +572,7 @@ C 0x5AA0 lee el bloque de tres fases (0-5)
 C 0x5AA7 hl_mas_a: HL += A
 C 0x5AF2 hl_mas_a: HL += A
 C 0x5B52 lee la FASE (0 el patio, 1-18)
+C 0x5BBD lee el tipo de la cosa
 C 0x5BCF lee la HABITACION dentro de la fase
 C 0x5BDA lee la FASE (0 el patio, 1-18)
 C 0x5BE4 hl_mas_a: HL += A
@@ -583,11 +608,13 @@ C 0x5F2E guarda la posicion de la cosa que se crea
 C 0x5F45 guarda la ficha de la cosa que se crea
 C 0x5F48 lee el tipo de la cosa que se crea
 C 0x5F4E hl_mas_a: HL += A
+C 0x5F52 guarda cuantos sprites lleva la cosa
 C 0x5F7C lee la ficha de la cosa que se crea
 C 0x5F7F lee el tipo de la cosa que se crea
 C 0x5F86 lee la posicion de la cosa que se crea
 C 0x5FB5 lee el tipo de la cosa que se crea
 C 0x5FBB de_mas_a: DE += A
 C 0x5FC2 lee la ficha de la cosa que se crea
+C 0x5FC5 lee el tipo de la cosa
 C 0x5FC9 despacha: salta a la entrada A de la tabla que va detras del call
 # --- fin de las anotaciones de anota.py ---

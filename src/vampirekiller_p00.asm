@@ -2284,14 +2284,14 @@ L_4E9F:
 	ld de,0e048h		;4ea1
 	jp crea_una_cosa		;4ea4   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_4EA7:
-	ld (ix+006h),001h		;4ea7
-	ld (ix+00bh),094h		;4eab
+	ld (ix+006h),001h		;4ea7   ; la cosa se mueve
+	ld (ix+00bh),094h		;4eab   ; el dibujo de la cosa = 0x94
 	ld (ix+00eh),a		;4eaf
 	ret			;4eb2
 L_4EB3:
 	xor a			;4eb3
-	ld (ix+008h),a		;4eb4
-	ld (ix+007h),a		;4eb7
+	ld (ix+008h),a		;4eb4   ; guarda la velocidad vertical
+	ld (ix+007h),a		;4eb7   ; guarda la velocidad vertical (parte baja)
 	ld de,0ffe0h		;4eba
 	jp 0a56ch		;4ebd   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_4EC0:
@@ -2304,7 +2304,7 @@ L_4EC0:
 L_4ED0:
 	ld hl,0ffe0h		;4ed0
 	ld de,00000h		;4ed3
-	bit 0,(ix+000h)		;4ed6
+	bit 0,(ix+000h)		;4ed6   ; mira el bit 0 de el tipo de la cosa
 	jr z,L_4EE2		;4eda
 	ld hl,00020h		;4edc
 	ld de,0fff0h		;4edf
@@ -2312,8 +2312,8 @@ L_4EE2:
 	call 0a55dh		;4ee2   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ex de,hl			;4ee5
 	call 0a56ch		;4ee6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld (ix+006h),001h		;4ee9
-	ld (ix+00bh),092h		;4eed
+	ld (ix+006h),001h		;4ee9   ; la cosa se mueve
+	ld (ix+00bh),092h		;4eed   ; el dibujo de la cosa = 0x92
 	xor a			;4ef1
 	ld (ix+010h),a		;4ef2
 	ld (ix+00eh),a		;4ef5
@@ -2325,42 +2325,42 @@ L_4EF9:
 	ret nz			;4f01
 	ld (ix+010h),000h		;4f02
 	inc (ix+011h)		;4f06
-	ld (ix+00bh),092h		;4f09
+	ld (ix+00bh),092h		;4f09   ; el dibujo de la cosa = 0x92
 	bit 0,(ix+011h)		;4f0d
 	ret z			;4f11
-	ld (ix+00bh),093h		;4f12
+	ld (ix+00bh),093h		;4f12   ; el dibujo de la cosa = 0x93
 	ret			;4f16
 L_4F17:
 	ld c,02ah		;4f17
 	ld de,0f0c0h		;4f19
 	jp crea_una_cosa		;4f1c   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_4F1F:
-	ld (ix+00bh),098h		;4f1f
+	ld (ix+00bh),098h		;4f1f   ; el dibujo de la cosa = 0x98
 	xor a			;4f23
-	ld (ix+001h),a		;4f24
+	ld (ix+001h),a		;4f24   ; guarda el paso en que va la cosa
 	ld (ix+013h),a		;4f27
 	ld (ix+014h),a		;4f2a
 	ld (ix+00eh),a		;4f2d
-	ld (ix+006h),001h		;4f30
+	ld (ix+006h),001h		;4f30   ; la cosa se mueve
 	ret			;4f34
 L_4F35:
-	ld a,(ix+001h)		;4f35
+	ld a,(ix+001h)		;4f35   ; lee el paso en que va la cosa
 	dec a			;4f38
 	jr z,L_4F57		;4f39
 	call L_4F60		;4f3b
 	xor a			;4f3e
-	ld (ix+00ah),0ffh		;4f3f
-	ld (ix+009h),080h		;4f43
-	ld (ix+008h),a		;4f47
-	ld (ix+007h),a		;4f4a
-	ld a,(ix+005h)		;4f4d
+	ld (ix+00ah),0ffh		;4f3f   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0xFF
+	ld (ix+009h),080h		;4f43   ; la velocidad horizontal (parte baja) = 0x80
+	ld (ix+008h),a		;4f47   ; guarda la velocidad vertical
+	ld (ix+007h),a		;4f4a   ; guarda la velocidad vertical (parte baja)
+	ld a,(ix+005h)		;4f4d   ; lee la x de la cosa
 	cp 080h		;4f50
 	ret nc			;4f52
-	inc (ix+001h)		;4f53
+	inc (ix+001h)		;4f53   ; sube el paso en que va la cosa
 	ret			;4f56
 L_4F57:
-	ld (ix+006h),000h		;4f57
-	ld (ix+00bh),097h		;4f5b
+	ld (ix+006h),000h		;4f57   ; la cosa se queda quieta
+	ld (ix+00bh),097h		;4f5b   ; el dibujo de la cosa = 0x97
 	ret			;4f5f
 L_4F60:
 	ld a,(ix+014h)		;4f60
@@ -2376,7 +2376,7 @@ L_4F6D:
 	ld hl,04f7fh		;4f74
 	call hl_mas_a		;4f77   ; hl_mas_a: HL += A
 	ld a,(hl)			;4f7a
-	ld (ix+00bh),a		;4f7b
+	ld (ix+00bh),a		;4f7b   ; guarda el dibujo de la cosa
 	ret			;4f7e
 
 ; ----------------------------------------------------------------------
@@ -3138,7 +3138,7 @@ L_5516:
 	and 00fh		;551e
 	cp 00fh		;5520
 	jr nz,L_5527		;5522
-	and (ix+000h)		;5524
+	and (ix+000h)		;5524   ; AND con el tipo de la cosa
 L_5527:
 	add a,a			;5527
 	add a,a			;5528
@@ -3149,7 +3149,7 @@ L_5527:
 	and 00fh		;552d
 	cp 00fh		;552f
 	jr nz,L_5536		;5531
-	and (ix+000h)		;5533
+	and (ix+000h)		;5533   ; AND con el tipo de la cosa
 L_5536:
 	or c			;5536
 	ld (de),a			;5537
@@ -4107,7 +4107,7 @@ L_5BB7:
 	push hl			;5bb7
 	pop ix		;5bb8
 	call L_5B96		;5bba
-	ld a,(ix+000h)		;5bbd
+	ld a,(ix+000h)		;5bbd   ; lee el tipo de la cosa
 	ld c,a			;5bc0
 	and 03ch		;5bc1
 	rrca			;5bc3
@@ -4670,7 +4670,7 @@ L_5F42:
 	ld hl,06057h		;5f4b
 	call hl_mas_a		;5f4e   ; hl_mas_a: HL += A
 	ld a,(hl)			;5f51
-	ld (ix+020h),a		;5f52
+	ld (ix+020h),a		;5f52   ; guarda cuantos sprites lleva la cosa
 	ld c,a			;5f55
 	and a			;5f56
 	jr z,L_5F77		;5f57
@@ -4728,7 +4728,7 @@ L_5F77:
 	ld a,(de)			;5fbe
 	ld (ix+00dh),a		;5fbf
 	ld hl,(0cff3h)		;5fc2   ; lee la ficha de la cosa que se crea
-	ld a,(ix+000h)		;5fc5
+	ld a,(ix+000h)		;5fc5   ; lee el tipo de la cosa
 	dec a			;5fc8
 	call despacha		;5fc9   ; despacha: salta a la entrada A de la tabla que va detras del call
 
