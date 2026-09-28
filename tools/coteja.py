@@ -10,7 +10,9 @@ p01:6321 encienda la pantalla).
                 0, filas 32 a 207) con lo que esconde la habitacion pintado.
                 Las velas se turnan entre dos dibujos: se admiten los dos.
 
-Uso:  coteja.py [habitaciones]
+  mapa          la rejilla y las salidas de las 19 fases (tools/mapa.py).
+
+Uso:  coteja.py [habitaciones] [mapa] [-v]
 """
 import glob
 import os
@@ -84,7 +86,31 @@ def habitaciones(cart, detalle=False):
     return vistos > 0 and malos == 0
 
 
-PRUEBAS = {"habitaciones": habitaciones}
+def mapa(cart, detalle=False):
+    """La rejilla y las salidas de las 19 fases: cada habitacion en su casilla,
+    sin dos en la misma, y las salidas de ida (la vecina no vuelve) son
+    caidas -hacia abajo- o la entrada a la habitacion especial de la fase
+    (0x636F, la del jefe). Las que no, se listan: son las que hay que mirar."""
+    from graficos import cuantas_habitaciones, HABITACION_ESPECIAL_DE_CADA_FASE, B123
+    from mapa import casillas, sin_vuelta, LADOS
+    malas, raras, n = 0, [], 0
+    for fase in range(19):
+        cas = casillas(cart, fase)
+        if len(set(cas)) != len(cas) or len(cas) != cuantas_habitaciones(cart, fase):
+            print("  fase %2d: casillas repetidas %s" % (fase, cas))
+            malas += 1
+        jefe = cart.leer(HABITACION_ESPECIAL_DE_CADA_FASE + fase, B123) >> 4
+        for h, lado, v in sin_vuelta(cart, fase):
+            n += 1
+            if LADOS[lado] != "abajo" and v != jefe:
+                raras.append((fase, h, LADOS[lado], v))
+    for r in raras:
+        print("  fase %2d hab %2d: sale por %s a la %d y no vuelve" % r)
+    print("mapa: 19 fases, %d salidas de ida, %d que no son caidas ni la del jefe" % (n, len(raras)))
+    return malas == 0
+
+
+PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa}
 
 
 def main():
@@ -93,7 +119,7 @@ def main():
     detalle = "-v" in sys.argv
     todo = True
     for c in cuales:
-        todo &= PRUEBAS[c](cart, detalle) if c == "habitaciones" else PRUEBAS[c](cart)
+        todo &= PRUEBAS[c](cart, detalle)
     print("VERDE" if todo else "ROJO")
     sys.exit(0 if todo else 1)
 

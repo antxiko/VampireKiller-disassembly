@@ -133,6 +133,78 @@ def puerta_de_la_fase(cart, fase):
     return b & 0x0F, bool(b & 0x80), cart.leer(q + 2, B111213), cart.leer(q + 1, B111213)
 
 
+# ------------------------------------------------------------ que es cada cosa
+# Lo que hace recoger cada tipo: los 25 manejadores de p02:8D3E y, desde el
+# 0x1A, las armas (p02:8D70: el arma es el tipo menos 0x19). Donde el codigo
+# solo pone un bit, el nombre es el de su dibujo (fila 0x50/0x60 de la pagina
+# 1, el tipo menos uno).
+NOMBRES = {
+    0x00: "nada",                                   # p02:8AA6: el objeto se quita
+    0x01: "corazon (+1)",                           # p02:8DAF
+    0x02: "corazon grande (+5)",                    # p02:8DB7
+    0x03: "escudo rojo (16 golpes)",                # p02:8D98
+    0x04: "escudo (16 golpes)",                     # p02:8DA1
+    0x05: "cruz: borra lo que hay en la habitacion",  # p02:8DBB
+    0x06: "cruz gris (cuenta del arma)",            # p02:8D7C
+    0x07: "8 de vida",                              # p02:8DDE
+    0x08: "invencibilidad",                         # p02:8DCD
+    0x09: "anillo (cuenta de 0xC434)",              # p02:8DE5
+    0x0A: "reloj de arena",                         # p02:8D94
+    0x0B: "lazo: alarga las cuentas",               # p02:8DF5
+    0x0C: "botas",                                  # p02:8DFC
+    0x0D: "alas",                                   # p02:8E03
+    0x0E: "vela: marca los bloques que se rompen",  # p02:8E16
+    0x0F: "pergamino",                              # p02:8E33
+    0x10: "libro rojo",                             # p02:8E1D
+    0x11: "libro blanco",                           # p02:8E26
+    0x12: "baston",                                 # p02:8E79
+    0x13: "5.000 puntos",                           # p02:8E42
+    0x14: "1.000 puntos",                           # p02:8E4B
+    0x15: "sale un bicho",                          # p02:8AD0, la cosa de 0x8AF0
+    0x16: "vida llena",                             # p02:8E0D
+    0x17: "llave",                                  # p02:8E50
+    0x18: "llave blanca",                           # p02:8E60
+    0x19: "cofre",
+    0x1A: "arma 1: latigo de cadena",
+    0x1B: "arma 2: daga",
+    0x1C: "arma 3: hacha",
+    0x1D: "arma 4: cruz que vuelve",
+    0x1E: "arma 5: frasco",                         # p02:8D8D, aparte: el bit 3
+}
+BICHO = 0x15
+
+
+def que_sale(e):
+    """Lo que esconde una entrada: (que, tipo). que es 'objeto', 'cofre' (un
+    cofre con el tipo dentro, tercer byte 10xxxxxx: p02:8827) o 'puerta' (una
+    puerta cerrada, tercer byte 11xxxxxx: p02:8831)."""
+    if e["que"] == "bloque" and e["bytes"][2] is not None:
+        b3 = e["bytes"][2]
+        if b3 & 0xC0 == 0xC0:
+            return "puerta", None
+        return "cofre", b3 & 0x1F
+    if e["que"] == "cofre":
+        return "cofre", e["contenido"]
+    if e["que"] == "objeto":
+        return "objeto", e["tipo"]
+    if e["que"] in ("vela", "bloque"):
+        return "objeto", e["contenido"]
+    return "puerta", None
+
+
+def describe(e):
+    que, tipo = que_sale(e)
+    if e["que"] == "puerta":
+        return "puerta cerrada (%d, clase %d)" % (e["llave"], e["clase"])
+    donde = {"vela": "vela", "bloque": "bloque que se rompe" + (" grande" if e.get("tamano") == 3 else ""),
+             "cofre": "cofre", "objeto": "a la vista"}[e["que"]]
+    if que == "puerta":
+        return "%s: sale una puerta cerrada" % donde
+    if que == "cofre" and e["que"] != "cofre":
+        return "%s: sale un cofre con %s" % (donde, NOMBRES.get(tipo, "tipo %d" % tipo))
+    return "%s: %s" % (donde, NOMBRES.get(tipo, "tipo %d" % tipo))
+
+
 # ------------------------------------------------------------ pintar
 def _lmmm(vram, x0, y0, x, y, ancho, alto):
     """p00:49DB con TIMP: de la pagina 1 a la 0, el color 0 no se copia."""
