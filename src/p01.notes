@@ -60,7 +60,7 @@ C 0x61F5 su numero
 C 0x61F6 crea la cosa
 C 0x61FB la siguiente, 4 bytes mas alla
 C 0x61FF cuatro
-C 0x6202 LA PANTALLA DEL TITULO
+C 0x6202 EL LOGOTIPO DE KONAMI
 C 0x6208 su paleta
 C 0x620E el borde...
 C 0x6210 ... registro 7 = 0x0F
@@ -73,12 +73,12 @@ C 0x6227 ... el logotipo, del guion de 0x628F
 C 0x6230 la cuenta del telon
 C 0x6236 0x31 lineas
 C 0x6239 sin acabar
-C 0x624C EL TELON DEL TITULO: la cuenta
+C 0x624C EL TELON DEL LOGOTIPO: la cuenta
 C 0x6250 un cuadro de cada dos
 C 0x6254 una linea menos
 C 0x6256 quedan
 C 0x6258 se acabo:
-C 0x625A el titulo, listo
+C 0x625A el logotipo, listo
 C 0x625E 0x31 menos las que quedan
 C 0x6261 C = las lineas que se ven
 C 0x6262 0xA8 de ancho
@@ -111,9 +111,9 @@ C 0x62FE los dibujos de su decorado
 C 0x6301 monta la habitacion
 C 0x6307 mira si es la habitacion especial
 C 0x630A la pinta
-C 0x630D las puertas
+C 0x630D los vendedores
 C 0x6310 los bloques que se rompen
-C 0x6313 otra lista
+C 0x6313 la puerta de la fase
 C 0x6316 lo que lleva, en el marcador
 C 0x6319 la especial 6...
 C 0x631E ... trae lo suyo
@@ -130,7 +130,7 @@ C 0x6359 no
 C 0x635A si: el nibble bajo...
 C 0x635D ... a 0xCE00
 C 0x6363 vale 6?
-C 0x6366 si: los dibujos grandes de 0x57DF (0xB5A1 y 0xB719)
+C 0x6366 si: la paleta de Dracula, su sala y su cuerpo
 C 0x6385 vacia las listas de la habitacion...
 C 0x638A ... 0x290 bytes
 C 0x638F los bloques que se rompen
@@ -235,9 +235,9 @@ C 0x659E rotando
 C 0x65A4 sin rotar: la copia de 0xD400...
 C 0x65A7 ... a 0xF400 de la VRAM...
 C 0x65AA ... colores y atributos de golpe
-C 0x65CC LA ESCENA DEL FINAL: paso 0
+C 0x65CC LA SALA DE DRACULA (la clase 6, p03:B6B9), paso 0
 C 0x65D3 en (0xC0, 0xD0)...
-C 0x65D6 ... la cosa 0x11
+C 0x65D6 ... Dracula (la cosa 0x11)
 C 0x65DE paso 1
 C 0x65E1 espera...
 C 0x65F3 paso 2
@@ -373,6 +373,349 @@ C 0x6A4F ... cada ocho cuadros...
 C 0x6A55 ... una cosa 0x2C...
 C 0x6A57 ... en (0x98, 0x80)
 
+L 0x6029 colorea_los_sprites
+L 0x6048 apunta_el_sprite
+L 0x6154 las_cosas_del_bloque
+L 0x6181 copia_una_lista
+L 0x6185 un_tipo_de_la_lista
+L 0x6194 lista_habitacion_siguiente
+L 0x619E listas_del_bloque
+L 0x61A9 listas_en_blanco
+L 0x61BB crea_las_cosas_de_la_habitacion
+L 0x6202 logotipo_de_konami
+L 0x624C el_telon
+L 0x626F monta_el_logotipo
+L 0x62D0 empieza_una_vida
+L 0x62D5 barra_del_enemigo_llena
+L 0x62E6 monta_la_fase
+L 0x62F5 monta_la_habitacion_entera
+L 0x632D trae_lo_de_dracula
+L 0x6333 mira_la_habitacion_especial
+L 0x6382 vacia_la_habitacion
+C 0x6392 la puerta de la fase
+C 0x6395 las plataformas...
+C 0x6398 ... en su sitio
+C 0x639B las salidas
+L 0x63B1 vacia_fichas
+L 0x63B7 borra_lo_de_simon
+L 0x63C5 sprites_fuera
+L 0x63D3 pantalla_de_una_escena
+L 0x6402 simon_a_la_salida
+
+L 0x6445 compone_los_sprites
+L 0x6476 sprite_a_sprite
+L 0x6497 composicion_82
+L 0x649D composicion_81
+L 0x64A3 composicion_80
+L 0x64A7 composicion_fija
+L 0x64A8 sprite_fijo
+L 0x64E5 sprites_de_lo_que_lanzan_a_la_copia
+L 0x64EC sprites_de_los_enemigos_a_la_copia
+L 0x64F1 una_ficha_a_la_copia
+L 0x6501 sprites_de_una_cosa
+L 0x6508 un_sprite_de_la_cosa
+L 0x6528 colores_del_hueco
+L 0x654B sprites_a_la_vram
+L 0x657D tanda_de_atributos
+L 0x658A colores_rotados
+L 0x6596 tanda_de_colores
+L 0x65A4 sprites_sin_rotar
+L 0x65B0 la_sala_de_dracula
+L 0x65CC dracula_paso_0
+L 0x65DE dracula_paso_1
+L 0x65F3 dracula_paso_2
+L 0x6602 dracula_paso_3
+L 0x6619 dracula_paso_4
+L 0x663E dracula_paso_5
+L 0x6655 dracula_paso_6
+L 0x6667 dracula_paso_6_cae
+L 0x6677 dracula_paso_7
+L 0x668C dracula_paso_8
+L 0x6697 dracula_paso_9
+L 0x66A9 dracula_paso_10
+L 0x66BA el_texto_del_final
+L 0x66C9 final_empieza
+L 0x66D1 final_paso_siguiente
+L 0x66D6 final_renglones
+L 0x66E0 final_espera
+L 0x66F1 final_acaba
+L 0x6712 prepara_el_texto
+L 0x672F texto_cada_cuadro
+L 0x6738 cuenta_del_texto
+L 0x6743 renglon_del_texto
+L 0x6781 ultimo_renglon
+L 0x67E4 el_destello
+L 0x6810 destello_a_negro
+L 0x6818 cuenta_de_la_escena
+L 0x682A borra_la_linea_de_arriba
+L 0x6841 sube_la_pantalla
+
+L 0x684F crea_seis_del_0x2e
+L 0x6851 crea_uno_del_0x2e
+L 0x686E animacion_de_la_escena
+L 0x687C animacion_espera
+L 0x6881 animacion_paso_siguiente
+L 0x6886 animacion_sube
+L 0x6895 animacion_baja
+L 0x68A8 cuenta_hacia_el_primero
+L 0x68B9 cuenta_a_los_16
+L 0x68C4 cuenta_hacia_el_tercero
+L 0x68D7 cuenta_a_1
+L 0x68DC cuadro_segundo
+L 0x6914 cuadro_primero
+L 0x694C cuadro_tercero
+L 0x6984 dos_trozos_primeros
+L 0x69A0 dos_trozos_segundos
+L 0x69BC nace_el_0x2e
+L 0x69FC guarda_la_paleta
+L 0x6A0E apaga_la_paleta_un_paso
+L 0x6A40 quieta_con_0x0e_a_5
+L 0x6A49 crea_un_0x2c
+L 0x6A5D nace_el_0x2c
+L 0x6A9C el_0x2c
+L 0x6AB7 el_0x2c_paso_0
+L 0x6AC7 el_0x2c_paso_1
+L 0x6ADF el_0x2c_paso_2
+L 0x6AEB el_0x2c_paso_3
+L 0x6AF9 color_del_0x2c
+C 0x6A5D EL TIPO 0x2C (p01:6A49), al nacer: se mueve...
+C 0x6A6D ... cae a 0x300...
+C 0x6A73 ... y de lado, una de las ocho de 0x6A8C por turno...
+C 0x6A80 ... hacia Simon
+C 0x6A9C EL TIPO 0x2C, cada cuadro: salvo en el paso 4...
+C 0x6AA1 ... sube a -0x30 por cuadro
+C 0x6AB7 paso 0: al acabar la cuenta, el dibujo 0xA5
+C 0x6AC7 paso 1: al acabar, el 0xA6 o, a la derecha, el 0xA7
+C 0x6ADF paso 2: 0x18 cuadros
+C 0x6AEB paso 3: su color (byte 0x11)...
+C 0x6AF1 ... hasta acabar la cuenta
+
+B 0x6AFF SIMON, cada cuadro (p00:5C5F). Con la bola del jefe cogida (0xCE11) no hay mandos. Luego lo de 0x7718, su estado (0x6B39), y fuera de los estados 2, 3 y 5 de la puerta de la fase, lo de 0x710D; y el latigo, las armas y lo demas (0x767B-0x7618). Los mandos (0xC007, recien pulsados en 0xC006): bit 0 arriba, 1 abajo, 2 izquierda, 3 derecha, 4 y 5 los disparos.
+L 0x6AFF simon_cada_cuadro
+C 0x6AFF la bola cogida (0xCE11)?
+C 0x6B05 si: sin mandos
+C 0x6B12 la puerta de la fase...
+C 0x6B21 ... si no esta abriendose
+B 0x6B39 LOS ESTADOS DE SIMON (0xC420, subestado en 0xC421): 0 de pie o andando, 1 saltando, 2 agachado, 3 en la escalera, 4 cayendo, 5-7 los de 0x6F85, 0x7093 y 0x70FB.
+L 0x6B39 el_estado_de_simon
+C 0x6B3C por su estado
+L 0x6B52 simon_de_pie
+C 0x6B52 ESTADO 0: suelo bajo los pies?
+C 0x6B57 ... o una plataforma (0xC439)?
+C 0x6B5B nada: a caer
+C 0x6B5D con la puerta de la fase en 4...
+C 0x6B64 ... o en 0 o 1, sigue
+C 0x6B67 sobre una plataforma...
+C 0x6B6B ... se mueve con ella
+C 0x6B6E dando un latigazo (0xC422): nada mas
+C 0x6B73 de pie (poses 0 y 0)
+C 0x6B7D arriba: a la escalera?
+L 0x6B83 abajo_y_a_los_lados
+C 0x6B83 abajo: a la escalera o agachado
+C 0x6B87 izquierda...
+C 0x6B8D ... derecha
+C 0x6B91 el segundo disparo recien pulsado...
+C 0x6B97 ... sin techo encima...
+C 0x6B9B ... al estado 1: salta
+L 0x6BA5 a_caer
+C 0x6BA5 al estado 4: cae
+B 0x6BAF CON LA PLATAFORMA: la 1 o la 2 (0xC439) de 0xC598; se mueve un punto con ella, a su lado (el bit 7 de su tercer byte), si no hay pared.
+L 0x6BAF con_la_plataforma
+C 0x6BAF la 1: la ficha de 0xC598...
+C 0x6BB0 ... la 2, siete bytes mas alla
+L 0x6BB5 hacia_donde_va
+C 0x6BBE hacia la izquierda (bit 7)?
+C 0x6BC4 no: pared a la derecha?
+C 0x6BC8 un punto a la derecha
+L 0x6BCC plataforma_a_la_izquierda
+C 0x6BCC pared a la izquierda?
+C 0x6BD0 un punto a la izquierda
+L 0x6BD2 mueve_con_la_plataforma
+C 0x6BD2 la x de Simon, mas D
+B 0x6BDA ARRIBA: si hay escalera que sube (0x7CDB hacia la izquierda, 0x7D05 hacia la derecha), al estado 3 con la x en la rejilla de 8; si no, lo demas.
+L 0x6BDA arriba
+C 0x6BDB sube a la izquierda?
+C 0x6BDE (subestado 0, tecla 1: arriba)
+C 0x6BE3 sube a la derecha?
+C 0x6BE6 (subestado 1)
+C 0x6BEB no hay: lo demas
+L 0x6BEE a_la_escalera
+C 0x6BEE ESTADO 3...
+C 0x6BF3 ... con la tecla que sigue (0xC435)...
+C 0x6BF7 ... hacia donde va la escalera...
+C 0x6BFC ... y la x en la rejilla de 8 (mas 8 en la de la derecha)
+C 0x6C08 sin fracciones
+B 0x6C10 ABAJO: si hay escalera que baja (0x7C8B, 0x7CB3), al estado 3; si no, agachado (estado 2, poses 6 y 0).
+L 0x6C10 abajo
+C 0x6C10 baja a la derecha?
+C 0x6C13 (tecla 2: abajo)
+C 0x6C18 baja a la izquierda?
+C 0x6C20 no: ESTADO 2, agachado
+C 0x6C25 las piernas en la pose 6
+B 0x6C2F ANDA A LA IZQUIERDA (0x6C53 a la derecha): sin pared, a 0x200 por cuadro, o a 0x280 con las botas (bit 3 de 0xC431); sin pasar de 0x10 (o de 0xF0) si 0xC41E (0xC41F a la derecha) vale 0xFF, sin meterse en la puerta de la fase y sin moverse con ella en los estados 2 y 3.
+L 0x6C2F anda_a_la_izquierda
+C 0x6C2F mira a la izquierda
+C 0x6C34 con 0xC41E a 0xFF...
+C 0x6C3A ... no pasa de 0x10
+L 0x6C40 izquierda_sin_pared
+C 0x6C40 pared?
+C 0x6C44 con las botas...
+C 0x6C49 ... -0x200...
+C 0x6C4E ... o -0x280
+L 0x6C53 anda_a_la_derecha
+C 0x6C53 mira a la derecha
+C 0x6C57 con 0xC41F a 0xFF...
+C 0x6C5D ... no pasa de 0xF0
+L 0x6C63 derecha_sin_pared
+C 0x6C63 pared?
+C 0x6C67 con las botas...
+C 0x6C6C ... 0x200...
+C 0x6C71 ... o 0x280
+L 0x6C73 anda
+C 0x6C74 en la puerta de la fase?
+C 0x6C80 si: no pasa
+C 0x6C81 la puerta de la fase en 2 o 3...
+C 0x6C88 ... tampoco
+C 0x6C89 en el estado 5...
+C 0x6C90 ... o de pie, con las poses de andar
+L 0x6C94 suma_la_velocidad
+C 0x6C94 x += BC
+L 0x6C9C poses_de_andar
+C 0x6C9C izquierda y derecha a la vez...
+C 0x6CA1 ... nada
+L 0x6CA4 poses_por_el_cuadro
+C 0x6CA4 cada ocho cuadros, uno de tres pasos:
+C 0x6CAA 1 y 1...
+C 0x6CB0 ... 0 y 0...
+C 0x6CB5 ... o 2 y 2
+C 0x6CB8 se suman a las poses
+L 0x6CC0 simon_salta
+C 0x6CC0 ESTADO 1, por su subestado
+L 0x6CCE salto_empieza
+C 0x6CCE subestado 0: hacia donde, 1 recto...
+C 0x6CD0 ... con izquierda o derecha...
+C 0x6CD9 (las dos: recto)
+C 0x6CDD ... 2 a la izquierda...
+C 0x6CE1 ... 3 a la derecha
+L 0x6CE2 salto_subestado
+C 0x6CE2 al subestado
+B 0x6CE7 LA CURVA DEL SALTO: la cuenta de 0xC428 sube hasta 0x13 (0x15 con las alas, bit 4 de 0xC431, que empiezan un paso antes en 0x6D94) y cada paso suma a la y lo de 0x6D95; las piernas en la pose 6 si no da un latigazo. Desde el paso 9 mira el suelo; al caer pasado el final, 0xCFF0 = 1 para el efecto 7 al aterrizar. En el suelo: la y en la rejilla de 8 y al estado 0.
+L 0x6CE7 salto_recto
+C 0x6CE7 con las alas...
+C 0x6CEC ... la curva de 0x6D95, 0x13 pasos...
+C 0x6CF3 ... o de 0x6D94, 0x15
+C 0x6CF8 la cuenta del salto
+C 0x6D00 dando un latigazo?
+C 0x6D06 no: la pose del salto
+L 0x6D13 salto_mira_el_suelo
+C 0x6D13 antes del paso 9...
+C 0x6D16 ... sube: nada mas
+C 0x6D17 sin aterrizaje fuerte, de momento
+C 0x6D1C pasado el final de la curva...
+C 0x6D22 ... cae de verdad
+C 0x6D26 suelo?
+C 0x6D2B plataforma?
+C 0x6D2F nada: sigue
+L 0x6D30 aterriza
+C 0x6D30 tras caer de verdad...
+C 0x6D36 ... el efecto 7
+L 0x6D3B de_pie_otra_vez
+C 0x6D3B la y en la rejilla de 8...
+C 0x6D42 ... y al estado 0
+C 0x6D4D APLICA LA CURVA: la cuenta sube...
+C 0x6D4F ... hasta D
+C 0x6D53 el paso de la tabla de BC...
+C 0x6D59 ... a la y de Simon
+L 0x6D61 salto_a_la_izquierda
+C 0x6D61 subestado 2: anda a la izquierda y sigue la curva
+L 0x6D67 salto_a_la_derecha
+C 0x6D67 subestado 3: a la derecha
+L 0x6D6D cae_de_verdad
+C 0x6D6D se apunta (0xCFF0 = 1)
+C 0x6D70 en el estado 1, nada mas
+C 0x6D75 en los otros: de lado...
+C 0x6D76 ... (la cuenta - 0x13) * 8...
+C 0x6D7E ... en el 2, a la derecha...
+C 0x6D82 ... y en el 3, a la izquierda
+L 0x6D8A de_lado_a_la_derecha
+L 0x6D8C suma_de_lado
+C 0x6D8C x += DE
+L 0x6DA9 simon_agachado
+C 0x6DA9 ESTADO 2: con 0x85F4...
+C 0x6DAE ... y el segundo disparo recien pulsado...
+C 0x6DB5 ... al estado 7...
+C 0x6DBE ... 0x40 cuadros...
+C 0x6DC3 ... y el efecto 0x15
+L 0x6DC8 sigue_agachado
+C 0x6DC8 sobre una plataforma...
+C 0x6DCB ... se mueve con ella
+C 0x6DCF dando un latigazo: nada mas
+C 0x6DD4 abajo aun pulsado...
+C 0x6DD9 ... sigue agachado
+C 0x6DDA si no, de pie
+B 0x6DDD LA ESCALERA (estado 3). El subestado dice como va: 0, subiendo a la izquierda; 1, subiendo a la derecha. Cada cuadro un punto en diagonal (0x100 en y y en x) por la tecla que se pulse (o la que sigue en 0xC435 hasta completar ocho puntos); poses 3 y 1 hacia la derecha, 0x0D y 0x10 hacia la izquierda; al cabo de ocho, si hay suelo, se sale (estado 0).
+L 0x6DDD simon_en_la_escalera
+C 0x6DDD dando un latigazo: nada
+C 0x6DE2 un paso a medias (0xC435)...
+C 0x6DE8 ... si no, los mandos
+L 0x6DEB la_tecla_de_la_escalera
+C 0x6DEC un punto por cuadro
+C 0x6DEF subiendo a la derecha?
+C 0x6DF6 subiendo a la izquierda: arriba...
+C 0x6DF7 ... sube a la izquierda
+C 0x6DFA abajo...
+C 0x6DFB ... baja a la derecha
+C 0x6DFE izquierda: sube
+C 0x6E02 derecha: baja
+L 0x6E07 escalera_a_la_derecha
+C 0x6E07 arriba: sube a la derecha
+C 0x6E0A abajo: baja a la izquierda
+C 0x6E0D izquierda: baja
+C 0x6E10 derecha: sube
+L 0x6E14 baja_a_la_derecha
+C 0x6E14 y + 1...
+C 0x6E1B ... x + 1
+C 0x6E22 mira a la derecha
+C 0x6E26 poses 3 y 1
+C 0x6E2D el paso
+C 0x6E30 un punto mas
+C 0x6E36 a mitad de los ocho...
+C 0x6E38 ... sigue a la derecha (0xC435 = 8)
+C 0x6E3C ... y al completarlos, libre
+C 0x6E40 tras ocho puntos...
+C 0x6E44 ... con suelo, fuera
+L 0x6E4B baja_a_la_izquierda
+C 0x6E4C y + 1...
+C 0x6E53 ... x - 1
+C 0x6E5B mira a la izquierda
+C 0x6E60 poses 0x0D y 0x10
+C 0x6E6A un punto mas
+C 0x6E72 sigue a la izquierda (0xC435 = 4)
+C 0x6E7A tras ocho...
+C 0x6E7E ... con suelo, fuera
+L 0x6E84 sube_a_la_derecha
+C 0x6E85 y - 1...
+C 0x6E8D ... x + 1
+C 0x6E94 mira a la derecha
+C 0x6E98 poses 3 y 1
+C 0x6EA2 un punto mas
+C 0x6EAA sigue a la derecha
+L 0x6EAF escalera_libre_1
+C 0x6EB2 tras ocho...
+C 0x6EB6 ... arriba del todo, fuera
+L 0x6EBC sube_a_la_izquierda
+C 0x6EBD y - 1...
+C 0x6EC6 ... x - 1
+C 0x6ECE mira a la izquierda
+C 0x6ED3 poses 0x0D y 0x10
+C 0x6EDD un punto mas
+C 0x6EE5 sigue a la izquierda
+L 0x6EEA escalera_libre_2
+C 0x6EED tras ocho...
+C 0x6EF1 ... arriba del todo, fuera
+L 0x6EF5 fuera_de_la_escalera
+C 0x6EF5 de pie...
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
 F 0x6058 16
@@ -382,7 +725,7 @@ D 0x60E2 0x6110 vida_de_cada_tipo  46 bytes, uno por tipo (1-46): la vida con la
 F 0x60E2 16
 D 0x6110 0x6154 listas_de_colores  las listas de colores de sprite a las que apuntan los punteros de 0x6086: un byte por sprite
 F 0x6110 16
-D 0x628F 0x62D0 logotipo  como se monta el logotipo del titulo: numeros de dibujo que p01:626F coloca de izquierda a derecha; 0xFE [dx] baja una fila y corre dx, 0xFF acaba (p01:6227, con DE = 0x4040)
+D 0x628F 0x62D0 logotipo  como se monta el logotipo de Konami: numeros de dibujo que p01:626F coloca de izquierda a derecha; 0xFE [dx] baja una fila y corre dx, 0xFF acaba (p01:6227, con DE = 0x4040)
 F 0x628F 16
 D 0x636F 0x6382 habitacion_especial_de_cada_fase  19 bytes, uno por fase: la habitacion (nibble alto) en la que p01:6343 pone el nibble bajo en 0xCE00 al entrar; si vale 6, llama ademas a 0x59EC
 F 0x636F 16
@@ -589,98 +932,63 @@ C 0x6A1A hl_mas_a: HL += A
 C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x6A44 la cosa se queda quieta
 C 0x6A5A crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x6A5D la cosa se mueve
 C 0x6A61 la cuenta de cuadros del paso = 0x08
 C 0x6A69 el dibujo de la cosa = 0x02
 C 0x6A70 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x6A7D palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-C 0x6A80 lee la X de Simon
 C 0x6A83 le resta la x de la cosa
 C 0x6A86 niega_de: DE = -DE
 C 0x6A89 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0x6A9C lee el paso en que va la cosa
 C 0x6AA4 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 C 0x6AA7 lee el paso en que va la cosa
 C 0x6AAA despacha: salta a la entrada A de la tabla que va detras del call
-C 0x6AB7 baja la cuenta de cuadros del paso
 C 0x6ABB el dibujo de la cosa = 0xA5
 C 0x6ABF la cuenta de cuadros del paso = 0x08
 C 0x6AC3 sube el paso en que va la cosa
-C 0x6AC7 baja la cuenta de cuadros del paso
 C 0x6ACB va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0x6AD4 guarda el dibujo de la cosa
 C 0x6AD7 la cuenta de cuadros del paso = 0x08
 C 0x6ADB sube el paso en que va la cosa
-C 0x6ADF baja la cuenta de cuadros del paso
 C 0x6AE3 la cuenta de cuadros del paso = 0x18
 C 0x6AE7 sube el paso en que va la cosa
-C 0x6AF1 baja la cuenta de cuadros del paso
 C 0x6AF5 sube el paso en que va la cosa
-C 0x6B12 lee el estado de la puerta de la fase
 C 0x6B3F despacha: salta a la entrada A de la tabla que va detras del call
-C 0x6B52 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-C 0x6B5D lee el estado de la puerta de la fase
 C 0x6B76 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6B7A pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6BB8 hl_mas_a: HL += A
-C 0x6BD2 lee la X de Simon
 C 0x6BD6 guarda la X de Simon
-C 0x6BFC lee la X de Simon
 C 0x6C05 guarda la X de Simon
 C 0x6C09 guarda la fraccion de la y de Simon
 C 0x6C0C guarda la fraccion de la x de Simon
 C 0x6C28 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6C2C pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6C31 guarda el lado al que mira Simon (0 derecha)
-C 0x6C3A lee la X de Simon
 C 0x6C54 guarda el lado al que mira Simon (0 derecha)
-C 0x6C5D lee la X de Simon
-C 0x6C74 lee la Y de Simon
 C 0x6C78 lee la X de Simon
-C 0x6C81 lee el estado de la puerta de la fase
-C 0x6C94 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6C98 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
-C 0x6CA4 lee el contador de cuadros
-C 0x6CB8 lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6CBC guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6CC3 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x6CFC aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
 C 0x6D0A guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6D0F pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x6D17 apunta a el tipo de la cosa que se crea
-C 0x6D26 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-C 0x6D30 lee el tipo de la cosa que se crea
 C 0x6D38 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x6D3B apunta a la Y de Simon
 C 0x6D56 hl_mas_a: HL += A
-C 0x6D59 lee la Y de Simon
 C 0x6D5D guarda la Y de Simon
-C 0x6D8C lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6D90 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6DC5 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x6E14 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E18 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
-C 0x6E1B lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E1F guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E23 guarda el lado al que mira Simon (0 derecha)
 C 0x6E29 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-C 0x6E44 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-C 0x6E4C lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E50 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
-C 0x6E53 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E58 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E5D guarda el lado al que mira Simon (0 derecha)
 C 0x6E63 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-C 0x6E7E mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-C 0x6E85 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6E8A guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
-C 0x6E8D lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E91 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6E95 guarda el lado al que mira Simon (0 derecha)
 C 0x6E9B guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-C 0x6EBD lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
 C 0x6EC2 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
-C 0x6EC6 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6ECB guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
 C 0x6ED0 guarda el lado al que mira Simon (0 derecha)
 C 0x6ED6 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
