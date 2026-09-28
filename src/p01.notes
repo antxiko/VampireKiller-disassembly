@@ -82,3 +82,423 @@ F 0x749D 2
 D 0x771E 0x772A tabla_771E  6 destinos del despachador de 0x406B (call en p01:771B): 0x7805, 0x772A, 0x7805, 0x778A, 0x772A, 0x778A; lo leen p01:771B (12 bytes)
 F 0x771E 2
 # --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0x6542 palabra_de_la_tabla
+L 0x6D4D aplica_la_curva
+L 0x765F pose_segun_el_lado
+L 0x7B32 rotulo_por_filas
+L 0x7B88 mira_el_suelo
+L 0x7B98 choca_con_el_decorado
+L 0x7C5E es_pared
+L 0x7D2F celda_del_mapa
+C 0x6031 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x6034 lee la ficha de la cosa que se crea
+C 0x6049 lee la ficha de la cosa que se crea
+C 0x6052 hl_mas_a: HL += A
+C 0x6157 el mapper: pone en 0x8000 el banco de A
+C 0x615A guarda la copia del banco de 0x8000
+C 0x6179 el mapper: pone en 0x8000 el banco de A
+C 0x617C guarda la copia del banco de 0x8000
+C 0x6181 guarda el tipo de la cosa que se crea
+C 0x6194 lee el tipo de la cosa que se crea
+C 0x619E lee el bloque de tres fases (0-5)
+C 0x61A4 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x61BB lee el bloque de tres fases (0-5)
+C 0x61C2 lee la FASE (0 el patio, 1-18)
+C 0x61CF lee la HABITACION dentro de la fase
+C 0x61D6 hl_mas_a: HL += A
+C 0x6202 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
+C 0x620B pon_paleta: lista de [color][RB][G] hasta 0xFF
+C 0x621E rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
+C 0x622D enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
+C 0x626C copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x62D2 guarda la vida de Simon
+C 0x62D7 guarda la vida del enemigo (barra ENEMY)
+C 0x62E6 sube_los_dibujos_de_la_fase: los 191 dibujos del decorado de la fase de 0xD000
+C 0x6304 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
+C 0x6321 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
+C 0x6343 lee la FASE (0 el patio, 1-18)
+C 0x6349 hl_mas_a: HL += A
+C 0x634C lee la HABITACION dentro de la fase
+C 0x63D8 guarda la Y de Simon
+C 0x63DB guarda la X de Simon
+C 0x63F3 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
+C 0x63FF enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
+C 0x6402 lee la FASE (0 el patio, 1-18)
+C 0x6409 hl_mas_a: HL += A
+C 0x6411 guarda la Y de Simon
+C 0x6415 guarda la X de Simon
+C 0x641B guarda el lado al que mira Simon
+C 0x6451 el mapper: pone en 0xA000 el banco de A
+C 0x6454 guarda la copia del banco de 0xA000
+C 0x645E palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x648F el mapper: pone en 0xA000 el banco de A
+C 0x6492 guarda la copia del banco de 0xA000
+C 0x64C5 el mapper: pone en 0xA000 el banco de A
+C 0x64C8 guarda la copia del banco de 0xA000
+C 0x6559 lee el estado de la puerta de la fase
+C 0x6573 vram_para_escribir: prepara el V9938 para escribir en la direccion HL
+C 0x658D vram_para_escribir: prepara el V9938 para escribir en la direccion HL
+C 0x65AD copia_a_la_vram: BC bytes de HL a la VRAM de DE
+C 0x65B0 lee el paso de la escena
+C 0x65B3 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x65D8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x65DB siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x65F0 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x65FF siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x6613 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6616 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x661B sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6620 guarda la vida del enemigo (barra ENEMY)
+C 0x662E crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x663B siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x664A guarda la cuenta del destello
+C 0x6652 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x6674 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x6681 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6689 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x6694 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x66A6 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0x66BE despacha: salta a la entrada A de la tabla que va detras del call
+C 0x66CB sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x66EC apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
+C 0x6719 guarda la cuenta del texto del final
+C 0x671C guarda el renglon del final que toca
+C 0x672C pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x6738 lee el contador de cuadros
+C 0x673E apunta a la cuenta del texto del final
+C 0x6746 el mapper: pone en 0xA000 el banco de A
+C 0x6749 guarda la copia del banco de 0xA000
+C 0x6750 el mapper: pone en 0x8000 el banco de A
+C 0x6753 guarda la copia del banco de 0x8000
+C 0x6757 lee el renglon del final que toca
+C 0x675D palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x6761 lee la cuenta del texto del final
+C 0x6765 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
+C 0x676F lee la cuenta del texto del final
+C 0x677A apunta a el renglon del final que toca
+C 0x677E bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
+C 0x6788 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x678B bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
+C 0x67E4 apunta a la cuenta del destello
+C 0x67F2 hl_mas_a: HL += A
+C 0x67FA pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x6815 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x682A lee la cuenta del texto del final
+C 0x6846 lee la cuenta del texto del final
+C 0x6867 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x6871 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x68E7 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x68F5 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6903 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6911 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x691F copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x692D copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x693B copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6949 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6957 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6965 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6973 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x6981 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x698F copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x699D copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x69AB copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x69B9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x69D4 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x69D7 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0x69DE pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0x69E1 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x6A1A hl_mas_a: HL += A
+C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x6A4F lee el contador de cuadros
+C 0x6A5A crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0x6A70 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0x6A7D palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0x6A80 lee la X de Simon
+C 0x6A86 niega_de: DE = -DE
+C 0x6A89 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0x6AA4 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
+C 0x6AAA despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6B12 lee el estado de la puerta de la fase
+C 0x6B3F despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6B52 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6B5D lee el estado de la puerta de la fase
+C 0x6B76 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6B7A pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6BB8 hl_mas_a: HL += A
+C 0x6BD2 lee la X de Simon
+C 0x6BD6 guarda la X de Simon
+C 0x6BFC lee la X de Simon
+C 0x6C05 guarda la X de Simon
+C 0x6C09 guarda la fraccion de la y de Simon
+C 0x6C0C guarda la fraccion de la x de Simon
+C 0x6C28 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6C2C pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6C31 guarda el lado al que mira Simon
+C 0x6C3A lee la X de Simon
+C 0x6C54 guarda el lado al que mira Simon
+C 0x6C5D lee la X de Simon
+C 0x6C74 lee la Y de Simon
+C 0x6C78 lee la X de Simon
+C 0x6C81 lee el estado de la puerta de la fase
+C 0x6C94 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6C98 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6CA4 lee el contador de cuadros
+C 0x6CB8 lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6CBC guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6CC3 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6CFC aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
+C 0x6D0A guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6D0F pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6D17 apunta a el tipo de la cosa que se crea
+C 0x6D26 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6D30 lee el tipo de la cosa que se crea
+C 0x6D38 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6D3B apunta a la Y de Simon
+C 0x6D56 hl_mas_a: HL += A
+C 0x6D59 lee la Y de Simon
+C 0x6D5D guarda la Y de Simon
+C 0x6D8C lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6D90 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6DC5 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6E14 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E18 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E1B lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E1F guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E23 guarda el lado al que mira Simon
+C 0x6E29 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6E44 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6E4C lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E50 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E53 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E58 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E5D guarda el lado al que mira Simon
+C 0x6E63 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6E7E mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6E85 lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E8A guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6E8D lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E91 guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6E95 guarda el lado al que mira Simon
+C 0x6E9B guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6EBD lee la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6EC2 guarda la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)
+C 0x6EC6 lee la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6ECB guarda la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)
+C 0x6ED0 guarda el lado al que mira Simon
+C 0x6ED6 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6EF8 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6F03 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6F15 lee la pose de arriba de Simon
+C 0x6F19 guarda la pose de arriba de Simon
+C 0x6F1C lee la pose de abajo de Simon
+C 0x6F20 guarda la pose de abajo de Simon
+C 0x6F2E lee la pose de arriba de Simon
+C 0x6F32 guarda la pose de arriba de Simon
+C 0x6F35 lee la pose de abajo de Simon
+C 0x6F39 guarda la pose de abajo de Simon
+C 0x6F43 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6F4B guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6F4F pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6F5F hl_mas_a: HL += A
+C 0x6F62 lee la Y de Simon
+C 0x6F66 guarda la Y de Simon
+C 0x6F6A lee la Y de Simon
+C 0x6F6F guarda la Y de Simon
+C 0x6F7E sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6F88 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x6F9A sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x6FA9 lee la vida de Simon
+C 0x6FB6 guarda la pose de abajo de Simon
+C 0x6FB9 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6FBF guarda el lado al que mira Simon
+C 0x6FCD guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x6FD1 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x6FE0 aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
+C 0x6FE8 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
+C 0x6FF2 lee la Y de Simon
+C 0x6FF7 guarda la Y de Simon
+C 0x6FFF lee la vida de Simon
+C 0x700C lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x7012 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x703C lee el estado de la puerta de la fase
+C 0x704B lee el lado al que mira Simon
+C 0x7050 guarda el lado al que mira Simon
+C 0x7053 lee la vida de Simon
+C 0x7058 apunta a la X de Simon
+C 0x7076 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x707A pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x70A7 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x70B4 apunta a los corazones, en BCD
+C 0x70D6 guarda la HABITACION dentro de la fase
+C 0x70E5 guarda el arma que lleva Simon (0, ninguna)
+C 0x7109 guarda el lado por el que se sale de la habitacion
+C 0x7123 lee el arma que lleva Simon (0, ninguna)
+C 0x714D lee los corazones, en BCD
+C 0x7164 lee los corazones, en BCD
+C 0x7170 lee los corazones, en BCD
+C 0x7176 guarda los corazones, en BCD
+C 0x7191 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x71B2 lee los corazones, en BCD
+C 0x71B8 guarda los corazones, en BCD
+C 0x71EF despacha: salta a la entrada A de la tabla que va detras del call
+C 0x7209 guarda la pose de arriba de Simon
+C 0x721D guarda la pose de abajo de Simon
+C 0x7220 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x7225 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x722F guarda la pose de abajo de Simon
+C 0x7232 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x7240 apunta a la pose de abajo de Simon
+C 0x725A apunta a la pose de abajo de Simon
+C 0x7280 guarda la pose de abajo de Simon
+C 0x7283 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x729D lee el lado al que mira Simon
+C 0x72D3 despacha: salta a la entrada A de la tabla que va detras del call
+C 0x72DE lee el contador de cuadros
+C 0x72F5 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x72FC despacha: salta a la entrada A de la tabla que va detras del call
+C 0x730C lee la Y de Simon
+C 0x7334 lee la X de Simon
+C 0x73B3 lee la Y de Simon
+C 0x73D1 lee la X de Simon
+C 0x73E4 hl_mas_a: HL += A
+C 0x7403 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0x7416 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7419 lee el contador de cuadros
+C 0x7440 lee la Y de Simon
+C 0x7465 lee la X de Simon
+C 0x7470 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7473 lee el contador de cuadros
+C 0x7489 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x749A despacha: salta a la entrada A de la tabla que va detras del call
+C 0x74DF lee el arma que lleva Simon (0, ninguna)
+C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7624 apunta a la pose de arriba de Simon
+C 0x7654 apunta a la pose de arriba de Simon
+C 0x765F lee el lado al que mira Simon
+C 0x7664 lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x7677 guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x7681 apunta a el lado por el que se sale de la habitacion
+C 0x7684 apunta a la Y de Simon
+C 0x7687 apunta a la X de Simon
+C 0x76AC lee el lado al que mira Simon
+C 0x76D4 lee la FASE (0 el patio, 1-18)
+C 0x76E5 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x76F2 lee el lado al que mira Simon
+C 0x7718 lee el estado de la puerta de la fase
+C 0x771B despacha: salta a la entrada A de la tabla que va detras del call
+C 0x772A apunta a la Y de Simon
+C 0x773A lee la FASE (0 el patio, 1-18)
+C 0x7752 apunta a el estado de la puerta de la fase
+C 0x7756 lee la FASE (0 el patio, 1-18)
+C 0x775C de_mas_a: DE += A
+C 0x7765 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x776F sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7774 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x778A lee el estado de la puerta de la fase
+C 0x779A guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+C 0x779E pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
+C 0x77A1 lee el lado al que mira Simon
+C 0x77B3 lee el estado de la puerta de la fase
+C 0x77BA lee la X de Simon
+C 0x77CA lee la X de Simon
+C 0x77D4 apunta a la X de Simon
+C 0x77ED guarda el lado por el que se sale de la habitacion
+C 0x77F2 lee la FASE (0 el patio, 1-18)
+C 0x77FD sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x783A lee el estado de la puerta de la fase
+C 0x7844 lee el arma que lleva Simon (0, ninguna)
+C 0x7858 lee la pose de arriba de Simon
+C 0x785F hl_mas_a: HL += A
+C 0x7868 lee el estado de la puerta de la fase
+C 0x787A lee la pose de abajo de Simon
+C 0x7881 hl_mas_a: HL += A
+C 0x788A lee el estado de la puerta de la fase
+C 0x7899 lee la Y de Simon
+C 0x789F lee la pose de arriba de Simon
+C 0x78D2 lee el contador de cuadros
+C 0x78E4 lee la X de Simon
+C 0x790C lee el arma que lleva Simon (0, ninguna)
+C 0x7917 lee el estado de la puerta de la fase
+C 0x792A lee el contador de cuadros
+C 0x7938 lee el contador de cuadros
+C 0x7955 lee la FASE (0 el patio, 1-18)
+C 0x795F hl_mas_a: HL += A
+C 0x7965 lee la FASE (0 el patio, 1-18)
+C 0x796B hl_mas_a: HL += A
+C 0x796F sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7ADA rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
+C 0x7AEC pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x7B2C pon_un_color: color A de la paleta = DE (y su copia en 0xF680)
+C 0x7B68 lee la Y de Simon
+C 0x7B6E lee la X de Simon
+C 0x7B72 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7B75 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7B78 lee la Y de Simon
+C 0x7B7E lee la X de Simon
+C 0x7B82 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7B85 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7B88 lee la Y de Simon
+C 0x7B92 lee la X de Simon
+C 0x7B98 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7B9B es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7BA3 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7BA6 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7BA9 lee la Y de Simon
+C 0x7BAD lee la X de Simon
+C 0x7BC0 guarda el tipo de la cosa que se crea
+C 0x7BC9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7BCC es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7BD4 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7BD7 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7BDB lee el tipo de la cosa que se crea
+C 0x7BE5 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7BE8 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7BEC lee el tipo de la cosa que se crea
+C 0x7BFF celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7C02 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7C05 lee la Y de Simon
+C 0x7C09 lee la X de Simon
+C 0x7C1C guarda el tipo de la cosa que se crea
+C 0x7C25 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7C28 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7C30 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7C33 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7C37 lee el tipo de la cosa que se crea
+C 0x7C41 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7C44 es_pared: carry si el bloque de la celda es de los que paran (tope por fase de 0x7C78)
+C 0x7C48 lee el tipo de la cosa que se crea
+C 0x7C5B celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7C66 lee la FASE (0 el patio, 1-18)
+C 0x7C6C hl_mas_a: HL += A
+C 0x7C94 apunta a la Y de Simon
+C 0x7C9D celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7CA7 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7CBC apunta a la Y de Simon
+C 0x7CC5 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7CCF celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7CE4 apunta a la Y de Simon
+C 0x7CF1 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7CF9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7D0E apunta a la Y de Simon
+C 0x7D1B celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7D23 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+C 0x7D45 hl_mas_a: HL += A
+C 0x7D68 lee el lado por el que se sale de la habitacion
+C 0x7D79 lee el arma que lleva Simon (0, ninguna)
+C 0x7DD6 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7DE6 lee el arma que lleva Simon (0, ninguna)
+C 0x7E0F lee la vida del enemigo (barra ENEMY)
+C 0x7E1E sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7E2F lee el arma que lleva Simon (0, ninguna)
+C 0x7E42 hl_mas_a: HL += A
+C 0x7E4B lee el arma que lleva Simon (0, ninguna)
+C 0x7EBE sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7F10 borra_la_cosa: tipo a cero y sus sprites libres
+C 0x7F67 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7F9B sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7FD8 sonido: arranca la musica o el efecto A (bit 7 = musica)
+# --- fin de las anotaciones de anota.py ---

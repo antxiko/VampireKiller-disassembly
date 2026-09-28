@@ -480,67 +480,67 @@ DATA_letras_8894:
 ; ======================================================================
 
 
-L_8964:
-	ld a,(0c097h)		;8964
+reproductor:
+	ld a,(0c097h)		;8964   ; lee la copia del registro 7 del PSG (el mezclador)
 	ld e,a			;8967
 	ld a,007h		;8968
 	call 00093h		;896a   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(0c098h)		;896d
+	ld a,(0c098h)		;896d   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
 	bit 0,a		;8970
 	jp nz,L_89F2		;8972
 	bit 1,a		;8975
 	jp nz,L_89F6		;8977
-	ld a,(0c0a5h)		;897a
+	ld a,(0c0a5h)		;897a   ; lee la cuenta del fundido de la musica
 	dec a			;897d
 	jp m,L_89A5		;897e
 	jp nz,L_89A2		;8981
-	ld a,(0c0a6h)		;8984
+	ld a,(0c0a6h)		;8984   ; lee el volumen que se le resta a la musica
 	dec a			;8987
-	ld (0c0a6h),a		;8988
+	ld (0c0a6h),a		;8988   ; guarda el volumen que se le resta a la musica
 	cp 0f0h		;898b
 	jp nz,L_89A0		;898d
-	ld hl,L_89CE		;8990
-	ld (0c010h),hl		;8993
-	ld (0c012h),hl		;8996
-	ld (0c014h),hl		;8999
+	ld hl,canal_en_reposo		;8990
+	ld (0c010h),hl		;8993   ; guarda el manejador del canal A del sonido
+	ld (0c012h),hl		;8996   ; guarda el manejador del canal B
+	ld (0c014h),hl		;8999   ; guarda el manejador del canal C
 	xor a			;899c
 	jp L_89A2		;899d
 L_89A0:
 	ld a,03ah		;89a0
 L_89A2:
-	ld (0c0a5h),a		;89a2
+	ld (0c0a5h),a		;89a2   ; guarda la cuenta del fundido de la musica
 L_89A5:
 	xor a			;89a5
 	ld b,a			;89a6
-	ld hl,(0c010h)		;89a7
+	ld hl,(0c010h)		;89a7   ; lee el manejador del canal A del sonido
 	call L_89C6		;89aa
 	ld a,001h		;89ad
 	ld b,a			;89af
-	ld hl,(0c012h)		;89b0
+	ld hl,(0c012h)		;89b0   ; lee el manejador del canal B
 	call L_89C6		;89b3
 	ld a,002h		;89b6
 	ld b,a			;89b8
-	ld hl,(0c014h)		;89b9
+	ld hl,(0c014h)		;89b9   ; lee el manejador del canal C
 L_89BC:
 	call L_89C6		;89bc
 	ld a,002h		;89bf
 	ld b,003h		;89c1
-	ld hl,(0c016h)		;89c3
+	ld hl,(0c016h)		;89c3   ; lee el manejador del efecto de sonido
 L_89C6:
-	ld (0c094h),a		;89c6
+	ld (0c094h),a		;89c6   ; guarda el canal del PSG que se esta tocando
 	ld a,b			;89c9
-	ld (0c095h),a		;89ca
+	ld (0c095h),a		;89ca   ; guarda el numero de canal
 	jp (hl)			;89cd
-L_89CE:
-	ld a,(0c095h)		;89ce
+canal_en_reposo:
+	ld a,(0c095h)		;89ce   ; lee el numero de canal
 	cp 003h		;89d1
 	jp nz,L_89DD		;89d3
 	xor a			;89d6
-	ld (0c096h),a		;89d7
-	ld a,(0c095h)		;89da
+	ld (0c096h),a		;89d7   ; guarda la prioridad del efecto que suena
+	ld a,(0c095h)		;89da   ; lee el numero de canal
 L_89DD:
 	rlca			;89dd
-	ld hl,0c010h		;89de
+	ld hl,0c010h		;89de   ; apunta a el manejador del canal A del sonido
 	add a,l			;89e1
 	ld l,a			;89e2
 	jr nc,L_89E6		;89e3
@@ -551,26 +551,26 @@ L_89E6:
 	inc hl			;89ea
 	ld (hl),d			;89eb
 	ld e,000h		;89ec
-	jp L_8A0B		;89ee
+	jp volumen_del_canal		;89ee   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_89F1:
 	ret			;89f1
 L_89F2:
-	ld hl,(0c01ah)		;89f2
+	ld hl,(0c01ah)		;89f2   ; lee el manejador de la musica de la pausa
 	jp (hl)			;89f5
 L_89F6:
 	xor a			;89f6
 	ld b,004h		;89f7
-	ld hl,(0c018h)		;89f9
+	ld hl,(0c018h)		;89f9   ; lee el manejador del segundo efecto
 	jp L_89BC		;89fc
 L_89FF:
-	ld a,(0c094h)		;89ff
+	ld a,(0c094h)		;89ff   ; lee el canal del PSG que se esta tocando
 	rlca			;8a02
 	call 00093h		;8a03   ; BIOS WRTPSG - Writes data to PSG-register
 	inc a			;8a06
 	ld e,d			;8a07
 	jp 00093h		;8a08   ; BIOS WRTPSG - Writes data to PSG-register
-L_8A0B:
-	ld a,(0c094h)		;8a0b
+volumen_del_canal:
+	ld a,(0c094h)		;8a0b   ; lee el canal del PSG que se esta tocando
 	add a,008h		;8a0e
 	jp 00093h		;8a10   ; BIOS WRTPSG - Writes data to PSG-register
 L_8A13:
@@ -589,18 +589,18 @@ L_8A28:
 	push hl			;8a28
 	ld hl,08a45h		;8a29
 L_8A2C:
-	ld a,(0c094h)		;8a2c
+	ld a,(0c094h)		;8a2c   ; lee el canal del PSG que se esta tocando
 	rlca			;8a2f
 	add a,l			;8a30
 	ld l,a			;8a31
 	jr nc,L_8A35		;8a32
 	inc h			;8a34
 L_8A35:
-	ld a,(0c097h)		;8a35
+	ld a,(0c097h)		;8a35   ; lee la copia del registro 7 del PSG (el mezclador)
 	and (hl)			;8a38
 	inc hl			;8a39
 	or (hl)			;8a3a
-	ld (0c097h),a		;8a3b
+	ld (0c097h),a		;8a3b   ; guarda la copia del registro 7 del PSG (el mezclador)
 	pop hl			;8a3e
 	ld e,a			;8a3f
 	ld a,007h		;8a40
@@ -634,10 +634,10 @@ L_8A6B:
 L_8A72:
 	ld ix,0c044h		;8a72
 L_8A76:
-	ld a,(0c095h)		;8a76
+	ld a,(0c095h)		;8a76   ; lee el numero de canal
 	cp 002h		;8a79
 	jp nz,L_8A89		;8a7b
-	ld a,(0c096h)		;8a7e
+	ld a,(0c096h)		;8a7e   ; lee la prioridad del efecto que suena
 	or a			;8a81
 	jp z,L_8A89		;8a82
 	set 5,(ix+002h)		;8a85
@@ -658,7 +658,7 @@ L_8AA3:
 	ld (ix+00ah),e		;8aa8
 	bit 5,(ix+002h)		;8aab
 	ret nz			;8aaf
-	jp L_8A0B		;8ab0
+	jp volumen_del_canal		;8ab0   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8AB3:
 	bit 5,(ix+002h)		;8ab3
 	ret nz			;8ab7
@@ -668,7 +668,7 @@ L_8AB3:
 	ret nc			;8ac0
 	set 7,(ix+002h)		;8ac1
 	ld e,000h		;8ac5
-	jp L_8A0B		;8ac7
+	jp volumen_del_canal		;8ac7   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8ACA:
 	ld l,(ix+000h)		;8aca
 	ld h,(ix+001h)		;8acd
@@ -691,10 +691,10 @@ L_8AEB:
 	add a,e			;8aeb
 	djnz L_8AEB		;8aec
 	ld (ix+009h),a		;8aee
-	ld a,(0c095h)		;8af1
+	ld a,(0c095h)		;8af1   ; lee el numero de canal
 	cp 002h		;8af4
 	jp nz,L_8B04		;8af6
-	ld a,(0c096h)		;8af9
+	ld a,(0c096h)		;8af9   ; lee la prioridad del efecto que suena
 	or a			;8afc
 	jp nz,L_8B04		;8afd
 	res 5,(ix+002h)		;8b00
@@ -731,14 +731,14 @@ L_8B2D:
 	inc de			;8b3b
 L_8B3C:
 	call L_89FF		;8b3c
-	ld a,(0c0a6h)		;8b3f
+	ld a,(0c0a6h)		;8b3f   ; lee el volumen que se le resta a la musica
 	add a,(ix+004h)		;8b42
 	jp p,L_8B49		;8b45
 	xor a			;8b48
 L_8B49:
 	ld (ix+00ah),a		;8b49
 	ld e,a			;8b4c
-	call L_8A0B		;8b4d
+	call volumen_del_canal		;8b4d   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 	jp L_8A28		;8b50
 L_8B53:
 	bit 2,(ix+002h)		;8b53
@@ -806,7 +806,7 @@ L_8BA1:
 	ret nz			;8bab
 	ld e,000h		;8bac
 	ld (ix+00ah),e		;8bae
-	jp L_8A0B		;8bb1
+	jp volumen_del_canal		;8bb1   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8BB4:
 	and 0f0h		;8bb4
 	cp 0d0h		;8bb6
@@ -919,7 +919,7 @@ L_8C77:
 	ld h,(ix+013h)		;8c7a
 	jp L_8AD0		;8c7d
 L_8C80:
-	ld a,(0c095h)		;8c80
+	ld a,(0c095h)		;8c80   ; lee el numero de canal
 	inc a			;8c83
 	ld b,a			;8c84
 	ld a,07fh		;8c85
@@ -930,7 +930,7 @@ L_8C87:
 	ld a,(0c0a7h)		;8c8b
 	and b			;8c8e
 	ld (0c0a7h),a		;8c8f
-	jp L_89CE		;8c92
+	jp canal_en_reposo		;8c92   ; canal_en_reposo: el canal que no suena
 L_8C95:
 	ld ix,0c06ch		;8c95
 	jp L_8CA0		;8c99
@@ -939,7 +939,7 @@ L_8C9C:
 L_8CA0:
 	call L_8CA7		;8ca0
 	ret nc			;8ca3
-	jp L_89CE		;8ca4
+	jp canal_en_reposo		;8ca4   ; canal_en_reposo: el canal que no suena
 L_8CA7:
 	dec (ix+00eh)		;8ca7
 	jp nz,L_8D8B		;8caa
@@ -982,17 +982,17 @@ L_8CE1:
 	call 00093h		;8cef   ; BIOS WRTPSG - Writes data to PSG-register
 	jp L_8D09		;8cf2
 L_8CF5:
-	ld a,(0c095h)		;8cf5
+	ld a,(0c095h)		;8cf5   ; lee el numero de canal
 	cp 003h		;8cf8
 	jp nc,L_8D06		;8cfa
-	ld a,(0c0a6h)		;8cfd
+	ld a,(0c0a6h)		;8cfd   ; lee el volumen que se le resta a la musica
 	add a,e			;8d00
 	jp p,L_8D05		;8d01
 	xor a			;8d04
 L_8D05:
 	ld e,a			;8d05
 L_8D06:
-	call L_8A0B		;8d06
+	call volumen_del_canal		;8d06   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8D09:
 	ld a,c			;8d09
 	and 00fh		;8d0a
@@ -1046,7 +1046,7 @@ L_8D5C:
 	and 010h		;8d5e
 	ld (ix+00ah),a		;8d60
 	ld e,a			;8d63
-	call L_8A0B		;8d64
+	call volumen_del_canal		;8d64   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 	ld a,(hl)			;8d67
 	inc hl			;8d68
 	ld (ix+00eh),a		;8d69

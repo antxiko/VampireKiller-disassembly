@@ -88,7 +88,7 @@ DATA_cuatro_valores:
 
 L_804C:
 	ld a,00ch		;804c
-	call 0509fh		;804e
+	call 0509fh		;804e   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,(ix+000h)		;8051
 	sub 011h		;8054
 	cp 007h		;8056
@@ -97,7 +97,7 @@ L_805A:
 	ld a,(iy+001h)		;805a
 	sub 002h		;805d
 	ld hl,08048h		;805f
-	call 04061h		;8062
+	call 04061h		;8062   ; hl_mas_a: HL += A
 	ld b,(hl)			;8065
 	ld a,(ix+00dh)		;8066
 	sub b			;8069
@@ -124,7 +124,7 @@ L_8088:
 	jr z,L_805A		;8093
 L_8095:
 	call 07e2ch		;8095
-	ld a,(0c418h)		;8098
+	ld a,(0c418h)		;8098   ; lee la vida del enemigo (barra ENEMY)
 	and a			;809b
 	jr z,L_80A1		;809c
 	rla			;809e
@@ -155,7 +155,7 @@ L_80AC:
 	call z,074ech		;80cc
 L_80CF:
 	ld a,00ch		;80cf
-	jp 0509fh		;80d1
+	jp 0509fh		;80d1   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_80D4:
 	ld de,00010h		;80d4
 	add ix,de		;80d7
@@ -169,7 +169,7 @@ L_80E5:
 	ld a,(hl)			;80e5
 	rla			;80e6
 	ret nc			;80e7
-	ld a,(0c416h)		;80e8
+	ld a,(0c416h)		;80e8   ; lee el arma que lleva Simon (0, ninguna)
 	cp 002h		;80eb
 	jr nc,L_80FD		;80ed
 	ld a,(0c422h)		;80ef
@@ -198,7 +198,7 @@ L_8112:
 	inc l			;8114
 	inc (hl)			;8115
 	ld a,00ch		;8116
-	jp 0509fh		;8118
+	jp 0509fh		;8118   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_811B:
 	ld hl,0c500h		;811b
 	ld b,008h		;811e
@@ -219,7 +219,7 @@ L_8120:
 	cp 00bh		;8131
 	jr nz,L_8163		;8133
 L_8135:
-	ld a,(0c416h)		;8135
+	ld a,(0c416h)		;8135   ; lee el arma que lleva Simon (0, ninguna)
 	cp 002h		;8138
 	jr nc,L_814A		;813a
 	ld a,(0c422h)		;813c
@@ -245,7 +245,7 @@ L_8159:
 	inc l			;815b
 	ld (hl),002h		;815c
 	ld a,00ch		;815e
-	call 0509fh		;8160
+	call 0509fh		;8160   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_8163:
 	pop hl			;8163
 	pop bc			;8164
@@ -259,15 +259,15 @@ L_816C:
 	dec a			;816f
 	add a,a			;8170
 	ld hl,081ceh		;8171
-	call 04061h		;8174
+	call 04061h		;8174   ; hl_mas_a: HL += A
 	inc hl			;8177
 	ld b,(hl)			;8178
 	ld a,(0c701h)		;8179
 	bit 4,a		;817c
 	jr z,L_8193		;817e
-	ld a,(0c427h)		;8180
+	ld a,(0c427h)		;8180   ; lee la X de Simon
 	sub (ix+005h)		;8183
-	ld a,(0c42ch)		;8186
+	ld a,(0c42ch)		;8186   ; lee el lado al que mira Simon
 	jr nc,L_8190		;8189
 	and a			;818b
 	jr z,L_8198		;818c
@@ -297,7 +297,7 @@ L_81AB:
 	dec a			;81af
 	add a,a			;81b0
 	ld hl,081ceh		;81b1
-	call 04061h		;81b4
+	call 04061h		;81b4   ; hl_mas_a: HL += A
 	ld e,000h		;81b7
 	ld d,(hl)			;81b9
 	ld a,b			;81ba
@@ -349,7 +349,7 @@ L_8240:
 	jp L_847A		;8249
 L_824C:
 	call L_82FB		;824c
-	call 0406bh		;824f
+	call 0406bh		;824f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_8252: 3 destinos del despachador de 0x406B (call en p02:824F):
@@ -367,7 +367,7 @@ DATA_tabla_8252:
 
 L_8258:
 	call L_82FB		;8258
-	call 0406bh		;825b
+	call 0406bh		;825b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_825E: 3 destinos del despachador de 0x406B (call en p02:825B):
@@ -385,7 +385,7 @@ DATA_tabla_825E:
 
 L_8264:
 	call L_82FB		;8264
-	call 0406bh		;8267
+	call 0406bh		;8267   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_826A: 3 destinos del despachador de 0x406B (call en p02:8267):
@@ -403,7 +403,7 @@ DATA_tabla_826A:
 
 L_8270:
 	call L_82FB		;8270
-	call 0406bh		;8273
+	call 0406bh		;8273   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_8276: 3 destinos del despachador de 0x406B (call en p02:8273):
@@ -421,7 +421,7 @@ DATA_tabla_8276:
 
 L_827C:
 	call L_82B8		;827c
-	call 0406bh		;827f
+	call 0406bh		;827f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_8282: 7 destinos del despachador de 0x406B (call en p02:827F):
@@ -444,7 +444,7 @@ DATA_tabla_8282:
 
 L_8290:
 	call L_82B8		;8290
-	call 0406bh		;8293
+	call 0406bh		;8293   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_8296: 7 destinos del despachador de 0x406B (call en p02:8293):
@@ -467,7 +467,7 @@ DATA_tabla_8296:
 
 L_82A4:
 	call L_82B8		;82a4
-	call 0406bh		;82a7
+	call 0406bh		;82a7   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_82AA: 7 destinos del despachador de 0x406B (call en p02:82A7):
@@ -492,7 +492,7 @@ L_82B8:
 	ld a,(ix+000h)		;82b8
 	dec a			;82bb
 	ld hl,082cbh		;82bc
-	call 04061h		;82bf
+	call 04061h		;82bf   ; hl_mas_a: HL += A
 	ld a,(hl)			;82c2
 	dec a			;82c3
 	ld b,(ix+005h)		;82c4
@@ -517,7 +517,7 @@ L_82FB:
 	ld a,(ix+000h)		;82fb
 	dec a			;82fe
 	ld hl,0830dh		;82ff
-	call 04061h		;8302
+	call 04061h		;8302   ; hl_mas_a: HL += A
 	ld a,(hl)			;8305
 	ld b,(ix+005h)		;8306
 	ld c,(ix+003h)		;8309
@@ -767,7 +767,7 @@ L_847A:
 	ld a,005h		;847a
 	add a,l			;847c
 	ld l,a			;847d
-	ld a,(0c427h)		;847e
+	ld a,(0c427h)		;847e   ; lee la X de Simon
 	sub d			;8481
 	jr nc,L_8486		;8482
 	neg		;8484
@@ -787,7 +787,7 @@ L_8496:
 	ld h,a			;8497
 	ld a,b			;8498
 	dec a			;8499
-	ld a,(0c425h)		;849a
+	ld a,(0c425h)		;849a   ; lee la Y de Simon
 	jr nz,L_84A1		;849d
 	sub 008h		;849f
 L_84A1:
@@ -797,7 +797,7 @@ L_84A1:
 	cp h			;84a5
 	ret			;84a6
 L_84A7:
-	ld a,(0c416h)		;84a7
+	ld a,(0c416h)		;84a7   ; lee el arma que lleva Simon (0, ninguna)
 	dec a			;84aa
 	ld a,00ch		;84ab
 	jr nz,L_84B1		;84ad
@@ -826,22 +826,22 @@ L_84CC:
 	ld a,004h		;84cd
 	add a,h			;84cf
 	ld h,a			;84d0
-	ld a,(0c425h)		;84d1
+	ld a,(0c425h)		;84d1   ; lee la Y de Simon
 	sub b			;84d4
 	sub e			;84d5
 	add a,c			;84d6
 	cp h			;84d7
 	ret			;84d8
 L_84D9:
-	ld a,(0c416h)		;84d9
+	ld a,(0c416h)		;84d9   ; lee el arma que lleva Simon (0, ninguna)
 	dec a			;84dc
 	ld b,014h		;84dd
 	jr nz,L_84E3		;84df
 	ld b,018h		;84e1
 L_84E3:
-	ld a,(0c42ch)		;84e3
+	ld a,(0c42ch)		;84e3   ; lee el lado al que mira Simon
 	and a			;84e6
-	ld a,(0c427h)		;84e7
+	ld a,(0c427h)		;84e7   ; lee la X de Simon
 	jr z,L_84EE		;84ea
 	sub b			;84ec
 	ret			;84ed
@@ -901,7 +901,7 @@ L_8539:
 	pop bc			;8540
 	pop hl			;8541
 	ld a,007h		;8542
-	call 04061h		;8544
+	call 04061h		;8544   ; hl_mas_a: HL += A
 	djnz L_8539		;8547
 	ld a,d			;8549
 	or e			;854a
@@ -910,18 +910,18 @@ L_8539:
 L_854F:
 	ld c,(hl)			;854f
 	inc hl			;8550
-	ld a,(0c425h)		;8551
+	ld a,(0c425h)		;8551   ; lee la Y de Simon
 	sub (hl)			;8554
 	cp 008h		;8555
 	jr nc,L_856E		;8557
 	ld b,007h		;8559
 	inc hl			;855b
-	ld a,(0c427h)		;855c
+	ld a,(0c427h)		;855c   ; lee la X de Simon
 	sub b			;855f
 	sub (hl)			;8560
 	cp 020h		;8561
 	jr c,L_8578		;8563
-	ld a,(0c427h)		;8565
+	ld a,(0c427h)		;8565   ; lee la X de Simon
 	add a,b			;8568
 	sub (hl)			;8569
 	cp 020h		;856a
@@ -945,7 +945,7 @@ L_857E:
 	ld e,c			;857e
 	ret			;857f
 L_8580:
-	ld a,(0c42ch)		;8580
+	ld a,(0c42ch)		;8580   ; lee el lado al que mira Simon
 	and a			;8583
 	jr z,L_858C		;8584
 	ld a,c			;8586
@@ -959,7 +959,7 @@ L_858C:
 L_8590:
 	dec b			;8590
 	dec b			;8591
-	ld a,(0c5adh)		;8592
+	ld a,(0c5adh)		;8592   ; lee donde esta la puerta de la fase
 	sub 008h		;8595
 	ld d,a			;8597
 	ld a,b			;8598
@@ -1003,14 +1003,14 @@ L_85D3:
 	jp 0462bh		;85d3
 L_85D6:
 	ld a,008h		;85d6
-	call 04061h		;85d8
+	call 04061h		;85d8   ; hl_mas_a: HL += A
 	djnz L_85BB		;85db
 	ret			;85dd
 L_85DE:
 	inc hl			;85de
 	ld a,(hl)			;85df
 	ld d,a			;85e0
-	ld a,(0c425h)		;85e1
+	ld a,(0c425h)		;85e1   ; lee la Y de Simon
 	sub 01ch		;85e4
 	sub d			;85e6
 	cp 008h		;85e7
@@ -1018,7 +1018,7 @@ L_85DE:
 	inc hl			;85ea
 	ld a,(hl)			;85eb
 	ld d,a			;85ec
-	ld a,(0c427h)		;85ed
+	ld a,(0c427h)		;85ed   ; lee la X de Simon
 	sub d			;85f0
 	cp 020h		;85f1
 	ret			;85f3
@@ -1030,7 +1030,7 @@ L_85F4:
 	inc hl			;85fa
 	ld a,(hl)			;85fb
 	ld d,a			;85fc
-	ld a,(0c425h)		;85fd
+	ld a,(0c425h)		;85fd   ; lee la Y de Simon
 	sub 004h		;8600
 	sub d			;8602
 	cp 010h		;8603
@@ -1038,7 +1038,7 @@ L_85F4:
 	inc hl			;8606
 	ld a,(hl)			;8607
 	ld d,a			;8608
-	ld a,(0c427h)		;8609
+	ld a,(0c427h)		;8609   ; lee la X de Simon
 	sub d			;860c
 	cp 010h		;860d
 	ret			;860f
@@ -1059,7 +1059,7 @@ L_861C:
 	jr nc,L_8642		;862a
 	call L_9A1A		;862c
 	ld a,00bh		;862f
-	call 0509fh		;8631
+	call 0509fh		;8631   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld hl,0c441h		;8634
 	dec (hl)			;8637
 	jr nz,L_8642		;8638
@@ -1076,14 +1076,14 @@ L_864B:
 	ld a,004h		;864b
 	add a,l			;864d
 	ld l,a			;864e
-	ld a,(0c42ch)		;864f
+	ld a,(0c42ch)		;864f   ; lee el lado al que mira Simon
 	and a			;8652
 	ld a,008h		;8653
 	jr z,L_8659		;8655
 	neg		;8657
 L_8659:
 	ld b,a			;8659
-	ld a,(0c427h)		;865a
+	ld a,(0c427h)		;865a   ; lee la X de Simon
 	add a,b			;865d
 	sub d			;865e
 	jr nc,L_8663		;865f
@@ -1095,7 +1095,7 @@ L_8663:
 	ld a,020h		;8666
 	add a,h			;8668
 	ld h,a			;8669
-	ld a,(0c425h)		;866a
+	ld a,(0c425h)		;866a   ; lee la Y de Simon
 	sub e			;866d
 	add a,c			;866e
 	cp h			;866f
@@ -1168,7 +1168,7 @@ L_86C7:
 	jp L_898A		;86c7
 L_86CA:
 	ld b,a			;86ca
-	ld a,(0d002h)		;86cb
+	ld a,(0d002h)		;86cb   ; lee el bloque de tres fases (0-5)
 	or a			;86ce
 	ld hl,08792h		;86cf
 	jr z,L_86D7		;86d2
@@ -1180,7 +1180,7 @@ L_86D7:
 	jr z,L_86E7		;86dd
 	ld bc,02004h		;86df
 	ld a,004h		;86e2
-	call 04061h		;86e4
+	call 04061h		;86e4   ; hl_mas_a: HL += A
 L_86E7:
 	push bc			;86e7
 	push de			;86e8
@@ -1190,7 +1190,7 @@ L_86E7:
 	push de			;86ec
 	call L_877C		;86ed
 	pop de			;86f0
-	call 07d2fh		;86f1
+	call 07d2fh		;86f1   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop de			;86f4
 	pop bc			;86f5
 	ex de,hl			;86f6
@@ -1249,19 +1249,19 @@ L_873A:
 L_8744:
 	push hl			;8744
 	push bc			;8745
-	call 07d2fh		;8746
+	call 07d2fh		;8746   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;8749
 	pop de			;874a
 	ld a,c			;874b
 	add a,a			;874c
 	add a,a			;874d
-	call 04066h		;874e
+	call 04066h		;874e   ; de_mas_a: DE += A
 	ld bc,00202h		;8751
 	jp L_876C		;8754
 L_8757:
 	push hl			;8757
 	push bc			;8758
-	call 07d2fh		;8759
+	call 07d2fh		;8759   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;875c
 	pop de			;875d
 	ld a,c			;875e
@@ -1269,7 +1269,7 @@ L_8757:
 	add a,a			;8760
 	add a,a			;8761
 	add a,a			;8762
-	call 04066h		;8763
+	call 04066h		;8763   ; de_mas_a: DE += A
 	ld bc,00404h		;8766
 	jp L_876C		;8769
 L_876C:
@@ -1280,7 +1280,7 @@ L_876C:
 	pop hl			;8772
 	pop bc			;8773
 	ld a,020h		;8774
-	call 04061h		;8776
+	call 04061h		;8776   ; hl_mas_a: HL += A
 	djnz L_876C		;8779
 	ret			;877b
 L_877C:
@@ -1334,7 +1334,7 @@ L_87D2:
 	push bc			;87d4
 	ld c,a			;87d5
 	ld a,00eh		;87d6
-	call 0509fh		;87d8
+	call 0509fh		;87d8   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,c			;87db
 	pop bc			;87dc
 	cp 002h		;87dd
@@ -1409,7 +1409,7 @@ L_884D:
 	ld a,c			;884f
 	add a,a			;8850
 	add a,a			;8851
-	call 04061h		;8852
+	call 04061h		;8852   ; hl_mas_a: HL += A
 	ld bc,00202h		;8855
 	call L_877C		;8858
 	pop de			;885b
@@ -1425,7 +1425,7 @@ L_8861:
 	add a,a			;8865
 	add a,a			;8866
 	add a,a			;8867
-	call 04061h		;8868
+	call 04061h		;8868   ; hl_mas_a: HL += A
 	ld bc,00404h		;886b
 	call L_877C		;886e
 	pop de			;8871
@@ -1442,13 +1442,13 @@ L_887D:
 	push de			;8881
 	push hl			;8882
 	push bc			;8883
-	call 07d2fh		;8884
+	call 07d2fh		;8884   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;8887
 	pop de			;8888
 	ld a,c			;8889
 	add a,a			;888a
 	add a,a			;888b
-	call 04066h		;888c
+	call 04066h		;888c   ; de_mas_a: DE += A
 	ex de,hl			;888f
 	ld bc,00202h		;8890
 	call L_88B7		;8893
@@ -1462,7 +1462,7 @@ L_889C:
 	push de			;889d
 	push hl			;889e
 	push bc			;889f
-	call 07d2fh		;88a0
+	call 07d2fh		;88a0   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;88a3
 	pop de			;88a4
 	ld a,c			;88a5
@@ -1470,7 +1470,7 @@ L_889C:
 	add a,a			;88a7
 	add a,a			;88a8
 	add a,a			;88a9
-	call 04066h		;88aa
+	call 04066h		;88aa   ; de_mas_a: DE += A
 	ex de,hl			;88ad
 	ld bc,00404h		;88ae
 	call L_88B7		;88b1
@@ -1485,7 +1485,7 @@ L_88B7:
 	pop de			;88bd
 	pop bc			;88be
 	ld a,020h		;88bf
-	call 04066h		;88c1
+	call 04066h		;88c1   ; de_mas_a: DE += A
 	djnz L_88B7		;88c4
 	ret			;88c6
 L_88C7:
@@ -1543,7 +1543,7 @@ L_8908:
 	ld a,c			;890a
 	inc a			;890b
 	ld de,l8928h		;890c
-	call 04066h		;890f
+	call 04066h		;890f   ; de_mas_a: DE += A
 	ld a,(de)			;8912
 	inc (hl)			;8913
 	or a			;8914
@@ -1632,7 +1632,7 @@ L_897D:
 	ld h,a			;8981
 	ld bc,01010h		;8982
 	ld a,001h		;8985
-	jp 04946h		;8987
+	jp 04946h		;8987   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_898A:
 	ld l,070h		;898a
 	jp L_8CCB		;898c
@@ -1747,7 +1747,7 @@ L_8A29:
 	ld a,b			;8a29
 	cp 01ah		;8a2a
 	ret c			;8a2c
-	ld a,(0c416h)		;8a2d
+	ld a,(0c416h)		;8a2d   ; lee el arma que lleva Simon (0, ninguna)
 	add a,019h		;8a30
 	cp b			;8a32
 	ret nz			;8a33
@@ -1806,7 +1806,7 @@ L_8A6D:
 	exx			;8a7f
 	ld hl,08a8dh		;8a80
 	add a,a			;8a83
-	call 04061h		;8a84
+	call 04061h		;8a84   ; hl_mas_a: HL += A
 	ld e,(hl)			;8a87
 	inc hl			;8a88
 	ld d,(hl)			;8a89
@@ -1853,7 +1853,7 @@ L_8AB7:
 	ld (ix+00ch),020h		;8acb
 	ret			;8acf
 L_8AD0:
-	ld a,(0d002h)		;8ad0
+	ld a,(0d002h)		;8ad0   ; lee el bloque de tres fases (0-5)
 	or a			;8ad3
 	ld b,a			;8ad4
 	jr z,L_8AED		;8ad5
@@ -1861,13 +1861,13 @@ L_8AD0:
 	dec a			;8ad8
 	and 007h		;8ad9
 	ld hl,08af0h		;8adb
-	call 04061h		;8ade
+	call 04061h		;8ade   ; hl_mas_a: HL += A
 	ld c,(hl)			;8ae1
 	push ix		;8ae2
 	ld a,e			;8ae4
 	add a,010h		;8ae5
 	ld e,a			;8ae7
-	call 05f1dh		;8ae8
+	call 05f1dh		;8ae8   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop ix		;8aeb
 L_8AED:
 	jp L_8B1B		;8aed
@@ -1891,7 +1891,7 @@ L_8AF8:
 	cp l			;8afe
 	jr c,L_8B1B		;8aff
 	ex de,hl			;8b01
-	call 07d2fh		;8b02
+	call 07d2fh		;8b02   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	sub 001h		;8b05
 	cp 009h		;8b07
 	jr c,L_8B68		;8b09
@@ -1910,7 +1910,7 @@ L_8B22:
 	pop hl			;8b24
 	inc l			;8b25
 	inc (ix+006h)		;8b26
-	ld a,(0c003h)		;8b29
+	ld a,(0c003h)		;8b29   ; lee el contador de cuadros
 	rra			;8b2c
 	jr nc,L_8B30		;8b2d
 	inc (hl)			;8b2f
@@ -1988,7 +1988,7 @@ L_8BA2:
 	ld a,(ix+006h)		;8bb5
 	inc a			;8bb8
 	ret z			;8bb9
-	ld a,(0c003h)		;8bba
+	ld a,(0c003h)		;8bba   ; lee el contador de cuadros
 	and 00fh		;8bbd
 	ret nz			;8bbf
 	dec (ix+006h)		;8bc0
@@ -2085,7 +2085,7 @@ L_8C60:
 	ld a,0e0h		;8c7a
 	jr L_8CA8		;8c7c
 L_8C7E:
-	ld a,(0c003h)		;8c7e
+	ld a,(0c003h)		;8c7e   ; lee el contador de cuadros
 	ld b,a			;8c81
 	and 001h		;8c82
 	ret nz			;8c84
@@ -2101,10 +2101,10 @@ L_8C91:
 	jr L_8CA5		;8c94
 L_8C96:
 	ld bc,0ec0eh		;8c96
-	ld a,(0c003h)		;8c99
+	ld a,(0c003h)		;8c99   ; lee el contador de cuadros
 	and 003h		;8c9c
 	ld hl,08cbdh		;8c9e
-	call 04061h		;8ca1
+	call 04061h		;8ca1   ; hl_mas_a: HL += A
 	ld c,(hl)			;8ca4
 L_8CA5:
 	ld a,(ix+001h)		;8ca5
@@ -2153,7 +2153,7 @@ L_8CCB:
 	jp 049dbh		;8cd5
 L_8CD8:
 	push bc			;8cd8
-	call 07d2fh		;8cd9
+	call 07d2fh		;8cd9   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	pop bc			;8cdc
 	ld (ix+007h),c		;8cdd
 	ld hl,0e520h		;8ce0
@@ -2166,7 +2166,7 @@ L_8CE6:
 	ld hl,0e520h		;8ced
 	push bc			;8cf0
 	push hl			;8cf1
-	call 07d2fh		;8cf2
+	call 07d2fh		;8cf2   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 	ld de,0e800h		;8cf5
 	ld bc,00202h		;8cf8
 	call L_876C		;8cfb
@@ -2177,7 +2177,7 @@ L_8CE6:
 	ld a,c			;8d02
 	add a,a			;8d03
 	add a,a			;8d04
-	call 04061h		;8d05
+	call 04061h		;8d05   ; hl_mas_a: HL += A
 	ld b,004h		;8d08
 	ld de,0e800h		;8d0a
 L_8D0D:
@@ -2210,7 +2210,7 @@ L_8D30:
 	cp 01ah		;8d36
 	jr nc,$+56		;8d38
 	dec a			;8d3a
-	call 0406bh		;8d3b
+	call 0406bh		;8d3b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_8D3E: 25 destinos del despachador de 0x406B (call en p02:8D3B):
@@ -2253,7 +2253,7 @@ L_8D70:
 	sub 019h		;8d70
 	cp 005h		;8d72
 	jr z,L_8D8D		;8d74
-	ld (0c416h),a		;8d76
+	ld (0c416h),a		;8d76   ; guarda el arma que lleva Simon (0, ninguna)
 	call L_8E9A		;8d79
 L_8D7C:
 	ld a,(0c431h)		;8d7c
@@ -2434,10 +2434,10 @@ L_8E79:
 	ret			;8e92
 L_8E93:
 	xor a			;8e93
-	ld (0c416h),a		;8e94
+	ld (0c416h),a		;8e94   ; guarda el arma que lleva Simon (0, ninguna)
 	jp L_8E9A		;8e97
 L_8E9A:
-	ld a,(0c416h)		;8e9a
+	ld a,(0c416h)		;8e9a   ; lee el arma que lleva Simon (0, ninguna)
 	ld de,0800ch		;8e9d
 	or a			;8ea0
 	jp z,L_8979		;8ea1
@@ -2507,7 +2507,7 @@ L_8F05:
 	push bc			;8f06
 	ld hl,08f19h		;8f07
 	add a,a			;8f0a
-	call 04061h		;8f0b
+	call 04061h		;8f0b   ; hl_mas_a: HL += A
 	ld d,(hl)			;8f0e
 	ld e,00ch		;8f0f
 	inc hl			;8f11
@@ -2554,12 +2554,12 @@ L_8F4A:
 	ld bc,04010h		;8f4d
 	xor a			;8f50
 	ld d,a			;8f51
-	jp 0490ah		;8f52
+	jp 0490ah		;8f52   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 L_8F55:
 	ld a,(0c5e5h)		;8f55
 	inc a			;8f58
 	ret nz			;8f59
-	ld a,(0c003h)		;8f5a
+	ld a,(0c003h)		;8f5a   ; lee el contador de cuadros
 	and 03fh		;8f5d
 	ret z			;8f5f
 	ld hl,0c5e6h		;8f60
@@ -2581,7 +2581,7 @@ L_8F68:
 L_8F7A:
 	dec (hl)			;8f7a
 	ld a,011h		;8f7b
-	call 0509fh		;8f7d
+	call 0509fh		;8f7d   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_8F80:
 	xor a			;8f80
 	pop hl			;8f81
@@ -2607,7 +2607,7 @@ L_8F9A:
 	or a			;8f9d
 	ret nz			;8f9e
 L_8F9F:
-	ld hl,(0d000h)		;8f9f
+	ld hl,(0d000h)		;8f9f   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 	ld de,00106h		;8fa2
 	rst 20h			;8fa5
 	ret nz			;8fa6
@@ -2702,7 +2702,7 @@ L_9015:
 	ld hl,08070h		;901c
 	ld bc,02010h		;901f
 	ld a,001h		;9022
-	jp 04946h		;9024
+	jp 04946h		;9024   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_9027:
 	call L_8F9F		;9027
 	jp L_8FD2		;902a
@@ -2718,7 +2718,7 @@ L_9036:
 	ret z			;9038
 	dec a			;9039
 	push hl			;903a
-	ld de,(0d000h)		;903b
+	ld de,(0d000h)		;903b   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 	cp e			;903f
 	jr nz,L_9060		;9040
 	inc hl			;9042
@@ -2752,7 +2752,7 @@ L_9060:
 	inc hl			;9064
 	add a,a			;9065
 	add a,a			;9066
-	call 04061h		;9067
+	call 04061h		;9067   ; hl_mas_a: HL += A
 	jr L_9036		;906a
 
 ; ----------------------------------------------------------------------
@@ -2839,7 +2839,7 @@ L_90E4:
 	ld hl,0d520h		;90ee
 L_90F1:
 	ld de,00244h		;90f1
-	ld a,(0d000h)		;90f4
+	ld a,(0d000h)		;90f4   ; lee la FASE (0 el patio, 1-18)
 	cp 005h		;90f7
 	jr z,L_90FE		;90f9
 	ld de,0094ch		;90fb
@@ -2875,7 +2875,7 @@ L_9118:
 	inc hl			;9124
 	inc de			;9125
 	ld c,(ix+001h)		;9126
-	ld a,(0d000h)		;9129
+	ld a,(0d000h)		;9129   ; lee la FASE (0 el patio, 1-18)
 	cp 005h		;912c
 	ld a,c			;912e
 	jr z,L_9133		;912f
@@ -2903,7 +2903,7 @@ DATA_cuatro_pares:
 
 
 L_9147:
-	ld hl,0c5ach		;9147
+	ld hl,0c5ach		;9147   ; apunta a el estado de la puerta de la fase
 	ld a,(hl)			;914a
 	inc a			;914b
 	jp z,053fch		;914c
@@ -2923,13 +2923,13 @@ L_9147:
 	inc l			;915f
 	ld bc,0082fh		;9160
 	ld a,000h		;9163
-	jp 04946h		;9165
+	jp 04946h		;9165   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_9168:
 	ld a,003h		;9168
-	ld (0c5ach),a		;916a
+	ld (0c5ach),a		;916a   ; guarda el estado de la puerta de la fase
 	ret			;916d
 L_916E:
-	ld hl,0c5ach		;916e
+	ld hl,0c5ach		;916e   ; apunta a el estado de la puerta de la fase
 	ld a,(hl)			;9171
 	dec a			;9172
 	ret nz			;9173
@@ -2967,7 +2967,7 @@ L_91A2:
 	ld a,b			;91a2
 	exx			;91a3
 	ld hl,05b0bh		;91a4
-	call 04061h		;91a7
+	call 04061h		;91a7   ; hl_mas_a: HL += A
 	ld c,(hl)			;91aa
 	ld b,002h		;91ab
 L_91AD:
@@ -3142,7 +3142,7 @@ L_929F:
 	ret			;92a6
 L_92A7:
 	ld a,(0c70ch)		;92a7
-	call 0406bh		;92aa
+	call 0406bh		;92aa   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_92AD: 7 destinos del despachador de 0x406B (call en p02:92AA):
@@ -3169,14 +3169,14 @@ L_92BB:
 	add a,a			;92c1
 	add a,a			;92c2
 	add a,a			;92c3
-	call 04066h		;92c4
+	call 04066h		;92c4   ; de_mas_a: DE += A
 	ld a,(hl)			;92c7
 	dec a			;92c8
 	cp 008h		;92c9
 	jr c,L_92CF		;92cb
 	ld a,007h		;92cd
 L_92CF:
-	call 04066h		;92cf
+	call 04066h		;92cf   ; de_mas_a: DE += A
 	ld a,(de)			;92d2
 	ld (0c70ch),a		;92d3
 	sub 007h		;92d6
@@ -3198,7 +3198,7 @@ L_92EF:
 L_92F2:
 	ld a,(0c70ch)		;92f2
 	ld hl,09320h		;92f5
-	call 04061h		;92f8
+	call 04061h		;92f8   ; hl_mas_a: HL += A
 	ld a,(hl)			;92fb
 	ld (0c70bh),a		;92fc
 	ret			;92ff
@@ -3241,12 +3241,12 @@ L_9343:
 	ret			;9343
 L_9344:
 	ld a,00fh		;9344
-	call 0509fh		;9346
+	call 0509fh		;9346   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld b,005h		;9349
 	jp 04594h		;934b
 L_934E:
 	ld a,01dh		;934e
-	call 0509fh		;9350
+	call 0509fh		;9350   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld b,005h		;9353
 	jp 045a0h		;9355
 L_9358:
@@ -3258,7 +3258,7 @@ L_9358:
 	ld l,(ix+008h)		;9368
 	ld (hl),000h		;936b
 	ld a,010h		;936d
-	call 0509fh		;936f
+	call 0509fh		;936f   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld de,05000h		;9372
 	jp 044ech		;9375
 L_9378:
@@ -3272,7 +3272,7 @@ L_9387:
 	ld a,014h		;938a
 	ld (0c706h),a		;938c
 	ld a,019h		;938f
-	call 0509fh		;9391
+	call 0509fh		;9391   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	jp L_9397		;9394
 L_9397:
 	ld a,(0c703h)		;9397
@@ -3281,7 +3281,7 @@ L_9397:
 	add a,a			;939e
 	add a,a			;939f
 	add a,a			;93a0
-	call 04061h		;93a1
+	call 04061h		;93a1   ; hl_mas_a: HL += A
 	inc hl			;93a4
 	ld e,(hl)			;93a5
 	inc hl			;93a6
@@ -3304,7 +3304,7 @@ L_93B3:
 	ld a,004h		;93c1
 	push hl			;93c3
 	push bc			;93c4
-	call 04946h		;93c5
+	call 04946h		;93c5   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop bc			;93c8
 	pop hl			;93c9
 	call 05d0eh		;93ca
@@ -3377,20 +3377,20 @@ L_944C:
 L_944F:
 	push af			;944f
 	ld bc,00000h		;9450
-	ld a,(0d000h)		;9453
+	ld a,(0d000h)		;9453   ; lee la FASE (0 el patio, 1-18)
 	or a			;9456
 	jr z,L_9461		;9457
 	dec a			;9459
 	ld hl,09473h		;945a
-	call 04061h		;945d
+	call 04061h		;945d   ; hl_mas_a: HL += A
 	ld c,(hl)			;9460
 L_9461:
 	ld hl,0de00h		;9461
 	add hl,bc			;9464
-	ld a,(0d001h)		;9465
+	ld a,(0d001h)		;9465   ; lee la HABITACION dentro de la fase
 	add a,a			;9468
 	add a,a			;9469
-	call 04061h		;946a
+	call 04061h		;946a   ; hl_mas_a: HL += A
 	pop af			;946d
 	or a			;946e
 	ret z			;946f
@@ -3439,7 +3439,7 @@ L_94AF:
 	ld e,a			;94b8
 	ret			;94b9
 L_94BA:
-	ld a,(0c003h)		;94ba
+	ld a,(0c003h)		;94ba   ; lee el contador de cuadros
 	and 01fh		;94bd
 	jr nz,L_94C7		;94bf
 	ld hl,0c706h		;94c1
@@ -3452,7 +3452,7 @@ L_94C7:
 	jr nc,L_94FC		;94cd
 	ld a,(0c707h)		;94cf
 	ld b,a			;94d2
-	ld a,(0c417h)		;94d3
+	ld a,(0c417h)		;94d3   ; lee los corazones, en BCD
 	cp b			;94d6
 	jr c,L_94FC		;94d7
 	ld a,(0c704h)		;94d9
@@ -3465,7 +3465,7 @@ L_94C7:
 	pop af			;94eb
 	call c,L_9397		;94ec
 	ld a,012h		;94ef
-	call 0509fh		;94f1
+	call 0509fh		;94f1   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	call L_944C		;94f4
 	inc hl			;94f7
 	res 7,(hl)		;94f8
@@ -3473,7 +3473,7 @@ L_94C7:
 	ret			;94fb
 L_94FC:
 	ld a,002h		;94fc
-	call 0509fh		;94fe
+	call 0509fh		;94fe   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	xor a			;9501
 	ret			;9502
 L_9503:
@@ -3489,7 +3489,7 @@ L_950D:
 	ld de,(0c704h)		;9511
 	ld bc,05020h		;9515
 	ld a,001h		;9518
-	call 04946h		;951a
+	call 04946h		;951a   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop bc			;951d
 	ret			;951e
 L_951F:
@@ -3559,14 +3559,14 @@ L_9582:
 	ld bc,000b4h		;9588
 	xor a			;958b
 	ld d,000h		;958c
-	call 0490ah		;958e
+	call 0490ah		;958e   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 	ld hl,01830h		;9591
 	ld bc,0d07eh		;9594
 	ld a,033h		;9597
 	ld d,000h		;9599
-	call 0490ah		;959b
+	call 0490ah		;959b   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 	ld a,019h		;959e
-	call 0509fh		;95a0
+	call 0509fh		;95a0   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_95A3:
 	ld hl,0cf38h		;95a3
 	inc (hl)			;95a6
@@ -3601,9 +3601,9 @@ L_95D4:
 	inc a			;95e3
 	ld (0cffdh),a		;95e4
 	ld c,a			;95e7
-	ld a,(0d000h)		;95e8
+	ld a,(0d000h)		;95e8   ; lee la FASE (0 el patio, 1-18)
 	ld hl,095f6h		;95eb
-	call 04061h		;95ee
+	call 04061h		;95ee   ; hl_mas_a: HL += A
 	ld a,c			;95f1
 	cp (hl)			;95f2
 	jr nz,L_95D4		;95f3
@@ -3624,7 +3624,7 @@ DATA_un_tope_por_fase:
 
 L_9609:
 	ld hl,0e800h		;9609
-	ld a,(0d000h)		;960c
+	ld a,(0d000h)		;960c   ; lee la FASE (0 el patio, 1-18)
 	ld b,a			;960f
 	ld a,(0cffdh)		;9610
 	ld c,a			;9613
@@ -3634,7 +3634,7 @@ L_9609:
 	ld de,0eb00h		;961d
 	call 05b21h		;9620
 	ld ix,0eb00h		;9623
-	ld a,(0d001h)		;9627
+	ld a,(0d001h)		;9627   ; lee la HABITACION dentro de la fase
 	ld hl,0cffdh		;962a
 	cp (hl)			;962d
 	jr nz,L_9634		;962e
@@ -3681,19 +3681,19 @@ L_9668:
 	inc hl			;966f
 	ld (hl),a			;9670
 	ld a,01dh		;9671
-	call 04061h		;9673
+	call 04061h		;9673   ; hl_mas_a: HL += A
 	dec c			;9676
 	jr nz,L_9668		;9677
 	ret			;9679
 L_967A:
-	ld a,(0d000h)		;967a
+	ld a,(0d000h)		;967a   ; lee la FASE (0 el patio, 1-18)
 	ld de,09695h		;967d
-	call 06542h		;9680
+	call 06542h		;9680   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	ld a,(0cffdh)		;9683
-	call 04066h		;9686
+	call 04066h		;9686   ; de_mas_a: DE += A
 	ld a,(de)			;9689
 	ld de,09757h		;968a
-	call 06542h		;968d
+	call 06542h		;968d   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	ld (0cff2h),de		;9690
 	ret			;9694
 
@@ -3759,7 +3759,7 @@ L_97AE:
 	jr z,L_97D3		;97c1
 	dec a			;97c3
 	jr z,L_97D7		;97c4
-	ld a,(0d002h)		;97c6
+	ld a,(0d002h)		;97c6   ; lee el bloque de tres fases (0-5)
 	cp 005h		;97c9
 	jr z,L_97E2		;97cb
 	and a			;97cd
@@ -3818,13 +3818,13 @@ L_9807:
 	ld hl,0eb00h		;980b
 	ld bc,02016h		;980e
 	xor a			;9811
-	jp 0498ah		;9812
+	jp 0498ah		;9812   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 L_9815:
-	ld a,(0d001h)		;9815
+	ld a,(0d001h)		;9815   ; lee la HABITACION dentro de la fase
 	ld (0cffdh),a		;9818
 	call L_967A		;981b
 	ld hl,(0cff2h)		;981e
-	ld a,(0c425h)		;9821
+	ld a,(0c425h)		;9821   ; lee la Y de Simon
 	sub 040h		;9824
 	call c,L_9844		;9826
 	rra			;9829
@@ -3833,7 +3833,7 @@ L_9815:
 	and 01fh		;982c
 	add a,l			;982e
 	ld e,a			;982f
-	ld a,(0c427h)		;9830
+	ld a,(0c427h)		;9830   ; lee la X de Simon
 	rra			;9833
 	rra			;9834
 	rra			;9835
@@ -3843,7 +3843,7 @@ L_9815:
 	ld bc,00404h		;983a
 	ld hl,0984bh		;983d
 	xor a			;9840
-	jp 0498ah		;9841
+	jp 0498ah		;9841   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 L_9844:
 	ex af,af'			;9844
 	ld a,l			;9845
@@ -3865,12 +3865,12 @@ DATA_hmmc_984B:
 
 
 L_9853:
-	ld a,(0d000h)		;9853
+	ld a,(0d000h)		;9853   ; lee la FASE (0 el patio, 1-18)
 	ld c,a			;9856
 	add a,a			;9857
 	add a,c			;9858
 	ld hl,098ach		;9859
-	call 04061h		;985c
+	call 04061h		;985c   ; hl_mas_a: HL += A
 	ld e,(hl)			;985f
 	inc hl			;9860
 	ld d,(hl)			;9861
@@ -3882,7 +3882,7 @@ L_9853:
 L_986D:
 	ld bc,00807h		;986d
 	xor a			;9870
-	jp 0498ah		;9871
+	jp 0498ah		;9871   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 
 ; ----------------------------------------------------------------------
 ; DATOS dibujo_de_8x7: 28 bytes, 8 x 7 puntos a 4 bits, que p02:9865 manda por
@@ -3970,7 +3970,7 @@ L_992F:
 L_993B:
 	ld a,(ix+000h)		;993b
 	dec a			;993e
-	call 0406bh		;993f
+	call 0406bh		;993f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_9942: 46 destinos del despachador de 0x406B (call en p02:993F):
@@ -4069,13 +4069,13 @@ L_99B9:
 L_99E5:
 	ld a,(ix+003h)		;99e5
 	cp 0e4h		;99e8
-	jr nc,L_99F6		;99ea
+	jr nc,borra_la_cosa		;99ea
 	ld a,(ix+005h)		;99ec
 	cp 0f1h		;99ef
-	jr nc,L_99F6		;99f1
+	jr nc,borra_la_cosa		;99f1
 	cp 007h		;99f3
 	ret nc			;99f5
-L_99F6:
+borra_la_cosa:
 	xor a			;99f6
 	ld (ix+000h),a		;99f7
 	ld (ix+00eh),a		;99fa
@@ -4103,7 +4103,7 @@ L_9A07:
 	jr nz,L_9A07		;9a17
 	ret			;9a19
 L_9A1A:
-	call L_99F6		;9a1a
+	call borra_la_cosa		;9a1a   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld c,(ix+003h)		;9a1d
 	ld b,(ix+005h)		;9a20
 	ld hl,00000h		;9a23
@@ -4111,7 +4111,7 @@ L_9A1A:
 	ld d,h			;9a27
 	ld a,0ffh		;9a28
 	push ix		;9a2a
-	call L_9F6D		;9a2c
+	call crea_con_parametros		;9a2c   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	ld (ix+01fh),000h		;9a2f
 	ld (ix+07eh),000h		;9a33
 	pop ix		;9a37
@@ -4130,7 +4130,7 @@ L_9A3F:
 L_9A4A:
 	call L_9A6B		;9a4a
 	ret c			;9a4d
-	call L_99F6		;9a4e
+	call borra_la_cosa		;9a4e   ; borra_la_cosa: tipo a cero y sus sprites libres
 	call L_9ABE		;9a51
 	ret c			;9a54
 	call L_9B22		;9a55
@@ -4138,7 +4138,7 @@ L_9A58:
 	ld c,01eh		;9a58
 	push ix		;9a5a
 	push bc			;9a5c
-	call 05f1dh		;9a5d
+	call 05f1dh		;9a5d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop bc			;9a60
 	ld (ix+01fh),b		;9a61
 	pop ix		;9a64
@@ -4147,7 +4147,7 @@ L_9A58:
 	ret			;9a6a
 L_9A6B:
 	ld a,(ix+000h)		;9a6b
-	ld (0cff0h),a		;9a6e
+	ld (0cff0h),a		;9a6e   ; guarda el tipo de la cosa que se crea
 	cp 022h		;9a71
 	jp z,L_9A8D		;9a73
 	cp 024h		;9a76
@@ -4163,7 +4163,7 @@ L_9A6B:
 	xor a			;9a8b
 	ret			;9a8c
 L_9A8D:
-	call L_99F6		;9a8d
+	call borra_la_cosa		;9a8d   ; borra_la_cosa: tipo a cero y sus sprites libres
 	scf			;9a90
 	ret			;9a91
 L_9A92:
@@ -4173,7 +4173,7 @@ L_9A97:
 	ld a,001h		;9a97
 L_9A99:
 	push af			;9a99
-	call L_99F6		;9a9a
+	call borra_la_cosa		;9a9a   ; borra_la_cosa: tipo a cero y sus sprites libres
 	pop af			;9a9d
 	call L_8D2C		;9a9e
 	scf			;9aa1
@@ -4201,7 +4201,7 @@ L_9ABE:
 	ld a,(0ce00h)		;9ac0
 	and a			;9ac3
 	ret nz			;9ac4
-	ld a,(0cff0h)		;9ac5
+	ld a,(0cff0h)		;9ac5   ; lee el tipo de la cosa que se crea
 	cp 00eh		;9ac8
 	jr z,L_9AF3		;9aca
 	ld a,(0cfffh)		;9acc
@@ -4251,15 +4251,15 @@ L_9B13:
 	push bc			;9b13
 	call L_9B22		;9b14
 	ld c,026h		;9b17
-	call 05f1dh		;9b19
+	call 05f1dh		;9b19   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop bc			;9b1c
 	ld (ix+01fh),c		;9b1d
 	scf			;9b20
 	ret			;9b21
 L_9B22:
-	ld a,(0cff0h)		;9b22
+	ld a,(0cff0h)		;9b22   ; lee el tipo de la cosa que se crea
 	ld hl,l9b33h		;9b25
-	call 04061h		;9b28
+	call 04061h		;9b28   ; hl_mas_a: HL += A
 	ld a,(ix+003h)		;9b2b
 	sub (hl)			;9b2e
 	ld e,a			;9b2f
@@ -4289,7 +4289,7 @@ L_9B60:
 	ret			;9b70
 L_9B71:
 	ld a,(ix+000h)		;9b71
-	ld (0cff0h),a		;9b74
+	ld (0cff0h),a		;9b74   ; guarda el tipo de la cosa que se crea
 	ld a,(ix+00ch)		;9b77
 	and 004h		;9b7a
 	ld c,085h		;9b7c
@@ -4299,22 +4299,22 @@ L_9B81:
 	ld (ix+00bh),c		;9b81
 	dec (ix+00ch)		;9b84
 	ret nz			;9b87
-	call L_99F6		;9b88
+	call borra_la_cosa		;9b88   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld a,(ix+01fh)		;9b8b
 	and a			;9b8e
 	ret z			;9b8f
 	ld c,024h		;9b90
 	ld e,(ix+003h)		;9b92
 	ld d,(ix+005h)		;9b95
-	jp 05f1dh		;9b98
+	jp 05f1dh		;9b98   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_9B9B:
 	ld (ix+00eh),002h		;9b9b
 	ld (ix+00ch),001h		;9b9f
 	ld (ix+006h),001h		;9ba3
 	ld de,00080h		;9ba7
-	call 0a55dh		;9baa
+	call 0a55dh		;9baa   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00200h		;9bad
-	call 0a56ch		;9bb0
+	call 0a56ch		;9bb0   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+011h),0ffh		;9bb3
 	ld (ix+010h),0e0h		;9bb7
 	ld (ix+00bh),000h		;9bbb
@@ -4340,12 +4340,12 @@ L_9BD9:
 	ld (ix+00ch),a		;9bf0
 	ld e,(ix+010h)		;9bf3
 	ld d,(ix+011h)		;9bf6
-	call 0a17ch		;9bf9
+	call 0a17ch		;9bf9   ; niega_de: DE = -DE
 	ld (ix+010h),e		;9bfc
 	ld (ix+011h),d		;9bff
 	ret			;9c02
 L_9C03:
-	call L_99F6		;9c03
+	call borra_la_cosa		;9c03   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld b,001h		;9c06
 	ld hl,00410h		;9c08
 L_9C0B:
@@ -4361,9 +4361,9 @@ L_9C0B:
 	jp L_89E3		;9c1b
 L_9C1E:
 	ld hl,09c59h		;9c1e
-	ld a,(0c003h)		;9c21
+	ld a,(0c003h)		;9c21   ; lee el contador de cuadros
 	and 003h		;9c24
-	call 04061h		;9c26
+	call 04061h		;9c26   ; hl_mas_a: HL += A
 	ld a,(hl)			;9c29
 	ld (ix+025h),a		;9c2a
 	ld a,(ix+001h)		;9c2d
@@ -4373,14 +4373,14 @@ L_9C1E:
 	ret nz			;9c36
 	inc (ix+001h)		;9c37
 	ld de,00000h		;9c3a
-	call 0a56ch		;9c3d
+	call 0a56ch		;9c3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00800h		;9c40
-	jp 0a55dh		;9c43
+	jp 0a55dh		;9c43   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_9C46:
 	ld (ix+006h),001h		;9c46
 	call L_9C5D		;9c4a
 	ret nc			;9c4d
-	call L_99F6		;9c4e
+	call borra_la_cosa		;9c4e   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld b,(ix+01fh)		;9c51
 	ld hl,00810h		;9c54
 	jr L_9C0B		;9c57
@@ -4400,11 +4400,11 @@ DATA_cuatro_valores_por_cuadro_2:
 L_9C5D:
 	ld e,(ix+003h)		;9c5d
 	ld d,(ix+005h)		;9c60
-	jp 07b98h		;9c63
+	jp 07b98h		;9c63   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 L_9C66:
 	ld (ix+00eh),000h		;9c66
 	ld c,00eh		;9c6a
-	ld a,(0d000h)		;9c6c
+	ld a,(0d000h)		;9c6c   ; lee la FASE (0 el patio, 1-18)
 	cp 00ah		;9c6f
 	jr nz,L_9C79		;9c71
 	ld c,015h		;9c73
@@ -4424,14 +4424,14 @@ L_9C79:
 	ld de,0ff00h		;9c96
 	ld hl,0fa00h		;9c99
 L_9C9C:
-	call 0a56ch		;9c9c
+	call 0a56ch		;9c9c   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;9c9f
-	jp 0a55dh		;9ca0
+	jp 0a55dh		;9ca0   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_9CA3:
 	ld de,00080h		;9ca3
-	jp 0a549h		;9ca6
+	jp 0a549h		;9ca6   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 L_9CA9:
-	ld hl,0cf00h		;9ca9
+	ld hl,0cf00h		;9ca9   ; apunta a los plazos de las siete cosas de la habitacion
 	ld de,09cbbh		;9cac
 	ld b,007h		;9caf
 L_9CB1:
@@ -4459,7 +4459,7 @@ DATA_cuentas_iniciales:
 
 L_9CC3:
 	exx			;9cc3
-	ld hl,0cf10h		;9cc4
+	ld hl,0cf10h		;9cc4   ; apunta a el reloj de los plazos
 	dec (hl)			;9cc7
 	ld a,(hl)			;9cc8
 	exx			;9cc9
@@ -4472,7 +4472,7 @@ L_9CC3:
 	inc (hl)			;9cd1
 	dec l			;9cd2
 	and 007h		;9cd3
-	call 04066h		;9cd5
+	call 04066h		;9cd5   ; de_mas_a: DE += A
 	ld a,(0d012h)		;9cd8
 	add a,a			;9cdb
 	ld c,a			;9cdc
@@ -4486,7 +4486,7 @@ L_9CE2:
 	xor a			;9ce4
 	ret			;9ce5
 L_9CE6:
-	ld hl,0cf00h		;9ce6
+	ld hl,0cf00h		;9ce6   ; apunta a los plazos de las siete cosas de la habitacion
 	ld de,09d43h		;9ce9
 	call L_9CC3		;9cec
 	ret nz			;9cef
@@ -4494,11 +4494,11 @@ L_9CE6:
 	call L_9E16		;9cf3
 	ret c			;9cf6
 	ld c,001h		;9cf7
-	jp 05f1dh		;9cf9
+	jp 05f1dh		;9cf9   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_9CFC:
-	ld a,(0c425h)		;9cfc
+	ld a,(0c425h)		;9cfc   ; lee la Y de Simon
 	ld c,a			;9cff
-	ld hl,(0d000h)		;9d00
+	ld hl,(0d000h)		;9d00   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 	ld a,l			;9d03
 	dec a			;9d04
 	jr z,L_9D28		;9d05
@@ -4532,7 +4532,7 @@ L_9D2C:
 	ld e,0c0h		;9d2c
 L_9D2E:
 	ld d,0f0h		;9d2e
-	ld a,(0c42ch)		;9d30
+	ld a,(0c42ch)		;9d30   ; lee el lado al que mira Simon
 	and a			;9d33
 	ret z			;9d34
 	ld d,010h		;9d35
@@ -4575,13 +4575,13 @@ L_9D57:
 	ld a,(0cf03h)		;9d62
 	and 007h		;9d65
 	ld hl,09d87h		;9d67
-	call 04061h		;9d6a
+	call 04061h		;9d6a   ; hl_mas_a: HL += A
 	ld d,(hl)			;9d6d
-	ld a,(0c427h)		;9d6e
+	ld a,(0c427h)		;9d6e   ; lee la X de Simon
 	sub d			;9d71
 	add a,018h		;9d72
 	cp 030h		;9d74
-	jp nc,05f1dh		;9d76
+	jp nc,05f1dh		;9d76   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	ld a,d			;9d79
 	ld d,020h		;9d7a
 	cp 080h		;9d7c
@@ -4590,7 +4590,7 @@ L_9D57:
 L_9D82:
 	add a,d			;9d82
 	ld d,a			;9d83
-	jp 05f1dh		;9d84
+	jp 05f1dh		;9d84   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 
 ; ----------------------------------------------------------------------
 ; DATOS plazos_de_la_cosa_3: la tabla de p02:9D67 (ocho bytes, con los tres
@@ -4621,10 +4621,10 @@ L_9D9F:
 	ld d,010h		;9dad
 L_9DAF:
 	call L_9E16		;9daf
-	ld a,(0c425h)		;9db2
+	ld a,(0c425h)		;9db2   ; lee la Y de Simon
 	sub 008h		;9db5
 	ld e,a			;9db7
-	jp 05f1dh		;9db8
+	jp 05f1dh		;9db8   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 
 ; ----------------------------------------------------------------------
 ; DATOS plazos_de_la_cosa_4: ocho plazos de la cosa de p02:9D97
@@ -4676,7 +4676,7 @@ L_9DE7:
 	ld de,09e0eh		;9dea
 	call L_9CC3		;9ded
 	ret nz			;9df0
-	ld a,(0c427h)		;9df1
+	ld a,(0c427h)		;9df1   ; lee la X de Simon
 	cp 0c0h		;9df4
 	jr c,L_9DFE		;9df6
 	ld a,001h		;9df8
@@ -4690,7 +4690,7 @@ L_9DFE:
 	ld e,040h		;9e07
 L_9E09:
 	ld c,00fh		;9e09
-	jp 05f1dh		;9e0b
+	jp 05f1dh		;9e0b   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 
 ; ----------------------------------------------------------------------
 ; DATOS plazos_de_la_cosa_7: ocho plazos de la cosa de p02:9DE7
@@ -4704,7 +4704,7 @@ DATA_plazos_de_la_cosa_7:
 
 
 L_9E16:
-	ld a,(0c427h)		;9e16
+	ld a,(0c427h)		;9e16   ; lee la X de Simon
 	cp 0c0h		;9e19
 	jr nc,L_9E29		;9e1b
 	cp 040h		;9e1d
@@ -4747,7 +4747,7 @@ L_9E50:
 L_9E58:
 	ld a,(ix+000h)		;9e58
 	dec a			;9e5b
-	call 0406bh		;9e5c
+	call 0406bh		;9e5c   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_9E5F: 12 destinos del despachador de 0x406B (call en p02:9E5C):
@@ -4810,7 +4810,7 @@ L_9EB0:
 	jr c,L_9EC1		;9ebc
 	ld de,0ffd0h		;9ebe
 L_9EC1:
-	jp 0a549h		;9ec1
+	jp 0a549h		;9ec1   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 L_9EC4:
 	ret			;9ec4
 L_9EC5:
@@ -4846,7 +4846,7 @@ L_9EED:
 	add a,010h		;9eff
 	cp 020h		;9f01
 	ret nc			;9f03
-	jp L_99F6		;9f04
+	jp borra_la_cosa		;9f04   ; borra_la_cosa: tipo a cero y sus sprites libres
 L_9F07:
 	ld a,(ix+00ch)		;9f07
 	inc a			;9f0a
@@ -4861,7 +4861,7 @@ L_9F10:
 	add a,04bh		;9f17
 	ld (ix+00bh),a		;9f19
 	ld de,00050h		;9f1c
-	jp 0a549h		;9f1f
+	jp 0a549h		;9f1f   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 L_9F22:
 	ld a,(ix+00ch)		;9f22
 	rra			;9f25
@@ -4876,9 +4876,9 @@ L_9F22:
 	ret nz			;9f37
 	ld a,040h		;9f38
 	call 0a0e7h		;9f3a
-	call 0a56ch		;9f3d
+	call 0a56ch		;9f3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;9f40
-	call 0a55dh		;9f41
+	call 0a55dh		;9f41   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+00ch),01eh		;9f44
 	inc (ix+001h)		;9f48
 	ret			;9f4b
@@ -4886,8 +4886,8 @@ L_9F4C:
 	dec (ix+00ch)		;9f4c
 	ret nz			;9f4f
 	ld de,00000h		;9f50
-	call 0a56ch		;9f53
-	call 0a55dh		;9f56
+	call 0a56ch		;9f53   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	call 0a55dh		;9f56   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+00ch),03ch		;9f59
 	ld (ix+001h),e		;9f5d
 	ret			;9f60
@@ -4897,9 +4897,9 @@ L_9F61:
 	ld c,a			;9f66
 	ld b,(ix+005h)		;9f67
 	ld a,(ix+000h)		;9f6a
-L_9F6D:
+crea_con_parametros:
 	ld (0cff9h),a		;9f6d
-	ld (0cff1h),bc		;9f70
+	ld (0cff1h),bc		;9f70   ; guarda la posicion de la cosa que se crea
 	ld (0cff5h),hl		;9f74
 	ld (0cff7h),de		;9f77
 	push ix		;9f7b
@@ -4912,11 +4912,11 @@ L_9F83:
 	ld c,00ch		;9f88
 	jr z,L_9F93		;9f8a
 	ld hl,0a08eh		;9f8c
-	call 04061h		;9f8f
+	call 04061h		;9f8f   ; hl_mas_a: HL += A
 	ld c,(hl)			;9f92
 L_9F93:
 	ld a,c			;9f93
-	ld (0cff0h),a		;9f94
+	ld (0cff0h),a		;9f94   ; guarda el tipo de la cosa que se crea
 	ld hl,0d700h		;9f97
 	ld b,008h		;9f9a
 	xor a			;9f9c
@@ -4930,7 +4930,7 @@ L_9FA0:
 L_9FA7:
 	push hl			;9fa7
 	pop ix		;9fa8
-	ld (0cff3h),hl		;9faa
+	ld (0cff3h),hl		;9faa   ; guarda la ficha de la cosa que se crea
 	ld c,002h		;9fad
 	ld (ix+020h),c		;9faf
 	ld (ix+07fh),001h		;9fb2
@@ -4960,12 +4960,12 @@ L_9FD8:
 	djnz L_9FCA		;9fdd
 	ret			;9fdf
 L_9FE0:
-	ld hl,(0cff3h)		;9fe0
-	ld a,(0cff0h)		;9fe3
+	ld hl,(0cff3h)		;9fe0   ; lee la ficha de la cosa que se crea
+	ld a,(0cff0h)		;9fe3   ; lee el tipo de la cosa que se crea
 	ld (hl),a			;9fe6
 	inc l			;9fe7
 	ld (hl),000h		;9fe8
-	ld de,(0cff1h)		;9fea
+	ld de,(0cff1h)		;9fea   ; lee la posicion de la cosa que se crea
 	inc l			;9fee
 	ld (hl),000h		;9fef
 	inc l			;9ff1

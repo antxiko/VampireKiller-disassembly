@@ -35,7 +35,7 @@ D 0xBC44 0xBC54 ocho_pares  ocho pares que p03:BC31 indexa con los tres bits baj
 F 0xBC44 16
 D 0xAC76 0xAC7E ocho_valores_AC76  ocho bytes que p03:AC54 elige segun (ix+0x10) sea menor que 7 o no
 F 0xAC76 16
-D 0xACAA 0xACAE dibujos_ACAA  cuatro dibujos, dos por lado: 0xAD37 suma 2 si Simon esta por debajo y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA, AC4E, AC80)
+D 0xACAA 0xACAE dibujos_ACAA  cuatro dibujos, dos por lado: 0xAD37 suma 2 si Simon esta a su derecha y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA, AC4E, AC80)
 F 0xACAA 16
 D 0xAD53 0xAD5B colores_AD53  ocho bytes que p03:AD4A copia, con 0xAD6D, a los colores de los ocho sprites de la cosa ((ix+0x25) de cinco en cinco)
 F 0xAD53 16
@@ -100,3 +100,325 @@ F 0xBE89 2
 D 0xBFC0 0xC000 relleno_p03  64 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (64 bytes)
 F 0xBFC0 16
 # --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0xA17C niega_de
+L 0xA549 suma_a_la_velocidad_y
+L 0xA55D pon_velocidad_y
+L 0xA56C pon_velocidad_x
+L 0xA62F dibujo_de_la_tabla
+L 0xAD37 dibujo_segun_simon
+L 0xAF40 distancia_horizontal
+L 0xBE3D siguiente_paso
+C 0xA014 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0xA017 lee la ficha de la cosa que se crea
+C 0xA02A lee la ficha de la cosa que se crea
+C 0xA031 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xA075 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA078 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA0F5 guarda el tipo de la cosa que se crea
+C 0xA117 lee la posicion de la cosa que se crea
+C 0xA11B niega_de: DE = -DE
+C 0xA11E guarda la ficha de la cosa que se crea
+C 0xA12D niega_de: DE = -DE
+C 0xA130 lee la ficha de la cosa que se crea
+C 0xA134 apunta a la posicion de la cosa que se crea
+C 0xA139 lee la Y de Simon
+C 0xA14A lee la X de Simon
+C 0xA15E hl_mas_a: HL += A
+C 0xA166 lee la posicion de la cosa que se crea
+C 0xA184 lee el tipo de la cosa que se crea
+C 0xA285 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xA2AA lee la FASE (0 el patio, 1-18)
+C 0xA2B1 lee la HABITACION dentro de la fase
+C 0xA2BA lee la X de Simon
+C 0xA307 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xA30D crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xA32A pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA348 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA37D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA38B borra_la_cosa: tipo a cero y sus sprites libres
+C 0xA397 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xA39D crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xA3B0 lee la Y de Simon
+C 0xA3ED lee la X de Simon
+C 0xA3FC pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA428 hl_mas_a: HL += A
+C 0xA43E choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA4AC crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xA4C4 lee la X de Simon
+C 0xA4E0 hl_mas_a: HL += A
+C 0xA4F0 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0xA508 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA51D lee la FASE (0 el patio, 1-18)
+C 0xA553 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA580 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA586 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA5A6 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA5EA lee la X de Simon
+C 0xA637 lee la Y de Simon
+C 0xA64A niega_de: DE = -DE
+C 0xA64D pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA655 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA667 niega_de: DE = -DE
+C 0xA66D pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA683 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xA6EE lee la Y de Simon
+C 0xA706 lee la X de Simon
+C 0xA73E lee la X de Simon
+C 0xA74F lee la X de Simon
+C 0xA7B1 hl_mas_a: HL += A
+C 0xA7C3 lee la X de Simon
+C 0xA7DF pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA7E5 lee la Y de Simon
+C 0xA7F6 hl_mas_a: HL += A
+C 0xA805 niega_de: DE = -DE
+C 0xA808 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA80D niega_de: DE = -DE
+C 0xA810 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA825 hl_mas_a: HL += A
+C 0xA85F lee la X de Simon
+C 0xA877 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA87A pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA882 borra_la_cosa: tipo a cero y sus sprites libres
+C 0xA888 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xA891 lee la X de Simon
+C 0xA8A4 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA8B5 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA8BC pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA8DE choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA8E5 lee la X de Simon
+C 0xA8F1 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA906 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA961 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA98A choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xA992 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA9AE pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xA9BE despacha: salta a la entrada A de la tabla que va detras del call
+C 0xAA5B crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xAA97 hl_mas_a: HL += A
+C 0xAB29 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xAB2F pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xAB49 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xAB67 lee la X de Simon
+C 0xABB0 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xABDD dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xAC05 lee la X de Simon
+C 0xAC1E crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xAC51 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xAC62 hl_mas_a: HL += A
+C 0xAC83 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xACD6 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xACE5 borra_la_cosa: tipo a cero y sus sprites libres
+C 0xACF4 lee la X de Simon
+C 0xAD09 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xAD0F pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xAD29 borra_la_cosa: tipo a cero y sus sprites libres
+C 0xAD37 lee la X de Simon
+C 0xAD3D dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
+C 0xAD42 dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
+C 0xAD6E hl_mas_a: HL += A
+C 0xAD76 hl_mas_a: HL += A
+C 0xAD90 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0xAD9E palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0xADB9 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0xADE5 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xAE04 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xAE1E lee la X de Simon
+C 0xAE33 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xAE4A choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xAE75 lee la X de Simon
+C 0xAE90 lee la X de Simon
+C 0xAED1 lee la X de Simon
+C 0xAF1A lee el contador de cuadros
+C 0xAF25 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xAF40 lee la X de Simon
+C 0xAF4D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xAF62 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xAF9B lee la X de Simon
+C 0xAFD0 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB00B niega_de: DE = -DE
+C 0xB086 lee la Y de Simon
+C 0xB09F pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB0A5 apunta a la X de Simon
+C 0xB0B1 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB0D1 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB0D7 lee la X de Simon
+C 0xB0DD niega_de: DE = -DE
+C 0xB10A lee la Y de Simon
+C 0xB115 lee la X de Simon
+C 0xB12D pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB137 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB13E lee la Y de Simon
+C 0xB16F hl_mas_a: HL += A
+C 0xB1B1 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xB1C0 borra_la_cosa: tipo a cero y sus sprites libres
+C 0xB20C dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
+C 0xB23F pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB245 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB24B despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB261 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB271 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB28A dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xB2A7 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB2B1 lee la X de Simon
+C 0xB2BC pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB2C4 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xB2E3 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB2EA pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB2ED choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB2F6 dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xB31F dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+C 0xB330 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB344 lee la X de Simon
+C 0xB359 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB364 lee la X de Simon
+C 0xB384 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB38D lee la X de Simon
+C 0xB3A9 lee la X de Simon
+C 0xB400 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB41A choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB426 niega_de: DE = -DE
+C 0xB429 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB42F pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB46F pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB495 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB4A6 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB4B8 lee la X de Simon
+C 0xB4DF pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB4E2 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB4F0 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB502 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB53F pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB54E pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB551 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB56F pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB59B pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB5C1 lee la Y de Simon
+C 0xB5F2 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB5F8 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB600 lee la X de Simon
+C 0xB60E pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB611 lee la FASE (0 el patio, 1-18)
+C 0xB617 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+C 0xB61A lee la HABITACION dentro de la fase
+C 0xB620 de_mas_a: DE += A
+C 0xB630 hl_mas_a: HL += A
+C 0xB6B6 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB6C8 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB6FC crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xB722 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0xB727 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0xB72C sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0xB736 lee el contador de cuadros
+C 0xB73B lee la vida de Simon
+C 0xB744 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0xB758 guarda la Y de Simon
+C 0xB798 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB79E pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB7A4 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB7AD lee el contador de cuadros
+C 0xB7CB lee la FASE (0 el patio, 1-18)
+C 0xB7E1 de_mas_a: DE += A
+C 0xB821 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xB84B hl_mas_a: HL += A
+C 0xB857 lee el paso de la escena
+C 0xB85A despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB866 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xB86E crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xB871 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xB887 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xB896 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xB8B4 lee la X de Simon
+C 0xB8C3 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB8F0 lee la X de Simon
+C 0xB8FB pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB902 lee la X de Simon
+C 0xB910 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB917 lee la X de Simon
+C 0xB941 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB951 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xB998 niega_de: DE = -DE
+C 0xB9A6 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xB9BF hl_mas_a: HL += A
+C 0xBA18 hl_mas_a: HL += A
+C 0xBA26 lee el paso de la escena
+C 0xBA29 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBA39 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xBA41 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xBA44 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xBA5E pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBA61 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBA78 lee la X de Simon
+C 0xBA90 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBAB0 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBAB6 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBAC7 hl_mas_a: HL += A
+C 0xBAE8 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBAEB pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBB11 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBB20 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBB60 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xBB80 niega_de: DE = -DE
+C 0xBB83 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBB89 niega_de: DE = -DE
+C 0xBB8C pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBBB1 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBBF3 lee el paso de la escena
+C 0xBBF6 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBC02 crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xBC15 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xBC34 hl_mas_a: HL += A
+C 0xBC41 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xBC57 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBC5D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBC8A pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBCB3 niega_de: DE = -DE
+C 0xBCB6 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBCBF choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
+C 0xBCC6 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBCCC niega_de: DE = -DE
+C 0xBCCF pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBCD5 niega_de: DE = -DE
+C 0xBCD8 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBCDB lee el paso de la escena
+C 0xBCDE despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBCEE siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xBCF6 siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xBCFE crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xBD0B rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
+C 0xBD0E siguiente_paso: sube el paso de la escena (0xCE01)
+C 0xBD1F despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBD72 lee la X de Simon
+C 0xBD8A pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBDB6 lee la X de Simon
+C 0xBDC9 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBDE9 lee la X de Simon
+C 0xBE01 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBE25 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
+C 0xBE2B lee el paso de la escena
+C 0xBE2E despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBE3A crea_una_cosa: crea una cosa del tipo C en la posicion DE
+C 0xBE3D apunta a el paso de la escena
+C 0xBE58 lee la FASE (0 el patio, 1-18)
+C 0xBE6A pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBE6D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBE86 despacha: salta a la entrada A de la tabla que va detras del call
+C 0xBEA6 lee la Y de Simon
+C 0xBEBF lee la X de Simon
+C 0xBEC7 lee la X de Simon
+C 0xBECB lee la Y de Simon
+C 0xBED1 guarda la X de Simon
+C 0xBED5 guarda la Y de Simon
+C 0xBEDB pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBEDF pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBEE4 guarda la Y de Simon
+C 0xBEE8 guarda la X de Simon
+C 0xBF2C pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+C 0xBF2F pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBF59 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xBF5C lee la X de Simon
+C 0xBF80 lee la X de Simon
+C 0xBF87 niega_de: DE = -DE
+C 0xBF8A pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+# --- fin de las anotaciones de anota.py ---

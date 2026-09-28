@@ -180,7 +180,7 @@ def tabla_antes(p, pc):
         # entre el `ld hl` y el `call 0x4061` puede ir el calculo del indice
         # (`ld a,(0xD000) / add a,a`), que no toca HL
         for j in range(k + 1, min(k + 4, len(txt) - 3)):
-            if txt[j] in ("call L_4061", "call 04061h"):
+            if txt[j] in ("call L_4061", "call 04061h", "call hl_mas_a"):
                 if txt[j + 1] == "ld e,(hl)" and txt[j + 2] == "inc hl" and txt[j + 3] == "ld d,(hl)":
                     return num(m.group(1))
                 break

@@ -224,3 +224,22 @@ F 0xBF29 8
 D 0xBFF9 0xC000 relleno_p13  7 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (7 bytes)
 F 0xBFF9 16
 # --- fin de los bloques de bloques.py ---
+
+# --- ANOTACIONES AUTOMATICAS (seccion que reescribe tools/anota.py; no editar a mano) ---
+L 0xB963 sale_de_la_habitacion
+L 0xB99A salidas_de_la_habitacion
+C 0xB963 lee el lado por el que se sale de la habitacion
+C 0xB96C apunta a el lado por el que se sale de la habitacion
+C 0xB987 guarda la HABITACION dentro de la fase
+C 0xB98D guarda el lado por el que se sale de la habitacion
+C 0xB990 lee la habitacion a la que lleva el paso
+C 0xB9BD lee la FASE (0 el patio, 1-18)
+C 0xB9CB lee la HABITACION dentro de la fase
+C 0xBB37 lee la FASE (0 el patio, 1-18)
+C 0xBB48 lee la HABITACION dentro de la fase
+C 0xBB52 guarda donde esta la puerta de la fase
+C 0xBB5D guarda el estado de la puerta de la fase
+C 0xBB9A lee la fase (0xD000) y la habitacion (0xD001) de un tiron
+C 0xBBBA guarda el paso a otra habitacion
+C 0xBBC9 guarda la habitacion a la que lleva el paso
+# --- fin de las anotaciones de anota.py ---

@@ -1033,12 +1033,12 @@ DATA_rle_B895:
 ; ======================================================================
 
 
-L_B963:
-	ld a,(0c41bh)		;b963
+sale_de_la_habitacion:
+	ld a,(0c41bh)		;b963   ; lee el lado por el que se sale de la habitacion
 	inc a			;b966
 	jr z,L_B98C		;b967
 	call L_B9BD		;b969
-	ld de,0c41bh		;b96c
+	ld de,0c41bh		;b96c   ; apunta a el lado por el que se sale de la habitacion
 	ld a,(de)			;b96f
 	ld b,a			;b970
 	xor a			;b971
@@ -1060,13 +1060,13 @@ L_B982:
 	cp 00fh		;b984
 	ret z			;b986
 L_B987:
-	ld (0d001h),a		;b987
+	ld (0d001h),a		;b987   ; guarda la HABITACION dentro de la fase
 	scf			;b98a
 	ret			;b98b
 L_B98C:
 	xor a			;b98c
-	ld (0c41bh),a		;b98d
-	ld a,(0c5b4h)		;b990
+	ld (0c41bh),a		;b98d   ; guarda el lado por el que se sale de la habitacion
+	ld a,(0c5b4h)		;b990   ; lee la habitacion a la que lleva el paso
 	jr L_B987		;b993
 L_B995:
 	add a,l			;b995
@@ -1074,7 +1074,7 @@ L_B995:
 	ret nc			;b997
 	inc h			;b998
 	ret			;b999
-L_B99A:
+salidas_de_la_habitacion:
 	call L_B9BD		;b99a
 	ld de,0c41ch		;b99d
 	ld b,004h		;b9a0
@@ -1101,7 +1101,7 @@ L_B9BA:
 	djnz L_B9A2		;b9ba
 	ret			;b9bc
 L_B9BD:
-	ld a,(0d000h)		;b9bd
+	ld a,(0d000h)		;b9bd   ; lee la FASE (0 el patio, 1-18)
 	ld hl,0b9d3h		;b9c0
 	add a,a			;b9c3
 	call L_B995		;b9c4
@@ -1109,7 +1109,7 @@ L_B9BD:
 	inc hl			;b9c8
 	ld h,(hl)			;b9c9
 	ld l,a			;b9ca
-	ld a,(0d001h)		;b9cb
+	ld a,(0d001h)		;b9cb   ; lee la HABITACION dentro de la fase
 	add a,a			;b9ce
 	call L_B995		;b9cf
 	ret			;b9d2
@@ -1437,7 +1437,7 @@ L_BB31:
 	call L_BB37		;bb31
 	jp L_BB9A		;bb34
 L_BB37:
-	ld a,(0d000h)		;bb37
+	ld a,(0d000h)		;bb37   ; lee la FASE (0 el patio, 1-18)
 	ld hl,0bb61h		;bb3a
 	ld b,a			;bb3d
 	add a,a			;bb3e
@@ -1447,7 +1447,7 @@ L_BB37:
 	ld b,a			;bb44
 	and 00fh		;bb45
 	ld c,a			;bb47
-	ld a,(0d001h)		;bb48
+	ld a,(0d001h)		;bb48   ; lee la HABITACION dentro de la fase
 	cp c			;bb4b
 	ret nz			;bb4c
 	inc hl			;bb4d
@@ -1455,14 +1455,14 @@ L_BB37:
 	inc hl			;bb4f
 	ld h,(hl)			;bb50
 	ld l,a			;bb51
-	ld (0c5adh),hl		;bb52
+	ld (0c5adh),hl		;bb52   ; guarda donde esta la puerta de la fase
 	ld a,b			;bb55
 	add a,a			;bb56
 	ld a,0ffh		;bb57
 	jr c,L_BB5D		;bb59
 	ld a,004h		;bb5b
 L_BB5D:
-	ld (0c5ach),a		;bb5d
+	ld (0c5ach),a		;bb5d   ; guarda el estado de la puerta de la fase
 	ret			;bb60
 
 ; ----------------------------------------------------------------------
@@ -1497,7 +1497,7 @@ DATA_puerta_de_cada_fase:
 
 
 L_BB9A:
-	ld de,(0d000h)		;bb9a
+	ld de,(0d000h)		;bb9a   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 	ld hl,0bbcdh		;bb9e
 L_BBA1:
 	ld a,(hl)			;bba1
@@ -1523,7 +1523,7 @@ L_BBB5:
 	inc hl			;bbb7
 	ld h,(hl)			;bbb8
 	ld l,a			;bbb9
-	ld (0c5b2h),hl		;bbba
+	ld (0c5b2h),hl		;bbba   ; guarda el paso a otra habitacion
 	ld a,001h		;bbbd
 	ld (0c5b1h),a		;bbbf
 	ld a,c			;bbc2
@@ -1532,7 +1532,7 @@ L_BBB5:
 	rrca			;bbc5
 	rrca			;bbc6
 	and 00fh		;bbc7
-	ld (0c5b4h),a		;bbc9
+	ld (0c5b4h),a		;bbc9   ; guarda la habitacion a la que lleva el paso
 	ret			;bbcc
 
 ; ----------------------------------------------------------------------

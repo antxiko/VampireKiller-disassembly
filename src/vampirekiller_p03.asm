@@ -27,8 +27,8 @@ L_A000:
 	ld (hl),003h		;a00c
 	ld a,(ix+000h)		;a00e
 	ld de,0a0bdh		;a011
-	call 06542h		;a014
-	ld hl,(0cff3h)		;a017
+	call 06542h		;a014   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+	ld hl,(0cff3h)		;a017   ; lee la ficha de la cosa que se crea
 	set 5,l		;a01a
 	ld b,(hl)			;a01c
 	ld a,005h		;a01d
@@ -42,10 +42,10 @@ L_A021:
 	add a,005h		;a025
 	ld l,a			;a027
 	djnz L_A021		;a028
-	ld hl,(0cff3h)		;a02a
+	ld hl,(0cff3h)		;a02a   ; lee la ficha de la cosa que se crea
 	ld a,(ix+000h)		;a02d
 	dec a			;a030
-	call 0406bh		;a031
+	call 0406bh		;a031   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_A034: 12 destinos del despachador de 0x406B (call en p03:A031):
@@ -89,8 +89,8 @@ L_A06A:
 	ld (ix+006h),001h		;a06a
 	ld (ix+00ch),03ch		;a06e
 	ld de,00000h		;a072
-	call L_A55D		;a075
-	jp L_A56C		;a078
+	call pon_velocidad_y		;a075   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	jp pon_velocidad_x		;a078   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_A07B:
 	ld a,(ix+00ah)		;a07b
 	ld (ix+010h),a		;a07e
@@ -132,7 +132,7 @@ L_A0ED:
 	add a,a			;a0f2
 	add a,a			;a0f3
 	add a,c			;a0f4
-	ld (0cff0h),a		;a0f5
+	ld (0cff0h),a		;a0f5   ; guarda el tipo de la cosa que se crea
 	call L_A134		;a0f8
 	ld a,(0cff8h)		;a0fb
 	ld e,a			;a0fe
@@ -151,22 +151,22 @@ L_A0ED:
 	ld (0cff7h),a		;a110
 	ld e,c			;a113
 	call L_A184		;a114
-	ld a,(0cff1h)		;a117
+	ld a,(0cff1h)		;a117   ; lee la posicion de la cosa que se crea
 	and a			;a11a
-	call nz,L_A17C		;a11b
-	ld (0cff3h),de		;a11e
+	call nz,niega_de		;a11b   ; niega_de: DE = -DE
+	ld (0cff3h),de		;a11e   ; guarda la ficha de la cosa que se crea
 	ld a,(0cff7h)		;a122
 	ld e,a			;a125
 	call L_A184		;a126
 	ld a,(0cff2h)		;a129
 	and a			;a12c
-	call nz,L_A17C		;a12d
-	ld hl,(0cff3h)		;a130
+	call nz,niega_de		;a12d   ; niega_de: DE = -DE
+	ld hl,(0cff3h)		;a130   ; lee la ficha de la cosa que se crea
 	ret			;a133
 L_A134:
-	ld hl,0cff1h		;a134
+	ld hl,0cff1h		;a134   ; apunta a la posicion de la cosa que se crea
 	ld (hl),000h		;a137
-	ld a,(0c425h)		;a139
+	ld a,(0c425h)		;a139   ; lee la Y de Simon
 	sub e			;a13c
 	jr nc,L_A142		;a13d
 	neg		;a13f
@@ -178,7 +178,7 @@ L_A142:
 	rra			;a146
 	and 038h		;a147
 	ld e,a			;a149
-	ld a,(0c427h)		;a14a
+	ld a,(0c427h)		;a14a   ; lee la X de Simon
 	sub d			;a14d
 	jr nc,L_A153		;a14e
 	neg		;a150
@@ -192,11 +192,11 @@ L_A153:
 	and 007h		;a158
 	add a,e			;a15a
 	ld hl,0a1a2h		;a15b
-	call 04061h		;a15e
+	call 04061h		;a15e   ; hl_mas_a: HL += A
 	ld a,(hl)			;a161
 	ld (0cff8h),a		;a162
 	ld c,a			;a165
-	ld hl,(0cff1h)		;a166
+	ld hl,(0cff1h)		;a166   ; lee la posicion de la cosa que se crea
 	ld a,h			;a169
 	ld b,000h		;a16a
 	and a			;a16c
@@ -211,7 +211,7 @@ L_A177:
 	add a,b			;a177
 	ld (0cff9h),a		;a178
 	ret			;a17b
-L_A17C:
+niega_de:
 	ld a,d			;a17c
 	cpl			;a17d
 	ld d,a			;a17e
@@ -221,7 +221,7 @@ L_A17C:
 	inc de			;a182
 	ret			;a183
 L_A184:
-	ld a,(0cff0h)		;a184
+	ld a,(0cff0h)		;a184   ; lee el tipo de la cosa que se crea
 	ld h,a			;a187
 	call L_A196		;a188
 	xor a			;a18b
@@ -315,7 +315,7 @@ L_A27A:
 	ld c,a			;a27f
 	ld b,(ix+005h)		;a280
 	ld a,00ah		;a283
-	call 09f6dh		;a285
+	call 09f6dh		;a285   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	ld a,04ch		;a288
 L_A28A:
 	ld (ix+025h),002h		;a28a
@@ -344,15 +344,15 @@ DATA_dos_bytes_sueltos:
 
 L_A2A8:
 	ld b,005h		;a2a8
-	ld a,(0d000h)		;a2aa
+	ld a,(0d000h)		;a2aa   ; lee la FASE (0 el patio, 1-18)
 	cp 009h		;a2ad
 	jr nz,L_A2BA		;a2af
-	ld a,(0d001h)		;a2b1
+	ld a,(0d001h)		;a2b1   ; lee la HABITACION dentro de la fase
 	cp 004h		;a2b4
 	jr nz,L_A2BA		;a2b6
 	ld b,007h		;a2b8
 L_A2BA:
-	ld a,(0c427h)		;a2ba
+	ld a,(0c427h)		;a2ba   ; lee la X de Simon
 	cp (ix+005h)		;a2bd
 	jr nc,L_A2C3		;a2c0
 	dec b			;a2c2
@@ -384,10 +384,10 @@ L_A2E0:
 	ld d,(ix+005h)		;a301
 	ld c,020h		;a304
 	push de			;a306
-	call 05f1dh		;a307
+	call 05f1dh		;a307   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop de			;a30a
 	ld c,020h		;a30b
-	jp 05f1dh		;a30d
+	jp 05f1dh		;a30d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_A310:
 	inc (ix+01dh)		;a310
 	ld a,(ix+001h)		;a313
@@ -400,9 +400,9 @@ L_A310:
 	call L_A4B3		;a324
 L_A327:
 	ld de,00000h		;a327
-	call L_A56C		;a32a
+	call pon_velocidad_x		;a32a   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00080h		;a32d
-	call L_A549		;a330
+	call suma_a_la_velocidad_y		;a330
 	bit 7,(ix+008h)		;a333
 	ret nz			;a337
 	ld d,(ix+005h)		;a338
@@ -413,7 +413,7 @@ L_A327:
 	add a,008h		;a345
 	ld d,a			;a347
 L_A348:
-	call 07b98h		;a348
+	call 07b98h		;a348   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr nc,L_A380		;a34b
 	ld a,007h		;a34d
 	call L_A4E8		;a34f
@@ -433,29 +433,29 @@ L_A366:
 	ld (ix+001h),001h		;a372
 	ld (ix+013h),008h		;a376
 	ld de,00000h		;a37a
-	jp L_A55D		;a37d
+	jp pon_velocidad_y		;a37d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_A380:
 	ld a,(ix+003h)		;a380
 	cp 0c0h		;a383
 	ret c			;a385
 	ld a,009h		;a386
 	call L_A4E8		;a388
-	call 099f6h		;a38b
+	call 099f6h		;a38b   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld e,(ix+003h)		;a38e
 	ld d,(ix+005h)		;a391
 	ld c,020h		;a394
 	push de			;a396
-	call 05f1dh		;a397
+	call 05f1dh		;a397   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop de			;a39a
 	ld c,020h		;a39b
-	jp 05f1dh		;a39d
+	jp 05f1dh		;a39d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_A3A0:
 	bit 0,(ix+01bh)		;a3a0
 	jr z,L_A3CB		;a3a4
 	bit 0,(ix+01ch)		;a3a6
 	jr nz,L_A3CB		;a3aa
 	ld (ix+00bh),012h		;a3ac
-	ld a,(0c425h)		;a3b0
+	ld a,(0c425h)		;a3b0   ; lee la Y de Simon
 	ld b,a			;a3b3
 	ld (ix+000h),003h		;a3b4
 	ld a,(ix+003h)		;a3b8
@@ -481,13 +481,13 @@ L_A3DE:
 	call L_A4CF		;a3e3
 	ld (ix+012h),000h		;a3e6
 	ld de,0fe80h		;a3ea
-	ld a,(0c427h)		;a3ed
+	ld a,(0c427h)		;a3ed   ; lee la X de Simon
 	cp (ix+005h)		;a3f0
 	jr c,L_A3FC		;a3f3
 	ld (ix+012h),001h		;a3f5
 	ld de,00180h		;a3f9
 L_A3FC:
-	call L_A56C		;a3fc
+	call pon_velocidad_x		;a3fc   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+013h),001h		;a3ff
 L_A403:
 	ld hl,0a452h		;a403
@@ -505,7 +505,7 @@ L_A40F:
 	jr z,L_A428		;a424
 	add a,002h		;a426
 L_A428:
-	call 04061h		;a428
+	call 04061h		;a428   ; hl_mas_a: HL += A
 	ld a,(hl)			;a42b
 	ld (ix+00bh),a		;a42c
 L_A42F:
@@ -516,7 +516,7 @@ L_A42F:
 L_A43A:
 	ld d,a			;a43a
 	ld e,(ix+003h)		;a43b
-	call 07b98h		;a43e
+	call 07b98h		;a43e   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret c			;a441
 	ld (ix+008h),000h		;a442
 	ld (ix+007h),000h		;a446
@@ -578,7 +578,7 @@ L_A4A1:
 	ld c,a			;a4a6
 	ld b,(ix+005h)		;a4a7
 	ld a,002h		;a4aa
-	jp 09f6dh		;a4ac
+	jp 09f6dh		;a4ac   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 
 ; ----------------------------------------------------------------------
 ; DATOS cuatro_dibujos_A4AF: cuatro dibujos que p03:A46A usa segun la
@@ -601,7 +601,7 @@ L_A4B3:
 	ld c,00fh		;a4bf
 L_A4C1:
 	ld (ix+00bh),b		;a4c1
-	ld a,(0c427h)		;a4c4
+	ld a,(0c427h)		;a4c4   ; lee la X de Simon
 	cp (ix+005h)		;a4c7
 	ret nc			;a4ca
 	ld (ix+00bh),c		;a4cb
@@ -614,7 +614,7 @@ L_A4CF:
 L_A4DB:
 	ld a,(ix+01dh)		;a4db
 	and 003h		;a4de
-	call 04061h		;a4e0
+	call 04061h		;a4e0   ; hl_mas_a: HL += A
 	ld a,(hl)			;a4e3
 	ld (ix+015h),a		;a4e4
 	ret			;a4e7
@@ -624,7 +624,7 @@ L_A4E8:
 	cp 006h		;a4ec
 	ret z			;a4ee
 	ld a,c			;a4ef
-	jp 0509fh		;a4f0
+	jp 0509fh		;a4f0   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 
 ; ----------------------------------------------------------------------
 ; DATOS dos_animaciones_A4F3: dos animaciones de cuatro valores (0xA4F3 y
@@ -644,7 +644,7 @@ L_A4FB:
 	ld a,(ix+003h)		;a4ff
 	ld (ix+010h),a		;a502
 	ld de,0fc80h		;a505
-	call L_A55D		;a508
+	call pon_velocidad_y		;a508   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld a,(ix+005h)		;a50b
 	cp 080h		;a50e
 	ld de,00280h		;a510
@@ -654,7 +654,7 @@ L_A518:
 	jp L_A653		;a518
 L_A51B:
 	ld c,071h		;a51b
-	ld a,(0d000h)		;a51d
+	ld a,(0d000h)		;a51d   ; lee la FASE (0 el patio, 1-18)
 	cp 015h		;a520
 	jr nz,L_A526		;a522
 	ld c,072h		;a524
@@ -673,20 +673,20 @@ L_A538:
 	ld de,00040h		;a53b
 	ld a,(ix+003h)		;a53e
 	cp (ix+010h)		;a541
-	jr c,L_A549		;a544
+	jr c,suma_a_la_velocidad_y		;a544
 	ld de,0ffc0h		;a546
-L_A549:
+suma_a_la_velocidad_y:
 	ld l,(ix+007h)		;a549
 	ld h,(ix+008h)		;a54c
 	add hl,de			;a54f
 	ex de,hl			;a550
 	ld a,d			;a551
 	and a			;a552
-	jp m,L_A55D		;a553
+	jp m,pon_velocidad_y		;a553   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	cp 008h		;a556
-	jr c,L_A55D		;a558
+	jr c,pon_velocidad_y		;a558
 	ld de,007ffh		;a55a
-L_A55D:
+pon_velocidad_y:
 	ld (ix+007h),e		;a55d
 	ld (ix+008h),d		;a560
 	ret			;a563
@@ -695,7 +695,7 @@ L_A564:
 	ld h,(ix+00ah)		;a567
 	add hl,de			;a56a
 	ex de,hl			;a56b
-L_A56C:
+pon_velocidad_x:
 	ld (ix+009h),e		;a56c
 	ld (ix+00ah),d		;a56f
 	ret			;a572
@@ -704,9 +704,9 @@ L_A573:
 	ld de,00000h		;a577
 	ld (ix+010h),e		;a57a
 	ld (ix+011h),e		;a57d
-	call L_A55D		;a580
+	call pon_velocidad_y		;a580   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00160h		;a583
-	call L_A56C		;a586
+	call pon_velocidad_x		;a586   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+00bh),050h		;a589
 	ld (ix+00ch),060h		;a58d
 	ret			;a591
@@ -720,7 +720,7 @@ L_A59F:
 	add a,(ix+005h)		;a59f
 	ld d,a			;a5a2
 	ld e,(ix+003h)		;a5a3
-	call 07b98h		;a5a6
+	call 07b98h		;a5a6   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr nc,L_A60C		;a5a9
 	ld d,(ix+005h)		;a5ab
 	ld bc,00808h		;a5ae
@@ -749,7 +749,7 @@ L_A5DC:
 	bit 0,(ix+011h)		;a5e1
 	jr nz,L_A602		;a5e5
 	ld de,00160h		;a5e7
-	ld a,(0c427h)		;a5ea
+	ld a,(0c427h)		;a5ea   ; lee la X de Simon
 	cp (ix+005h)		;a5ed
 	jr nc,L_A5F5		;a5f0
 	ld de,0fea0h		;a5f2
@@ -792,14 +792,14 @@ DATA_dos_animaciones_A627:
 ; ======================================================================
 
 
-L_A62F:
+dibujo_de_la_tabla:
 	ld b,000h		;a62f
 	add hl,bc			;a631
 	ld a,(hl)			;a632
 	ld (ix+00bh),a		;a633
 	ret			;a636
 L_A637:
-	ld a,(0c425h)		;a637
+	ld a,(0c425h)		;a637   ; lee la Y de Simon
 	sub (ix+003h)		;a63a
 	add a,008h		;a63d
 	cp 010h		;a63f
@@ -809,15 +809,15 @@ L_A642:
 	push de			;a643
 	ld e,(ix+009h)		;a644
 	ld d,(ix+00ah)		;a647
-	call L_A17C		;a64a
-	call L_A56C		;a64d
+	call niega_de		;a64a   ; niega_de: DE = -DE
+	call pon_velocidad_x		;a64d   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	pop de			;a650
 	pop af			;a651
 	ret			;a652
 L_A653:
 	ld a,d			;a653
 	or e			;a654
-	jp z,L_A56C		;a655
+	jp z,pon_velocidad_x		;a655   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	push hl			;a658
 	ex de,hl			;a659
 	ld a,(0d012h)		;a65a
@@ -829,11 +829,11 @@ L_A653:
 	ld d,000h		;a662
 	ld e,a			;a664
 	bit 7,h		;a665
-	call nz,L_A17C		;a667
+	call nz,niega_de		;a667   ; niega_de: DE = -DE
 	add hl,de			;a66a
 	ex de,hl			;a66b
 	pop hl			;a66c
-	jp L_A56C		;a66d
+	jp pon_velocidad_x		;a66d   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_A670:
 	ld (ix+010h),018h		;a670
 	ld (ix+00bh),089h		;a674
@@ -842,7 +842,7 @@ L_A670:
 L_A67D:
 	inc (ix+018h)		;a67d
 	ld a,(ix+001h)		;a680
-	call 0406bh		;a683
+	call 0406bh		;a683   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_A686: 8 destinos del despachador de 0x406B (call en p03:A683):
@@ -904,7 +904,7 @@ L_A6D7:
 	ret			;a6e9
 L_A6EA:
 	ld (ix+001h),001h		;a6ea
-	ld a,(0c425h)		;a6ee
+	ld a,(0c425h)		;a6ee   ; lee la Y de Simon
 	sub (ix+003h)		;a6f1
 	cp 018h		;a6f4
 	jp nc,L_A7BD		;a6f6
@@ -913,7 +913,7 @@ L_A6EA:
 L_A6FE:
 	ld (ix+00ah),003h		;a6fe
 	ld (ix+009h),000h		;a702
-	ld a,(0c427h)		;a706
+	ld a,(0c427h)		;a706   ; lee la X de Simon
 	cp (ix+005h)		;a709
 	jr nc,L_A716		;a70c
 	ld (ix+00ah),0fdh		;a70e
@@ -933,7 +933,7 @@ L_A728:
 	bit 7,(ix+00ah)		;a734
 	jr z,L_A74B		;a738
 	ld (ix+011h),000h		;a73a
-	ld a,(0c427h)		;a73e
+	ld a,(0c427h)		;a73e   ; lee la X de Simon
 	sub 008h		;a741
 	cp (ix+005h)		;a743
 	ret c			;a746
@@ -941,7 +941,7 @@ L_A728:
 	ret			;a74a
 L_A74B:
 	ld (ix+011h),001h		;a74b
-	ld a,(0c427h)		;a74f
+	ld a,(0c427h)		;a74f   ; lee la X de Simon
 	add a,008h		;a752
 	cp (ix+005h)		;a754
 	ret nc			;a757
@@ -988,7 +988,7 @@ L_A7A3:
 	sra a		;a7ab
 	sra a		;a7ad
 	sra a		;a7af
-	call 04061h		;a7b1
+	call 04061h		;a7b1   ; hl_mas_a: HL += A
 	ld a,(hl)			;a7b4
 	ld (ix+00bh),a		;a7b5
 	ret			;a7b8
@@ -1008,7 +1008,7 @@ DATA_dos_animaciones_A7B9:
 L_A7BD:
 	ld de,0fe00h		;a7bd
 	ld hl,00200h		;a7c0
-	ld a,(0c427h)		;a7c3
+	ld a,(0c427h)		;a7c3   ; lee la X de Simon
 	cp (ix+005h)		;a7c6
 	jr c,L_A7CC		;a7c9
 	ex de,hl			;a7cb
@@ -1023,9 +1023,9 @@ L_A7CC:
 L_A7DC:
 	ld de,0fe00h		;a7dc
 L_A7DF:
-	call L_A56C		;a7df
+	call pon_velocidad_x		;a7df   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld hl,0a813h		;a7e2
-	ld a,(0c425h)		;a7e5
+	ld a,(0c425h)		;a7e5   ; lee la Y de Simon
 	cp (ix+003h)		;a7e8
 	jr c,L_A7F0		;a7eb
 	ld hl,0a81bh		;a7ed
@@ -1033,7 +1033,7 @@ L_A7F0:
 	ld a,(ix+018h)		;a7f0
 	and 003h		;a7f3
 	add a,a			;a7f5
-	call 04061h		;a7f6
+	call 04061h		;a7f6   ; hl_mas_a: HL += A
 	ld d,(hl)			;a7f9
 	inc hl			;a7fa
 	ld e,(hl)			;a7fb
@@ -1041,12 +1041,12 @@ L_A7F0:
 	bit 7,d		;a7ff
 	jr z,L_A80B		;a801
 	cp 040h		;a803
-	call c,L_A17C		;a805
-	jp L_A55D		;a808
+	call c,niega_de		;a805   ; niega_de: DE = -DE
+	jp pon_velocidad_y		;a808   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_A80B:
 	cp 0c0h		;a80b
-	call nc,L_A17C		;a80d
-	jp L_A55D		;a810
+	call nc,niega_de		;a80d   ; niega_de: DE = -DE
+	jp pon_velocidad_y		;a810   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 
 ; ----------------------------------------------------------------------
 ; DATOS dos_tablas_A813: dos tablas de ocho bytes (0xA813 y 0xA81B) que
@@ -1063,7 +1063,7 @@ DATA_dos_tablas_A813:
 
 L_A823:
 	bit 7,a		;a823
-	jp z,04061h		;a825
+	jp z,04061h		;a825   ; hl_mas_a: HL += A
 	add a,l			;a828
 	ld l,a			;a829
 	ret c			;a82a
@@ -1097,7 +1097,7 @@ L_A852:
 	ret			;a85b
 L_A85C:
 	ld b,(ix+005h)		;a85c
-	ld a,(0c427h)		;a85f
+	ld a,(0c427h)		;a85f   ; lee la X de Simon
 	cp b			;a862
 	ld a,043h		;a863
 	jr nc,L_A869		;a865
@@ -1107,14 +1107,14 @@ L_A869:
 	ld (ix+006h),001h		;a86c
 	ld (ix+00ch),000h		;a870
 	ld de,00000h		;a874
-	call L_A56C		;a877
-	jp L_A55D		;a87a
+	call pon_velocidad_x		;a877   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+	jp pon_velocidad_y		;a87a   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_A87D:
 	ld a,(ix+005h)		;a87d
 	cp 018h		;a880
-	jp c,099f6h		;a882
+	jp c,099f6h		;a882   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld a,(ix+001h)		;a885
-	call 0406bh		;a888
+	call 0406bh		;a888   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_A88B: 3 destinos del despachador de 0x406B (call en p03:A888):
@@ -1131,7 +1131,7 @@ DATA_tabla_A88B:
 
 
 L_A891:
-	ld a,(0c427h)		;a891
+	ld a,(0c427h)		;a891   ; lee la X de Simon
 	sub (ix+005h)		;a894
 	ld de,00400h		;a897
 	jr nc,L_A8A1		;a89a
@@ -1140,17 +1140,17 @@ L_A891:
 L_A8A1:
 	cp 040h		;a8a1
 	ret nc			;a8a3
-	call L_A56C		;a8a4
+	call pon_velocidad_x		;a8a4   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+001h),001h		;a8a7
 	ret			;a8ab
 L_A8AC:
 	call L_A909		;a8ac
 	ld e,(ix+003h)		;a8af
 	ld d,(ix+005h)		;a8b2
-	call 07b98h		;a8b5
+	call 07b98h		;a8b5   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret c			;a8b8
 	ld de,0fef8h		;a8b9
-	call L_A55D		;a8bc
+	call pon_velocidad_y		;a8bc   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld a,(ix+00ah)		;a8bf
 	bit 7,a		;a8c2
 	ld a,046h		;a8c4
@@ -1162,25 +1162,25 @@ L_A8CA:
 	ret			;a8d1
 L_A8D2:
 	ld de,000a0h		;a8d2
-	call L_A549		;a8d5
+	call suma_a_la_velocidad_y		;a8d5
 	ld e,(ix+003h)		;a8d8
 	ld d,(ix+005h)		;a8db
-	call 07b98h		;a8de
+	call 07b98h		;a8de   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;a8e1
 	ld b,(ix+005h)		;a8e2
-	ld a,(0c427h)		;a8e5
+	ld a,(0c427h)		;a8e5   ; lee la X de Simon
 	cp b			;a8e8
 	ld de,00400h		;a8e9
 	jr nc,L_A8F1		;a8ec
 	ld de,0fc00h		;a8ee
 L_A8F1:
-	call L_A56C		;a8f1
+	call pon_velocidad_x		;a8f1   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+00ch),000h		;a8f4
 	ld (ix+001h),001h		;a8f8
 	ld (ix+002h),000h		;a8fc
 	call L_A9A2		;a900
 	ld de,00000h		;a903
-	jp L_A55D		;a906
+	jp pon_velocidad_y		;a906   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_A909:
 	ld a,(ix+00ch)		;a909
 	inc a			;a90c
@@ -1224,7 +1224,7 @@ L_A94B:
 	ld (ix+00ch),008h		;a957
 	ld (ix+010h),c		;a95b
 	ld de,00000h		;a95e
-	jp L_A55D		;a961
+	jp pon_velocidad_y		;a961   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_A964:
 	dec (ix+00ch)		;a964
 	jr nz,L_A984		;a967
@@ -1245,10 +1245,10 @@ L_A97D:
 L_A984:
 	ld d,(ix+005h)		;a984
 	ld e,(ix+003h)		;a987
-	call 07b98h		;a98a
+	call 07b98h		;a98a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr nc,L_A9AB		;a98d
 	ld de,00000h		;a98f
-	call L_A55D		;a992
+	call pon_velocidad_y		;a992   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld e,(ix+011h)		;a995
 	ld d,(ix+012h)		;a998
 	call L_A653		;a99b
@@ -1260,14 +1260,14 @@ L_A9A2:
 	ret			;a9aa
 L_A9AB:
 	ld de,00000h		;a9ab
-	call L_A56C		;a9ae
+	call pon_velocidad_x		;a9ae   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00060h		;a9b1
-	jp L_A549		;a9b4
+	jp suma_a_la_velocidad_y		;a9b4
 L_A9B7:
 	ld hl,0a9c7h		;a9b7
 	push hl			;a9ba
 	ld a,(ix+001h)		;a9bb
-	call 0406bh		;a9be
+	call 0406bh		;a9be   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_A9C1: 3 destinos del despachador de 0x406B (call en p03:A9BE):
@@ -1358,7 +1358,7 @@ L_AA37:
 	ld c,a			;aa55
 	ld b,(ix+023h)		;aa56
 	ld a,00eh		;aa59
-	jp 09f6dh		;aa5b
+	jp 09f6dh		;aa5b   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 L_AA5E:
 	ld (ix+00ch),01eh		;aa5e
 	ld (ix+001h),001h		;aa62
@@ -1396,7 +1396,7 @@ L_AA8A:
 	add a,a			;aa92
 	add a,a			;aa93
 	ld hl,0aaadh		;aa94
-	call 04061h		;aa97
+	call 04061h		;aa97   ; hl_mas_a: HL += A
 	push ix		;aa9a
 	pop de			;aa9c
 	set 4,e		;aa9d
@@ -1479,9 +1479,9 @@ DATA_sprites_de_la_cosa:
 L_AB22:
 	ld (ix+006h),000h		;ab22
 	ld de,0fe00h		;ab26
-	call L_A55D		;ab29
+	call pon_velocidad_y		;ab29   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00000h		;ab2c
-	call L_A56C		;ab2f
+	call pon_velocidad_x		;ab2f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+00bh),056h		;ab32
 	ld (ix+00ch),01eh		;ab36
 	xor a			;ab3a
@@ -1492,7 +1492,7 @@ L_AB42:
 	ld hl,0ab60h		;ab42
 	push hl			;ab45
 	ld a,(ix+001h)		;ab46
-	call 0406bh		;ab49
+	call 0406bh		;ab49   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_AB4C: 10 destinos del despachador de 0x406B (call en p03:AB49):
@@ -1521,7 +1521,7 @@ L_AB60:
 	ld (0ce0fh),a		;ab63
 	ret			;ab66
 L_AB67:
-	ld a,(0c427h)		;ab67
+	ld a,(0c427h)		;ab67   ; lee la X de Simon
 	sub (ix+005h)		;ab6a
 	ld c,056h		;ab6d
 	jr c,L_AB73		;ab6f
@@ -1554,7 +1554,7 @@ L_ABA7:
 L_ABAB:
 	ld c,000h		;abab
 	ld hl,0acaah		;abad
-	call L_AD37		;abb0
+	call dibujo_segun_simon		;abb0   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	call L_AD45		;abb3
 	bit 0,(ix+00ch)		;abb6
 	call nz,L_AD61		;abba
@@ -1571,7 +1571,7 @@ L_ABD4:
 	ret nz			;abd7
 	ld c,001h		;abd8
 	ld hl,0acaah		;abda
-	call L_AD37		;abdd
+	call dibujo_segun_simon		;abdd   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	call L_ADD2		;abe0
 	ld (ix+00ch),004h		;abe3
 	jr L_ABA7		;abe7
@@ -1587,7 +1587,7 @@ L_ABE9:
 	ld (ix+00ch),01eh		;abff
 	jr L_ABA7		;ac03
 L_AC05:
-	ld a,(0c427h)		;ac05
+	ld a,(0c427h)		;ac05   ; lee la X de Simon
 	cp (ix+005h)		;ac08
 	ld de,00280h		;ac0b
 	jr nc,L_AC13		;ac0e
@@ -1598,7 +1598,7 @@ L_AC13:
 	ld c,a			;ac18
 	ld b,(ix+005h)		;ac19
 	ld a,011h		;ac1c
-	jp 09f6dh		;ac1e
+	jp 09f6dh		;ac1e   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 L_AC21:
 	dec (ix+00ch)		;ac21
 	ret nz			;ac24
@@ -1619,14 +1619,14 @@ L_AC40:
 	ld (ix+003h),a		;ac49
 	ld c,000h		;ac4c
 	ld hl,0acaah		;ac4e
-	call L_AD37		;ac51
+	call dibujo_segun_simon		;ac51   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	ld hl,0ac76h		;ac54
 	ld a,(ix+010h)		;ac57
 	cp 007h		;ac5a
 	jr c,L_AC62		;ac5c
 	ld (ix+010h),0ffh		;ac5e
 L_AC62:
-	call 04061h		;ac62
+	call 04061h		;ac62   ; hl_mas_a: HL += A
 	ld a,(hl)			;ac65
 	ld (ix+005h),a		;ac66
 	call L_AD80		;ac69
@@ -1649,7 +1649,7 @@ DATA_ocho_valores_AC76:
 L_AC7E:
 	ld c,000h		;ac7e
 	ld hl,0acaah		;ac80
-	call L_AD37		;ac83
+	call dibujo_segun_simon		;ac83   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	call L_AD45		;ac86
 	bit 0,(ix+00ch)		;ac89
 	call nz,L_AD5B		;ac8d
@@ -1665,7 +1665,7 @@ L_AC7E:
 
 ; ----------------------------------------------------------------------
 ; DATOS dibujos_ACAA: cuatro dibujos, dos por lado: 0xAD37 suma 2 si Simon
-;   esta por debajo y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA,
+;   esta a su derecha y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA,
 ;   AC4E, AC80)
 ;   0xacaa..0xacae  (4 bytes)
 DATA_dibujos_ACAA:
@@ -1692,19 +1692,19 @@ L_ACAE:
 	ld e,a			;acd0
 	ld d,(ix+005h)		;acd1
 	ld c,02dh		;acd4
-	jp 05f1dh		;acd6
+	jp 05f1dh		;acd6   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_ACD9:
 	dec (ix+00ch)		;acd9
 	ret nz			;acdc
 	ld a,001h		;acdd
 	ld (0ce16h),a		;acdf
 	call L_ADC6		;ace2
-	jp 099f6h		;ace5
+	jp 099f6h		;ace5   ; borra_la_cosa: tipo a cero y sus sprites libres
 L_ACE8:
 	ld (ix+006h),001h		;ace8
 	ld (ix+00eh),000h		;acec
 	ld (ix+07eh),000h		;acf0
-	ld a,(0c427h)		;acf4
+	ld a,(0c427h)		;acf4   ; lee la X de Simon
 	cp (ix+005h)		;acf7
 	ld c,057h		;acfa
 	ld de,00300h		;acfc
@@ -1713,12 +1713,12 @@ L_ACE8:
 	ld c,059h		;ad04
 L_AD06:
 	ld (ix+00bh),c		;ad06
-	call L_A56C		;ad09
+	call pon_velocidad_x		;ad09   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,0fd00h		;ad0c
-	jp L_A55D		;ad0f
+	jp pon_velocidad_y		;ad0f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_AD12:
 	ld de,00050h		;ad12
-	jp L_A549		;ad15
+	jp suma_a_la_velocidad_y		;ad15
 L_AD18:
 	push ix		;ad18
 	ld ix,0d700h		;ad1a
@@ -1739,20 +1739,20 @@ DATA_codigo_sin_llamar_AD20:
 
 L_AD28:
 	push bc			;ad28
-	call 099f6h		;ad29
+	call 099f6h		;ad29   ; borra_la_cosa: tipo a cero y sus sprites libres
 	ld de,00080h		;ad2c
 	add ix,de		;ad2f
 	pop bc			;ad31
 	djnz L_AD28		;ad32
 	pop ix		;ad34
 	ret			;ad36
-L_AD37:
-	ld a,(0c427h)		;ad37
+dibujo_segun_simon:
+	ld a,(0c427h)		;ad37   ; lee la X de Simon
 	cp (ix+005h)		;ad3a
-	jp c,L_A62F		;ad3d
+	jp c,dibujo_de_la_tabla		;ad3d   ; dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 	inc c			;ad40
 	inc c			;ad41
-	jp L_A62F		;ad42
+	jp dibujo_de_la_tabla		;ad42   ; dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 L_AD45:
 	ld b,008h		;ad45
 	ld de,00025h		;ad47
@@ -1789,13 +1789,13 @@ L_AD67:
 	ret			;ad6c
 L_AD6D:
 	ld a,d			;ad6d
-	call 04061h		;ad6e
+	call 04061h		;ad6e   ; hl_mas_a: HL += A
 	ld c,(hl)			;ad71
 L_AD72:
 	push ix		;ad72
 	pop hl			;ad74
 	ld a,e			;ad75
-	call 04061h		;ad76
+	call 04061h		;ad76   ; hl_mas_a: HL += A
 	ld (hl),c			;ad79
 	inc d			;ad7a
 	ld a,e			;ad7b
@@ -1810,7 +1810,7 @@ L_AD80:
 	ld de,08080h		;ad88
 	ld bc,02020h		;ad8b
 	ld a,004h		;ad8e
-	jp 04946h		;ad90
+	jp 04946h		;ad90   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_AD93:
 	ld hl,0ce0eh		;ad93
 	ld a,(hl)			;ad96
@@ -1818,7 +1818,7 @@ L_AD93:
 	ret m			;ad98
 	ld (hl),000h		;ad99
 	ld de,0adbch		;ad9b
-	call 06542h		;ad9e
+	call 06542h		;ad9e   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	ex de,hl			;ada1
 	ld a,(0ce0fh)		;ada2
 	sub 010h		;ada5
@@ -1832,7 +1832,7 @@ L_AD93:
 	jp 049dbh		;adb4
 L_ADB7:
 	ld a,001h		;adb7
-	jp 04946h		;adb9
+	jp 04946h		;adb9   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 
 ; ----------------------------------------------------------------------
 ; DATOS cinco_pares: cinco pares (0x80 y 0x00, 0x20, 0x40, 0x60, 0x80) que
@@ -1863,7 +1863,7 @@ L_ADD2:
 L_ADDE:
 	ld (ix+006h),001h		;adde
 	ld de,00000h		;ade2
-	call L_A55D		;ade5
+	call pon_velocidad_y		;ade5   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	call L_A653		;ade8
 	ld (ix+00bh),05fh		;adeb
 	ld (ix+010h),000h		;adef
@@ -1874,7 +1874,7 @@ L_ADF8:
 	jr nz,L_AE36		;adfc
 	ld d,(ix+005h)		;adfe
 	ld e,(ix+003h)		;ae01
-	call 07b98h		;ae04
+	call 07b98h		;ae04   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr c,L_AE0C		;ae07
 	jp L_B33E		;ae09
 L_AE0C:
@@ -1884,7 +1884,7 @@ L_AE0C:
 	inc (ix+001h)		;ae14
 	ld de,00140h		;ae17
 	ld (ix+00bh),061h		;ae1a
-	ld a,(0c427h)		;ae1e
+	ld a,(0c427h)		;ae1e   ; lee la X de Simon
 	cp (ix+005h)		;ae21
 	jr nc,L_AE2D		;ae24
 	ld de,0fec0h		;ae26
@@ -1892,7 +1892,7 @@ L_AE0C:
 L_AE2D:
 	call L_A653		;ae2d
 	ld de,00000h		;ae30
-	jp L_A55D		;ae33
+	jp pon_velocidad_y		;ae33   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_AE36:
 	call L_AF18		;ae36
 	ld a,010h		;ae39
@@ -1903,7 +1903,7 @@ L_AE43:
 	add a,(ix+005h)		;ae43
 	ld d,a			;ae46
 	ld e,(ix+003h)		;ae47
-	call 07b98h		;ae4a
+	call 07b98h		;ae4a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jp nc,L_AEF6		;ae4d
 	ld d,(ix+005h)		;ae50
 	ld bc,00808h		;ae53
@@ -1916,11 +1916,11 @@ L_AE61:
 L_AE64:
 	jp c,L_AEF6		;ae64
 	ld (ix+006h),001h		;ae67
-	call L_AF40		;ae6b
+	call distancia_horizontal		;ae6b
 	cp 02eh		;ae6e
 	jr nc,L_AE89		;ae70
 	ld de,00140h		;ae72
-	ld a,(0c427h)		;ae75
+	ld a,(0c427h)		;ae75   ; lee la X de Simon
 	cp (ix+005h)		;ae78
 	jr c,L_AE80		;ae7b
 	ld de,0fec0h		;ae7d
@@ -1932,7 +1932,7 @@ L_AE89:
 	cp 05ch		;ae89
 	jr c,L_AEA2		;ae8b
 	ld de,00140h		;ae8d
-	ld a,(0c427h)		;ae90
+	ld a,(0c427h)		;ae90   ; lee la X de Simon
 	cp (ix+005h)		;ae93
 	jr nc,L_AE9B		;ae96
 	ld de,0fec0h		;ae98
@@ -1948,7 +1948,7 @@ L_AEA2:
 L_AEAF:
 	bit 1,(ix+001h)		;aeaf
 	jr nz,L_AEE9		;aeb3
-	call L_AF40		;aeb5
+	call distancia_horizontal		;aeb5
 	cp 02ah		;aeb8
 	jr nc,L_AEDF		;aeba
 	bit 0,(ix+010h)		;aebc
@@ -1960,7 +1960,7 @@ L_AEC1:
 	ld (0cffch),hl		;aec8
 	ld hl,00000h		;aecb
 	ld de,00400h		;aece
-	ld a,(0c427h)		;aed1
+	ld a,(0c427h)		;aed1   ; lee la X de Simon
 	cp (ix+005h)		;aed4
 	jr nc,L_AEDC		;aed7
 	ld de,0fc00h		;aed9
@@ -1980,7 +1980,7 @@ L_AEE9:
 	ret			;aef5
 L_AEF6:
 	ld (ix+006h),000h		;aef6
-	call L_AF40		;aefa
+	call distancia_horizontal		;aefa
 	cp 03eh		;aefd
 	jr c,L_AF0C		;aeff
 	cp 04ch		;af01
@@ -1995,13 +1995,13 @@ L_AF12:
 	jr L_AEAF		;af16
 L_AF18:
 	ld c,000h		;af18
-	ld a,(0c003h)		;af1a
+	ld a,(0c003h)		;af1a   ; lee el contador de cuadros
 	and 008h		;af1d
 	jr z,L_AF22		;af1f
 	inc c			;af21
 L_AF22:
 	ld hl,0af28h		;af22
-	jp L_AD37		;af25
+	jp dibujo_segun_simon		;af25   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 
 ; ----------------------------------------------------------------------
 ; DATOS dibujos_AF28: cuatro dibujos, dos por lado, para 0xAD37 (p03:AF22)
@@ -2024,15 +2024,15 @@ L_AF36:
 	ret z			;af3a
 	ld (ix+006h),000h		;af3b
 	ret			;af3f
-L_AF40:
-	ld a,(0c427h)		;af40
+distancia_horizontal:
+	ld a,(0c427h)		;af40   ; lee la X de Simon
 	sub (ix+005h)		;af43
 	ret nc			;af46
 	neg		;af47
 	ret			;af49
 L_AF4A:
 	ld de,00000h		;af4a
-	call L_A55D		;af4d
+	call pon_velocidad_y		;af4d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+011h),030h		;af50
 	xor a			;af54
 	ld (ix+02fh),a		;af55
@@ -2041,7 +2041,7 @@ L_AF4A:
 	ret			;af5e
 L_AF5F:
 	ld a,(ix+001h)		;af5f
-	call 0406bh		;af62
+	call 0406bh		;af62   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_AF65: 3 destinos del despachador de 0x406B (call en p03:AF62):
@@ -2079,7 +2079,7 @@ L_AF7E:
 	ld (ix+006h),001h		;af96
 	ret			;af9a
 L_AF9B:
-	ld a,(0c427h)		;af9b
+	ld a,(0c427h)		;af9b   ; lee la X de Simon
 	sub (ix+005h)		;af9e
 	jr c,L_AFB0		;afa1
 	ld (ix+012h),000h		;afa3
@@ -2102,7 +2102,7 @@ L_AFCB:
 	add a,c			;afcb
 	ld d,a			;afcc
 	ld e,(ix+003h)		;afcd
-	call 07b98h		;afd0
+	call 07b98h		;afd0   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr nc,L_AFFD		;afd3
 	ld d,(ix+005h)		;afd5
 	ld e,(ix+003h)		;afd8
@@ -2129,7 +2129,7 @@ L_AFFD:
 	ld (ix+012h),a		;b002
 	ld e,(ix+009h)		;b005
 	ld d,(ix+00ah)		;b008
-	call L_A17C		;b00b
+	call niega_de		;b00b   ; niega_de: DE = -DE
 	call L_A653		;b00e
 L_B011:
 	bit 2,(ix+00ch)		;b011
@@ -2185,7 +2185,7 @@ L_B07B:
 	ret nz			;b081
 	ld (ix+00ch),010h		;b082
 L_B086:
-	ld a,(0c425h)		;b086
+	ld a,(0c425h)		;b086   ; lee la Y de Simon
 	ld de,0ff00h		;b089
 	inc a			;b08c
 	cp (ix+003h)		;b08d
@@ -2196,15 +2196,15 @@ L_B086:
 	jr nc,L_B09F		;b09a
 	ld de,00000h		;b09c
 L_B09F:
-	call L_A55D		;b09f
+	call pon_velocidad_y		;b09f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,0fee0h		;b0a2
-	ld hl,0c427h		;b0a5
+	ld hl,0c427h		;b0a5   ; apunta a la X de Simon
 	ld a,(ix+005h)		;b0a8
 	sub (hl)			;b0ab
 	jr nc,L_B0B1		;b0ac
 	ld de,00120h		;b0ae
 L_B0B1:
-	call L_A56C		;b0b1
+	call pon_velocidad_x		;b0b1   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ret			;b0b4
 L_B0B5:
 	ld a,016h		;b0b5
@@ -2222,11 +2222,11 @@ L_B0CA:
 	ld (ix+001h),002h		;b0ca
 L_B0CE:
 	ld de,00180h		;b0ce
-	call L_A55D		;b0d1
+	call pon_velocidad_y		;b0d1   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00300h		;b0d4
-	ld a,(0c427h)		;b0d7
+	ld a,(0c427h)		;b0d7   ; lee la X de Simon
 	sub (ix+005h)		;b0da
-	call c,L_A17C		;b0dd
+	call c,niega_de		;b0dd   ; niega_de: DE = -DE
 	call L_A653		;b0e0
 	ld (ix+006h),001h		;b0e3
 	ld (ix+011h),000h		;b0e7
@@ -2243,12 +2243,12 @@ L_B0F8:
 	jp z,L_B17F		;b0ff
 	ld (ix+00bh),01ah		;b102
 	ld (ix+006h),000h		;b106
-	ld a,(0c425h)		;b10a
+	ld a,(0c425h)		;b10a   ; lee la Y de Simon
 	sub (ix+003h)		;b10d
 	cp 050h		;b110
 	ret nc			;b112
 	ld c,01bh		;b113
-	ld a,(0c427h)		;b115
+	ld a,(0c427h)		;b115   ; lee la X de Simon
 	sub (ix+005h)		;b118
 	ld de,00180h		;b11b
 	jr nc,L_B127		;b11e
@@ -2259,14 +2259,14 @@ L_B127:
 	cp 040h		;b127
 	ret nc			;b129
 	ld (ix+00bh),c		;b12a
-	call L_A56C		;b12d
+	call pon_velocidad_x		;b12d   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+006h),001h		;b130
 	ld de,00180h		;b134
-	call L_A55D		;b137
+	call pon_velocidad_y		;b137   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	inc (ix+001h)		;b13a
 	ret			;b13d
 L_B13E:
-	ld a,(0c425h)		;b13e
+	ld a,(0c425h)		;b13e   ; lee la Y de Simon
 	sub (ix+005h)		;b141
 	sub 004h		;b144
 	cp 010h		;b146
@@ -2288,7 +2288,7 @@ L_B15D:
 	jr z,L_B16F		;b16a
 	ld hl,0b17bh		;b16c
 L_B16F:
-	call 04061h		;b16f
+	call 04061h		;b16f   ; hl_mas_a: HL += A
 	ld a,(hl)			;b172
 	ld (ix+00bh),a		;b173
 	ret			;b176
@@ -2313,7 +2313,7 @@ L_B17F:
 	jr c,L_B190		;b18b
 	ld de,0ffe7h		;b18d
 L_B190:
-	jp L_A549		;b190
+	jp suma_a_la_velocidad_y		;b190
 L_B193:
 	call L_B212		;b193
 	ld (ix+011h),000h		;b196
@@ -2330,19 +2330,19 @@ L_B1AD:
 	add a,b			;b1ad
 	ld d,a			;b1ae
 	push ix		;b1af
-	call 05f1dh		;b1b1
+	call 05f1dh		;b1b1   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop ix		;b1b4
 	ld a,(0cf31h)		;b1b6
 	and a			;b1b9
 	ret nz			;b1ba
 	ld a,001h		;b1bb
 	ld (0cf0ch),a		;b1bd
-	jp 099f6h		;b1c0
+	jp 099f6h		;b1c0   ; borra_la_cosa: tipo a cero y sus sprites libres
 L_B1C3:
 	call L_B1E7		;b1c3
 	bit 0,(ix+001h)		;b1c6
 	jr nz,L_B1DE		;b1ca
-	call L_AF40		;b1cc
+	call distancia_horizontal		;b1cc
 	cp 038h		;b1cf
 	ret nc			;b1d1
 	ld (ix+00ch),008h		;b1d2
@@ -2372,7 +2372,7 @@ L_B1E7:
 	ld (ix+011h),000h		;b205
 L_B209:
 	ld hl,0b20fh		;b209
-	jp L_A62F		;b20c
+	jp dibujo_de_la_tabla		;b20c   ; dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 
 ; ----------------------------------------------------------------------
 ; DATOS tres_dibujos_B20F: tres dibujos que p03:B209 pasa a 0xA62F
@@ -2404,12 +2404,12 @@ L_B234:
 	ld de,0fd80h		;b234
 	ld (ix+00bh),067h		;b237
 	ld (ix+010h),001h		;b23b
-	call L_A56C		;b23f
+	call pon_velocidad_x		;b23f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00000h		;b242
-	jp L_A55D		;b245
+	jp pon_velocidad_y		;b245   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B248:
 	ld a,(ix+001h)		;b248
-	call 0406bh		;b24b
+	call 0406bh		;b24b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B24E: 5 destinos del despachador de 0x406B (call en p03:B24B):
@@ -2428,18 +2428,18 @@ DATA_tabla_B24E:
 
 
 L_B258:
-	call L_AF40		;b258
+	call distancia_horizontal		;b258
 	cp 03ch		;b25b
 	ret nc			;b25d
 	ld de,00000h		;b25e
-	call L_A56C		;b261
+	call pon_velocidad_x		;b261   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	inc (ix+001h)		;b264
 	ret			;b267
 L_B268:
 	call L_B33E		;b268
 	ld d,(ix+005h)		;b26b
 	ld e,(ix+003h)		;b26e
-	call 07b98h		;b271
+	call 07b98h		;b271   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr c,L_B276		;b274
 L_B276:
 	inc (ix+001h)		;b276
@@ -2451,7 +2451,7 @@ L_B279:
 L_B285:
 	ld c,000h		;b285
 	ld hl,0b33ah		;b287
-	call L_AD37		;b28a
+	call dibujo_segun_simon		;b28a   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	dec (ix+00ch)		;b28d
 	ret nz			;b290
 	inc (ix+001h)		;b291
@@ -2464,19 +2464,19 @@ L_B285:
 	jr nz,L_B2A7		;b2a2
 	ld de,0f8e0h		;b2a4
 L_B2A7:
-	call L_A55D		;b2a7
+	call pon_velocidad_y		;b2a7   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B2AA:
 	ld (ix+006h),001h		;b2aa
 	ld de,00220h		;b2ae
-	ld a,(0c427h)		;b2b1
+	ld a,(0c427h)		;b2b1   ; lee la X de Simon
 	cp (ix+005h)		;b2b4
 	jr nc,L_B2BC		;b2b7
 	ld de,0fde0h		;b2b9
 L_B2BC:
-	call L_A56C		;b2bc
+	call pon_velocidad_x		;b2bc   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld c,001h		;b2bf
 	ld hl,0b33ah		;b2c1
-	jp L_AD37		;b2c4
+	jp dibujo_segun_simon		;b2c4   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 L_B2C7:
 	call L_B33E		;b2c7
 	call L_B300		;b2ca
@@ -2489,16 +2489,16 @@ L_B2C7:
 	ld a,e			;b2df
 	sub 010h		;b2e0
 	ld e,a			;b2e2
-	call 07b98h		;b2e3
+	call 07b98h		;b2e3   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;b2e6
 	ld de,00000h		;b2e7
-	jp L_A55D		;b2ea
+	jp pon_velocidad_y		;b2ea   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B2ED:
-	call 07b98h		;b2ed
+	call 07b98h		;b2ed   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;b2f0
 	ld c,000h		;b2f1
 	ld hl,0b33ah		;b2f3
-	call L_AD37		;b2f6
+	call dibujo_segun_simon		;b2f6   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	ld (ix+001h),002h		;b2f9
 	jp L_B279		;b2fd
 L_B300:
@@ -2514,15 +2514,15 @@ L_B300:
 L_B31A:
 	ld c,000h		;b31a
 	ld hl,0b33ah		;b31c
-	call L_AD37		;b31f
-	call L_AF40		;b322
+	call dibujo_segun_simon		;b31f   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
+	call distancia_horizontal		;b322
 	cp 03ch		;b325
 	jr c,L_B32D		;b327
 	dec (ix+00ch)		;b329
 	ret nz			;b32c
 L_B32D:
 	ld de,0ffffh		;b32d
-	call L_A55D		;b330
+	call pon_velocidad_y		;b330   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+001h),003h		;b333
 	jp L_B2AA		;b337
 
@@ -2540,9 +2540,9 @@ DATA_dibujos_B33A:
 
 L_B33E:
 	ld de,000a0h		;b33e
-	jp L_A549		;b341
+	jp suma_a_la_velocidad_y		;b341
 L_B344:
-	ld a,(0c427h)		;b344
+	ld a,(0c427h)		;b344   ; lee la X de Simon
 	ld b,(ix+005h)		;b347
 	cp b			;b34a
 	ld de,00240h		;b34b
@@ -2551,11 +2551,11 @@ L_B344:
 L_B353:
 	call L_A653		;b353
 	ld de,00000h		;b356
-	call L_A55D		;b359
+	call pon_velocidad_y		;b359   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+006h),001h		;b35c
 	ld (ix+011h),000h		;b360
 L_B364:
-	ld a,(0c427h)		;b364
+	ld a,(0c427h)		;b364   ; lee la X de Simon
 	cp (ix+005h)		;b367
 	ld c,047h		;b36a
 	jr c,L_B370		;b36c
@@ -2571,7 +2571,7 @@ L_B37A:
 L_B37E:
 	call L_B364		;b37e
 	ld a,(ix+001h)		;b381
-	call 0406bh		;b384
+	call 0406bh		;b384   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B387: 3 destinos del despachador de 0x406B (call en p03:B384):
@@ -2588,7 +2588,7 @@ DATA_tabla_B387:
 
 
 L_B38D:
-	ld a,(0c427h)		;b38d
+	ld a,(0c427h)		;b38d   ; lee la X de Simon
 	ld b,a			;b390
 	ld a,(ix+005h)		;b391
 	add a,030h		;b394
@@ -2602,7 +2602,7 @@ L_B38D:
 	ld de,00240h		;b3a4
 	jr L_B3C3		;b3a7
 L_B3A9:
-	ld a,(0c427h)		;b3a9
+	ld a,(0c427h)		;b3a9   ; lee la X de Simon
 	ld b,a			;b3ac
 	ld a,(ix+005h)		;b3ad
 	add a,050h		;b3b0
@@ -2639,7 +2639,7 @@ L_B3F8:
 	call 07c1ah		;b3f8
 	jr nc,L_B403		;b3fb
 	ld de,00240h		;b3fd
-	call L_A56C		;b400
+	call pon_velocidad_x		;b400   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_B403:
 	ld e,(ix+003h)		;b403
 	ld a,(ix+00ah)		;b406
@@ -2653,14 +2653,14 @@ L_B415:
 	ld a,(ix+005h)		;b415
 	add a,b			;b418
 	ld d,a			;b419
-	call 07b98h		;b41a
+	call 07b98h		;b41a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr c,L_B437		;b41d
 	ld de,00240h		;b41f
 	bit 7,(ix+00ah)		;b422
-	call nz,L_A17C		;b426
-	call L_A56C		;b429
+	call nz,niega_de		;b426   ; niega_de: DE = -DE
+	call pon_velocidad_x		;b429   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,0fb8fh		;b42c
-	call L_A55D		;b42f
+	call pon_velocidad_y		;b42f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+001h),001h		;b432
 	ret			;b436
 L_B437:
@@ -2689,10 +2689,10 @@ L_B467:
 	jr nc,L_B472		;b46a
 L_B46C:
 	ld de,00000h		;b46c
-	call L_A56C		;b46f
+	call pon_velocidad_x		;b46f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_B472:
 	ld de,00068h		;b472
-	call L_A549		;b475
+	call suma_a_la_velocidad_y		;b475
 	bit 7,(ix+008h)		;b478
 	ret nz			;b47c
 	ld e,(ix+003h)		;b47d
@@ -2708,14 +2708,14 @@ L_B490:
 	ld a,(ix+005h)		;b490
 	add a,b			;b493
 	ld d,a			;b494
-	call 07b98h		;b495
+	call 07b98h		;b495   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;b498
 	xor a			;b499
 	ld (ix+001h),a		;b49a
 	ld (ix+002h),a		;b49d
 	call L_A9A2		;b4a0
 	ld de,00000h		;b4a3
-	jp L_A55D		;b4a6
+	jp pon_velocidad_y		;b4a6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B4A9:
 	dec (ix+010h)		;b4a9
 	ret nz			;b4ac
@@ -2725,7 +2725,7 @@ L_B4A9:
 	jr nc,L_B4B8		;b4b3
 	ld hl,0f800h		;b4b5
 L_B4B8:
-	ld a,(0c427h)		;b4b8
+	ld a,(0c427h)		;b4b8   ; lee la X de Simon
 	cp (ix+005h)		;b4bb
 	ld de,00180h		;b4be
 	jr nc,L_B4C6		;b4c1
@@ -2740,14 +2740,14 @@ L_B4D2:
 	ld (ix+006h),001h		;b4d5
 	ld de,00000h		;b4d9
 	ld (ix+00eh),e		;b4dc
-	call L_A56C		;b4df
-	call L_A55D		;b4e2
+	call pon_velocidad_x		;b4df   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+	call pon_velocidad_y		;b4e2   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+010h),008h		;b4e5
 	ret			;b4e9
 L_B4EA:
 	call L_B611		;b4ea
 	ld a,(ix+001h)		;b4ed
-	call 0406bh		;b4f0
+	call 0406bh		;b4f0   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B4F3: 4 destinos del despachador de 0x406B (call en p03:B4F0):
@@ -2768,7 +2768,7 @@ L_B4FB:
 	call L_B589		;b4fb
 	ret nz			;b4fe
 	ld de,00200h		;b4ff
-	call L_A55D		;b502
+	call pon_velocidad_y		;b502   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+00eh),007h		;b505
 	inc (ix+001h)		;b509
 	ret			;b50c
@@ -2793,15 +2793,15 @@ L_B526:
 	jp nc,L_B5EF		;b536
 	call L_B5AE		;b539
 	ld de,00000h		;b53c
-	call c,L_A56C		;b53f
+	call c,pon_velocidad_x		;b53f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	call L_B59E		;b542
 	jr c,L_B54B		;b545
 	dec (ix+010h)		;b547
 	ret nz			;b54a
 L_B54B:
 	ld de,00000h		;b54b
-	call L_A55D		;b54e
-	call L_A56C		;b551
+	call pon_velocidad_y		;b54e   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	call pon_velocidad_x		;b551   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld a,(ix+003h)		;b554
 	and 0f8h		;b557
 	ld (ix+003h),a		;b559
@@ -2812,11 +2812,11 @@ L_B54B:
 L_B569:
 	call L_B5AE		;b569
 	ld de,00000h		;b56c
-	call c,L_A56C		;b56f
+	call c,pon_velocidad_x		;b56f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	call L_B5E0		;b572
 	jr c,L_B57F		;b575
 	ld de,00040h		;b577
-	call L_A549		;b57a
+	call suma_a_la_velocidad_y		;b57a
 	xor a			;b57d
 	ret			;b57e
 L_B57F:
@@ -2834,7 +2834,7 @@ L_B58E:
 	call L_B600		;b592
 	ld de,00200h		;b595
 	ld de,0fd00h		;b598
-	jp L_A55D		;b59b
+	jp pon_velocidad_y		;b59b   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B59E:
 	ld a,(ix+005h)		;b59e
 	bit 7,(ix+00ah)		;b5a1
@@ -2855,7 +2855,7 @@ L_B5AE:
 	jp z,07bb7h		;b5bb
 	jp 07c13h		;b5be
 L_B5C1:
-	ld a,(0c425h)		;b5c1
+	ld a,(0c425h)		;b5c1   ; lee la Y de Simon
 	sub 010h		;b5c4
 	cp (ix+003h)		;b5c6
 	ccf			;b5c9
@@ -2879,27 +2879,27 @@ L_B5E0:
 	jp 07ba3h		;b5ec
 L_B5EF:
 	ld de,00000h		;b5ef
-	call L_A56C		;b5f2
+	call pon_velocidad_x		;b5f2   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00200h		;b5f5
-	call L_A55D		;b5f8
+	call pon_velocidad_y		;b5f8   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+001h),001h		;b5fb
 	ret			;b5ff
 L_B600:
-	ld a,(0c427h)		;b600
+	ld a,(0c427h)		;b600   ; lee la X de Simon
 	cp (ix+005h)		;b603
 	ld de,001c0h		;b606
 	jr nc,L_B60E		;b609
 	ld de,0fe40h		;b60b
 L_B60E:
-	jp L_A56C		;b60e
+	jp pon_velocidad_x		;b60e   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_B611:
-	ld a,(0d000h)		;b611
+	ld a,(0d000h)		;b611   ; lee la FASE (0 el patio, 1-18)
 	ld de,L_B63E+1		;b614
-	call 06542h		;b617
-	ld a,(0d001h)		;b61a
+	call 06542h		;b617   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
+	ld a,(0d001h)		;b61a   ; lee la HABITACION dentro de la fase
 	srl a		;b61d
 	push af			;b61f
-	call 04066h		;b620
+	call 04066h		;b620   ; de_mas_a: DE += A
 	pop af			;b623
 	ld a,(de)			;b624
 	jr c,L_B62B		;b625
@@ -2910,7 +2910,7 @@ L_B611:
 L_B62B:
 	and 00fh		;b62b
 	ld hl,0b642h		;b62d
-	call 04061h		;b630
+	call 04061h		;b630   ; hl_mas_a: HL += A
 	ld a,(hl)			;b633
 	inc (ix+00ch)		;b634
 	bit 4,(ix+00ch)		;b637
@@ -2945,7 +2945,7 @@ L_B6AB:
 	ld a,(0ce00h)		;b6b1
 	dec a			;b6b4
 	ret m			;b6b5
-	call 0406bh		;b6b6
+	call 0406bh		;b6b6   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B6B9: 6 destinos del despachador de 0x406B (call en p03:B6B6):
@@ -2967,7 +2967,7 @@ DATA_tabla_B6B9:
 
 L_B6C5:
 	ld a,(0ce10h)		;b6c5
-	call 0406bh		;b6c8
+	call 0406bh		;b6c8   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B6CB: 7 destinos del despachador de 0x406B (call en p03:B6C8):
@@ -3008,7 +3008,7 @@ L_B6ED:
 	ld (0ce14h),a		;b6f4
 	ld c,022h		;b6f7
 	ld de,07840h		;b6f9
-	call 05f1dh		;b6fc
+	call 05f1dh		;b6fc   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	ld a,0b4h		;b6ff
 	ld (0ce02h),a		;b701
 	jr L_B6E8		;b704
@@ -3027,24 +3027,24 @@ L_B706:
 	ld a,090h		;b71b
 	ld (0ce02h),a		;b71d
 	ld a,08ch		;b720
-	jp 0509fh		;b722
+	jp 0509fh		;b722   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_B725:
 	ld a,000h		;b725
-	call 0509fh		;b727
+	call 0509fh		;b727   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,08ch		;b72a
-	call 0509fh		;b72c
+	call 0509fh		;b72c   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld a,096h		;b72f
 	ld (0ce02h),a		;b731
 	jr L_B6E8		;b734
 L_B736:
-	ld a,(0c003h)		;b736
+	ld a,(0c003h)		;b736   ; lee el contador de cuadros
 	rra			;b739
 	ret c			;b73a
-	ld a,(0c415h)		;b73b
+	ld a,(0c415h)		;b73b   ; lee la vida de Simon
 	cp 020h		;b73e
 	jr nc,L_B74A		;b740
 	ld a,001h		;b742
-	call 0509fh		;b744
+	call 0509fh		;b744   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	jp 04651h		;b747
 L_B74A:
 	ld a,03ch		;b74a
@@ -3055,7 +3055,7 @@ L_B751:
 	dec (hl)			;b754
 	ret nz			;b755
 	ld a,0e0h		;b756
-	ld (0c425h),a		;b758
+	ld (0c425h),a		;b758   ; guarda la Y de Simon
 	ld hl,0d600h		;b75b
 	ld b,080h		;b75e
 L_B760:
@@ -3081,12 +3081,12 @@ L_B777:
 	ld (ix+00ch),000h		;b78d
 	ld (ix+07eh),000h		;b791
 	ld de,00000h		;b795
-	call L_A56C		;b798
+	call pon_velocidad_x		;b798   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,00100h		;b79b
-	jp L_A55D		;b79e
+	jp pon_velocidad_y		;b79e   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B7A1:
 	ld a,(ix+001h)		;b7a1
-	call 0406bh		;b7a4
+	call 0406bh		;b7a4   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B7A7: 3 destinos del despachador de 0x406B (call en p03:B7A4):
@@ -3103,7 +3103,7 @@ DATA_tabla_B7A7:
 
 
 L_B7AD:
-	ld a,(0c003h)		;b7ad
+	ld a,(0c003h)		;b7ad   ; lee el contador de cuadros
 	and 001h		;b7b0
 	ld c,0ffh		;b7b2
 	jr nz,L_B7B7		;b7b4
@@ -3118,7 +3118,7 @@ L_B7B7:
 	inc (ix+001h)		;b7c7
 	ret			;b7ca
 L_B7CB:
-	ld a,(0d000h)		;b7cb
+	ld a,(0d000h)		;b7cb   ; lee la FASE (0 el patio, 1-18)
 	ld de,0b7fah		;b7ce
 	sub 003h		;b7d1
 	jr z,L_B7D8		;b7d3
@@ -3130,7 +3130,7 @@ L_B7D8:
 	add a,a			;b7de
 	add a,a			;b7df
 	add a,b			;b7e0
-	call 04066h		;b7e1
+	call 04066h		;b7e1   ; de_mas_a: DE += A
 	push ix		;b7e4
 	pop hl			;b7e6
 	ld a,025h		;b7e7
@@ -3167,7 +3167,7 @@ L_B818:
 	call L_B83F		;b818
 	ld e,(ix+003h)		;b81b
 	ld d,(ix+005h)		;b81e
-	call 07b98h		;b821
+	call 07b98h		;b821   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;b824
 	ld (ix+006h),000h		;b825
 	ld (ix+00bh),08fh		;b829
@@ -3184,7 +3184,7 @@ L_B83F:
 	rra			;b845
 	and 003h		;b846
 	ld hl,0b853h		;b848
-	call 04061h		;b84b
+	call 04061h		;b84b   ; hl_mas_a: HL += A
 	ld a,(hl)			;b84e
 	ld (ix+00bh),a		;b84f
 	ret			;b852
@@ -3202,8 +3202,8 @@ DATA_cuatro_dibujos_B853:
 
 
 L_B857:
-	ld a,(0ce01h)		;b857
-	call 0406bh		;b85a
+	ld a,(0ce01h)		;b857   ; lee el paso de la escena
+	call 0406bh		;b85a   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B85D: 2 destinos del despachador de 0x406B (call en p03:B85A):
@@ -3221,11 +3221,11 @@ DATA_tabla_B85D:
 L_B861:
 	ld c,014h		;b861
 	ld de,030c5h		;b863
-	call 05f1dh		;b866
+	call 05f1dh		;b866   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	ld c,014h		;b869
 	ld de,0d0c5h		;b86b
-	call 05f1dh		;b86e
-	jp L_BE3D		;b871
+	call 05f1dh		;b86e   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
+	jp siguiente_paso		;b871   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_B874:
 	ld a,(0ce15h)		;b874
 	and a			;b877
@@ -3235,13 +3235,13 @@ L_B87C:
 	ld (ix+00bh),036h		;b87c
 	ld (ix+010h),020h		;b880
 	ld de,00000h		;b884
-	call L_A55D		;b887
+	call pon_velocidad_y		;b887   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+014h),002h		;b88a
 	ld (ix+015h),001h		;b88e
 	ret			;b892
 L_B893:
 	ld a,(ix+001h)		;b893
-	call 0406bh		;b896
+	call 0406bh		;b896   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_B899: 4 destinos del despachador de 0x406B (call en p03:B896):
@@ -3267,13 +3267,13 @@ L_B8A1:
 L_B8AD:
 	ld de,0fdd0h		;b8ad
 	ld (ix+012h),001h		;b8b0
-	ld a,(0c427h)		;b8b4
+	ld a,(0c427h)		;b8b4   ; lee la X de Simon
 	cp (ix+005h)		;b8b7
 	jr c,L_B8C3		;b8ba
 	ld de,00230h		;b8bc
 	ld (ix+012h),000h		;b8bf
 L_B8C3:
-	call L_A56C		;b8c3
+	call pon_velocidad_x		;b8c3   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	inc (ix+001h)		;b8c6
 	ld (ix+013h),007h		;b8c9
 	jp L_B9B6		;b8cd
@@ -3290,22 +3290,22 @@ L_B8D0:
 	jr nz,L_B90D		;b8ec
 	jr L_B8F8		;b8ee
 L_B8F0:
-	ld a,(0c427h)		;b8f0
+	ld a,(0c427h)		;b8f0   ; lee la X de Simon
 	cp (ix+005h)		;b8f3
 	jr nc,L_B90D		;b8f6
 L_B8F8:
 	ld de,0fdd0h		;b8f8
-	call L_A56C		;b8fb
+	call pon_velocidad_x		;b8fb   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+012h),001h		;b8fe
-	ld a,(0c427h)		;b902
+	ld a,(0c427h)		;b902   ; lee la X de Simon
 	cp (ix+005h)		;b905
 	jr c,L_B922		;b908
 	call L_B9CF		;b90a
 L_B90D:
 	ld de,00230h		;b90d
-	call L_A56C		;b910
+	call pon_velocidad_x		;b910   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+012h),000h		;b913
-	ld a,(0c427h)		;b917
+	ld a,(0c427h)		;b917   ; lee la X de Simon
 	cp (ix+005h)		;b91a
 	jr nc,L_B922		;b91d
 	jp L_B9CF		;b91f
@@ -3323,12 +3323,12 @@ L_B930:
 L_B93A:
 	bit 7,(ix+00ah)		;b93a
 	ld de,00230h		;b93e
-	call L_A56C		;b941
+	call pon_velocidad_x		;b941   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+012h),000h		;b944
 	ld (ix+005h),020h		;b948
 	jr nz,L_B95B		;b94c
 	ld de,0fdd0h		;b94e
-	call L_A56C		;b951
+	call pon_velocidad_x		;b951   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+005h),0e0h		;b954
 	inc (ix+012h)		;b958
 L_B95B:
@@ -3359,13 +3359,13 @@ L_B985:
 	ld a,(ix+012h)		;b993
 	rrca			;b996
 	xor d			;b997
-	call m,L_A17C		;b998
+	call m,niega_de		;b998   ; niega_de: DE = -DE
 	ld a,(ix+003h)		;b99b
 	sub 018h		;b99e
 	ld c,a			;b9a0
 	ld b,(ix+005h)		;b9a1
 	ld a,014h		;b9a4
-	call 09f6dh		;b9a6
+	call 09f6dh		;b9a6   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	ld a,00ah		;b9a9
 	call L_A4E8		;b9ab
 	dec (ix+001h)		;b9ae
@@ -3376,7 +3376,7 @@ L_B9B6:
 	or 080h		;b9b8
 	ld hl,0b9c7h		;b9ba
 	and 007h		;b9bd
-	call 04061h		;b9bf
+	call 04061h		;b9bf   ; hl_mas_a: HL += A
 	ld a,(hl)			;b9c2
 	ld (ix+010h),a		;b9c3
 	ret			;b9c6
@@ -3422,7 +3422,7 @@ L_BA03:
 	ld (ix+015h),001h		;ba11
 L_BA15:
 	ld a,(ix+014h)		;ba15
-	call 04061h		;ba18
+	call 04061h		;ba18   ; hl_mas_a: HL += A
 	ld a,(hl)			;ba1b
 	ld (ix+00bh),a		;ba1c
 	ret			;ba1f
@@ -3440,8 +3440,8 @@ DATA_dos_animaciones_BA20:
 
 
 L_BA26:
-	ld a,(0ce01h)		;ba26
-	call 0406bh		;ba29
+	ld a,(0ce01h)		;ba26   ; lee el paso de la escena
+	call 0406bh		;ba29   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BA2C: 2 destinos del despachador de 0x406B (call en p03:BA29):
@@ -3461,11 +3461,11 @@ L_BA30:
 	ld (0ce07h),a		;ba31
 	ld c,015h		;ba34
 	ld de,0d0c0h		;ba36
-	call 05f1dh		;ba39
+	call 05f1dh		;ba39   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	ld c,018h		;ba3c
 	ld de,0d0a0h		;ba3e
-	call 05f1dh		;ba41
-	jp L_BE3D		;ba44
+	call 05f1dh		;ba41   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
+	jp siguiente_paso		;ba44   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_BA47:
 	ld a,(0ce15h)		;ba47
 	and a			;ba4a
@@ -3476,8 +3476,8 @@ L_BA4F:
 	ld (ix+010h),030h		;ba53
 	ld (ix+006h),001h		;ba57
 	ld de,00000h		;ba5b
-	call L_A56C		;ba5e
-	jp L_A55D		;ba61
+	call pon_velocidad_x		;ba5e   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+	jp pon_velocidad_y		;ba61   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_BA64:
 	ld a,(ix+010h)		;ba64
 	and a			;ba67
@@ -3487,7 +3487,7 @@ L_BA64:
 	dec a			;ba71
 	jr z,L_BA97		;ba72
 	ld (ix+00ch),020h		;ba74
-	ld a,(0c427h)		;ba78
+	ld a,(0c427h)		;ba78   ; lee la X de Simon
 	sub (ix+005h)		;ba7b
 	jr nc,L_BA89		;ba7e
 	add a,040h		;ba80
@@ -3498,7 +3498,7 @@ L_BA89:
 	ld de,00220h		;ba89
 L_BA8C:
 	ld (0ce09h),de		;ba8c
-	call L_A56C		;ba90
+	call pon_velocidad_x		;ba90   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	inc (ix+001h)		;ba93
 	ret			;ba96
 L_BA97:
@@ -3514,10 +3514,10 @@ L_BAA3:
 	cp 010h		;baaa
 	ret nc			;baac
 	ld de,00220h		;baad
-	jp L_A56C		;bab0
+	jp pon_velocidad_x		;bab0   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BAB3:
 	ld de,0fde0h		;bab3
-	jp L_A56C		;bab6
+	jp pon_velocidad_x		;bab6   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BAB9:
 	ld hl,0bacfh		;bab9
 	inc (ix+011h)		;babc
@@ -3526,7 +3526,7 @@ L_BAB9:
 	rra			;bac3
 	rra			;bac4
 	and 003h		;bac5
-	call 04061h		;bac7
+	call 04061h		;bac7   ; hl_mas_a: HL += A
 	ld a,(hl)			;baca
 	ld (ix+00bh),a		;bacb
 	ret			;bace
@@ -3553,8 +3553,8 @@ L_BADD:
 	ld (ix+006h),001h		;badd
 	ld (ix+010h),000h		;bae1
 	ld de,00000h		;bae5
-	call L_A55D		;bae8
-	call L_A56C		;baeb
+	call pon_velocidad_y		;bae8   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	call pon_velocidad_x		;baeb   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	call L_BBE1		;baee
 	xor a			;baf1
 	ld (ix+011h),a		;baf2
@@ -3572,13 +3572,13 @@ L_BAF6:
 	jr z,L_BB18		;bb08
 	ld (ix+011h),000h		;bb0a
 	ld de,0fa00h		;bb0e
-	call L_A55D		;bb11
+	call pon_velocidad_y		;bb11   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	inc (ix+001h)		;bb14
 	ret			;bb17
 L_BB18:
 	ld (ix+00bh),067h		;bb18
 	ld de,(0ce09h)		;bb1c
-	jp L_A56C		;bb20
+	jp pon_velocidad_x		;bb20   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BB23:
 	call L_BBC0		;bb23
 	ret c			;bb26
@@ -3592,7 +3592,7 @@ L_BB34:
 	call L_BBE6		;bb34
 	call L_BBD4		;bb37
 	ld de,00060h		;bb3a
-	call L_A549		;bb3d
+	call suma_a_la_velocidad_y		;bb3d
 	ld a,(ix+005h)		;bb40
 	cp 0e8h		;bb43
 	ld e,(ix+009h)		;bb45
@@ -3606,7 +3606,7 @@ L_BB34:
 	ret nz			;bb59
 	ld e,(ix+003h)		;bb5a
 	ld d,(ix+005h)		;bb5d
-	call 07b98h		;bb60
+	call 07b98h		;bb60   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;bb63
 	ld c,069h		;bb64
 	call L_BBE6		;bb66
@@ -3620,13 +3620,13 @@ L_BB34:
 L_BB7D:
 	bit 7,d		;bb7d
 	ret nz			;bb7f
-	call L_A17C		;bb80
-	jp L_A56C		;bb83
+	call niega_de		;bb80   ; niega_de: DE = -DE
+	jp pon_velocidad_x		;bb83   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BB86:
 	bit 7,d		;bb86
 	ret z			;bb88
-	call L_A17C		;bb89
-	jp L_A56C		;bb8c
+	call niega_de		;bb89   ; niega_de: DE = -DE
+	jp pon_velocidad_x		;bb8c   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BB8F:
 	call L_BBC0		;bb8f
 	ld (ix+006h),000h		;bb92
@@ -3645,7 +3645,7 @@ L_BBA8:
 	ld h,000h		;bbad
 	add hl,hl			;bbaf
 	add hl,de			;bbb0
-	call L_A55D		;bbb1
+	call pon_velocidad_y		;bbb1   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+006h),001h		;bbb4
 	xor a			;bbb8
 	ld (ix+011h),a		;bbb9
@@ -3680,8 +3680,8 @@ L_BBEF:
 	ld (ix+00bh),a		;bbef
 	ret			;bbf2
 L_BBF3:
-	ld a,(0ce01h)		;bbf3
-	call 0406bh		;bbf6
+	ld a,(0ce01h)		;bbf3   ; lee el paso de la escena
+	call 0406bh		;bbf6   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BBF9: 2 destinos del despachador de 0x406B (call en p03:BBF6):
@@ -3699,14 +3699,14 @@ DATA_tabla_BBF9:
 L_BBFD:
 	ld de,0a090h		;bbfd
 	ld c,016h		;bc00
-	call 05f1dh		;bc02
+	call 05f1dh		;bc02   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	call L_BC29		;bc05
 	call L_BC29		;bc08
 	call L_BC29		;bc0b
 	call L_BC29		;bc0e
 	xor a			;bc11
 	ld (0ce02h),a		;bc12
-	jp L_BE3D		;bc15
+	jp siguiente_paso		;bc15   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_BC18:
 	ld a,(0ce15h)		;bc18
 	and a			;bc1b
@@ -3723,7 +3723,7 @@ L_BC29:
 	and 007h		;bc2e
 	add a,a			;bc30
 	ld hl,0bc44h		;bc31
-	call 04061h		;bc34
+	call 04061h		;bc34   ; hl_mas_a: HL += A
 	ld c,(hl)			;bc37
 	inc hl			;bc38
 	ld b,(hl)			;bc39
@@ -3731,7 +3731,7 @@ L_BC29:
 	ld h,e			;bc3d
 	ld l,e			;bc3e
 	ld a,016h		;bc3f
-	jp 09f6dh		;bc41
+	jp 09f6dh		;bc41   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 
 ; ----------------------------------------------------------------------
 ; DATOS ocho_pares: ocho pares que p03:BC31 indexa con los tres bits bajos de
@@ -3747,9 +3747,9 @@ DATA_ocho_pares:
 
 L_BC54:
 	ld de,0fd80h		;bc54
-	call L_A56C		;bc57
+	call pon_velocidad_x		;bc57   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld de,0fe00h		;bc5a
-	call L_A55D		;bc5d
+	call pon_velocidad_y		;bc5d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+006h),000h		;bc60
 	ld (ix+00ch),01eh		;bc64
 	ld (ix+00bh),07ch		;bc68
@@ -3769,7 +3769,7 @@ L_BC7F:
 	ld hl,00008h		;bc85
 	add hl,de			;bc88
 	ex de,hl			;bc89
-	call L_A55D		;bc8a
+	call pon_velocidad_y		;bc8a   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld e,(ix+009h)		;bc8d
 	ld d,(ix+00ah)		;bc90
 	ld a,(ix+005h)		;bc93
@@ -3786,28 +3786,28 @@ L_BC7F:
 	ld d,(ix+008h)		;bcac
 	bit 7,d		;bcaf
 	jr z,L_BCB9		;bcb1
-	call L_A17C		;bcb3
-	call L_A55D		;bcb6
+	call niega_de		;bcb3   ; niega_de: DE = -DE
+	call pon_velocidad_y		;bcb6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_BCB9:
 	ld e,(ix+003h)		;bcb9
 	ld d,(ix+005h)		;bcbc
-	call 07b98h		;bcbf
+	call 07b98h		;bcbf   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	ret nc			;bcc2
 	ld de,0fd00h		;bcc3
-	jp L_A55D		;bcc6
+	jp pon_velocidad_y		;bcc6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_BCC9:
 	bit 7,d		;bcc9
 	ret nz			;bccb
-	call L_A17C		;bccc
-	jp L_A56C		;bccf
+	call niega_de		;bccc   ; niega_de: DE = -DE
+	jp pon_velocidad_x		;bccf   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BCD2:
 	bit 7,d		;bcd2
 	ret z			;bcd4
-	call L_A17C		;bcd5
-	jp L_A56C		;bcd8
+	call niega_de		;bcd5   ; niega_de: DE = -DE
+	jp pon_velocidad_x		;bcd8   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BCDB:
-	ld a,(0ce01h)		;bcdb
-	call 0406bh		;bcde
+	ld a,(0ce01h)		;bcdb   ; lee el paso de la escena
+	call 0406bh		;bcde   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BCE1: 4 destinos del despachador de 0x406B (call en p03:BCDE):
@@ -3827,22 +3827,22 @@ DATA_tabla_BCE1:
 L_BCE9:
 	ld a,078h		;bce9
 	ld (0ce02h),a		;bceb
-	jp L_BE3D		;bcee
+	jp siguiente_paso		;bcee   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_BCF1:
 	ld hl,0ce02h		;bcf1
 	dec (hl)			;bcf4
 	ret nz			;bcf5
-	jp L_BE3D		;bcf6
+	jp siguiente_paso		;bcf6   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_BCF9:
 	ld de,09090h		;bcf9
 	ld c,013h		;bcfc
-	call 05f1dh		;bcfe
+	call 05f1dh		;bcfe   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	ld hl,08070h		;bd01
 	ld bc,02020h		;bd04
 	ld a,000h		;bd07
 	ld d,000h		;bd09
-	call 0490ah		;bd0b
-	jp L_BE3D		;bd0e
+	call 0490ah		;bd0b   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
+	jp siguiente_paso		;bd0e   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_BD11:
 	ld a,(0ce15h)		;bd11
 	and a			;bd14
@@ -3851,7 +3851,7 @@ L_BD11:
 L_BD19:
 	call L_BE0D		;bd19
 	ld a,(ix+001h)		;bd1c
-	call 0406bh		;bd1f
+	call 0406bh		;bd1f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BD22: 2 destinos del despachador de 0x406B (call en p03:BD1F):
@@ -3892,14 +3892,14 @@ L_BD52:
 	ld de,0ffe0h		;bd5f
 L_BD62:
 	add hl,de			;bd62
-	jp L_A549		;bd63
+	jp suma_a_la_velocidad_y		;bd63
 L_BD66:
 	call L_BD46		;bd66
 	ld a,(ix+005h)		;bd69
 	sub 010h		;bd6c
 	cp 0e0h		;bd6e
 	jr nc,L_BD7F		;bd70
-	ld a,(0c427h)		;bd72
+	ld a,(0c427h)		;bd72   ; lee la X de Simon
 	sub (ix+005h)		;bd75
 	jr nc,L_BD7C		;bd78
 	neg		;bd7a
@@ -3914,7 +3914,7 @@ L_BD7F:
 	cpl			;bd87
 	ld d,a			;bd88
 	inc de			;bd89
-	call L_A56C		;bd8a
+	call pon_velocidad_x		;bd8a   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+012h),03fh		;bd8d
 	ld (ix+013h),060h		;bd91
 	inc (ix+001h)		;bd95
@@ -3931,7 +3931,7 @@ L_BD99:
 	xor a			;bdae
 	ld (ix+009h),0f8h		;bdaf
 	ld (ix+00ah),a		;bdb3
-	ld a,(0c427h)		;bdb6
+	ld a,(0c427h)		;bdb6   ; lee la X de Simon
 	cp (ix+005h)		;bdb9
 	jr nc,L_BDCC		;bdbc
 	ld a,(ix+009h)		;bdbe
@@ -3941,7 +3941,7 @@ L_BD99:
 	cpl			;bdc6
 	ld d,a			;bdc7
 	inc de			;bdc8
-	call L_A56C		;bdc9
+	call pon_velocidad_x		;bdc9   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_BDCC:
 	ld (ix+006h),001h		;bdcc
 	ld (ix+001h),000h		;bdd0
@@ -3955,7 +3955,7 @@ L_BDDD:
 	sub 010h		;bde3
 	cp 0e0h		;bde5
 	jr nc,L_BDF6		;bde7
-	ld a,(0c427h)		;bde9
+	ld a,(0c427h)		;bde9   ; lee la X de Simon
 	sub (ix+005h)		;bdec
 	jr nc,L_BDF3		;bdef
 	neg		;bdf1
@@ -3970,7 +3970,7 @@ L_BDF6:
 	cpl			;bdfe
 	ld d,a			;bdff
 	inc de			;be00
-	call L_A56C		;be01
+	call pon_velocidad_x		;be01   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+012h),03fh		;be04
 	ld (ix+013h),010h		;be08
 	ret			;be0c
@@ -3985,12 +3985,12 @@ L_BE0D:
 	ld b,(ix+005h)		;be1e
 	push ix		;be21
 	ld a,013h		;be23
-	call 09f6dh		;be25
+	call 09f6dh		;be25   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	pop ix		;be28
 	ret			;be2a
 L_BE2B:
-	ld a,(0ce01h)		;be2b
-	call 0406bh		;be2e
+	ld a,(0ce01h)		;be2b   ; lee el paso de la escena
+	call 0406bh		;be2e   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BE31: 2 destinos del despachador de 0x406B (call en p03:BE2E):
@@ -4008,9 +4008,9 @@ DATA_tabla_BE31:
 L_BE35:
 	ld c,012h		;be35
 	ld de,07040h		;be37
-	call 05f1dh		;be3a
-L_BE3D:
-	ld hl,0ce01h		;be3d
+	call 05f1dh		;be3a   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
+siguiente_paso:
+	ld hl,0ce01h		;be3d   ; apunta a el paso de la escena
 	inc (hl)			;be40
 	ret			;be41
 L_BE42:
@@ -4026,15 +4026,15 @@ L_BE47:
 L_BE50:
 	ld (ix+00bh),04fh		;be50
 	ld (ix+006h),000h		;be54
-	ld a,(0d000h)		;be58
+	ld a,(0d000h)		;be58   ; lee la FASE (0 el patio, 1-18)
 	cp 003h		;be5b
 	ld (ix+013h),03ch		;be5d
 	jr z,L_BE67		;be61
 	ld (ix+013h),001h		;be63
 L_BE67:
 	ld de,00000h		;be67
-	call L_A56C		;be6a
-	jp L_A55D		;be6d
+	call pon_velocidad_x		;be6a   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+	jp pon_velocidad_y		;be6d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_BE70:
 	inc (ix+014h)		;be70
 	inc (ix+00ch)		;be73
@@ -4046,7 +4046,7 @@ L_BE70:
 L_BE80:
 	ld (ix+00bh),a		;be80
 	ld a,(ix+001h)		;be83
-	call 0406bh		;be86
+	call 0406bh		;be86   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_BE89: 6 destinos del despachador de 0x406B (call en p03:BE86):
@@ -4075,7 +4075,7 @@ L_BE95:
 L_BEA2:
 	ld (ix+001h),002h		;bea2
 L_BEA6:
-	ld a,(0c425h)		;bea6
+	ld a,(0c425h)		;bea6   ; lee la Y de Simon
 	sub 030h		;bea9
 	ld b,030h		;beab
 	jr c,L_BEB0		;bead
@@ -4089,28 +4089,28 @@ L_BEB0:
 	neg		;bebc
 L_BEBE:
 	ld c,a			;bebe
-	ld a,(0c427h)		;bebf
+	ld a,(0c427h)		;bebf   ; lee la X de Simon
 	add a,c			;bec2
 	ld c,a			;bec3
 	ld (ix+012h),c		;bec4
-	ld a,(0c427h)		;bec7
+	ld a,(0c427h)		;bec7   ; lee la X de Simon
 	ld h,a			;beca
-	ld a,(0c425h)		;becb
+	ld a,(0c425h)		;becb   ; lee la Y de Simon
 	ld l,a			;bece
 	push hl			;becf
 	ld a,c			;bed0
-	ld (0c427h),a		;bed1
+	ld (0c427h),a		;bed1   ; guarda la X de Simon
 	ld a,b			;bed4
-	ld (0c425h),a		;bed5
+	ld (0c425h),a		;bed5   ; guarda la Y de Simon
 	call L_A0E5		;bed8
-	call L_A56C		;bedb
+	call pon_velocidad_x		;bedb   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ex de,hl			;bede
-	call L_A55D		;bedf
+	call pon_velocidad_y		;bedf   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	pop hl			;bee2
 	ld a,l			;bee3
-	ld (0c425h),a		;bee4
+	ld (0c425h),a		;bee4   ; guarda la Y de Simon
 	ld a,h			;bee7
-	ld (0c427h),a		;bee8
+	ld (0c427h),a		;bee8   ; guarda la X de Simon
 	ld (ix+001h),003h		;beeb
 	ret			;beef
 L_BEF0:
@@ -4142,8 +4142,8 @@ L_BEFD:
 	ret c			;bf28
 L_BF29:
 	ld de,00000h		;bf29
-	call L_A56C		;bf2c
-	call L_A55D		;bf2f
+	call pon_velocidad_x		;bf2c   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
+	call pon_velocidad_y		;bf2f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld a,r		;bf32
 	srl a		;bf34
 	srl a		;bf36
@@ -4162,8 +4162,8 @@ L_BF4A:
 	dec (ix+010h)		;bf52
 	ret nz			;bf55
 	ld de,00280h		;bf56
-	call L_A55D		;bf59
-	ld a,(0c427h)		;bf5c
+	call pon_velocidad_y		;bf59   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+	ld a,(0c427h)		;bf5c   ; lee la X de Simon
 	ld b,(ix+005h)		;bf5f
 	cp b			;bf62
 	jr nc,L_BF68		;bf63
@@ -4184,16 +4184,16 @@ L_BF68:
 	rr e		;bf7a
 	srl d		;bf7c
 	rr e		;bf7e
-	ld a,(0c427h)		;bf80
+	ld a,(0c427h)		;bf80   ; lee la X de Simon
 	ld b,(ix+005h)		;bf83
 	cp b			;bf86
-	call c,L_A17C		;bf87
-	call L_A56C		;bf8a
+	call c,niega_de		;bf87   ; niega_de: DE = -DE
+	call pon_velocidad_x		;bf8a   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+001h),005h		;bf8d
 	ret			;bf91
 L_BF92:
 	ld de,0fff0h		;bf92
-	call L_A549		;bf95
+	call suma_a_la_velocidad_y		;bf95
 	ld a,(ix+005h)		;bf98
 	cp 019h		;bf9b
 	ld b,002h		;bf9d
