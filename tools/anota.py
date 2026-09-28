@@ -150,8 +150,8 @@ RAM = {
     0xC426: ("la fraccion de la x de Simon", "p01:6C94 suma en 16 bits a 0xC426"),
     0xC427: ("la X de Simon", "p03:AF40 la resta de (ix+5), la x de las cosas, que p02:99EC borra fuera de 7..0xF0"),
     0xC42C: ("el lado al que mira Simon (0 derecha)", "p02:8186: con la cosa a su derecha, 0 es mirarla; p01:6402 lo saca del bit 0 de la tabla de salida"),
-    0xC42E: ("la pose de arriba de Simon", "p01:785C elige por ella en 0x7985"),
-    0xC42F: ("la pose de abajo de Simon", "p01:787E elige por ella en 0x79D5"),
+    0xC42E: ("la pose de las piernas de Simon", "p01:785C elige por ella en 0x7985"),
+    0xC42F: ("la pose del cuerpo de Simon", "p01:787E elige por ella en 0x79D5"),
     0xC470: ("los bloques que se rompen (ocho de 16 bytes)", "p02:868C los rompe y los borra del mapa; los pone p00:5B1E"),
     0xC5A6: ("los dos cascotes (tres bytes cada uno)", "p02:88C7 los lanza al romperse un bloque"),
     0xC5AC: ("el estado de la puerta de la fase", "p13:BB5D lo pone a 4 o a 0xFF"),
@@ -192,7 +192,7 @@ RAM16 = {
     0xC000: "el estado (0xC000) y el subestado (0xC001) de un tiron",
     0xC424: "la y de Simon con su fraccion (0xC424 la fraccion, 0xC425 la y)",
     0xC426: "la x de Simon con su fraccion (0xC426 la fraccion, 0xC427 la x)",
-    0xC42E: "las dos poses de Simon (0xC42E arriba, 0xC42F abajo)",
+    0xC42E: "las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)",
     0xD000: "la fase (0xD000) y la habitacion (0xD001) de un tiron",
 }
 

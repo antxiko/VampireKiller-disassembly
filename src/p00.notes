@@ -991,10 +991,10 @@ C 0x56C0 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x56C9 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x56CC bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x56E1 bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
-C 0x56E4 lee la pose de arriba de Simon
+C 0x56E4 lee la pose de las piernas de Simon
 C 0x56EB hl_mas_a: HL += A
 C 0x56F4 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
-C 0x56F7 lee la pose de abajo de Simon
+C 0x56F7 lee la pose del cuerpo de Simon
 C 0x56FE hl_mas_a: HL += A
 C 0x5707 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x570A bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3

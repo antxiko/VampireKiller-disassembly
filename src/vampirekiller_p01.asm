@@ -1588,7 +1588,7 @@ L_6B67:
 	and a			;6b71
 	ret nz			;6b72
 	ld de,00000h		;6b73
-	ld (0c42eh),de		;6b76   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6b76   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call pose_segun_el_lado		;6b7a   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	ld a,(0c007h)		;6b7d
 	rra			;6b80
@@ -1684,7 +1684,7 @@ L_6C10:
 	ld a,002h		;6c20
 	ld (0c420h),a		;6c22
 	ld de,00006h		;6c25
-	ld (0c42eh),de		;6c28   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6c28   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	jp pose_segun_el_lado		;6c2c   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_6C2F:
 	ld a,001h		;6c2f
@@ -1763,9 +1763,9 @@ L_6CA4:
 	jr c,L_6CB8		;6cb3
 	ld de,00202h		;6cb5
 L_6CB8:
-	ld hl,(0c42eh)		;6cb8   ; lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld hl,(0c42eh)		;6cb8   ; lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	add hl,de			;6cbb
-	ld (0c42eh),hl		;6cbc   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),hl		;6cbc   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ret			;6cbf
 L_6CC0:
 	ld a,(0c421h)		;6cc0
@@ -1821,7 +1821,7 @@ L_6CF8:
 	jr nz,L_6D13		;6d04
 	ld d,000h		;6d06
 	ld e,006h		;6d08
-	ld (0c42eh),de		;6d0a   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6d0a   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	push hl			;6d0e
 	call pose_segun_el_lado		;6d0f   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	pop hl			;6d12
@@ -1995,7 +1995,7 @@ L_6E14:
 	xor a			;6e22
 	ld (0c42ch),a		;6e23   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e26
-	ld (0c42eh),de		;6e29   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6e29   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call L_6F09		;6e2d
 	ld hl,0c42bh		;6e30
 	inc (hl)			;6e33
@@ -2024,7 +2024,7 @@ L_6E4B:
 	ld a,001h		;6e5b
 	ld (0c42ch),a		;6e5d   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6e60
-	ld (0c42eh),de		;6e63   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6e63   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call L_6F09		;6e67
 	ld hl,0c42bh		;6e6a
 	inc (hl)			;6e6d
@@ -2053,7 +2053,7 @@ L_6E84:
 	xor a			;6e94
 	ld (0c42ch),a		;6e95   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e98
-	ld (0c42eh),de		;6e9b   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6e9b   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call L_6F24		;6e9f
 	ld hl,0c42bh		;6ea2
 	inc (hl)			;6ea5
@@ -2083,7 +2083,7 @@ L_6EBC:
 	ld a,001h		;6ece
 	ld (0c42ch),a		;6ed0   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6ed3
-	ld (0c42eh),de		;6ed6   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6ed6   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call L_6F24		;6eda
 	ld hl,0c42bh		;6edd
 	inc (hl)			;6ee0
@@ -2102,7 +2102,7 @@ L_6EEA:
 	ret nc			;6ef4
 L_6EF5:
 	ld de,00000h		;6ef5
-	ld (0c42eh),de		;6ef8   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6ef8   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	xor a			;6efc
 	ld (0c435h),a		;6efd
 	ld (0c42bh),a		;6f00
@@ -2117,12 +2117,12 @@ L_6F09:
 	neg		;6f11
 	inc a			;6f13
 	ld b,a			;6f14
-	ld a,(0c42eh)		;6f15   ; lee la pose de arriba de Simon
+	ld a,(0c42eh)		;6f15   ; lee la pose de las piernas de Simon
 	add a,b			;6f18
-	ld (0c42eh),a		;6f19   ; guarda la pose de arriba de Simon
-	ld a,(0c42fh)		;6f1c   ; lee la pose de abajo de Simon
+	ld (0c42eh),a		;6f19   ; guarda la pose de las piernas de Simon
+	ld a,(0c42fh)		;6f1c   ; lee la pose del cuerpo de Simon
 	add a,c			;6f1f
-	ld (0c42fh),a		;6f20   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;6f20   ; guarda la pose del cuerpo de Simon
 	ret			;6f23
 L_6F24:
 	ld a,(0c42bh)		;6f24
@@ -2132,12 +2132,12 @@ L_6F24:
 	ld c,a			;6f2b
 	inc a			;6f2c
 	ld b,a			;6f2d
-	ld a,(0c42eh)		;6f2e   ; lee la pose de arriba de Simon
+	ld a,(0c42eh)		;6f2e   ; lee la pose de las piernas de Simon
 	add a,b			;6f31
-	ld (0c42eh),a		;6f32   ; guarda la pose de arriba de Simon
-	ld a,(0c42fh)		;6f35   ; lee la pose de abajo de Simon
+	ld (0c42eh),a		;6f32   ; guarda la pose de las piernas de Simon
+	ld a,(0c42fh)		;6f35   ; lee la pose del cuerpo de Simon
 	add a,c			;6f38
-	ld (0c42fh),a		;6f39   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;6f39   ; guarda la pose del cuerpo de Simon
 	ret			;6f3c
 L_6F3D:
 	ld a,(0c439h)		;6f3d
@@ -2146,7 +2146,7 @@ L_6F3D:
 	call mira_el_suelo		;6f43   ; mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
 	jr c,L_6F6A		;6f46
 	ld de,00000h		;6f48
-	ld (0c42eh),de		;6f4b   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6f4b   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call pose_segun_el_lado		;6f4f   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	ld hl,0c428h		;6f52
 	ld a,(hl)			;6f55
@@ -2219,7 +2219,7 @@ L_6F93:
 	ld a,003h		;6faf
 	ld (0c420h),a		;6fb1
 	ld a,002h		;6fb4
-	ld (0c42fh),a		;6fb6   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;6fb6   ; guarda la pose del cuerpo de Simon
 	jp pose_segun_el_lado		;6fb9   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_6FBC:
 	ld a,(0c43ch)		;6fbc
@@ -2229,7 +2229,7 @@ L_6FBC:
 	xor a			;6fc6
 	ld (0c42ah),a		;6fc7
 	ld de,00307h		;6fca
-	ld (0c42eh),de		;6fcd   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;6fcd   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	jp pose_segun_el_lado		;6fd1   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_6FD4:
 	call L_6C2F		;6fd4
@@ -2261,10 +2261,10 @@ L_6FF2:
 	ld a,010h		;7007
 L_7009:
 	ld (0c42ah),a		;7009
-	ld de,(0c42eh)		;700c   ; lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld de,(0c42eh)		;700c   ; lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	inc d			;7010
 	inc e			;7011
-	ld (0c42eh),de		;7012   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),de		;7012   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ret			;7016
 L_7017:
 	call L_6C53		;7017
@@ -2312,7 +2312,7 @@ L_7063:
 	ld a,006h		;706e
 	ld (0c420h),a		;7070
 	ld bc,00509h		;7073
-	ld (0c42eh),bc		;7076   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),bc		;7076   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	jp pose_segun_el_lado		;707a   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 
 ; ----------------------------------------------------------------------
@@ -2542,7 +2542,7 @@ L_71FA:
 	jr nz,L_7209		;7205
 	ld a,006h		;7207
 L_7209:
-	ld (0c42eh),a		;7209   ; guarda la pose de arriba de Simon
+	ld (0c42eh),a		;7209   ; guarda la pose de las piernas de Simon
 L_720C:
 	ld a,(0c436h)		;720c
 	cp 002h		;720f
@@ -2553,7 +2553,7 @@ L_720C:
 	jr nz,L_721D		;7219
 	ld a,009h		;721b
 L_721D:
-	ld (0c42fh),a		;721d   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;721d   ; guarda la pose del cuerpo de Simon
 	call pose_segun_el_lado		;7220   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	ld a,005h		;7223
 	call 0509fh		;7225   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
@@ -2561,7 +2561,7 @@ L_721D:
 L_722A:
 	call 05593h		;722a
 	ld a,00ch		;722d
-	ld (0c42fh),a		;722f   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;722f   ; guarda la pose del cuerpo de Simon
 	call pose_segun_el_lado		;7232   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	jr $+6		;7235
 
@@ -2584,7 +2584,7 @@ L_723B:
 	inc (hl)			;723e
 	ret			;723f
 L_7240:
-	ld hl,0c42fh		;7240   ; apunta a la pose de abajo de Simon
+	ld hl,0c42fh		;7240   ; apunta a la pose del cuerpo de Simon
 	inc (hl)			;7243
 	call L_723B		;7244
 	ld a,(0c436h)		;7247
@@ -2596,7 +2596,7 @@ L_7250:
 	cp 002h		;7253
 	jr nc,L_7240		;7255
 	call 0999fh		;7257
-	ld hl,0c42fh		;725a   ; apunta a la pose de abajo de Simon
+	ld hl,0c42fh		;725a   ; apunta a la pose del cuerpo de Simon
 	inc (hl)			;725d
 	ld a,004h		;725e
 	jr L_7238		;7260
@@ -2617,7 +2617,7 @@ L_726E:
 	jr nz,L_7280		;727c
 	ld a,002h		;727e
 L_7280:
-	ld (0c42fh),a		;7280   ; guarda la pose de abajo de Simon
+	ld (0c42fh),a		;7280   ; guarda la pose del cuerpo de Simon
 	jp pose_segun_el_lado		;7283   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 L_7286:
 	call 0999fh		;7286
@@ -3147,7 +3147,7 @@ L_7618:
 	ld a,(0c701h)		;761e   ; lee lo que lleva Simon (un bit por objeto)
 	and 030h		;7621
 	ret z			;7623
-	ld hl,0c42eh		;7624   ; apunta a la pose de arriba de Simon
+	ld hl,0c42eh		;7624   ; apunta a la pose de las piernas de Simon
 	ld a,(hl)			;7627
 	cp 014h		;7628
 	jr nc,L_762F		;762a
@@ -3182,7 +3182,7 @@ L_764E:
 	ld a,(0c420h)		;764e
 	cp 003h		;7651
 	ret nz			;7653
-	ld hl,0c42eh		;7654   ; apunta a la pose de arriba de Simon
+	ld hl,0c42eh		;7654   ; apunta a la pose de las piernas de Simon
 	ld a,(hl)			;7657
 	cp 014h		;7658
 	ret c			;765a
@@ -3193,7 +3193,7 @@ pose_segun_el_lado:
 	ld a,(0c42ch)		;765f   ; lee el lado al que mira Simon (0 derecha)
 	and a			;7662
 	ret z			;7663
-	ld hl,(0c42eh)		;7664   ; lee las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld hl,(0c42eh)		;7664   ; lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ld a,l			;7667
 	cp 00ah		;7668
 	jr nc,L_766F		;766a
@@ -3206,7 +3206,7 @@ L_766F:
 	add a,00fh		;7674
 	ld h,a			;7676
 L_7677:
-	ld (0c42eh),hl		;7677   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),hl		;7677   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ret			;767a
 L_767B:
 	ld a,(0c420h)		;767b
@@ -3392,7 +3392,7 @@ L_778A:
 	and a			;7795
 	ret nz			;7796
 	ld bc,00000h		;7797
-	ld (0c42eh),bc		;779a   ; guarda las dos poses de Simon (0xC42E arriba, 0xC42F abajo)
+	ld (0c42eh),bc		;779a   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call pose_segun_el_lado		;779e   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	ld a,(0c42ch)		;77a1   ; lee el lado al que mira Simon (0 derecha)
 	and a			;77a4
@@ -3499,7 +3499,7 @@ L_7851:
 	inc de			;7855
 	djnz L_7851		;7856
 L_7858:
-	ld a,(0c42eh)		;7858   ; lee la pose de arriba de Simon
+	ld a,(0c42eh)		;7858   ; lee la pose de las piernas de Simon
 	add a,a			;785b
 	ld hl,07985h		;785c
 	call 04061h		;785f   ; hl_mas_a: HL += A
@@ -3517,7 +3517,7 @@ L_7875:
 	ld b,(hl)			;7875
 	inc hl			;7876
 	call L_7899		;7877
-	ld a,(0c42fh)		;787a   ; lee la pose de abajo de Simon
+	ld a,(0c42fh)		;787a   ; lee la pose del cuerpo de Simon
 	add a,a			;787d
 	ld hl,079d5h		;787e
 	call 04061h		;7881   ; hl_mas_a: HL += A
@@ -3539,7 +3539,7 @@ L_7899:
 	add a,(hl)			;789c
 	push bc			;789d
 	ld b,a			;789e
-	ld a,(0c42eh)		;789f   ; lee la pose de arriba de Simon
+	ld a,(0c42eh)		;789f   ; lee la pose de las piernas de Simon
 	cp 006h		;78a2
 	jr z,L_78B2		;78a4
 	cp 010h		;78a6
@@ -3687,10 +3687,10 @@ DATA_musica_de_cada_fase:
 	defb 083h,083h,085h	; 7982
 
 ; ----------------------------------------------------------------------
-; DATOS poses_de_simon_arriba: 40 punteros, uno por pose (0xC42E), a la lista
-;   de sprites de la parte de arriba de Simon (p01:785C)
+; DATOS poses_de_las_piernas: 40 punteros, uno por pose (0xC42E), a la lista
+;   de sprites de las piernas de Simon (p01:785C)
 ;   0x7985..0x79d5  (80 bytes)
-DATA_poses_de_simon_arriba:
+DATA_poses_de_las_piernas:
 	defb 01dh,07ah,01dh,07ah,01dh,07ah,01dh,07ah,01dh,07ah,01dh,07ah,022h,07ah,027h,07ah	; 7985  .z.z.z.z.z.z"z'z
 	defb 027h,07ah,02ch,07ah,031h,07ah,031h,07ah,031h,07ah,031h,07ah,031h,07ah,031h,07ah	; 7995  'z,z1z1z1z1z1z1z
 	defb 036h,07ah,03bh,07ah,03bh,07ah,040h,07ah,01dh,07ah,01dh,07ah,01dh,07ah,01dh,07ah	; 79a5  6z;z;z@z.z.z.z.z
@@ -3698,10 +3698,10 @@ DATA_poses_de_simon_arriba:
 	defb 031h,07ah,031h,07ah,031h,07ah,031h,07ah,036h,07ah,03bh,07ah,03bh,07ah,040h,07ah	; 79c5  1z1z1z1z6z;z;z@z
 
 ; ----------------------------------------------------------------------
-; DATOS poses_de_simon_abajo: 36 punteros, uno por pose (0xC42F), a la lista
-;   de sprites de la parte de abajo (p01:787E)
+; DATOS poses_del_cuerpo: 36 punteros, uno por pose (0xC42F), a la lista de
+;   sprites del cuerpo y el latigo (p01:787E)
 ;   0x79d5..0x7a1d  (72 bytes)
-DATA_poses_de_simon_abajo:
+DATA_poses_del_cuerpo:
 	defb 045h,07ah,045h,07ah,045h,07ah,04fh,07ah,04fh,07ah,054h,07ah,059h,07ah,066h,07ah	; 79d5  EzEzEzOzOzTzYzfz
 	defb 06fh,07ah,059h,07ah,066h,07ah,06fh,07ah,07ch,07ah,07ch,07ah,081h,07ah,08ah,07ah	; 79e5  ozYzfzoz|z|z.z.z
 	defb 08ah,07ah,08ah,07ah,094h,07ah,094h,07ah,099h,07ah,09eh,07ah,0abh,07ah,0b4h,07ah	; 79f5  .z.z.z.z.z.z.z.z

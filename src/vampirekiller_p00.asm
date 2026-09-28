@@ -3464,7 +3464,7 @@ DATA_codigo_sin_llamar_56CF:
 
 L_56E1:
 	call bancos_11_12_13		;56e1   ; bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
-	ld a,(0c42eh)		;56e4   ; lee la pose de arriba de Simon
+	ld a,(0c42eh)		;56e4   ; lee la pose de las piernas de Simon
 	add a,a			;56e7
 	ld hl,0a281h		;56e8
 	call hl_mas_a		;56eb   ; hl_mas_a: HL += A
@@ -3473,7 +3473,7 @@ L_56E1:
 	ld d,(hl)			;56f0
 	ld hl,0f800h		;56f1
 	call rle_a_la_vram		;56f4   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
-	ld a,(0c42fh)		;56f7   ; lee la pose de abajo de Simon
+	ld a,(0c42fh)		;56f7   ; lee la pose del cuerpo de Simon
 	add a,a			;56fa
 	ld hl,0a2d1h		;56fb
 	call hl_mas_a		;56fe   ; hl_mas_a: HL += A

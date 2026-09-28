@@ -73,7 +73,34 @@ proc encendida {} {
     say "pantalla encendida en p01:6321"
     # sin freno openMSX se salta cuadros al pintar y la captura seria vieja
     if {[info exists ::env(VK_CAPTURA)]} { set ::throttle on }
+    if {[info exists ::env(VK_MUESTRAS)]} {
+        set ::muestras $::env(VK_MUESTRAS)
+        global OUT NOMBRE
+        set ::fm [open "$OUT/$NOMBRE.cosas" w]
+        after frame { seguro muestra }
+        return
+    }
     after time 0.5 { seguro vuelca }
+}
+
+# Con VK_MUESTRAS=<n> apunta en <nombre>.cosas, durante n cuadros, las quince
+# fichas de 0xC800 y 0xD700 (tipo, dibujo, y, x y sus sprites de +0x20) con
+# Simon invencible (0xC43A), y luego vuelca como siempre.
+proc muestra {} {
+    pon 0xC43A 0xFF
+    set linea {}
+    foreach base {0xC800 0xC880 0xC900 0xC980 0xCA00 0xCA80 0xCB00
+                  0xD700 0xD780 0xD800 0xD880 0xD900 0xD980 0xDA00 0xDA80} {
+        if {[lee $base] == 0} continue
+        set b {}
+        foreach off {0 0x0B 3 5} { lappend b [format %02X [lee [expr {$base + $off}]]] }
+        set n [lee [expr {$base + 0x20}]]
+        for {set i 0} {$i < 5 * $n + 1} {incr i} { lappend b [format %02X [lee [expr {$base + 0x20 + $i}]]] }
+        lappend linea [join $b ""]
+    }
+    puts $::fm [join $linea " "]
+    incr ::muestras -1
+    if {$::muestras > 0} { after frame { seguro muestra } } else { close $::fm ; seguro vuelca }
 }
 
 set throttle off
