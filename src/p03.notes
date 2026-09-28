@@ -1086,6 +1086,20 @@ C 0xBEC7 guarda el sitio de Simon...
 C 0xBED0 ... y pone el punto
 C 0xBED8 apunta
 
+L 0xBAA3 el_jefe_12_no_sale
+L 0xBAB9 anda_el_jefe_de_la_fase_12
+L 0xBAD3 manda_saltar
+L 0xBBE1 plazo_del_disparo
+L 0xBBE6 dibujo_segun_el_lado
+L 0xBCC9 vuelve_a_la_izquierda
+L 0xBCD2 vuelve_a_la_derecha
+L 0xBD46 dibujo_del_jefe_de_la_fase_6
+L 0xBE0D dispara_el_jefe_de_la_fase_6
+C 0xBE0D cada 0x3C cuadros...
+C 0xBE15 ... hacia Simon...
+C 0xBE23 ... el tipo 0x13 de 0xA08E
+L 0xBF44 apunta_y_lanza
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0xA08F 0xA0E5 tablas_por_tipo  tres tablas seguidas: 0xA08F, un byte por tipo de cosa que p02:9F8C lee con 0xA08E + tipo; 0xA0BF, punteros por tipo (p03:A011 con DE = 0xA0BD, via 0x6542) a las cuatro listas cortas de 0xA0D7-0xA0E4, que se copian a los sprites de la cosa (p03:A017); los mismos bytes usan p01:68EA y p03:BBFD como coordenadas de VRAM
 F 0xA08F 16

@@ -74,6 +74,10 @@ C 0xBBC2 la habitacion a la que lleva...
 C 0xBBC3 ... el nibble alto
 C 0xBBC9 a 0xC5B4
 
+L 0xB995 suma_a_hl
+L 0xB9BD apunta_a_las_salidas
+L 0xBB37 puerta_de_la_fase_aqui
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
 D 0xA000 0xA041 bloques_9AC1_cola  88 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones (sigue del banco anterior, 0x9AC1); lo leen p00:5010 (65 bytes)
 F 0xA000 16

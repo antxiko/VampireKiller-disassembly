@@ -3597,8 +3597,8 @@ L_BA4F:
 L_BA64:
 	ld a,(ix+010h)		;ba64
 	and a			;ba67
-	call nz,L_BAD3		;ba68
-	call L_BAB9		;ba6b
+	call nz,manda_saltar		;ba68
+	call anda_el_jefe_de_la_fase_12		;ba6b
 	ld a,(ix+001h)		;ba6e   ; lee el paso en que va la cosa
 	dec a			;ba71
 	jr z,L_BA97		;ba72
@@ -3618,12 +3618,12 @@ L_BA8C:
 	inc (ix+001h)		;ba93   ; sube el paso en que va la cosa
 	ret			;ba96
 L_BA97:
-	call L_BAA3		;ba97
+	call el_jefe_12_no_sale		;ba97
 	dec (ix+00ch)		;ba9a   ; baja la cuenta de cuadros del paso
 	ret nz			;ba9d
 	ld (ix+001h),000h		;ba9e   ; el paso en que va la cosa = 0x00
 	ret			;baa2
-L_BAA3:
+el_jefe_12_no_sale:
 	ld a,(ix+005h)		;baa3   ; lee la x de la cosa
 	cp 0e0h		;baa6
 	jr nc,L_BAB3		;baa8
@@ -3634,7 +3634,7 @@ L_BAA3:
 L_BAB3:
 	ld de,0fde0h		;bab3
 	jp pon_velocidad_x		;bab6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-L_BAB9:
+anda_el_jefe_de_la_fase_12:
 	ld hl,0bacfh		;bab9
 	inc (ix+011h)		;babc
 	ld a,(ix+011h)		;babf
@@ -3659,7 +3659,7 @@ DATA_cuatro_dibujos_BACF:
 ; ======================================================================
 
 
-L_BAD3:
+manda_saltar:
 	dec (ix+010h)		;bad3
 	ret nz			;bad6
 	ld a,001h		;bad7
@@ -3671,7 +3671,7 @@ L_BADD:
 	ld de,00000h		;bae5
 	call pon_velocidad_y		;bae8   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	call pon_velocidad_x		;baeb   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	call L_BBE1		;baee
+	call plazo_del_disparo		;baee
 	xor a			;baf1
 	ld (ix+011h),a		;baf2
 	ret			;baf5
@@ -3709,7 +3709,7 @@ en_el_aire:
 	jr c,L_BB34		;bb31
 	inc c			;bb33   ; ... y desde el cuarto, el 0x68
 L_BB34:
-	call L_BBE6		;bb34
+	call dibujo_segun_el_lado		;bb34
 	call dispara_cada_tanto		;bb37   ; dispara cada tanto
 	ld de,00060h		;bb3a   ; la gravedad, 0x60
 	call suma_a_la_velocidad_y		;bb3d   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
@@ -3729,7 +3729,7 @@ L_BB34:
 	call 07b98h		;bb60   ; toca el decorado?
 	ret nc			;bb63
 	ld c,069h		;bb64   ; si: el dibujo 0x69...
-	call L_BBE6		;bb66
+	call dibujo_segun_el_lado		;bb66
 	ld (ix+006h),000h		;bb69   ; ... quieto...
 	ld a,(ix+003h)		;bb6d   ; ... en la rejilla de 8...
 	and 0f8h		;bb70
@@ -3785,13 +3785,13 @@ se_mueve:
 dispara_cada_tanto:
 	dec (ix+012h)		;bbd4   ; al acabar la cuenta del byte 0x12...
 	ret nz			;bbd7
-	call L_BBE1		;bbd8
+	call plazo_del_disparo		;bbd8
 	call apunta_a_simon		;bbdb   ; ... hacia Simon...
 	jp 09f61h		;bbde   ; ... su tipo
-L_BBE1:
+plazo_del_disparo:
 	ld (ix+012h),030h		;bbe1
 	ret			;bbe5
-L_BBE6:
+dibujo_segun_el_lado:
 	bit 7,(ix+00ah)		;bbe6   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	ld a,c			;bbea
 	jr nz,L_BBEF		;bbeb
@@ -3895,10 +3895,10 @@ L_BC7F:
 	ld a,(ix+005h)		;bc93   ; lee la x de la cosa
 	cp 0e8h		;bc96
 	push af			;bc98
-	call nc,L_BCC9		;bc99
+	call nc,vuelve_a_la_izquierda		;bc99
 	pop af			;bc9c
 	cp 018h		;bc9d
-	call c,L_BCD2		;bc9f
+	call c,vuelve_a_la_derecha		;bc9f
 	ld a,(ix+003h)		;bca2   ; lee la y de la cosa
 	cp 040h		;bca5
 	jr nc,L_BCB9		;bca7
@@ -3915,12 +3915,12 @@ L_BCB9:
 	ret nc			;bcc2
 	ld de,0fd00h		;bcc3
 	jp pon_velocidad_y		;bcc6   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_BCC9:
+vuelve_a_la_izquierda:
 	bit 7,d		;bcc9
 	ret nz			;bccb
 	call niega_de		;bccc   ; niega_de: DE = -DE
 	jp pon_velocidad_x		;bccf   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-L_BCD2:
+vuelve_a_la_derecha:
 	bit 7,d		;bcd2
 	ret z			;bcd4
 	call niega_de		;bcd5   ; niega_de: DE = -DE
@@ -3969,7 +3969,7 @@ L_BD11:
 	ret z			;bd15
 	jp L_BE47		;bd16
 L_BD19:
-	call L_BE0D		;bd19
+	call dispara_el_jefe_de_la_fase_6		;bd19
 	ld a,(ix+001h)		;bd1c   ; lee el paso en que va la cosa
 	call 0406bh		;bd1f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -3997,7 +3997,7 @@ L_BD26:
 	ld (ix+015h),03ch		;bd3d
 	ld (ix+014h),008h		;bd41
 	ret			;bd45
-L_BD46:
+dibujo_del_jefe_de_la_fase_6:
 	dec (ix+014h)		;bd46
 	ld c,02bh		;bd49
 	bit 3,(ix+014h)		;bd4b
@@ -4014,7 +4014,7 @@ L_BD62:
 	add hl,de			;bd62
 	jp suma_a_la_velocidad_y		;bd63   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 L_BD66:
-	call L_BD46		;bd66
+	call dibujo_del_jefe_de_la_fase_6		;bd66
 	ld a,(ix+005h)		;bd69   ; lee la x de la cosa
 	sub 010h		;bd6c
 	cp 0e0h		;bd6e
@@ -4070,7 +4070,7 @@ L_BDCC:
 L_BDDC:
 	ret			;bddc
 L_BDDD:
-	call L_BD46		;bddd
+	call dibujo_del_jefe_de_la_fase_6		;bddd
 	ld a,(ix+005h)		;bde0   ; lee la x de la cosa
 	sub 010h		;bde3
 	cp 0e0h		;bde5
@@ -4094,17 +4094,17 @@ L_BDF6:
 	ld (ix+012h),03fh		;be04
 	ld (ix+013h),010h		;be08
 	ret			;be0c
-L_BE0D:
-	dec (ix+015h)		;be0d
+dispara_el_jefe_de_la_fase_6:
+	dec (ix+015h)		;be0d   ; cada 0x3C cuadros...
 	ret nz			;be10
 	ld (ix+015h),03ch		;be11
-	call apunta_a_simon		;be15
+	call apunta_a_simon		;be15   ; ... hacia Simon...
 	ld a,(ix+003h)		;be18   ; lee la y de la cosa
 	sub 010h		;be1b
 	ld c,a			;be1d
 	ld b,(ix+005h)		;be1e   ; lee la x de la cosa
 	push ix		;be21
-	ld a,013h		;be23
+	ld a,013h		;be23   ; ... el tipo 0x13 de 0xA08E
 	call 09f6dh		;be25   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
 	pop ix		;be28
 	ret			;be2a
@@ -4276,13 +4276,13 @@ L_BF29:
 	ld (ix+010h),a		;bf3c
 	ld (ix+001h),004h		;bf3f   ; el paso en que va la cosa = 0x04
 	ret			;bf43
-L_BF44:
+apunta_y_lanza:
 	call apunta_a_simon		;bf44
 	jp 09f61h		;bf47
 L_BF4A:
 	ld a,(ix+010h)		;bf4a
 	cp 018h		;bf4d
-	call z,L_BF44		;bf4f
+	call z,apunta_y_lanza		;bf4f
 	dec (ix+010h)		;bf52
 	ret nz			;bf55
 	ld de,00280h		;bf56

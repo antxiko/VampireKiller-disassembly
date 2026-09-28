@@ -537,20 +537,20 @@ L_89A5:
 	xor a			;89a5   ; canal 0 (A)
 	ld b,a			;89a6
 	ld hl,(0c010h)		;89a7   ; lee el manejador del canal A del sonido
-	call L_89C6		;89aa   ; a su manejador
+	call al_manejador_del_canal		;89aa   ; a su manejador
 	ld a,001h		;89ad   ; canal 1 (B)
 	ld b,a			;89af
 	ld hl,(0c012h)		;89b0   ; lee el manejador del canal B
-	call L_89C6		;89b3
+	call al_manejador_del_canal		;89b3
 	ld a,002h		;89b6   ; canal 2 (C)
 	ld b,a			;89b8
 	ld hl,(0c014h)		;89b9   ; lee el manejador del canal C
 L_89BC:
-	call L_89C6		;89bc
+	call al_manejador_del_canal		;89bc
 	ld a,002h		;89bf   ; y el efecto, por el canal C (numero 3)
 	ld b,003h		;89c1
 	ld hl,(0c016h)		;89c3   ; lee el manejador del efecto de sonido
-L_89C6:
+al_manejador_del_canal:
 	ld (0c094h),a		;89c6   ; guarda el canal del PSG que se esta tocando
 	ld a,b			;89c9
 	ld (0c095h),a		;89ca   ; guarda el numero de canal
@@ -586,7 +586,7 @@ L_89F6:
 	ld b,004h		;89f7   ; ... numero 4
 	ld hl,(0c018h)		;89f9   ; lee el manejador del segundo efecto
 	jp L_89BC		;89fc
-L_89FF:
+escribe_el_periodo:
 	ld a,(0c094h)		;89ff   ; escribe el periodo DE en el canal: registro 2 * canal
 	rlca			;8a02
 	call 00093h		;8a03   ; BIOS WRTPSG - Writes data to PSG-register
@@ -597,20 +597,20 @@ volumen_del_canal:
 	ld a,(0c094h)		;8a0b   ; lee el canal del PSG que se esta tocando
 	add a,008h		;8a0e   ; registro 8 + canal
 	jp 00093h		;8a10   ; BIOS WRTPSG - Writes data to PSG-register
-L_8A13:
+canal_callado:
 	push hl			;8a13   ; abre y cierra tono y ruido del canal: cuatro formas
 	ld hl,08a57h		;8a14
 	jp L_8A2C		;8a17
-L_8A1A:
-	push hl			;8a1a
+tono_y_ruido:
+	push hl			;8a1a   ; tono y ruido abiertos
 	ld hl,08a51h		;8a1b
 	jp L_8A2C		;8a1e
-L_8A21:
-	push hl			;8a21
+solo_ruido:
+	push hl			;8a21   ; solo el ruido
 	ld hl,08a4bh		;8a22
 	jp L_8A2C		;8a25
-L_8A28:
-	push hl			;8a28
+solo_tono:
+	push hl			;8a28   ; solo el tono
 	ld hl,08a45h		;8a29
 L_8A2C:
 	ld a,(0c094h)		;8a2c   ; lee el canal del PSG que se esta tocando
@@ -692,7 +692,7 @@ L_8AB3:
 	ret nz			;8ab7
 	bit 7,(ix+002h)		;8ab8   ; el golpe acabo?
 	ret nz			;8abc
-	call L_8CA7		;8abd   ; un paso del golpe
+	call cuenta_del_paso		;8abd   ; un paso del golpe
 	ret nc			;8ac0   ; sigue
 	set 7,(ix+002h)		;8ac1   ; acabo
 	ld e,000h		;8ac5   ; volumen a cero
@@ -758,7 +758,7 @@ L_8B2D:
 	inc de			;8b3a   ; ... un pelo mas grave
 	inc de			;8b3b
 L_8B3C:
-	call L_89FF		;8b3c   ; al PSG
+	call escribe_el_periodo		;8b3c   ; al PSG
 	ld a,(0c0a6h)		;8b3f   ; lee el volumen que se le resta a la musica
 	add a,(ix+004h)		;8b42   ; mas el volumen base
 	jp p,L_8B49		;8b45
@@ -767,7 +767,7 @@ L_8B49:
 	ld (ix+00ah),a		;8b49   ; el volumen
 	ld e,a			;8b4c
 	call volumen_del_canal		;8b4d   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
-	jp L_8A28		;8b50   ; y el mezclador: tono abierto
+	jp solo_tono		;8b50   ; y el mezclador: tono abierto
 L_8B53:
 	bit 2,(ix+002h)		;8b53   ; UN GOLPE de percusion: que tabla?
 	jp nz,L_8B7B		;8b57
@@ -969,14 +969,14 @@ L_8C95:
 L_8C9C:
 	ld ix,0c058h		;8c9c   ; el efecto: su ficha
 L_8CA0:
-	call L_8CA7		;8ca0   ; un paso
+	call cuenta_del_paso		;8ca0   ; un paso
 	ret nc			;8ca3   ; sigue
 	jp canal_en_reposo		;8ca4   ; acabo: en reposo
 
 ; ----------------------------------------------------------------------
 ; UN PASO DE UN EFECTO (o de un golpe de percusion): cada tantos cuadros, un byte del guion. 0xFF acaba; 0xFE es un bucle; 0x2x abre y cierra tono y ruido y da la duracion (y desde 0x28 el periodo de la envolvente del PSG); 0x1x pone el ruido y luego volumen y periodo; y lo demas es volumen (nibble alto) y periodo (nibble bajo y un byte mas).
 ; ----------------------------------------------------------------------
-L_8CA7:
+cuenta_del_paso:
 	dec (ix+00eh)		;8ca7   ; la cuenta del paso
 	jp nz,L_8D8B		;8caa   ; aun no toca
 	ld a,(ix+00fh)		;8cad   ; otra vez...
@@ -1037,7 +1037,7 @@ L_8D09:
 	inc hl			;8d0e
 	ld (ix+00ch),l		;8d0f   ; donde sigue el guion
 	ld (ix+00dh),h		;8d12
-	jp L_89FF		;8d15   ; y el periodo, al PSG
+	jp escribe_el_periodo		;8d15   ; y el periodo, al PSG
 L_8D18:
 	ld a,(ix+011h)		;8d18   ; el BUCLE del efecto: la cuenta
 	dec a			;8d1b   ; era la ultima?
@@ -1064,18 +1064,18 @@ L_8D38:
 	jp nz,L_8D4E		;8d3a
 	bit 1,c		;8d3d
 	jp nz,L_8D48		;8d3f
-	call L_8A13		;8d42   ; tono
+	call canal_callado		;8d42   ; tono
 	jp L_8D5C		;8d45
 L_8D48:
-	call L_8A28		;8d48   ; tono y ruido
+	call solo_tono		;8d48   ; tono y ruido
 	jp L_8D5C		;8d4b
 L_8D4E:
 	bit 1,c		;8d4e
 	jp nz,L_8D59		;8d50
-	call L_8A21		;8d53   ; ruido
+	call solo_ruido		;8d53   ; ruido
 	jp L_8D5C		;8d56
 L_8D59:
-	call L_8A1A		;8d59   ; nada
+	call tono_y_ruido		;8d59   ; nada
 L_8D5C:
 	ld a,c			;8d5c   ; el bit 3 pasa a ser el 4: con envolvente
 	rlca			;8d5d

@@ -1826,6 +1826,65 @@ C 0x9FEA la posicion: y...
 C 0x9FF7 ... y x...
 C 0x9FF9 ... y se mueve
 
+L 0x80E5 golpe_al_vendedor
+L 0x81AB puntos_del_tipo
+L 0x8264 despacha_por_la_otra_forma
+L 0x82A4 despacha_por_la_forma
+L 0x82B8 forma_de_caja_del_tipo
+L 0x82FB otra_forma_del_tipo
+L 0x839C caja_de_la_lista
+L 0x83A1 caja_grande_de_la_lista_y_golpe
+L 0x83AE caja_de_la_lista_y_arma
+L 0x83B3 caja_grande_de_la_lista_y_arma
+L 0x83BC centro_grande_de_la_lista
+L 0x83C7 centro_de_la_lista
+L 0x8460 caja_de_la_cosa_fija
+L 0x8500 distancia_al_arma
+L 0x854F encima_de_la_plataforma
+L 0x85DE la_cabeza_contra_la_cosa
+L 0x868C rompe_el_bloque
+L 0x8702 marco_del_bloque
+L 0x8707 pinta_los_marcos_si_la_vela
+L 0x870C pinta_los_marcos
+L 0x873A celdas_vacias_del_bloque
+L 0x8757 guarda_4x4_celdas
+L 0x876C copia_filas_del_mapa
+L 0x877C pinta_celdas
+L 0x884A celdas_vacias_2x2
+L 0x884D pinta_2x2_celdas_guardadas
+L 0x885E celdas_vacias_4x4
+L 0x8874 borra_la_marca_del_bloque
+L 0x887D vacia_2x2_celdas
+L 0x8899 celdas_vacias_4x4_al_mapa
+L 0x889C devuelve_4x4_celdas_al_mapa
+L 0x88B7 copia_filas_al_mapa
+L 0x88F2 mueve_un_cascote
+L 0x893B cascotes_a_sprites
+L 0x8972 rellena_16_bytes
+L 0x89BF sale_una_cosa_en_su_lugar
+L 0x89E3 sale_un_objeto
+L 0x89F0 ficha_del_objeto
+L 0x8A29 cambia_el_arma_repetida
+L 0x8A37 hueco_en_la_lista_de_objetos
+L 0x8A6D mueve_un_objeto
+L 0x8C2F el_objeto_sube
+L 0x8C60 pinta_el_objeto
+L 0x8CC1 dibujo_del_objeto
+L 0x8CD8 guarda_las_celdas_del_objeto
+L 0x8CE6 devuelve_las_celdas_del_objeto
+L 0x8D29 recoge_el_objeto
+L 0x8D2C recoge_con_sonido
+L 0x8D30 da_el_objeto
+L 0x8E6D pon_en_lo_que_lleva
+L 0x8E72 pon_en_0xc702
+L 0x8E9A pinta_el_arma
+L 0x8EA6 pinta_el_dibujo_en_el_marcador
+L 0x8EBA pinta_la_llave_blanca
+L 0x8EC9 pinta_la_llave_o_el_baston
+L 0x8EE6 repinta_lo_que_lleva
+L 0x8F9F trampas_de_la_fase_6
+L 0x9F83 crea_en_lo_que_lanzan
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
 F 0x8000 16

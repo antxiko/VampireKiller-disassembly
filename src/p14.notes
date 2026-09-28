@@ -219,6 +219,17 @@ C 0x8D88 y sigue
 C 0x8D8B sigue (sin carry)
 C 0x8D8D acabo (con carry)
 
+L 0x89C6 al_manejador_del_canal
+L 0x89FF escribe_el_periodo
+L 0x8A13 canal_callado
+L 0x8A1A tono_y_ruido
+L 0x8A21 solo_ruido
+L 0x8A28 solo_tono
+C 0x8A1A tono y ruido abiertos
+C 0x8A21 solo el ruido
+C 0x8A28 solo el tono
+L 0x8CA7 cuenta_del_paso
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
 D 0x8000 0x800C listas_de_cada_bloque  6 punteros, uno por bloque de tres fases (0xD002), a la lista que p00:5A67 copia a 0xE000; lo leen p00:5AA3 (12 bytes)
 F 0x8000 2

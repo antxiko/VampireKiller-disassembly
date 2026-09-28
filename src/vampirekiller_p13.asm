@@ -1041,7 +1041,7 @@ sale_de_la_habitacion:
 	ld a,(0c41bh)		;b963   ; lee el lado por el que se sale de la habitacion
 	inc a			;b966   ; 0xFF?
 	jr z,L_B98C		;b967   ; si: por un paso
-	call L_B9BD		;b969   ; HL = las salidas de esta habitacion
+	call apunta_a_las_salidas		;b969   ; HL = las salidas de esta habitacion
 	ld de,0c41bh		;b96c   ; apunta a el lado por el que se sale de la habitacion
 	ld a,(de)			;b96f   ; el lado
 	ld b,a			;b970
@@ -1072,14 +1072,14 @@ L_B98C:
 	ld (0c41bh),a		;b98d   ; guarda el lado por el que se sale de la habitacion
 	ld a,(0c5b4h)		;b990   ; la habitacion del paso
 	jr L_B987		;b993
-L_B995:
+suma_a_hl:
 	add a,l			;b995   ; HL += A
 	ld l,a			;b996
 	ret nc			;b997
 	inc h			;b998
 	ret			;b999
 salidas_de_la_habitacion:
-	call L_B9BD		;b99a   ; COPIA LAS CUATRO SALIDAS de la habitacion a 0xC41C-0xC41F: HL = las suyas
+	call apunta_a_las_salidas		;b99a   ; COPIA LAS CUATRO SALIDAS de la habitacion a 0xC41C-0xC41F: HL = las suyas
 	ld de,0c41ch		;b99d   ; el destino
 	ld b,004h		;b9a0   ; cuatro nibbles
 L_B9A2:
@@ -1104,18 +1104,18 @@ L_B9B3:
 L_B9BA:
 	djnz L_B9A2		;b9ba   ; cuatro
 	ret			;b9bc
-L_B9BD:
+apunta_a_las_salidas:
 	ld a,(0d000h)		;b9bd   ; HL = LAS SALIDAS DE ESTA HABITACION: la fase
 	ld hl,0b9d3h		;b9c0   ; la tabla de salidas de cada fase
 	add a,a			;b9c3   ; dos bytes por fase
-	call L_B995		;b9c4
+	call suma_a_hl		;b9c4
 	ld a,(hl)			;b9c7   ; la tabla de la fase
 	inc hl			;b9c8
 	ld h,(hl)			;b9c9
 	ld l,a			;b9ca
 	ld a,(0d001h)		;b9cb   ; la habitacion
 	add a,a			;b9ce   ; dos bytes por habitacion
-	call L_B995		;b9cf
+	call suma_a_hl		;b9cf
 	ret			;b9d2
 
 ; ----------------------------------------------------------------------
@@ -1438,15 +1438,15 @@ DATA_salidas_fase_18:
 
 
 L_BB31:
-	call L_BB37		;bb31   ; LA PUERTA Y EL PASO de la habitacion
+	call puerta_de_la_fase_aqui		;bb31   ; LA PUERTA Y EL PASO de la habitacion
 	jp L_BB9A		;bb34
-L_BB37:
+puerta_de_la_fase_aqui:
 	ld a,(0d000h)		;bb37   ; la fase...
 	ld hl,0bb61h		;bb3a   ; ... en la tabla de la puerta de cada fase
 	ld b,a			;bb3d
 	add a,a			;bb3e   ; tres bytes por fase
 	add a,b			;bb3f
-	call L_B995		;bb40
+	call suma_a_hl		;bb40
 	ld a,(hl)			;bb43   ; el primer byte
 	ld b,a			;bb44
 	and 00fh		;bb45   ; la habitacion de la puerta

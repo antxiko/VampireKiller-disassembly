@@ -64,7 +64,7 @@ L_802D:
 	rra			;8036
 	jr nc,L_8040		;8037
 	push bc			;8039   ; mira si alguna arma la toca
-	call L_82A4		;803a
+	call despacha_por_la_forma		;803a
 	pop bc			;803d
 	jr c,$+14		;803e   ; si: a restarle vida
 L_8040:
@@ -106,7 +106,7 @@ L_805A:
 	jr z,L_8072		;806d   ; a cero: muerta
 	jp p,L_8078		;806f   ; aun le queda: sigue
 L_8072:
-	call L_81AB		;8072   ; muerta: puntos
+	call puntos_del_tipo		;8072   ; muerta: puntos
 	call se_va_la_cosa		;8075   ; y lo que suelta
 L_8078:
 	ld a,(iy+001h)		;8078   ; que arma era?
@@ -141,7 +141,7 @@ L_80AC:
 	and a			;80af   ; vacia?
 	jr z,L_80D4		;80b0
 	push bc			;80b2
-	call L_8460		;80b3   ; le da un arma?
+	call caja_de_la_cosa_fija		;80b3   ; le da un arma?
 	pop bc			;80b6
 	jr nc,L_80D4		;80b7   ; no
 	inc (ix+003h)		;80b9   ; si: sube su estado ((ix+3) en esta lista)
@@ -164,9 +164,9 @@ L_80D4:
 	ret			;80db
 L_80DC:
 	ld hl,0c5b5h		;80dc   ; las dos fichas de 0xC5B5 y 0xC5C5
-	call L_80E5		;80df
+	call golpe_al_vendedor		;80df
 	ld hl,0c5c5h		;80e2
-L_80E5:
+golpe_al_vendedor:
 	ld a,(hl)			;80e5   ; el bit 7: esta puesta?
 	rla			;80e6
 	ret nc			;80e7   ; no
@@ -177,12 +177,12 @@ L_80E5:
 	cp 003h		;80f2
 	jr nz,L_80FD		;80f4
 	push hl			;80f6
-	call L_83A1		;80f7   ; ... se mira de otra forma
+	call caja_grande_de_la_lista_y_golpe		;80f7   ; ... se mira de otra forma
 	pop hl			;80fa
 	jr c,L_8112		;80fb   ; le da
 L_80FD:
 	push hl			;80fd
-	call L_83B3		;80fe   ; le da un arma?
+	call caja_grande_de_la_lista_y_arma		;80fe   ; le da un arma?
 	pop hl			;8101
 	ret nc			;8102   ; no
 	ld a,(iy+001h)		;8103   ; el arma 2 se gasta al dar
@@ -227,12 +227,12 @@ L_8135:
 	cp 003h		;813f
 	jr nz,L_814A		;8141
 	push hl			;8143
-	call L_839C		;8144   ; ... se mira de otra forma
+	call caja_de_la_lista		;8144   ; ... se mira de otra forma
 	pop hl			;8147
 	jr c,L_8159		;8148   ; le da
 L_814A:
 	push hl			;814a
-	call L_83AE		;814b   ; le da un arma?
+	call caja_de_la_lista_y_arma		;814b   ; le da un arma?
 	pop hl			;814e
 	jr nc,L_8163		;814f   ; no
 	push hl			;8151
@@ -292,11 +292,11 @@ L_8198:
 	ld hl,0c701h		;819e   ; se acabo:
 	res 4,(hl)		;81a1   ; fuera el bit 4
 	push bc			;81a3
-	call L_8EE6		;81a4   ; y se repinta lo que lleva
+	call repinta_lo_que_lleva		;81a4   ; y se repinta lo que lleva
 	pop bc			;81a7
 L_81A8:
 	jp 0462bh		;81a8   ; quita B de vida a Simon
-L_81AB:
+puntos_del_tipo:
 	ld a,(ix+000h)		;81ab   ; lee el tipo de la cosa
 	ld b,a			;81ae   ; B = el tipo
 	dec a			;81af   ; desde el tipo 1
@@ -357,7 +357,7 @@ L_8240:
 	ld hl,01008h		;8246   ; una caja de 0x10 x 8 en la x de la cosa
 	jp toca_a_simon		;8249   ; toca_a_simon: carry si la caja (HL tamano, DE centro) toca a Simon
 L_824C:
-	call L_82FB		;824c   ; B = su x, C = su y, A = su forma de caja
+	call otra_forma_del_tipo		;824c   ; B = su x, C = su y, A = su forma de caja
 	call 0406bh		;824f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -375,7 +375,7 @@ DATA_tabla_8252:
 
 
 L_8258:
-	call L_82FB		;8258
+	call otra_forma_del_tipo		;8258
 	call 0406bh		;825b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -392,8 +392,8 @@ DATA_tabla_825E:
 ; ======================================================================
 
 
-L_8264:
-	call L_82FB		;8264
+despacha_por_la_otra_forma:
+	call otra_forma_del_tipo		;8264
 	call 0406bh		;8267   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -411,7 +411,7 @@ DATA_tabla_826A:
 
 
 L_8270:
-	call L_82FB		;8270
+	call otra_forma_del_tipo		;8270
 	call 0406bh		;8273   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -429,7 +429,7 @@ DATA_tabla_8276:
 
 
 L_827C:
-	call L_82B8		;827c   ; B = su x, C = su y, A = su otra forma de caja
+	call forma_de_caja_del_tipo		;827c   ; B = su x, C = su y, A = su otra forma de caja
 	call 0406bh		;827f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -452,7 +452,7 @@ DATA_tabla_8282:
 
 
 L_8290:
-	call L_82B8		;8290
+	call forma_de_caja_del_tipo		;8290
 	call 0406bh		;8293   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -474,8 +474,8 @@ DATA_tabla_8296:
 ; ======================================================================
 
 
-L_82A4:
-	call L_82B8		;82a4
+despacha_por_la_forma:
+	call forma_de_caja_del_tipo		;82a4
 	call 0406bh		;82a7   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -497,7 +497,7 @@ DATA_tabla_82AA:
 ; ======================================================================
 
 
-L_82B8:
+forma_de_caja_del_tipo:
 	ld a,(ix+000h)		;82b8   ; lee el tipo de la cosa
 	dec a			;82bb   ; desde el tipo 1
 	ld hl,082cbh		;82bc   ; la forma de caja de cada tipo
@@ -522,7 +522,7 @@ DATA_un_byte_de_cada_tipo:
 ; ======================================================================
 
 
-L_82FB:
+otra_forma_del_tipo:
 	ld a,(ix+000h)		;82fb   ; lee el tipo de la cosa
 	dec a			;82fe   ; desde el tipo 1
 	ld hl,0830dh		;82ff   ; la otra tabla de formas
@@ -628,11 +628,11 @@ L_8398:
 	ld d,b			;8398   ; la posicion de B y C
 	ld e,c			;8399
 	jr L_83A4		;839a
-L_839C:
-	call L_83C7		;839c   ; la de la lista de HL
+caja_de_la_lista:
+	call centro_de_la_lista		;839c   ; la de la lista de HL
 	jr L_83A4		;839f
-L_83A1:
-	call L_83BC		;83a1   ; la de la lista de HL, mas grande
+caja_grande_de_la_lista_y_golpe:
+	call centro_grande_de_la_lista		;83a1   ; la de la lista de HL, mas grande
 L_83A4:
 	ld hl,01008h		;83a4   ; caja de 0x10 x 8: le alcanza el latigo?
 	jp le_alcanza_el_latigo		;83a7   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
@@ -640,15 +640,15 @@ L_83AA:
 	ld d,b			;83aa   ; la posicion de B y C
 	ld e,c			;83ab
 	jr L_83B6		;83ac
-L_83AE:
-	call L_83C7		;83ae   ; la de la lista
+caja_de_la_lista_y_arma:
+	call centro_de_la_lista		;83ae   ; la de la lista
 	jr L_83B6		;83b1
-L_83B3:
-	call L_83BC		;83b3   ; la de la lista, mas grande
+caja_grande_de_la_lista_y_arma:
+	call centro_grande_de_la_lista		;83b3   ; la de la lista, mas grande
 L_83B6:
 	ld hl,01008h		;83b6   ; caja de 0x10 x 8: le da un arma?
 	jp le_da_un_arma		;83b9   ; le_da_un_arma: carry si le da alguna de las dos armas de 0xC450 y 0xC460
-L_83BC:
+centro_grande_de_la_lista:
 	inc l			;83bc   ; la y de la lista...
 	ld a,(hl)			;83bd
 	add a,020h		;83be   ; ... mas 0x20
@@ -658,7 +658,7 @@ L_83BC:
 	add a,010h		;83c3   ; ... mas 0x10
 	ld d,a			;83c5
 	ret			;83c6
-L_83C7:
+centro_de_la_lista:
 	inc l			;83c7   ; la y de la lista...
 	ld a,(hl)			;83c8
 	add a,010h		;83c9   ; ... mas 0x10
@@ -758,7 +758,7 @@ L_8450:
 	ld d,a			;8459
 	ld hl,01008h		;845a   ; caja de 0x10 x 8: le alcanza el latigo?
 	jp le_alcanza_el_latigo		;845d   ; le_alcanza_el_latigo: carry si la caja (HL tamano, DE centro) la alcanza el latigo
-L_8460:
+caja_de_la_cosa_fija:
 	ld a,(ix+004h)		;8460   ; en la lista de cosas fijas (IX = 0xC470 + 16 n): el tamano (byte 4)
 	cp 002h		;8463   ; menor que 2: la caja pequena
 	ld hl,01008h		;8465
@@ -859,12 +859,12 @@ L_84EE:
 	ret			;84ef
 le_da_un_arma:
 	ld iy,0c450h		;84f0   ; la primera arma
-	call L_8500		;84f4   ; le da?
+	call distancia_al_arma		;84f4   ; le da?
 	ret c			;84f7   ; si
 	ld iy,0c460h		;84f8   ; la segunda
-	call L_8500		;84fc
+	call distancia_al_arma		;84fc
 	ret			;84ff
-L_8500:
+distancia_al_arma:
 	ld a,006h		;8500   ; el ancho del arma, 6 mas
 	add a,l			;8502
 	ld l,a			;8503
@@ -906,7 +906,7 @@ L_8539:
 	and a			;853a
 	push hl			;853b
 	push bc			;853c
-	call nz,L_854F		;853d   ; si: esta debajo de Simon?
+	call nz,encima_de_la_plataforma		;853d   ; si: esta debajo de Simon?
 	pop bc			;8540
 	pop hl			;8541
 	ld a,007h		;8542   ; la siguiente, 7 bytes mas alla
@@ -916,7 +916,7 @@ L_8539:
 	or e			;854a
 	ld (0c439h),a		;854b   ; a 0xC439
 	ret			;854e
-L_854F:
+encima_de_la_plataforma:
 	ld c,(hl)			;854f   ; la bandera (bit 0: cual de las dos)
 	inc hl			;8550
 	ld a,(0c425h)		;8551   ; la y de Simon...
@@ -998,7 +998,7 @@ L_85BB:
 	and a			;85bc
 	jr z,L_85D6		;85bd
 	push hl			;85bf
-	call L_85DE		;85c0   ; toca a Simon?
+	call la_cabeza_contra_la_cosa		;85c0   ; toca a Simon?
 	pop hl			;85c3
 	jr nc,L_85D6		;85c4
 	ld a,005h		;85c6   ; si: Simon a la postura 5 (herido)
@@ -1015,7 +1015,7 @@ L_85D6:
 	call 04061h		;85d8   ; hl_mas_a: HL += A
 	djnz L_85BB		;85db
 	ret			;85dd
-L_85DE:
+la_cabeza_contra_la_cosa:
 	inc hl			;85de   ; su y
 	ld a,(hl)			;85df
 	ld d,a			;85e0
@@ -1064,7 +1064,7 @@ L_861C:
 	jr z,L_8642		;8621
 	cp 00ch		;8623   ; el tipo 0x0C no cuenta
 	jr z,L_8642		;8625
-	call L_8264		;8627   ; la toca?
+	call despacha_por_la_otra_forma		;8627   ; la toca?
 	jr nc,L_8642		;862a
 	call se_vuelve_llama		;862c   ; si: se la carga
 	ld a,00bh		;862f   ; efecto 0x0B
@@ -1074,7 +1074,7 @@ L_861C:
 	jr nz,L_8642		;8638
 	ld hl,0c701h		;863a   ; se acabo:
 	res 5,(hl)		;863d   ; fuera el bit 5
-	call L_8EE6		;863f   ; y se repinta lo que lleva
+	call repinta_lo_que_lleva		;863f   ; y se repinta lo que lleva
 L_8642:
 	pop bc			;8642
 	ld de,00080h		;8643   ; la siguiente ficha
@@ -1124,7 +1124,7 @@ L_8677:
 	ld a,(hl)			;867c   ; su estado
 	ld b,a			;867d
 	or a			;867e
-	call nz,L_868C		;867f   ; puesto: a mirarlo
+	call nz,rompe_el_bloque		;867f   ; puesto: a mirarlo
 	pop hl			;8682
 	pop bc			;8683
 	inc c			;8684   ; el numero de bloque
@@ -1133,7 +1133,7 @@ L_8677:
 	ld l,a			;8688
 	djnz L_8677		;8689
 	ret			;868b
-L_868C:
+rompe_el_bloque:
 	ld (hl),002h		;868c   ; estado 2: roto
 	inc l			;868e
 	ld e,(hl)			;868f   ; su y
@@ -1155,7 +1155,7 @@ L_868C:
 	ex af,af'			;86a3   ; el tamano
 	push af			;86a4
 	push de			;86a5
-	call L_873A		;86a6   ; borra el bloque del mapa
+	call celdas_vacias_del_bloque		;86a6   ; borra el bloque del mapa
 	pop de			;86a9
 	pop af			;86aa
 	cp 002h		;86ab   ; pequeno?
@@ -1201,27 +1201,27 @@ L_86E7:
 	push bc			;86ea
 	push hl			;86eb
 	push de			;86ec
-	call L_877C		;86ed   ; pinta el bloque roto
+	call pinta_celdas		;86ed   ; pinta el bloque roto
 	pop de			;86f0
 	call 07d2fh		;86f1   ; su celda en el mapa
 	pop de			;86f4
 	pop bc			;86f5
 	ex de,hl			;86f6
-	call L_88B7		;86f7   ; y la pone en el mapa de la habitacion
+	call copia_filas_al_mapa		;86f7   ; y la pone en el mapa de la habitacion
 	pop hl			;86fa
 	pop de			;86fb
 	ld e,d			;86fc
 	ld a,(0c702h)		;86fd   ; el bit 0 de 0xC702...
 	rra			;8700
 	ret nc			;8701   ; ... si no, nada
-L_8702:
+marco_del_bloque:
 	ld c,00eh		;8702   ; un marco de color 0x0E alrededor
 	jp 048dch		;8704
-L_8707:
+pinta_los_marcos_si_la_vela:
 	ld a,(0c702h)		;8707   ; el bit 0 de 0xC702...
 	rra			;870a
 	ret nc			;870b   ; ... si no, nada
-L_870C:
+pinta_los_marcos:
 	ld bc,00800h		;870c   ; los ocho bloques
 	ld hl,0c470h		;870f   ; apunta a los bloques que se rompen (ocho de 16 bytes)
 L_8712:
@@ -1244,7 +1244,7 @@ L_8712:
 	jr z,L_872D		;8728
 	ld de,02020h		;872a   ; ... o 0x20 x 0x20
 L_872D:
-	call L_8702		;872d   ; su marco
+	call marco_del_bloque		;872d   ; su marco
 L_8730:
 	pop hl			;8730
 	pop bc			;8731
@@ -1254,10 +1254,10 @@ L_8730:
 	ld l,a			;8736
 	djnz L_8712		;8737
 	ret			;8739
-L_873A:
+celdas_vacias_del_bloque:
 	cp 003h		;873a   ; grande?
 	ld hl,0e4a0h		;873c   ; las celdas vacias de un bloque grande
-	jr z,L_8757		;873f
+	jr z,guarda_4x4_celdas		;873f
 	ld hl,0e480h		;8741   ; las de uno pequeno
 L_8744:
 	push hl			;8744
@@ -1270,8 +1270,8 @@ L_8744:
 	add a,a			;874d
 	call 04066h		;874e   ; ... por bloque
 	ld bc,00202h		;8751   ; 2 x 2 celdas
-	jp L_876C		;8754
-L_8757:
+	jp copia_filas_del_mapa		;8754
+guarda_4x4_celdas:
 	push hl			;8757
 	push bc			;8758
 	call 07d2fh		;8759   ; la celda
@@ -1284,8 +1284,8 @@ L_8757:
 	add a,a			;8762
 	call 04066h		;8763   ; ... por bloque
 	ld bc,00404h		;8766   ; 4 x 4 celdas
-	jp L_876C		;8769
-L_876C:
+	jp copia_filas_del_mapa		;8769
+copia_filas_del_mapa:
 	push bc			;876c   ; una fila de C celdas
 	ld b,000h		;876d
 	push hl			;876f
@@ -1294,9 +1294,9 @@ L_876C:
 	pop bc			;8773
 	ld a,020h		;8774   ; la fila siguiente del mapa, 32 mas alla
 	call 04061h		;8776   ; hl_mas_a: HL += A
-	djnz L_876C		;8779   ; B filas
+	djnz copia_filas_del_mapa		;8779   ; B filas
 	ret			;877b
-L_877C:
+pinta_celdas:
 	push bc			;877c   ; pinta C x B dibujos de la lista de HL
 	push de			;877d
 	ld b,c			;877e
@@ -1311,7 +1311,7 @@ L_877F:
 	add a,008h		;878b
 	ld e,a			;878d
 	pop bc			;878e
-	djnz L_877C		;878f   ; B filas
+	djnz pinta_celdas		;878f   ; B filas
 	ret			;8791
 
 ; ----------------------------------------------------------------------
@@ -1338,8 +1338,8 @@ L_87BA:
 	ld b,(hl)			;87c3   ; B
 	cp 002h		;87c4   ; pequeno?
 	jp nc,L_87D2		;87c6
-	call L_884A		;87c9   ; las celdas vacias del pequeno
-	call L_8874		;87cc   ; y su marca, a cero
+	call celdas_vacias_2x2		;87c9   ; las celdas vacias del pequeno
+	call borra_la_marca_del_bloque		;87cc   ; y su marca, a cero
 	jp L_898F		;87cf
 L_87D2:
 	push bc			;87d2   ; el grande:
@@ -1352,19 +1352,19 @@ L_87D2:
 	pop bc			;87dc
 	cp 002h		;87dd   ; el tamano 2?
 	jr z,L_87E9		;87df
-	call L_885E		;87e1   ; las celdas de 4 x 4
-	call L_8899		;87e4   ; al mapa
+	call celdas_vacias_4x4		;87e1   ; las celdas de 4 x 4
+	call celdas_vacias_4x4_al_mapa		;87e4   ; al mapa
 	jr L_87EF		;87e7
 L_87E9:
-	call L_884A		;87e9   ; las de 2 x 2
-	call L_887D		;87ec   ; al mapa
+	call celdas_vacias_2x2		;87e9   ; las de 2 x 2
+	call vacia_2x2_celdas		;87ec   ; al mapa
 L_87EF:
 	ld a,(ix+005h)		;87ef   ; lee la x de la cosa
 	cp 01fh		;87f2   ; 0x1F?
 	jr z,L_8814		;87f4
 	cp 018h		;87f6   ; 0x18?
 	jr z,L_883E		;87f8
-	call L_8874		;87fa   ; la marca, a cero
+	call borra_la_marca_del_bloque		;87fa   ; la marca, a cero
 	pop de			;87fd
 	pop bc			;87fe
 	ld a,b			;87ff   ; sale algo?
@@ -1377,7 +1377,7 @@ L_87EF:
 	add a,010h		;880b
 	ld e,a			;880d
 L_880E:
-	call L_89E3		;880e   ; lo que sale
+	call sale_un_objeto		;880e   ; lo que sale
 L_8811:
 	jp L_88C7		;8811   ; y los cascotes
 L_8814:
@@ -1414,9 +1414,9 @@ L_883E:
 	ld h,(ix+007h)		;8841   ; lee la velocidad vertical (parte baja)
 	ld l,(ix+008h)		;8844   ; lee la velocidad vertical
 	jp L_89FD		;8847   ; sale lo de HL
-L_884A:
+celdas_vacias_2x2:
 	ld hl,0e480h		;884a   ; las celdas vacias de 2 x 2
-L_884D:
+pinta_2x2_celdas_guardadas:
 	push bc			;884d
 	push de			;884e
 	ld a,c			;884f   ; cuatro bytes por...
@@ -1424,11 +1424,11 @@ L_884D:
 	add a,a			;8851
 	call 04061h		;8852   ; hl_mas_a: HL += A
 	ld bc,00202h		;8855   ; 2 x 2
-	call L_877C		;8858   ; a la pantalla
+	call pinta_celdas		;8858   ; a la pantalla
 	pop de			;885b
 	pop bc			;885c
 	ret			;885d
-L_885E:
+celdas_vacias_4x4:
 	ld hl,0e4a0h		;885e   ; las de 4 x 4
 L_8861:
 	push bc			;8861
@@ -1440,16 +1440,16 @@ L_8861:
 	add a,a			;8867
 	call 04061h		;8868   ; hl_mas_a: HL += A
 	ld bc,00404h		;886b   ; 4 x 4
-	call L_877C		;886e   ; a la pantalla
+	call pinta_celdas		;886e   ; a la pantalla
 	pop de			;8871
 	pop bc			;8872
 	ret			;8873
-L_8874:
+borra_la_marca_del_bloque:
 	ld h,(ix+007h)		;8874   ; lee la velocidad vertical (parte baja)
 	ld l,(ix+008h)		;8877   ; lee la velocidad vertical
 	ld (hl),000h		;887a   ; la marca del bloque, a cero
 	ret			;887c
-L_887D:
+vacia_2x2_celdas:
 	ld hl,0e480h		;887d   ; las celdas de 2 x 2
 	push bc			;8880
 	push de			;8881
@@ -1464,13 +1464,13 @@ L_887D:
 	call 04066h		;888c   ; de_mas_a: DE += A
 	ex de,hl			;888f
 	ld bc,00202h		;8890   ; 2 x 2
-	call L_88B7		;8893   ; al mapa
+	call copia_filas_al_mapa		;8893   ; al mapa
 	pop de			;8896
 	pop bc			;8897
 	ret			;8898
-L_8899:
+celdas_vacias_4x4_al_mapa:
 	ld hl,0e4a0h		;8899   ; las de 4 x 4
-L_889C:
+devuelve_4x4_celdas_al_mapa:
 	push bc			;889c
 	push de			;889d
 	push hl			;889e
@@ -1486,11 +1486,11 @@ L_889C:
 	call 04066h		;88aa   ; de_mas_a: DE += A
 	ex de,hl			;88ad
 	ld bc,00404h		;88ae   ; 4 x 4
-	call L_88B7		;88b1   ; al mapa
+	call copia_filas_al_mapa		;88b1   ; al mapa
 	pop de			;88b4
 	pop bc			;88b5
 	ret			;88b6
-L_88B7:
+copia_filas_al_mapa:
 	push bc			;88b7   ; una fila de C bytes
 	ld b,000h		;88b8
 	push de			;88ba
@@ -1499,7 +1499,7 @@ L_88B7:
 	pop bc			;88be
 	ld a,020h		;88bf   ; la fila siguiente, 32 mas alla
 	call 04066h		;88c1   ; de_mas_a: DE += A
-	djnz L_88B7		;88c4   ; B filas
+	djnz copia_filas_al_mapa		;88c4   ; B filas
 	ret			;88c6
 L_88C7:
 	ld hl,0c5a6h		;88c7   ; los dos cascotes de 0xC5A6
@@ -1524,8 +1524,8 @@ L_88DD:
 	ld b,a			;88e0
 	or a			;88e1
 	jr z,L_88EA		;88e2   ; no hay
-	call L_88F2		;88e4   ; lo mueve
-	call L_893B		;88e7   ; y lo pinta
+	call mueve_un_cascote		;88e4   ; lo mueve
+	call cascotes_a_sprites		;88e7   ; y lo pinta
 L_88EA:
 	pop hl			;88ea
 	inc l			;88eb   ; el siguiente, 3 bytes mas alla
@@ -1534,7 +1534,7 @@ L_88EA:
 	pop bc			;88ee
 	djnz L_88DD		;88ef
 	ret			;88f1
-L_88F2:
+mueve_un_cascote:
 	and 07fh		;88f2   ; el tipo sin el bit del lado
 	ld c,a			;88f4
 	inc l			;88f5
@@ -1596,7 +1596,7 @@ DATA_curva_de_los_cascotes:
 ; ======================================================================
 
 
-L_893B:
+cascotes_a_sprites:
 	ld hl,0c5a7h		;893b   ; los dos cascotes a sprites
 	ld de,0d628h		;893e   ; en la tabla de sprites de 0xD628
 	ld b,002h		;8941   ; dos
@@ -1623,13 +1623,13 @@ L_894A:
 	djnz L_8943		;895c
 	ld hl,0d4a0h		;895e
 	ld a,002h		;8961   ; rellena 16 bytes con 2
-	call L_8972		;8963
+	call rellena_16_bytes		;8963
 	ld a,04ch		;8966   ; 16 con 0x4C
-	call L_8972		;8968
+	call rellena_16_bytes		;8968
 	ld a,002h		;896b   ; 16 con 2
-	call L_8972		;896d
+	call rellena_16_bytes		;896d
 	ld a,04ch		;8970   ; y 16 con 0x4C
-L_8972:
+rellena_16_bytes:
 	ld b,010h		;8972   ; 16 bytes
 L_8974:
 	ld (hl),a			;8974   ; del valor de A
@@ -1656,17 +1656,17 @@ L_898A:
 ; LOS OBJETOS QUE SALEN. La lista de 0xC500 (ocho de 16 bytes: [estado][y][x][paso][tipo][...]) son las cosas que aparecen al romper un bloque o al matar algo. 0x8A37 busca un hueco libre. Si el objeto es el arma que Simon ya lleva, sale el tipo 1 en su lugar (0x8A29).
 ; ----------------------------------------------------------------------
 L_898F:
-	call L_8A29		;898f   ; cambia el arma repetida por el tipo 1
+	call cambia_el_arma_repetida		;898f   ; cambia el arma repetida por el tipo 1
 L_8992:
 	ld a,b			;8992   ; que sale?
 	or a			;8993
 	jr z,L_899E		;8994   ; nada
 	cp 015h		;8996   ; el 0x15...
 	jr z,L_899E		;8998
-	call L_89BF		;899a   ; los demas: sale una cosa?
+	call sale_una_cosa_en_su_lugar		;899a   ; los demas: sale una cosa?
 	ret z			;899d   ; no hace falta
 L_899E:
-	call L_8A37		;899e   ; un hueco en la lista
+	call hueco_en_la_lista_de_objetos		;899e   ; un hueco en la lista
 	ret nz			;89a1   ; no hay
 	ld (hl),001h		;89a2   ; estado 1
 	inc l			;89a4
@@ -1689,7 +1689,7 @@ L_89BB:
 	inc l			;89bb
 	ld (hl),000h		;89bc
 	ret			;89be
-L_89BF:
+sale_una_cosa_en_su_lugar:
 	push bc			;89bf
 	push de			;89c0
 	push ix		;89c1
@@ -1715,14 +1715,14 @@ L_89D6:
 	pop de			;89e0
 	pop bc			;89e1
 	ret			;89e2
-L_89E3:
+sale_un_objeto:
 	ld a,b			;89e3   ; el 0x15...
 	cp 015h		;89e4
 	jp z,L_8992		;89e6   ; ... va por el otro camino
-	call L_8A29		;89e9   ; cambia el arma repetida
-	call L_8A37		;89ec   ; un hueco
+	call cambia_el_arma_repetida		;89e9   ; cambia el arma repetida
+	call hueco_en_la_lista_de_objetos		;89ec   ; un hueco
 	ret nz			;89ef   ; no hay
-L_89F0:
+ficha_del_objeto:
 	ld (hl),083h		;89f0   ; estado 0x83
 	inc l			;89f2
 	ld (hl),e			;89f3   ; y
@@ -1736,9 +1736,9 @@ L_89F0:
 	ret			;89fc
 L_89FD:
 	ld (0c70dh),hl		;89fd   ; guarda HL
-	call L_8A37		;8a00   ; un hueco
+	call hueco_en_la_lista_de_objetos		;8a00   ; un hueco
 	ret nz			;8a03   ; no hay
-	call L_89F0		;8a04   ; lo llena
+	call ficha_del_objeto		;8a04   ; lo llena
 	ld a,l			;8a07   ; el byte 9...
 	add a,009h		;8a08
 	ld l,a			;8a0a
@@ -1750,11 +1750,11 @@ L_8A0B:
 	ret			;8a12
 L_8A13:
 	ld (0c70dh),hl		;8a13   ; guarda HL
-	call L_8A37		;8a16   ; un hueco
+	call hueco_en_la_lista_de_objetos		;8a16   ; un hueco
 	ret nz			;8a19   ; no hay
 	push bc			;8a1a
 	ld b,019h		;8a1b   ; el tipo 0x19
-	call L_89F0		;8a1d   ; lo llena
+	call ficha_del_objeto		;8a1d   ; lo llena
 	pop bc			;8a20
 	ld a,l			;8a21   ; el byte 8...
 	add a,008h		;8a22
@@ -1762,7 +1762,7 @@ L_8A13:
 	ld (hl),b			;8a25   ; ... con B
 	inc l			;8a26
 	jr L_8A0B		;8a27
-L_8A29:
+cambia_el_arma_repetida:
 	ld a,b			;8a29   ; los tipos desde 0x1A son armas
 	cp 01ah		;8a2a
 	ret c			;8a2c   ; los de antes, tal cual
@@ -1772,7 +1772,7 @@ L_8A29:
 	ret nz			;8a33   ; no
 	ld b,001h		;8a34   ; si: el tipo 1 en su lugar
 	ret			;8a36
-L_8A37:
+hueco_en_la_lista_de_objetos:
 	push bc			;8a37
 	ld hl,0c500h		;8a38   ; la lista de objetos
 	ld b,008h		;8a3b
@@ -1801,8 +1801,8 @@ L_8A53:
 	ld b,a			;8a59
 	or a			;8a5a
 	jr z,L_8A63		;8a5b   ; vacio
-	call L_8A6D		;8a5d   ; lo mueve
-	call L_8C60		;8a60   ; y lo pinta
+	call mueve_un_objeto		;8a5d   ; lo mueve
+	call pinta_el_objeto		;8a60   ; y lo pinta
 L_8A63:
 	pop hl			;8a63
 	pop bc			;8a64
@@ -1812,7 +1812,7 @@ L_8A63:
 	inc c			;8a69
 	djnz L_8A53		;8a6a
 	ret			;8a6c
-L_8A6D:
+mueve_un_objeto:
 	ld e,(ix+001h)		;8a6d   ; su y
 	ld d,(ix+002h)		;8a70   ; su x
 	ex af,af'			;8a73   ; el estado, a guardar
@@ -1979,11 +1979,11 @@ L_8B70:
 	ld (ix+001h),e		;8b7c
 	ld (ix+002h),d		;8b7f
 	push de			;8b82
-	call L_8CD8		;8b83   ; lo pinta
+	call guarda_las_celdas_del_objeto		;8b83   ; lo pinta
 	pop de			;8b86
 	ld a,(ix+004h)		;8b87   ; su tipo
 	dec a			;8b8a
-	call L_8CC1		;8b8b   ; su dibujo
+	call dibujo_del_objeto		;8b8b   ; su dibujo
 	ld a,(ix+004h)		;8b8e   ; del 0x17 al 0x19...
 	sub 017h		;8b91
 	cp 003h		;8b93
@@ -2002,7 +2002,7 @@ L_8BA2:
 	push de			;8bac
 	ld a,(ix+004h)		;8bad   ; su dibujo
 	dec a			;8bb0
-	call L_8CC1		;8bb1
+	call dibujo_del_objeto		;8bb1
 	pop de			;8bb4
 	ld a,(ix+006h)		;8bb5   ; la cuenta de vida
 	inc a			;8bb8   ; 0xFF: no se acaba
@@ -2012,7 +2012,7 @@ L_8BA2:
 	ret nz			;8bbf
 	dec (ix+006h)		;8bc0   ; ... baja
 	ret nz			;8bc3   ; aun le queda
-	call L_8CE6		;8bc4   ; se acabo: se borra
+	call devuelve_las_celdas_del_objeto		;8bc4   ; se acabo: se borra
 L_8BC7:
 	ld (ix+000h),000h		;8bc7   ; y fuera
 	ret			;8bcb
@@ -2035,13 +2035,13 @@ L_8BDF:
 	ld (hl),000h		;8bea   ; el objeto se va
 	cp 004h		;8bec   ; estaba en el 4?
 	jr nz,L_8BF3		;8bee
-	call L_8CE6		;8bf0   ; se borra su dibujo
+	call devuelve_las_celdas_del_objeto		;8bf0   ; se borra su dibujo
 L_8BF3:
 	ld a,(ix+004h)		;8bf3   ; el tipo 0x19...
 	cp 019h		;8bf6
 	jr z,L_8C14		;8bf8
 	ld (ix+005h),0ffh		;8bfa   ; los demas: fuera
-	call L_8D29		;8bfe   ; y su efecto
+	call recoge_el_objeto		;8bfe   ; y su efecto
 	ld a,(ix+004h)		;8c01   ; el 0x17...
 	cp 017h		;8c04
 	jr z,L_8C0B		;8c06
@@ -2055,7 +2055,7 @@ L_8C0B:
 L_8C14:
 	ld a,(ix+00dh)		;8c14   ; el 0x19: pasa a ser el de (ix+0x0D)
 	ld (ix+004h),a		;8c17
-	call L_8C2F		;8c1a   ; y se lanza otra vez
+	call el_objeto_sube		;8c1a   ; y se lanza otra vez
 	ld a,(0c700h)		;8c1d   ; 0xC700 puesto?
 	or a			;8c20
 	jr nz,L_8C0B		;8c21
@@ -2063,9 +2063,9 @@ L_8C14:
 	ld a,(hl)			;8c26
 	and 0f9h		;8c27
 	ld (hl),a			;8c29
-	call L_8EC9		;8c2a   ; y se repinta
+	call pinta_la_llave_o_el_baston		;8c2a   ; y se repinta
 	jr L_8C0B		;8c2d
-L_8C2F:
+el_objeto_sube:
 	ld a,(ix+001h)		;8c2f   ; 8 mas arriba
 	sub 008h		;8c32
 	ld (ix+001h),a		;8c34
@@ -2079,14 +2079,14 @@ L_8C44:
 	cp 00ah		;8c4b
 	jr nz,L_8C58		;8c4d
 	ld (ix+004h),00bh		;8c4f   ; ... pasa a 0x0B
-	call L_8CE6		;8c53   ; se borra su dibujo
-	jr L_8C2F		;8c56
+	call devuelve_las_celdas_del_objeto		;8c53   ; se borra su dibujo
+	jr el_objeto_sube		;8c56
 L_8C58:
 	cp 00bh		;8c58   ; el 0x0B...
 	ret nz			;8c5a
 	ld (ix+006h),001h		;8c5b   ; ... se queda
 	ret			;8c5f
-L_8C60:
+pinta_el_objeto:
 	ld a,(ix+004h)		;8c60   ; PINTA EL OBJETO: el 0x19 no se pinta
 	cp 019h		;8c63
 	ret z			;8c65
@@ -2155,7 +2155,7 @@ DATA_cuatro_valores_por_cuadro:
 ; ======================================================================
 
 
-L_8CC1:
+dibujo_del_objeto:
 	ld l,050h		;8cc1   ; el dibujo A: fila 0x50...
 	cp 010h		;8cc3   ; ... los 16 primeros
 	jr c,L_8CCB		;8cc5
@@ -2170,14 +2170,14 @@ L_8CCB:
 	ld bc,01010h		;8cd0   ; 16 x 16 puntos
 	ld a,048h		;8cd3   ; con TIMP (transparente), de la pagina 1 a la 0
 	jp 049dbh		;8cd5   ; copia
-L_8CD8:
+guarda_las_celdas_del_objeto:
 	push bc			;8cd8   ; guarda lo que hay debajo del objeto:
 	call 07d2fh		;8cd9   ; su celda
 	pop bc			;8cdc
 	ld (ix+007h),c		;8cdd   ; a (ix+7)
 	ld hl,0e520h		;8ce0   ; en 0xE520
 	jp L_8744		;8ce3   ; 2 x 2 celdas
-L_8CE6:
+devuelve_las_celdas_del_objeto:
 	push ix		;8ce6   ; BORRA EL DIBUJO DEL OBJETO: devuelve lo de debajo
 	push de			;8ce8
 	push de			;8ce9
@@ -2188,7 +2188,7 @@ L_8CE6:
 	call 07d2fh		;8cf2   ; su celda
 	ld de,0e800h		;8cf5   ; las de ahora a 0xE800
 	ld bc,00202h		;8cf8
-	call L_876C		;8cfb   ; 2 x 2
+	call copia_filas_del_mapa		;8cfb   ; 2 x 2
 	pop hl			;8cfe
 	pop bc			;8cff
 	push bc			;8d00
@@ -2211,19 +2211,19 @@ L_8D12:
 	pop hl			;8d16
 	pop bc			;8d17
 	pop de			;8d18
-	call L_884D		;8d19   ; al mapa
+	call pinta_2x2_celdas_guardadas		;8d19   ; al mapa
 	call repinta_los_vendedores		;8d1c   ; repinta
 	call puerta_de_la_fase_a_0xff		;8d1f
-	call L_8707		;8d22   ; y los marcos
+	call pinta_los_marcos_si_la_vela		;8d22   ; y los marcos
 	pop de			;8d25
 	pop ix		;8d26
 	ret			;8d28
-L_8D29:
+recoge_el_objeto:
 	ld a,(ix+004h)		;8d29   ; EL EFECTO DE RECOGER un objeto de tipo (ix+4)
-L_8D2C:
+recoge_con_sonido:
 	ld hl,0509fh		;8d2c   ; el efecto de sonido que devuelva cada manejador...
 	push hl			;8d2f   ; ... suena al volver
-L_8D30:
+da_el_objeto:
 	ld (0c419h),a		;8d30   ; el ultimo objeto recogido
 	call ensena_lo_recogido		;8d33   ; cambia el arma repetida
 	cp 01ah		;8d36   ; desde 0x1A son armas
@@ -2273,7 +2273,7 @@ L_8D70:
 	cp 005h		;8d72   ; la 5...
 	jr z,L_8D8D		;8d74   ; ... va aparte
 	ld (0c416h),a		;8d76   ; guarda el arma que lleva Simon (0, ninguna)
-	call L_8E9A		;8d79   ; pinta el arma en el marcador
+	call pinta_el_arma		;8d79   ; pinta el arma en el marcador
 L_8D7C:
 	ld a,(0c431h)		;8d7c   ; con el bit 2 de 0xC431...
 	and 004h		;8d7f
@@ -2288,7 +2288,7 @@ L_8D8A:
 L_8D8D:
 	ld b,008h		;8d8d   ; el bit 3 de lo que lleva
 L_8D8F:
-	call L_8E6D		;8d8f   ; se pone
+	call pon_en_lo_que_lleva		;8d8f   ; se pone
 	jr L_8D8A		;8d92
 L_8D94:
 	ld b,040h		;8d94   ; el bit 6
@@ -2369,7 +2369,7 @@ L_8E14:
 	pop hl			;8e14
 	ret			;8e15
 L_8E16:
-	call L_870C		;8e16   ; pinta los marcos de los bloques
+	call pinta_los_marcos		;8e16   ; pinta los marcos de los bloques
 	ld b,001h		;8e19   ; el bit 0 de 0xC702
 	jr L_8E2D		;8e1b
 L_8E1D:
@@ -2382,7 +2382,7 @@ L_8E26:
 	res 6,(hl)		;8e29
 	ld b,080h		;8e2b   ; ... por el 7
 L_8E2D:
-	call L_8E72		;8e2d   ; se pone en 0xC702
+	call pon_en_0xc702		;8e2d   ; se pone en 0xC702
 	ld a,012h		;8e30   ; efecto 0x12
 	ret			;8e32
 L_8E33:
@@ -2403,16 +2403,16 @@ L_8E4B:
 	jr L_8E45		;8e4e
 L_8E50:
 	ld b,002h		;8e50   ; el bit 1 de lo que lleva
-	call L_8E6D		;8e52
+	call pon_en_lo_que_lleva		;8e52
 	ld hl,0c700h		;8e55   ; 0xC700 a 1
 	ld (hl),001h		;8e58
-	call L_8EC9		;8e5a   ; y se repinta
+	call pinta_la_llave_o_el_baston		;8e5a   ; y se repinta
 	ld a,014h		;8e5d   ; efecto 0x14
 	ret			;8e5f
 L_8E60:
 	ld b,001h		;8e60   ; el bit 0 de lo que lleva
-	call L_8E6D		;8e62
-	call L_8EBA		;8e65   ; se repinta
+	call pon_en_lo_que_lleva		;8e62
+	call pinta_la_llave_blanca		;8e65   ; se repinta
 	ld a,014h		;8e68   ; efecto 0x14
 	ret			;8e6a
 
@@ -2429,10 +2429,10 @@ DATA_codigo_sin_llamar_8E6B:
 ; ======================================================================
 
 
-L_8E6D:
+pon_en_lo_que_lleva:
 	ld hl,0c701h		;8e6d   ; pone los bits de B en lo que lleva (0xC701)
 	jr L_8E75		;8e70
-L_8E72:
+pon_en_0xc702:
 	ld hl,0c702h		;8e72   ; o en 0xC702
 L_8E75:
 	ld a,b			;8e75
@@ -2445,23 +2445,23 @@ L_8E79:
 	ld hl,0c701h		;8e7e   ; fuera el bit 1 de lo que lleva...
 	res 1,(hl)		;8e81
 	ld b,004h		;8e83   ; ... y el 2 puesto
-	call L_8E6D		;8e85
+	call pon_en_lo_que_lleva		;8e85
 	ld a,003h		;8e88   ; 0xC700 a 3
 	ld (0c700h),a		;8e8a
-	call L_8EC9		;8e8d   ; se repinta
+	call pinta_la_llave_o_el_baston		;8e8d   ; se repinta
 	ld a,00fh		;8e90   ; efecto 0x0F
 	ret			;8e92
 L_8E93:
 	xor a			;8e93   ; sin arma
 	ld (0c416h),a		;8e94   ; guarda el arma que lleva Simon (0, ninguna)
-	jp L_8E9A		;8e97
-L_8E9A:
+	jp pinta_el_arma		;8e97
+pinta_el_arma:
 	ld a,(0c416h)		;8e9a   ; PINTA EL ARMA en su recuadro del marcador
 	ld de,0800ch		;8e9d   ; en la VRAM 0x800C
 	or a			;8ea0   ; ninguna: el recuadro vacio
 	jp z,L_8979		;8ea1
 	add a,019h		;8ea4   ; su dibujo: 0x19 + el arma...
-L_8EA6:
+pinta_el_dibujo_en_el_marcador:
 	dec a			;8ea6   ; ... menos 1
 	ld l,050h		;8ea7   ; fila 0x50...
 	cp 010h		;8ea9
@@ -2471,16 +2471,16 @@ L_8EA6:
 L_8EB1:
 	jp L_897D		;8eb1   ; copia el dibujo
 L_8EB4:
-	call L_8EC9		;8eb4   ; repinta los dos recuadros
-	jp L_8EBA		;8eb7
-L_8EBA:
+	call pinta_la_llave_o_el_baston		;8eb4   ; repinta los dos recuadros
+	jp pinta_la_llave_blanca		;8eb7
+pinta_la_llave_blanca:
 	ld de,0a40ch		;8eba   ; en 0xA40C...
 	ld a,(0c701h)		;8ebd   ; ... el bit 0 de lo que lleva
 	and 001h		;8ec0
 	jp z,L_8979		;8ec2   ; no lo lleva: vacio
 	ld a,018h		;8ec5   ; el dibujo 0x18
-	jr L_8EA6		;8ec7
-L_8EC9:
+	jr pinta_el_dibujo_en_el_marcador		;8ec7
+pinta_la_llave_o_el_baston:
 	ld de,0940ch		;8ec9   ; en 0x940C...
 	ld a,(0c701h)		;8ecc   ; ... los bits 1 y 2 de lo que lleva
 	ld b,a			;8ecf
@@ -2494,8 +2494,8 @@ L_8EC9:
 	jr nz,L_8EE4		;8ee0
 	ld a,017h		;8ee2   ; ... si no, el 0x17
 L_8EE4:
-	jr L_8EA6		;8ee4
-L_8EE6:
+	jr pinta_el_dibujo_en_el_marcador		;8ee4
+repinta_lo_que_lleva:
 	call borra_lo_que_lleva		;8ee6   ; REPINTA LO QUE LLEVA: los cinco bits de arriba de 0xC701
 	ld a,(0c701h)		;8ee9   ; lee lo que lleva Simon (un bit por objeto)
 	ld c,a			;8eec
@@ -2531,7 +2531,7 @@ pinta_lo_que_lleva:
 	ld e,00ch		;8f0f   ; ... E = 0x0C, la fila
 	inc hl			;8f11
 	ld a,(hl)			;8f12   ; A = el dibujo
-	call L_8EA6		;8f13   ; lo copia
+	call pinta_el_dibujo_en_el_marcador		;8f13   ; lo copia
 	pop bc			;8f16   ; B y A, para el bucle de quien llama
 	pop af			;8f17
 	ret			;8f18
@@ -2564,7 +2564,7 @@ L_8F2D:
 	call borra_lo_que_lleva		;8f3a   ; borra la zona de lo que lleva...
 	ld de,0d00ch		;8f3d   ; ... y pinta ahi, en (0xD0, 0x0C), lo recogido
 	ld a,(0c419h)		;8f40   ; lee el ultimo objeto recogido
-	call L_8EA6		;8f43
+	call pinta_el_dibujo_en_el_marcador		;8f43
 	pop af			;8f46
 	pop ix		;8f47
 	ret			;8f49
@@ -2584,7 +2584,7 @@ cuenta_de_lo_recogido:
 	ld hl,0c5e6h		;8f60   ; la cuenta...
 	dec (hl)			;8f63
 	ret nz			;8f64   ; (aun no)
-	jp L_8EE6		;8f65   ; acabada: vuelve a pintar lo que lleva
+	jp repinta_lo_que_lleva		;8f65   ; acabada: vuelve a pintar lo que lleva
 puede_abrirlo:
 	push hl			;8f68
 	ld a,(ix+004h)		;8f69   ; el tipo del objeto (+4 en la lista de 0xC500)
@@ -2629,7 +2629,7 @@ pon_las_trampas_de_cadena:
 	ld a,(0c580h)		;8f9a   ; ya puestas?
 	or a			;8f9d
 	ret nz			;8f9e   ; si: nada
-L_8F9F:
+trampas_de_la_fase_6:
 	ld hl,(0d000h)		;8f9f   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 	ld de,00106h		;8fa2   ; solo en la fase 6, habitacion 1
 	rst 20h			;8fa5
@@ -2727,7 +2727,7 @@ L_9015:
 	ld a,001h		;9022   ; ... de la pagina 1 a la 0
 	jp 04946h		;9024   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 las_trampas_de_cadena:
-	call L_8F9F		;9027
+	call trampas_de_la_fase_6		;9027
 	jp L_8FD2		;902a
 
 ; ----------------------------------------------------------------------
@@ -3112,7 +3112,7 @@ L_9238:
 pinta_el_vendedor:
 	push de			;924c   ; guarda las 4 x 4 celdas del mapa que tapa (16 bytes por hueco en 0xE580)
 	ld hl,0e580h		;924d
-	call L_8757		;9250
+	call guarda_4x4_celdas		;9250
 	pop de			;9253
 	call su_cuenta_de_visitas		;9254   ; las visitas del hueco:
 	bit 7,(hl)		;9257   ; la tienda quedo abierta sin comprar (bit 7)?
@@ -3301,7 +3301,7 @@ el_vendedor_se_va:
 	ld (ix+000h),000h		;9358   ; 6: fuera la ficha
 	call devuelve_lo_que_tapaba		;935c   ; devuelve a la pantalla lo que tapaba
 	ld hl,0e580h		;935f   ; y al mapa
-	call L_889C		;9362
+	call devuelve_4x4_celdas_al_mapa		;9362
 	ld h,(ix+007h)		;9365   ; el secreto de 0xE000...
 	ld l,(ix+008h)		;9368   ; lee la velocidad vertical
 	ld (hl),000h		;936b   ; ... se borra: ya no vuelve
@@ -3377,7 +3377,7 @@ L_93B3:
 	call en_la_ventana		;93f4
 	ld a,(0c708h)		;93f7   ; ... el dibujo de lo que vende
 	dec a			;93fa
-	call L_8CC1		;93fb
+	call dibujo_del_objeto		;93fb
 	ret			;93fe
 lo_que_vende_y_su_precio:
 	call el_hueco_del_vendedor		;93ff   ; su hueco en 0xDE00
@@ -3521,7 +3521,7 @@ lee_la_compra:
 	call c,devuelve_el_fondo_de_la_ventana		;94df   ; si: se quita antes de repintar los corazones
 	call 045a0h		;94e2   ; quita el precio de los corazones
 	ld a,(0c708h)		;94e5   ; da lo que vende
-	call L_8D30		;94e8
+	call da_el_objeto		;94e8
 	pop af			;94eb
 	call c,pinta_la_ventana_de_la_tienda		;94ec   ; y vuelve la ventana, si se quito
 	ld a,012h		;94ef   ; efecto 0x12
@@ -3542,7 +3542,7 @@ sigue_la_tienda:
 	ret			;9506
 cierra_la_tienda:
 	call devuelve_el_fondo_de_la_ventana		;9507   ; devuelve el fondo...
-	jp L_8707		;950a   ; ... y los marcos
+	jp pinta_los_marcos_si_la_vela		;950a   ; ... y los marcos
 devuelve_el_fondo_de_la_ventana:
 	push bc			;950d
 	ld hl,0b080h		;950e   ; de (0xB0, 0x80) de la pagina 1...
@@ -3620,7 +3620,7 @@ el_mapa_del_pergamino:
 	jr nz,L_9582		;9578   ; ... y con el ultimo...
 	ld hl,0c701h		;957a   ; apunta a lo que lleva Simon (un bit por objeto)
 	res 7,(hl)		;957d   ; ... se va el pergamino...
-	call L_8EE6		;957f   ; ... y se repinta lo que lleva
+	call repinta_lo_que_lleva		;957f   ; ... y se repinta lo que lleva
 L_9582:
 	call 047feh		;9582
 	ld hl,00020h		;9585   ; borra el sitio de juego: desde (0, 0x20)...
@@ -3652,7 +3652,7 @@ quita_el_mapa:
 	call las_trampas_de_cadena		;95bc   ; ... sus trampas de cadena...
 	call puerta_de_la_fase_a_0xff		;95bf   ; ... la puerta de la fase...
 	call repinta_los_vendedores		;95c2   ; ... los vendedores...
-	call L_8707		;95c5   ; ... los marcos...
+	call pinta_los_marcos_si_la_vela		;95c5   ; ... los marcos...
 	call 04809h		;95c8
 	xor a			;95cb   ; y 0xCF38 a 0
 	ld (0cf38h),a		;95cc
@@ -4270,7 +4270,7 @@ L_9A99:
 	push af			;9a99
 	call borra_la_cosa		;9a9a   ; se borra...
 	pop af			;9a9d
-	call L_8D2C		;9a9e   ; ... y Simon lo coge
+	call recoge_con_sonido		;9a9e   ; ... y Simon lo coge
 	scf			;9aa1
 	ret			;9aa2
 dracula_cae:
@@ -4459,7 +4459,7 @@ deja_el_objeto_b:
 	add a,004h		;9c16
 	and 0f8h		;9c18   ; ... a la rejilla de 8
 	ld d,a			;9c1a
-	jp L_89E3		;9c1b   ; y sale como un objeto a la vista
+	jp sale_un_objeto		;9c1b   ; y sale como un objeto a la vista
 lo_que_suelta_cae:
 	ld hl,09c59h		;9c1e   ; LO QUE SUELTA UN ENEMIGO, cada cuadro: su color, uno de 0x9C59...
 	ld a,(0c003h)		;9c21   ; ... por los dos bits bajos del contador de cuadros
@@ -5020,14 +5020,14 @@ crea_con_parametros:
 	ld (0cff5h),hl		;9f74   ; ... HL y DE (las velocidades)...
 	ld (0cff7h),de		;9f77
 	push ix		;9f7b
-	call L_9F83		;9f7d   ; ... y la crea
+	call crea_en_lo_que_lanzan		;9f7d   ; ... y la crea
 	pop ix		;9f80
 	ret			;9f82
 
 ; ----------------------------------------------------------------------
 ; CREA UNA COSA EN LA LISTA DE 0xD700: el tipo pedido 0xCFF9 da el suyo en 0xA08E (0xFF da el 0x0C); busca una ficha libre de las ocho y dos sprites libres (con y = 0xE0) desde el 0x11 hacia abajo (entre dos solo, con 0xCE03), y la rellena con la posicion y las velocidades de 0xCFF1-0xCFF8.
 ; ----------------------------------------------------------------------
-L_9F83:
+crea_en_lo_que_lanzan:
 	ld a,(0cff9h)		;9f83   ; el tipo pedido...
 	cp 0ffh		;9f86
 	ld c,00ch		;9f88   ; ... 0xFF: el 0x0C...
