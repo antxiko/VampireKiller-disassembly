@@ -10,23 +10,19 @@
 
 
 ; ----------------------------------------------------------------------
-; Etiquetas que no caen en ninguna posicion emitida del listado
-; (destinos fuera del binario o dentro de una instruccion).
-; ----------------------------------------------------------------------
-L_7EDD:	equ 0x07edd
-
-; ----------------------------------------------------------------------
-; DATOS sin identificar  0x6000..0x6029  (41 bytes)
+; DATOS sin identificar  0x6000..0x6028  (40 bytes)
 DATA_6000:
 	defb 0d2h,0b4h,0d2h,0b4h,028h,060h,060h,09bh,0ceh,0b0h,066h,09ch,0c7h,0a2h,077h,0b7h	; 6000  ....(``...f...w.
 	defb 012h,0b2h,09bh,09bh,028h,060h,0c4h,09bh,0a7h,04eh,0d0h,04eh,0d0h,04eh,01fh,04fh	; 6010  ....(`...N.N.N.O
-	defb 028h,060h,05dh,06ah,0e8h,0ach,0bch,069h,0c9h	; 6020  (`]j...i.
+	defb 028h,060h,05dh,06ah,0e8h,0ach,0bch,069h	; 6020  (`]j...i
 
 ; ======================================================================
-; CODIGO 0x6029..0x6058  (47 bytes)
+; CODIGO 0x6028..0x6058  (48 bytes)
 ; ======================================================================
 
 
+L_6028:
+	ret			;6028
 L_6029:
 	ld a,(ix+020h)		;6029
 	and a			;602c
@@ -1064,7 +1060,7 @@ DATA_6874:
 	defb 07ch,068h,086h,068h,07ch,068h,095h,068h	; 6874  |h.h|h.h
 
 ; ======================================================================
-; CODIGO 0x687c..0x69bc  (320 bytes)
+; CODIGO 0x687c..0x69e4  (360 bytes)
 ; ======================================================================
 
 
@@ -1210,17 +1206,34 @@ L_69A0:
 	ld bc,01010h		;69b4
 	ld a,001h		;69b7
 	jp 04946h		;69b9
+L_69BC:
+	xor a			;69bc
+	ld (ix+07eh),a		;69bd
+	ld (ix+00eh),a		;69c0
+	ld (ix+006h),001h		;69c3
+	ld (ix+00bh),05ah		;69c7
+	ld hl,0ce12h		;69cb
+	ld a,(hl)			;69ce
+	inc (hl)			;69cf
+	add a,a			;69d0
+	ld de,069e4h		;69d1
+	call L_6542		;69d4
+	call 0a55dh		;69d7
+	inc hl			;69da
+	ld e,(hl)			;69db
+	inc hl			;69dc
+	ld d,(hl)			;69dd
+	call 0a56ch		;69de
+	jp L_6542		;69e1
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x69bc..0x69fc  (64 bytes)
-DATA_69BC:
-	defb 0afh,0ddh,077h,07eh,0ddh,077h,00eh,0ddh,036h,006h,001h,0ddh,036h,00bh,05ah,021h	; 69bc  ..w~.w..6...6.Z!
-	defb 012h,0ceh,07eh,034h,087h,011h,0e4h,069h,0cdh,042h,065h,0cdh,05dh,0a5h,023h,05eh	; 69cc  ..~4...i.Be.].#^
-	defb 023h,056h,0cdh,06ch,0a5h,0c3h,042h,065h,040h,0fbh,000h,001h,080h,0fdh,000h,002h	; 69dc  #V.l..Be@.......
-	defb 080h,001h,020h,003h,000h,004h,000h,0ffh,080h,0ffh,000h,0fch,000h,0feh,040h,0fdh	; 69ec  .. ...........@.
+; DATOS sin identificar  0x69e4..0x69fc  (24 bytes)
+DATA_69E4:
+	defb 040h,0fbh,000h,001h,080h,0fdh,000h,002h,080h,001h,020h,003h,000h,004h,000h,0ffh	; 69e4  @......... .....
+	defb 080h,0ffh,000h,0fch,000h,0feh,040h,0fdh	; 69f4  ......@.
 
 ; ======================================================================
-; CODIGO 0x69fc..0x6a5d  (97 bytes)
+; CODIGO 0x69fc..0x6a8c  (144 bytes)
 ; ======================================================================
 
 
@@ -1284,14 +1297,28 @@ L_6A49:
 	ld c,02ch		;6a55
 	ld de,08098h		;6a57
 	jp 05f1dh		;6a5a
+L_6A5D:
+	ld (ix+006h),001h		;6a5d
+	ld (ix+00ch),008h		;6a61
+	ld (ix+011h),000h		;6a65
+	ld (ix+00bh),002h		;6a69
+	ld de,00300h		;6a6d
+	call 0a55dh		;6a70
+	ld hl,0cf32h		;6a73
+	inc (hl)			;6a76
+	ld a,(hl)			;6a77
+	and 007h		;6a78
+	ld de,06a8ch		;6a7a
+	call L_6542		;6a7d
+	ld a,(0c427h)		;6a80
+	sub (ix+005h)		;6a83
+	call c,0a17ch		;6a86
+	jp 0a56ch		;6a89
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x6a5d..0x6a9c  (63 bytes)
-DATA_6A5D:
-	defb 0ddh,036h,006h,001h,0ddh,036h,00ch,008h,0ddh,036h,011h,000h,0ddh,036h,00bh,002h	; 6a5d  .6...6...6...6..
-	defb 011h,000h,003h,0cdh,05dh,0a5h,021h,032h,0cfh,034h,07eh,0e6h,007h,011h,08ch,06ah	; 6a6d  ....].!2.4~....j
-	defb 0cdh,042h,065h,03ah,027h,0c4h,0ddh,096h,005h,0dch,07ch,0a1h,0c3h,06ch,0a5h,000h	; 6a7d  .Be:'.....|..l..
-	defb 001h,080h,002h,080h,001h,000h,002h,040h,002h,040h,001h,000h,003h,0c0h,001h	; 6a8d  .......@.@.....
+; DATOS sin identificar  0x6a8c..0x6a9c  (16 bytes)
+DATA_6A8C:
+	defb 000h,001h,080h,002h,080h,001h,000h,002h,040h,002h,040h,001h,000h,003h,0c0h,001h	; 6a8c  ........@.@.....
 
 ; ======================================================================
 ; CODIGO 0x6a9c..0x6aad  (17 bytes)

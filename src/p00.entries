@@ -12,6 +12,8 @@
 #
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
 0x4028   # gancho de interrupcion H.TIMI: INIT escribe 0xC3 en 0xFD9F y esta direccion en 0xFDA0 (p00:40B3-p00:40BB)
+0x4061   # p02:8D05 call
+0x4066   # p02:874E call
 0x4075   # cabecera AB: INIT
 0x417D   # p00:415E entrada 0 de la tabla de 0x4161 (call 0x406B en 0x415E)
 0x41A0   # p00:415E entrada 1 de la tabla de 0x4161 (call 0x406B en 0x415E)
@@ -24,6 +26,7 @@
 0x4324   # p00:415E entrada 8 de la tabla de 0x4161 (call 0x406B en 0x415E)
 0x4377   # p00:415E entrada 9 de la tabla de 0x4161 (call 0x406B en 0x415E)
 0x4387   # p00:415E entrada 10 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4391   # a mano: p00:415A ld hl,0x4391 / push hl antes de despachar la maquina de estados: los estados 0-2 vuelven ahi
 0x43DA   # p00:415E entrada 11 de la tabla de 0x4161 (call 0x406B en 0x415E)
 0x43F0   # p00:415E entrada 12 de la tabla de 0x4161 (call 0x406B en 0x415E)
 0x4414   # p00:415E entrada 13 de la tabla de 0x4161 (call 0x406B en 0x415E)
@@ -35,26 +38,26 @@
 0x462B   # p02:85D3 jp
 0x463C   # p01:7E56 jp
 0x4651   # p03:B747 jp
+0x4675   # p01:65AD jp
 0x47B1   # p01:669B call
-0x47C7   # p01:6321 call
-0x47D4   # p01:6304 call
-0x49DB   # p02:8CD5 jp
+0x48DC   # p02:8704 jp
 0x4B0B   # p02:8781 call
 0x4B1D   # p01:7B48 call
 0x4B2F   # p01:6285 call
-0x4B4F   # p02:94A9 call
+0x4B4F   # p01:7B4B call
 0x4E9F   # p01:63EA call
+0x4EA7   # p00:5FC9 entrada 38 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x4EB3   # p02:993F entrada 38 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x4EC0   # p01:63ED call
+0x4ED0   # p00:5FC9 entrada 39 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x4EF9   # p02:993F entrada 39 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x4F17   # p01:63F0 call
+0x4F1F   # p00:5FC9 entrada 41 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x4F35   # p02:993F entrada 41 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x4F83   # p01:6301 call
 0x4F91   # p01:630A call
-0x509F   # p02:94F1 call
 0x5309   # p01:66E0 call
 0x530F   # p01:6221 call
-0x53B6   # p01:62E3 jp
 0x53DE   # p01:6712 call
 0x53FC   # p02:914C jp cc
 0x548D   # p01:62DD call

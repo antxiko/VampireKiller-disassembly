@@ -11,7 +11,7 @@
 # encuentra tools/z80trace.py solo, siguiendo el flujo.
 #
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
-0x8015   # p01:7FF0 jr cc
+0x8001   # a mano: p01:7FFE ld (0xC433),a partida entre el banco 1 y el 2: sigue en p02:8001
 0x801E   # p01:7D8E call
 0x80A6   # p01:7D94 call
 0x80DC   # p01:7D97 call
@@ -67,6 +67,10 @@
 0x8671   # p01:6310 call
 0x88D8   # p00:5C7A call
 0x8A4A   # p00:5C77 call
+0x8AF8   # a mano: tabla de p02:8A8D, entrada 1 (despachador de p02:8A80: push de / ret)
+0x8B70   # a mano: tabla de p02:8A8D, entrada 2
+0x8BA2   # a mano: tabla de p02:8A8D, entrada 3
+0x8BCC   # a mano: tabla de p02:8A8D, entrada 4
 0x8D7C   # p02:8D3B entrada 5 de la tabla de 0x8D3E (call 0x406B en 0x8D3B)
 0x8D94   # p02:8D3B entrada 9 de la tabla de 0x8D3E (call 0x406B en 0x8D3B)
 0x8D98   # p02:8D3B entrada 2 de la tabla de 0x8D3E (call 0x406B en 0x8D3B)
@@ -97,7 +101,6 @@
 0x8FCF   # p00:5C7D call
 0x902D   # p01:6395 call
 0x909B   # p01:6398 call
-0x9147   # p01:6313 call
 0x91BE   # p01:630D call
 0x9327   # p02:92AA entrada 0 de la tabla de 0x92AD (call 0x406B en 0x92AA)
 0x9333   # p02:92AA entrada 1 de la tabla de 0x92AD (call 0x406B en 0x92AA)
@@ -120,8 +123,11 @@
 0x9A3A   # p01:7813 call cc
 0x9B60   # p03:A031 entrada 11 de la tabla de 0xA034 (call 0x406B en 0xA031)
 0x9B71   # p02:9E5C entrada 11 de la tabla de 0x9E5F (call 0x406B en 0x9E5C)
+0x9B9B   # p00:5FC9 entrada 35 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
+0x9BC4   # p00:5FC9 entrada 37 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x9BD9   # p02:993F entrada 35 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x9C1E   # p02:993F entrada 37 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0x9C66   # p00:5FC9 entrada 31 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x9CA3   # p02:993F entrada 31 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x9CA9   # p01:6324 call
 0x9CE6   # p00:5EF6 call cc

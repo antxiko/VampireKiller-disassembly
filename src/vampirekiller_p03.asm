@@ -9,12 +9,6 @@
 	org 0x0a000
 
 
-; ----------------------------------------------------------------------
-; Etiquetas que no caen en ninguna posicion emitida del listado
-; (destinos fuera del binario o dentro de una instruccion).
-; ----------------------------------------------------------------------
-L_B99A:	equ 0x0b99a
-
 ; ======================================================================
 ; CODIGO 0xa000..0xa034  (52 bytes)
 ; ======================================================================
@@ -320,7 +314,7 @@ DATA_A2A6:
 	defb 03eh,04ch	; a2a6
 
 ; ======================================================================
-; CODIGO 0xa2a8..0xa2c7  (31 bytes)
+; CODIGO 0xa2a8..0xa452  (426 bytes)
 ; ======================================================================
 
 
@@ -341,18 +335,15 @@ L_A2BA:
 L_A2C3:
 	ld (ix+00bh),b		;a2c3
 	ret			;a2c6
-
-; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa2c7..0xa2e0  (25 bytes)
-DATA_A2C7:
-	defb 0ddh,036h,01bh,001h,0afh,0ddh,077h,01ch,0ddh,077h,012h,0ddh,036h,010h,002h,0ddh	; a2c7  .6....w..w..6...
-	defb 077h,019h,0ddh,036h,015h,001h,0c3h,066h,0a3h	; a2d7  w..6...f.
-
-; ======================================================================
-; CODIGO 0xa2e0..0xa452  (370 bytes)
-; ======================================================================
-
-
+L_A2C7:
+	ld (ix+01bh),001h		;a2c7
+	xor a			;a2cb
+	ld (ix+01ch),a		;a2cc
+	ld (ix+012h),a		;a2cf
+	ld (ix+010h),002h		;a2d2
+	ld (ix+019h),a		;a2d6
+	ld (ix+015h),001h		;a2d9
+	jp L_A366		;a2dd
 L_A2E0:
 	call L_A4B3		;a2e0
 	xor a			;a2e3
@@ -411,6 +402,7 @@ L_A348:
 	sub 030h		;a35f
 	neg		;a361
 	ld (ix+010h),a		;a363
+L_A366:
 	ld (ix+011h),010h		;a366
 	ld (ix+014h),000h		;a36a
 	ld (ix+015h),001h		;a36e
@@ -1225,16 +1217,23 @@ L_A9B7:
 	call 0406bh		;a9be
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa9c1..0xa9d8  (23 bytes)
+; DATOS sin identificar  0xa9c1..0xa9c7  (6 bytes)
 DATA_A9C1:
-	defb 0d8h,0a9h,00bh,0aah,037h,0aah,0ddh,07eh,022h,0c6h,010h,0ddh,077h,003h,0ddh,07eh	; a9c1  ....7..~"...w..~
-	defb 023h,0c6h,008h,0ddh,077h,005h,0c9h	; a9d1
+	defb 0d8h,0a9h,00bh,0aah,037h,0aah	; a9c1
 
 ; ======================================================================
-; CODIGO 0xa9d8..0xaaad  (213 bytes)
+; CODIGO 0xa9c7..0xaaad  (230 bytes)
 ; ======================================================================
 
 
+L_A9C7:
+	ld a,(ix+022h)		;a9c7
+	add a,010h		;a9ca
+	ld (ix+003h),a		;a9cc
+	ld a,(ix+023h)		;a9cf
+	add a,008h		;a9d2
+	ld (ix+005h),a		;a9d4
+	ret			;a9d7
 L_A9D8:
 	push ix		;a9d8
 	pop hl			;a9da
@@ -1435,16 +1434,20 @@ L_AB42:
 	call 0406bh		;ab49
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xab4c..0xab67  (27 bytes)
+; DATOS sin identificar  0xab4c..0xab60  (20 bytes)
 DATA_AB4C:
 	defb 067h,0abh,086h,0abh,0abh,0abh,0d4h,0abh,0e9h,0abh,021h,0ach,040h,0ach,07eh,0ach	; ab4c  g.........!.@.~.
-	defb 0aeh,0ach,0d9h,0ach,0ddh,07eh,005h,032h,00fh,0ceh,0c9h	; ab5c  .....~.2...
+	defb 0aeh,0ach,0d9h,0ach	; ab5c
 
 ; ======================================================================
-; CODIGO 0xab67..0xac76  (271 bytes)
+; CODIGO 0xab60..0xac76  (278 bytes)
 ; ======================================================================
 
 
+L_AB60:
+	ld a,(ix+005h)		;ab60
+	ld (0ce0fh),a		;ab63
+	ret			;ab66
 L_AB67:
 	ld a,(0c427h)		;ab67
 	sub (ix+005h)		;ab6a
@@ -1592,7 +1595,7 @@ DATA_ACAA:
 	defb 05bh,05ch,05dh,05eh	; acaa
 
 ; ======================================================================
-; CODIGO 0xacae..0xace8  (58 bytes)
+; CODIGO 0xacae..0xad20  (114 bytes)
 ; ======================================================================
 
 
@@ -1620,19 +1623,22 @@ L_ACD9:
 	ld (0ce16h),a		;acdf
 	call L_ADC6		;ace2
 	jp 099f6h		;ace5
-
-; ----------------------------------------------------------------------
-; DATOS sin identificar  0xace8..0xad12  (42 bytes)
-DATA_ACE8:
-	defb 0ddh,036h,006h,001h,0ddh,036h,00eh,000h,0ddh,036h,07eh,000h,03ah,027h,0c4h,0ddh	; ace8  .6...6...6~.:'..
-	defb 0beh,005h,00eh,057h,011h,000h,003h,038h,005h,011h,000h,0fdh,00eh,059h,0ddh,071h	; acf8  ...W...8.....Y.q
-	defb 00bh,0cdh,06ch,0a5h,011h,000h,0fdh,0c3h,05dh,0a5h	; ad08  ..l.....].
-
-; ======================================================================
-; CODIGO 0xad12..0xad20  (14 bytes)
-; ======================================================================
-
-
+L_ACE8:
+	ld (ix+006h),001h		;ace8
+	ld (ix+00eh),000h		;acec
+	ld (ix+07eh),000h		;acf0
+	ld a,(0c427h)		;acf4
+	cp (ix+005h)		;acf7
+	ld c,057h		;acfa
+	ld de,00300h		;acfc
+	jr c,L_AD06		;acff
+	ld de,0fd00h		;ad01
+	ld c,059h		;ad04
+L_AD06:
+	ld (ix+00bh),c		;ad06
+	call L_A56C		;ad09
+	ld de,0fd00h		;ad0c
+	jp L_A55D		;ad0f
 L_AD12:
 	ld de,00050h		;ad12
 	jp L_A549		;ad15
@@ -2125,6 +2131,7 @@ L_B0C6:
 	ret			;b0c9
 L_B0CA:
 	ld (ix+001h),002h		;b0ca
+L_B0CE:
 	ld de,00180h		;b0ce
 	call L_A55D		;b0d1
 	ld de,00300h		;b0d4
@@ -2849,7 +2856,7 @@ DATA_B6CB:
 	defb 0d9h,0b6h,0e3h,0b6h,0edh,0b6h,006h,0b7h,0e3h,0b6h,036h,0b7h,051h,0b7h	; b6cb  ..........6.Q.
 
 ; ======================================================================
-; CODIGO 0xb6d9..0xb777  (158 bytes)
+; CODIGO 0xb6d9..0xb7a7  (206 bytes)
 ; ======================================================================
 
 
@@ -2935,19 +2942,20 @@ L_B760:
 	inc a			;b772
 	ld (0c409h),a		;b773
 	ret			;b776
-
-; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb777..0xb7a1  (42 bytes)
-DATA_B777:
-	defb 03eh,05ah,0ddh,077h,010h,03eh,001h,032h,00ch,0ceh,0ddh,036h,00bh,08fh,0ddh,036h	; b777  >Z.w.>.2...6...6
-	defb 006h,000h,0ddh,036h,00eh,000h,0ddh,036h,00ch,000h,0ddh,036h,07eh,000h,011h,000h	; b787  ...6...6...6~...
-	defb 000h,0cdh,06ch,0a5h,011h,000h,001h,0c3h,05dh,0a5h	; b797  ..l.....].
-
-; ======================================================================
-; CODIGO 0xb7a1..0xb7a7  (6 bytes)
-; ======================================================================
-
-
+L_B777:
+	ld a,05ah		;b777
+	ld (ix+010h),a		;b779
+	ld a,001h		;b77c
+	ld (0ce0ch),a		;b77e
+	ld (ix+00bh),08fh		;b781
+	ld (ix+006h),000h		;b785
+	ld (ix+00eh),000h		;b789
+	ld (ix+00ch),000h		;b78d
+	ld (ix+07eh),000h		;b791
+	ld de,00000h		;b795
+	call L_A56C		;b798
+	ld de,00100h		;b79b
+	jp L_A55D		;b79e
 L_B7A1:
 	ld a,(ix+001h)		;b7a1
 	call 0406bh		;b7a4
@@ -3183,7 +3191,6 @@ L_B95B:
 	jr L_B9B6		;b95e
 L_B960:
 	dec (ix+011h)		;b960
-L_B963:
 	jr z,L_B985		;b963
 	ld a,008h		;b965
 	bit 0,(ix+011h)		;b967
@@ -3425,7 +3432,6 @@ L_BB23:
 	ld a,(ix+011h)		;bb2a
 	ld c,067h		;bb2d
 	cp 004h		;bb2f
-L_BB31:
 	jr c,L_BB34		;bb31
 	inc c			;bb33
 L_BB34:

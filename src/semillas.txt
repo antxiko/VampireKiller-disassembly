@@ -5,10 +5,29 @@
 # El reproductor de sonido (banco 14, con el 15 detras) llama cada cuadro a
 # un manejador por canal: `ld hl,(0xC010+2n) / jp (hl)` en p14:89CD, y el de
 # efectos por (0xC018) y (0xC01A) en p14:89F9 y p14:89F2.
-p14 0x89CE 1 14 15  # p14:8990 y p00:508F: ld hl,0x89CE / ld (0xC010..0xC016),hl (canal en reposo)
-p14 0x8A64 1 14 15  # p00:5106: ld hl,0x8A64 / ld (0xC010),hl (canal A de la musica)
-p14 0x8A6B 1 14 15  # p00:510C: ld hl,0x8A6B / ld (0xC012),hl (canal B)
-p14 0x8A72 1 14 15  # p00:5112: ld hl,0x8A72 / ld (0xC014),hl (canal C)
-p14 0x8C9C 1 14 15  # p00:519B: ld hl,0x8C9C / ld (0xC016),hl (efecto de sonido)
-p14 0x8A5D 1 14 15  # p00:5213: ld hl,0x8A5D / ld (0xC01A),hl (la musica de la pausa)
-p14 0x8C95 1 14 15  # p00:52AF: ld hl,0x8C95 / ld (0xC018),hl
+p14 0x89CE 1 14 15  # a mano: p14:8990 y p00:508F: ld hl,0x89CE / ld (0xC010..0xC016),hl (canal en reposo)
+p14 0x8A64 1 14 15  # a mano: p00:5106: ld hl,0x8A64 / ld (0xC010),hl (canal A de la musica)
+p14 0x8A6B 1 14 15  # a mano: p00:510C: ld hl,0x8A6B / ld (0xC012),hl (canal B)
+p14 0x8A72 1 14 15  # a mano: p00:5112: ld hl,0x8A72 / ld (0xC014),hl (canal C)
+p14 0x8C9C 1 14 15  # a mano: p00:519B: ld hl,0x8C9C / ld (0xC016),hl (efecto de sonido)
+p14 0x8A5D 1 14 15  # a mano: p00:5213: ld hl,0x8A5D / ld (0xC01A),hl (la musica de la pausa)
+p14 0x8C95 1 14 15  # a mano: p00:52AF: ld hl,0x8C95 / ld (0xC018),hl
+p14 0x89F1 1 14 15  # a mano: p14:89E6: ld de,0x89F1 / ld (hl),e / ld (hl),d en 0xC010+2n: el canal que acaba se queda en un `ret`
+#
+# La instruccion partida: p01:7FFE es `ld (0xC433),a` (32 33 | C4) y su tercer
+# byte es el primero del banco 2. El codigo sigue en 0x8001.
+p02 0x8001 1 2 3  # a mano: p01:7FFE ld (0xC433),a partida entre el banco 1 y el 2: sigue en p02:8001
+#
+# Un despachador hecho a mano en p02:8A80: `ld hl,0x8A8D / add a,a / call
+# 0x4061 / ld e,(hl) / inc hl / ld d,(hl) / push de / exx / ret`. La tabla de
+# 0x8A8D tiene seis palabras y acaba en 0x8A99, que es su primer destino.
+p02 0x8AF8 1 2 3  # a mano: tabla de p02:8A8D, entrada 1 (despachador de p02:8A80: push de / ret)
+p02 0x8B70 1 2 3  # a mano: tabla de p02:8A8D, entrada 2
+p02 0x8BA2 1 2 3  # a mano: tabla de p02:8A8D, entrada 3
+p02 0x8BCC 1 2 3  # a mano: tabla de p02:8A8D, entrada 4
+#
+# p03:A9B7 mete 0xA9C7 en la pila (`ld hl,0xA9C7 / push hl`) antes de
+# despachar: los estados vuelven ahi con su `ret`, no a quien llamo.
+p03 0xA9C7 1 2 3  # a mano: p03:A9B7 ld hl,0xA9C7 / push hl, vuelta de los estados de 0x406B
+p00 0x4391 1 2 3  # a mano: p00:415A ld hl,0x4391 / push hl antes de despachar la maquina de estados: los estados 0-2 vuelven ahi
+p03 0xAB60 1 2 3  # a mano: p03:AB42 ld hl,0xAB60 / push hl antes de despachar por (ix+1)

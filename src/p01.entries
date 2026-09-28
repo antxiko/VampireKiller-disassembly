@@ -11,6 +11,7 @@
 # encuentra tools/z80trace.py solo, siguiendo el flujo.
 #
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x6028   # p00:5FC9 entrada 28 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x6029   # p00:5FB2 call
 0x6048   # p02:9FD1 call
 0x6202   # p00:419B call
@@ -19,6 +20,7 @@
 0x62D5   # p00:4344 call
 0x62E6   # p00:423A call
 0x62F5   # p00:437F call
+0x63C5   # p00:47FB jp
 0x63D3   # p00:41F3 call
 0x6445   # p02:9923 call cc
 0x64E5   # p00:5C8F jp
@@ -47,8 +49,10 @@
 0x687C   # p01:6871 entrada 0 de la tabla de 0x6874 (call 0x406B en 0x6871)
 0x6886   # p01:6871 entrada 1 de la tabla de 0x6874 (call 0x406B en 0x6871)
 0x6895   # p01:6871 entrada 3 de la tabla de 0x6874 (call 0x406B en 0x6871)
+0x69BC   # p00:5FC9 entrada 45 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x6A40   # p00:5FC9 entrada 22 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x6A48   # p02:993F entrada 22 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0x6A5D   # p00:5FC9 entrada 43 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x6A9C   # p02:993F entrada 43 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x6AB7   # p01:6AAA entrada 0 de la tabla de 0x6AAD (call 0x406B en 0x6AAA)
 0x6AC7   # p01:6AAA entrada 1 de la tabla de 0x6AAD (call 0x406B en 0x6AAA)
@@ -95,15 +99,14 @@
 0x7AE7   # p00:41A5 call
 0x7AEF   # p00:4DB7 call
 0x7B32   # p00:4DAB call
-0x7B98   # p03:BB60 call
+0x7B98   # p02:9C63 jp
 0x7BA3   # p03:B5EC jp
 0x7BB7   # p03:B317 jp
 0x7BBE   # p03:AE5C call
 0x7C13   # p03:B314 jp cc
 0x7C1A   # p03:AE61 call
-0x7D2F   # p02:86F1 call
+0x7D2F   # p02:8CF2 call
 0x7D68   # p00:5C6E call
 0x7E17   # p02:80A1 call
 0x7E2C   # p02:8095 call
-0x7EDD   # p03:AB49 entrada 10 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
 0x7FEC   # p02:801B jr cc

@@ -17,12 +17,15 @@
 0xA06A   # p03:A031 entrada 7 de la tabla de 0xA034 (call 0x406B en 0xA031)
 0xA07B   # p03:A031 entrada 8 de la tabla de 0xA034 (call 0x406B en 0xA031)
 0xA0E7   # p02:9F3A call
+0xA17C   # p01:6A86 call cc
 0xA222   # p00:5FC9 entrada 9 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA22E   # p02:993F entrada 9 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0xA2C7   # p00:5FC9 entrada 32 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA2E0   # p00:5FC9 entrada 1 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA310   # p02:993F entrada 1 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xA4FB   # p00:5FC9 entrada 7 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA51B   # p02:993F entrada 7 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0xA549   # p02:9EC1 jp
 0xA564   # p02:9EE0 call
 0xA573   # p00:5FC9 entrada 5 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA592   # p02:993F entrada 5 de la tabla de 0x9942 (call 0x406B en 0x993F)
@@ -44,12 +47,14 @@
 0xA934   # p00:5FC9 entrada 0 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA964   # p02:993F entrada 0 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xA9B7   # p02:993F entrada 13 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0xA9C7   # a mano: p03:A9B7 ld hl,0xA9C7 / push hl, vuelta de los estados de 0x406B
 0xA9D8   # p03:A9BE entrada 0 de la tabla de 0xA9C1 (call 0x406B en 0xA9BE)
 0xAA0B   # p03:A9BE entrada 1 de la tabla de 0xA9C1 (call 0x406B en 0xA9BE)
 0xAA37   # p03:A9BE entrada 2 de la tabla de 0xA9C1 (call 0x406B en 0xA9BE)
 0xAACD   # p00:5FC9 entrada 13 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xAB22   # p00:5FC9 entrada 16 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xAB42   # p02:993F entrada 16 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0xAB60   # a mano: p03:AB42 ld hl,0xAB60 / push hl antes de despachar por (ix+1)
 0xAB67   # p03:AB49 entrada 0 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
 0xAB86   # p03:AB49 entrada 1 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
 0xABAB   # p03:AB49 entrada 2 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
@@ -60,6 +65,7 @@
 0xAC7E   # p03:AB49 entrada 7 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
 0xACAE   # p03:AB49 entrada 8 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
 0xACD9   # p03:AB49 entrada 9 de la tabla de 0xAB4C (call 0x406B en 0xAB49)
+0xACE8   # p00:5FC9 entrada 44 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xAD12   # p02:993F entrada 44 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xAD93   # p00:5C4C call cc
 0xADDE   # p00:5FC9 entrada 15 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
@@ -73,6 +79,7 @@
 0xB061   # p00:5FC9 entrada 6 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xB07B   # p02:993F entrada 6 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xB0CA   # p00:5FC9 entrada 3 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
+0xB0CE   # p00:5FC9 entrada 30 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xB0F8   # p02:993F entrada 3 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xB15D   # p01:6AFC jp
 0xB193   # p00:5FC9 entrada 14 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
@@ -102,6 +109,7 @@
 0xB706   # p03:B6C8 entrada 3 de la tabla de 0xB6CB (call 0x406B en 0xB6C8)
 0xB736   # p03:B6C8 entrada 5 de la tabla de 0xB6CB (call 0x406B en 0xB6C8)
 0xB751   # p03:B6C8 entrada 6 de la tabla de 0xB6CB (call 0x406B en 0xB6C8)
+0xB777   # p00:5FC9 entrada 33 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xB7A1   # p02:993F entrada 33 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xB7AD   # p03:B7A4 entrada 0 de la tabla de 0xB7A7 (call 0x406B en 0xB7A4)
 0xB818   # p03:B7A4 entrada 1 de la tabla de 0xB7A7 (call 0x406B en 0xB7A4)
@@ -115,8 +123,6 @@
 0xB8AD   # p03:B896 entrada 1 de la tabla de 0xB899 (call 0x406B en 0xB896)
 0xB8D0   # p03:B896 entrada 2 de la tabla de 0xB899 (call 0x406B en 0xB896)
 0xB960   # p03:B896 entrada 3 de la tabla de 0xB899 (call 0x406B en 0xB896)
-0xB963   # p00:5A31 call
-0xB99A   # p00:5A3A call
 0xBA26   # p03:B6B6 entrada 3 de la tabla de 0xB6B9 (call 0x406B en 0xB6B6)
 0xBA30   # p03:BA29 entrada 0 de la tabla de 0xBA2C (call 0x406B en 0xBA29)
 0xBA47   # p03:BA29 entrada 1 de la tabla de 0xBA2C (call 0x406B en 0xBA29)
@@ -124,7 +130,6 @@
 0xBA64   # p02:993F entrada 20 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xBADD   # p00:5FC9 entrada 23 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xBAF6   # p02:993F entrada 23 de la tabla de 0x9942 (call 0x406B en 0x993F)
-0xBB31   # p00:5A43 call
 0xBBF3   # p03:B6B6 entrada 4 de la tabla de 0xB6B9 (call 0x406B en 0xB6B6)
 0xBBFD   # p03:BBF6 entrada 0 de la tabla de 0xBBF9 (call 0x406B en 0xBBF6)
 0xBC18   # p03:BBF6 entrada 1 de la tabla de 0xBBF9 (call 0x406B en 0xBBF6)

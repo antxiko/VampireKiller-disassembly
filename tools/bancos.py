@@ -123,6 +123,28 @@ SOMBRA = {0xF0F1: 0, 0xF0F2: 1, 0xF0F3: 2, 0xF0F4: 3, 0xF0F5: 4}
 SOMBRA_RANURA = {0: 0, 1: 1, 2: 2, 3: 1, 4: 2}
 RANURA_REG = {0x6000: 0, 0x8000: 1, 0xA000: 2}
 
+# Subrutinas del banco 0 que CAMBIAN de banco y vuelven con `ret`. Sin
+# modelarlas, el trazador sigue tras el `call` con el reparto de antes y lee
+# el cartucho por donde no es: tras `call 0x5362` (11-12-13) un `call 0xB963`
+# caeria en el banco 3 en vez de en el 13. Cada una escribe el registro Y su
+# copia en RAM (0xF0F1..3). None = esa ranura no la toca.
+PONE_BANCOS = {
+    0x5336: (1, 2, 3),        # p00:5336  ld a,1 / 0x6000 / inc a / 0x8000 / inc a / 0xA000
+    0x5350: (None, 14, 15),   # p00:5350  ld a,14 / 0x8000 / inc a / 0xA000
+    0x5362: (11, 12, 13),     # p00:5362  ld a,11 / ... de tres en tres
+    0x537A: (None, 9, 10),    # p00:537A  ld a,9 / 0x8000 / inc a / 0xA000
+    0x538C: (None, 7, 8),     # p00:538C  ld a,7 / 0x8000 / inc a / 0xA000
+    0x539E: (4, 5, 6),        # p00:539E  ld a,4 / ... de tres en tres
+}
+
+
+def pone_bancos(t, s, sombra):
+    """El reparto (y la copia en RAM) que deja la subrutina t al volver."""
+    nuevo = PONE_BANCOS[t]
+    s = tuple(n if n is not None else v for n, v in zip(nuevo, s))
+    sombra = tuple(s) + tuple(sombra[3:])
+    return s, sombra
+
 
 class Cartucho:
     """Los 128 KB con el mapper puesto: leer un byte exige saber las ranuras."""
@@ -424,10 +446,17 @@ class TrazadorDeBancos:
                     if t == DESPACHADOR:
                         self._despacha(b, pc, nxt, s, sombra, pila)
                         para = True
+                    elif t in PONE_BANCOS:
+                        s, sombra = pone_bancos(t, s, sombra)
                 elif op in CALL_CC:
                     t = self.word(pc + 1, s)
                     self.llamadas.append((t, b, pc, s, hl, de))
                     self._ir(t, s, sombra, pila, b, pc, "call cc")
+                    if t in PONE_BANCOS:
+                        # si la llamada se hace, se sigue con el reparto nuevo;
+                        # si no, con el de antes: se apuntan los dos caminos
+                        s2, sombra2 = pone_bancos(t, s, sombra)
+                        pila.append((nxt, s2, sombra2, None, None, None))
                 elif op == 0x18:                                 # jr e
                     t = nxt + self._s8(self.byte(pc + 1, s))
                     self.llamadas.append((t, b, pc, s, hl, de))
@@ -685,8 +714,18 @@ def escribe_ficheros(t, src):
 
     por_pagina = defaultdict(list)
     for (b, pc), (tab, n, dest, ss) in sorted(t.tablas.items()):
-        if n:
-            por_pagina[b].append((tab, tab + 2 * n, pc, n))
+        if not n:
+            continue
+        fin = tab + 2 * n
+        frontera = (tab & 0xE000) + TAM_PAGINA
+        if fin <= frontera:
+            por_pagina[b].append((tab, fin, pc, n))
+        else:
+            # la tabla cruza al banco que haya en la ranura siguiente
+            # (p00:5FC9): cada trozo va al .nocode de SU banco
+            por_pagina[b].append((tab, frontera, pc, n))
+            otro = Cartucho.banco(frontera, ss)
+            por_pagina[otro].append((frontera, fin, pc, n))
     for p in range(N_PAGINAS):
         ruta = os.path.join(src, nombre(p) + ".nocode")
         with open(ruta, "w", encoding="utf-8") as f:

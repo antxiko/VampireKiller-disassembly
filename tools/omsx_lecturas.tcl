@@ -63,7 +63,17 @@ proc foto {s} { screenshot [format "%s_%03d.png" [file rootname $::OUT] $s] }
 set throttle off
 if {[info exists ::env(VK_FASE)]} { debug set_bp 0x44E8 {} pon_fase }
 if {[info exists ::env(VK_FOTOS)]} { foreach s $::env(VK_FOTOS) { after time $s [list foto $s] } }
-debug set_watchpoint read_mem {0x6000 0xBFFF} {} lee
+# La medida empieza cuando INIT llega a su `jr $` (p00:40C3). Antes, durante
+# el arranque de la BIOS, la pagina 2 puede no ser el cartucho aunque el mapper
+# diga que banco tiene: se colaban "lecturas" y "ejecuciones" que no eran del
+# juego (medido: 0x830D "ejecutandose" con basura en la pila).
+proc arma {} {
+    if {$::armado} return
+    set ::armado 1
+    debug set_watchpoint read_mem {0x6000 0xBFFF} {} lee
+}
+set ::armado 0
+debug set_bp 0x40C3 {} arma
 foreach t $TECLAS {
     lassign [split $t :] s fila m dur
     after time $s [list pulsa $fila $m $dur]

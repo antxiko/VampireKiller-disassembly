@@ -1,0 +1,8 @@
+# Tamanos de tabla del despachador puestos a mano: 'pNN 0xCALL n  # por que'.
+#
+# p00:5FC9 es `call 0x406B` a tres bytes del final del banco 0, y su tabla
+# SIGUE en el banco 1: 26 palabras en 0x5FCC-0x5FFF y 20 mas en 0x6000-0x6027.
+# Acaba donde empieza 0x6028, que es a la vez una de sus entradas (un `ret`).
+# Medido en openMSX: en la fase 10 se entra en p02:9C66 con DE = 0x600B, o sea
+# desde la entrada 31, que ya esta en el banco 1.
+p00 0x5FC9 46  # tabla de manejadores por tipo de cosa, a caballo de dos bancos

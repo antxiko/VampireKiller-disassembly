@@ -11,6 +11,6 @@
 # encuentra tools/z80trace.py solo, siguiendo el flujo.
 #
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
-#
-# Este banco no lleva ni un byte de codigo al que
-# se pueda llegar: es todo datos (o relleno 0xFF).
+0xB963   # p00:5A31 call
+0xB99A   # p00:5A3A call
+0xBB31   # p00:5A43 call
