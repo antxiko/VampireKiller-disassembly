@@ -22,14 +22,20 @@ sys.path.insert(0, os.path.join(RAIZ, "tools"))
 from paginas import ORG, TAM_PAGINA  # noqa: E402
 
 
+# {(banco, dir): ["banco:dir", ...]} las palabras de la pila en la primera lectura
+PILAS = {}
+
+
 def carga():
     """{(banco, dir): {(bancoPC, PC), ...}}"""
     lect = defaultdict(set)
-    for f in sorted(glob.glob(os.path.join(RAIZ, "work", "omsx", "*.txt"))):
+    for f in sorted(glob.glob(os.path.join(RAIZ, "work", "omsx", "f[0-9][0-9].txt"))):
         for ln in open(f, encoding="utf-8"):
             p = ln.split()
-            if len(p) != 4:
+            if len(p) < 4:
                 continue
+            if len(p) > 4:
+                PILAS.setdefault((int(p[0]), int(p[1], 16)), p[4:])
             try:
                 b, a, pb, pc = int(p[0]), int(p[1], 16), int(p[2]), int(p[3], 16)
             except ValueError:

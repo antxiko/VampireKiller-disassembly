@@ -96,6 +96,11 @@ class Bloques:
         self.avisos = []
 
     def anota(self, s, a, f, nom, que, quien, ancho=16):
+        if a < 0xC000 < f:
+            # p00:54E4: el ultimo dibujo se sale del cartucho y lo que falta
+            # lo lee de la RAM de 0xC000 en adelante
+            que += "; se sale de la ventana del cartucho: los ultimos %d bytes los lee "                    "de la RAM, de 0xC000 a 0x%04X" % (f - 0xC000, f - 1)
+            f = 0xC000
         for b, i, j in trozos(s, a, f):
             e = self.d[b].setdefault((i, j), {"nom": nom if i == a else "%s_cola" % nom,
                                               "que": que, "desde": set(), "ancho": ancho})
@@ -254,6 +259,11 @@ def dibujos_de_cada_fase(rom, t, bl):
         bl.anota(s, w, w + 191 * 32, "dibujos_%04X" % w,
                  "191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado",
                  "fase %d" % fase, ancho=32)
+    # p00:5670 entra en la misma subida con los bancos 9 y 10 y HL=0x8000
+    # (`call 0x537A / ld hl,0x8000 / jr 0x5665`)
+    bl.anota((1, 9, 10), 0x8000, 0x8000 + 191 * 32, "dibujos_8000",
+             "191 dibujos de 8x8 a 4 bits (32 bytes cada uno) que sube p00:5670 por el "
+             "mismo camino que los de las fases", "p00:5670", ancho=32)
 
 
 LECTORES = {
@@ -264,6 +274,8 @@ LECTORES = {
     0x46EB: ("rle_dest", "de"),
     0x4714: ("guion", "hl"),
     0x4675: ("crudo", "hl"),
+    0x4A90: ("dibujos16", "hl"),
+    0x498A: ("hmmc", "hl"),
 }
 # Los lectores se llaman entre ellos: esas llamadas no traen un puntero nuevo.
 DENTRO_DE_LOS_LECTORES = (0x4600, 0x4800)
@@ -314,6 +326,23 @@ def llamadas_a_lectores(rom, t, bl):
                     continue
                 bl.anota(s, ptr, ptr + 32 * n, "dibujos_%04X" % ptr,
                          "%d dibujos de 8x8 a 4 bits (32 bytes cada uno)" % n, quien, ancho=32)
+            elif fmt == "dibujos16":
+                n = registro_antes(b, pc, "b")
+                if n is None:
+                    bl.avisos.append("%s -> dibujos16 0x%04X: B sin saber" % (quien, ptr))
+                    continue
+                bl.anota(s, ptr, ptr + 128 * n, "dibujos16_%04X" % ptr,
+                         "%d dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube "
+                         "en dieciseis filas de 8)" % n, quien, ancho=8)
+            elif fmt == "hmmc":
+                bc = registro_antes(b, pc, "bc")
+                if bc is None:
+                    bl.avisos.append("%s -> hmmc 0x%04X: BC sin saber" % (quien, ptr))
+                    continue
+                n = (bc >> 8) * (bc & 0xFF) // 2
+                bl.anota(s, ptr, ptr + n, "hmmc_%04X" % ptr,
+                         "%dx%d puntos a 4 bits (%d bytes) que 0x498A manda al V9938 con una "
+                         "orden HMMC" % (bc >> 8, bc & 0xFF, n), quien, ancho=8)
             elif fmt == "letras":
                 n = registro_antes(b, pc, "b")
                 if n is None:
@@ -372,11 +401,10 @@ def habitaciones(rom, t, bl):
              "p00:5786")
     guiones = set()
     paletas = set()
+    # la ultima subtabla acaba donde empieza el primer guion de las de antes
+    primer_guion = min(palabra(rom, s, a) for a in range(ptrs[0], ptrs[-1], 4))
     for i, w in enumerate(ptrs):
-        fin = ptrs[i + 1] if i + 1 < len(ptrs) else None
-        if fin is None:
-            fin = min(palabra(rom, s, w + 4 * k) for k in range(64)
-                      if 0x8000 <= palabra(rom, s, w + 4 * k) < 0xC000)
+        fin = ptrs[i + 1] if i + 1 < len(ptrs) else primer_guion
         n = (fin - w) // 4
         bl.anota(s, w, fin, "habitaciones_fase_%d" % (i + 1),
                  "las %d habitaciones de la fase %d: [guion de 0x4714][paleta de 0x483E] "
@@ -392,10 +420,25 @@ def habitaciones(rom, t, bl):
                  "en la habitacion", "p00:57AE", ancho=3)
 
 
-# Llamadas cuyo puntero ya lo pone un recorrido de arriba.
-DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5)}
+def tabla_5421(rom, t, bl):
+    """p00:53FC: seis dibujos de 8x8 por HMMC, sus punteros en 0x5421.
 
-RECORRIDOS = [dibujos_de_cada_fase, llamadas_a_lectores, habitaciones]
+    `ld hl,0x5421 / ld b,6` y en el bucle `ld a,(hl) / inc hl / ld h,(hl) /
+    ld l,a / ld bc,0x0808 / call 0x498A`: 32 bytes cada uno.
+    """
+    s = (1, 2, 3)
+    ptrs = [palabra(rom, s, 0x5421 + 2 * i) for i in range(6)]
+    bl.anota(s, 0x5421, 0x542D, "tabla_5421",
+             "6 punteros a dibujos de 8x8 que pinta p00:5412 por HMMC", "p00:5402", ancho=2)
+    for w in sorted(set(ptrs)):
+        bl.anota(s, w, w + 32, "hmmc_%04X" % w,
+                 "8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A", "p00:5412", ancho=8)
+
+
+# Llamadas cuyo puntero ya lo pone un recorrido de arriba.
+DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5), (0, 0x5412)}
+
+RECORRIDOS = [dibujos_de_cada_fase, llamadas_a_lectores, habitaciones, tabla_5421]
 
 
 # ------------------------------------------------------------------ escritura

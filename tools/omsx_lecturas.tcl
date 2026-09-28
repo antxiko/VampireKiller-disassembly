@@ -7,7 +7,9 @@
 # aqui -openMSX solo avisa de las de datos-, asi que lo que sale son DATOS.
 #
 # Variables de entorno:
-#   VK_OUT     fichero de salida (una linea por byte: "banco dir pcbanco pc")
+#   VK_OUT     fichero de salida (una linea por byte: "banco dir pcbanco pc" y
+#              las diez palabras de arriba de la pila como "banco:dir", que
+#              dicen que llamada de fuera de la libreria de VRAM pidio el dato)
 #   VK_SEGS    segundos emulados que corre (por defecto 300)
 #   VK_TECLAS  guion de pulsaciones "t:fila:mascara:dur ..." (opcional)
 #   VK_FASE    si esta (0..18), al empezar la partida -el `ret` de p00:44E8,
@@ -36,7 +38,13 @@ proc lee {} {
     set k "$b [format %04X $a]"
     if {![info exists ::R($k)]} {
         set pc [reg PC]
-        set ::R($k) "[banco $pc] [format %04X $pc]"
+        set sp [reg SP]
+        set pila ""
+        for {set i 0} {$i < 20} {incr i 2} {
+            set w [expr {[debug read memory [expr {($sp + $i) & 0xFFFF}]] + 256 * [debug read memory [expr {($sp + $i + 1) & 0xFFFF}]]}]
+            append pila " [banco $w]:[format %04X $w]"
+        }
+        set ::R($k) "[banco $pc] [format %04X $pc]$pila"
     }
 }
 

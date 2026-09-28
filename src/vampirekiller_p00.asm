@@ -2889,15 +2889,46 @@ L_5407:
 	ret			;5420
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5421..0x548d  (108 bytes)
-DATA_5421:
-	defb 02dh,054h,04dh,054h,02dh,054h,04dh,054h,04dh,054h,06dh,054h,000h,0c3h,03ch,000h	; 5421  -TMT-TMTMTmT..<.
-	defb 000h,0c3h,03ch,000h,00ch,0c3h,03ch,0c0h,003h,033h,033h,030h,003h,033h,033h,030h	; 5431  ..<...<..330.330
-	defb 003h,033h,033h,030h,003h,003h,030h,030h,000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 5441  .330..00..<...<.
-	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h,000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 5451  ..<...<...<...<.
-	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h,000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 5461  ..<...<...<...<.
-	defb 00ch,0c3h,03ch,0c0h,003h,033h,033h,030h,003h,033h,033h,030h,003h,033h,033h,030h	; 5471  ..<..330.330.330
-	defb 003h,003h,030h,030h,000h,0c3h,03ch,000h,000h,000h,000h,000h	; 5481  ..00..<.....
+; DATOS tabla_5421: 6 punteros a dibujos de 8x8 que pinta p00:5412 por HMMC;
+;   lo leen p00:5402 (12 bytes)
+;   0x5421..0x542d  (12 bytes)
+DATA_tabla_5421:
+	defb 02dh,054h	; 5421
+	defb 04dh,054h	; 5423
+	defb 02dh,054h	; 5425
+	defb 04dh,054h	; 5427
+	defb 04dh,054h	; 5429
+	defb 06dh,054h	; 542b
+
+; ----------------------------------------------------------------------
+; DATOS hmmc_542D: 8x8 puntos a 4 bits (32 bytes) para la orden HMMC de
+;   0x498A; lo leen p00:5412 (32 bytes)
+;   0x542d..0x544d  (32 bytes)
+DATA_hmmc_542D:
+	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 542d  ..<...<.
+	defb 00ch,0c3h,03ch,0c0h,003h,033h,033h,030h	; 5435  ..<..330
+	defb 003h,033h,033h,030h,003h,033h,033h,030h	; 543d  .330.330
+	defb 003h,003h,030h,030h,000h,0c3h,03ch,000h	; 5445  ..00..<.
+
+; ----------------------------------------------------------------------
+; DATOS hmmc_544D: 8x8 puntos a 4 bits (32 bytes) para la orden HMMC de
+;   0x498A; lo leen p00:5412 (32 bytes)
+;   0x544d..0x546d  (32 bytes)
+DATA_hmmc_544D:
+	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 544d  ..<...<.
+	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 5455  ..<...<.
+	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 545d  ..<...<.
+	defb 000h,0c3h,03ch,000h,000h,0c3h,03ch,000h	; 5465  ..<...<.
+
+; ----------------------------------------------------------------------
+; DATOS hmmc_546D: 8x8 puntos a 4 bits (32 bytes) para la orden HMMC de
+;   0x498A; lo leen p00:5412 (32 bytes)
+;   0x546d..0x548d  (32 bytes)
+DATA_hmmc_546D:
+	defb 000h,0c3h,03ch,000h,00ch,0c3h,03ch,0c0h	; 546d  ..<...<.
+	defb 003h,033h,033h,030h,003h,033h,033h,030h	; 5475  .330.330
+	defb 003h,033h,033h,030h,003h,003h,030h,030h	; 547d  .330..00
+	defb 000h,0c3h,03ch,000h,000h,000h,000h,000h	; 5485  ..<.....
 
 ; ======================================================================
 ; CODIGO 0x548d..0x556e  (225 bytes)

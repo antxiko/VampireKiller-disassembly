@@ -78,10 +78,21 @@ DATA_paleta_A036:
 	defb 0ffh	; a03c
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa03d..0xa052  (21 bytes)
+; DATOS sin identificar  0xa03d..0xa04a  (13 bytes)
 DATA_A03D:
-	defb 004h,076h,001h,005h,076h,006h,006h,075h,006h,007h,074h,006h,0ffh,0ffh,004h,060h	; a03d  .v..v..u..t....`
-	defb 000h,006h,065h,006h,0ffh	; a04d
+	defb 004h,076h,001h,005h,076h,006h,006h,075h,006h,007h,074h,006h,0ffh	; a03d  .v..v..u..t..
+
+; ----------------------------------------------------------------------
+; DATOS paleta_A04A: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
+;   0x483E al entrar en la habitacion; lo leen p00:57AE (1 bytes)
+;   0xa04a..0xa04b  (1 bytes)
+DATA_paleta_A04A:
+	defb 0ffh	; a04a
+
+; ----------------------------------------------------------------------
+; DATOS sin identificar  0xa04b..0xa052  (7 bytes)
+DATA_A04B:
+	defb 004h,060h,000h,006h,065h,006h,0ffh	; a04b
 
 ; ----------------------------------------------------------------------
 ; DATOS paleta_A052: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
@@ -713,8 +724,10 @@ DATA_rle_B6D8:
 	defb 003h,009h,000h,087h,0ffh,0f9h,0f0h,0b0h,070h,0e0h,0c0h,009h,000h,000h	; b828  ........p.....
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb836..0xb97d  (327 bytes)
-DATA_B836:
+; DATOS rle_B836: rle a la VRAM 0xFA00, mandado por el guion de 0x9FA6; lo
+;   leen guion 0x9FA6 (327 bytes)
+;   0xb836..0xb97d  (327 bytes)
+DATA_rle_B836:
 	defb 00bh,000h,085h,0c0h,0f8h,0bfh,09fh,0dfh,00ah,000h,086h,006h,01ah,0f2h,0e2h,0c4h	; b836  ................
 	defb 0c4h,00dh,000h,083h,040h,060h,020h,00bh,000h,09dh,004h,00ch,01ch,038h,038h,010h	; b846  ....@` ......88.
 	defb 010h,008h,00ch,00ch,00ah,008h,009h,00ch,00ah,008h,008h,018h,014h,017h,00fh,008h	; b856  ................

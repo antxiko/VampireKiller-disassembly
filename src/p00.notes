@@ -1,6 +1,14 @@
 # Notas del banco 00: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x5421 0x542D tabla_5421  6 punteros a dibujos de 8x8 que pinta p00:5412 por HMMC; lo leen p00:5402 (12 bytes)
+F 0x5421 2
+D 0x542D 0x544D hmmc_542D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A; lo leen p00:5412 (32 bytes)
+F 0x542D 8
+D 0x544D 0x546D hmmc_544D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A; lo leen p00:5412 (32 bytes)
+F 0x544D 8
+D 0x546D 0x548D hmmc_546D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A; lo leen p00:5412 (32 bytes)
+F 0x546D 8
 D 0x55D7 0x55DD tabla_55D7  3 punteros a rle que lee p00:55AE; lo leen p00:55AE (6 bytes)
 F 0x55D7 2
 D 0x5742 0x5768 dibujos_de_cada_fase  19 punteros, uno por fase (0 el patio, 1-18): de donde salen los 191 dibujos de 8x8 de su decorado; los lee p00:565B con la fase de 0xD000; lo leen p00:565B (38 bytes)

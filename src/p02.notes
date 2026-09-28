@@ -1,1 +1,8 @@
 # Notas del banco 02: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x984B 0x9853 hmmc_984B  4x4 puntos a 4 bits (8 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p02:9841 (8 bytes)
+F 0x984B 8
+D 0x9890 0x98AC hmmc_9890  8x7 puntos a 4 bits (28 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p02:9871 (28 bytes)
+F 0x9890 8
+# --- fin de los bloques de bloques.py ---

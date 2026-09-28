@@ -11,4 +11,6 @@ D 0xAD7B 0xAD9B dibujos_AD7B  1 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo 
 F 0xAD7B 32
 D 0xAD9B 0xBB1B dibujos_AD9B  108 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58C9 (3456 bytes)
 F 0xAD9B 32
+D 0xBBDB 0xBFDB dibujos16_BBDB  8 dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube en dieciseis filas de 8); lo leen p00:5993 (1024 bytes)
+F 0xBBDB 8
 # --- fin de los bloques de bloques.py ---

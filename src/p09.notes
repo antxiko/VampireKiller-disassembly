@@ -1,6 +1,14 @@
 # Notas del banco 09: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8000 0x9A00 dibujos_8000  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) que sube p00:5670 por el mismo camino que los de las fases; se solapan 2 bloques (0x8000-0x97E0, 0x9000-0x9A00); lo leen p00:5498, p00:5670 (6656 bytes)
+F 0x8000 32
+D 0x9A00 0x9A80 dibujos16_9A00  1 dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube en dieciseis filas de 8); lo leen p00:54A3 (128 bytes)
+F 0x9A00 8
+D 0x9A80 0x9A90 hmmc_9A80  8x4 puntos a 4 bits (16 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p00:54B1 (16 bytes)
+F 0x9A80 8
+D 0x9A90 0x9AB0 hmmc_9A90  8x8 puntos a 4 bits (32 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p00:54C3 (32 bytes)
+F 0x9A90 8
 D 0x9AB0 0x9AD4 habitaciones_de_cada_fase  18 punteros, uno por fase (1-18), a su tabla de habitaciones; los lee p00:5790; lo leen p00:5786 (36 bytes)
 F 0x9AB0 16
 D 0x9AD4 0x9AF4 habitaciones_fase_1  las 8 habitaciones de la fase 1: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32 bytes)
@@ -37,6 +45,8 @@ D 0x9CB8 0x9CE0 habitaciones_fase_16  las 10 habitaciones de la fase 16: [guion 
 F 0x9CB8 4
 D 0x9CE0 0x9D10 habitaciones_fase_17  las 12 habitaciones de la fase 17: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48 bytes)
 F 0x9CE0 4
+D 0x9D10 0x9D38 habitaciones_fase_18  las 10 habitaciones de la fase 18: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (40 bytes)
+F 0x9D10 4
 D 0x9D38 0x9D4E guion_9D38  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (22 bytes)
 F 0x9D38 16
 D 0x9D4E 0x9D64 guion_9D4E  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (22 bytes)
@@ -73,6 +83,8 @@ D 0x9F5F 0x9F91 guion_9F5F  guion de carga de la VRAM que interpreta 0x4714 (0xF
 F 0x9F5F 16
 D 0x9F91 0x9FA6 guion_9F91  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (21 bytes)
 F 0x9F91 16
+D 0x9FA6 0x9FB2 guion_9FA6  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (12 bytes)
+F 0x9FA6 16
 D 0x9FB2 0x9FD2 guion_9FB2  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (32 bytes)
 F 0x9FB2 16
 D 0x9FD2 0x9FED guion_9FD2  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
