@@ -114,6 +114,11 @@ RAM = {
     0xC004: ("la espera del estado, en cuadros", "p00:41B6 la pone a 0x20"),
     0xC002: ("las banderas de la partida (bit 7: de verdad, no la demostracion)", "p00:44EE no cuenta puntos con el bit 7 a cero"),
     0xC405: ("el MARCADOR, tres bytes en BCD", "p00:44F3 le suma los puntos con `daa`"),
+    0xC43A: ("la cuenta de la INVENCIBILIDAD", "p02:8DD8 la pone al recoger su objeto y p02:85B1 no hace dano mientras no sea cero"),
+    0xC419: ("el ultimo objeto recogido", "p02:8D30"),
+    0xC500: ("los objetos que salen (ocho de 16 bytes)", "p02:89A2 los crea y p02:8A4A los mueve"),
+    0xC701: ("lo que lleva Simon (un bit por objeto)", "p02:8E6D pone el bit y p02:8EE6 repinta los cinco de arriba"),
+    0xC702: ("mas cosas que lleva (bit 0: se ven los bloques que se rompen)", "p02:8E72 las pone y p02:8707 pinta los marcos con el bit 0"),
     0xC441: ("los usos que le quedan a lo que para golpes", "p02:8198 gasta uno por golpe"),
     0xC005: ("el semaforo de la interrupcion", "p00:404E: no se entra dos veces"),
     0xC010: ("el manejador del canal A del sonido", "p14:89A7 salta por el"),
@@ -269,7 +274,7 @@ def por_nombre():
 #   p01:71C0  las dos armas de 0xC450 y 0xC460 y lo que llaman (0x72BD, 0x72CE)
 #   p02:8460  lo llama el bucle de las cosas fijas de 0xC470 (p02:80B3)
 #   p02:8671  otra vuelta a 0xC470 (`push hl / pop ix`) y 0x868C
-#   p02:8A30  las ocho de 0xC500 (p02:8A53)
+#   p02:8A30  las ocho de 0xC500 (p02:8A53) y lo que despacha 0x8A80, hasta 0x8D40
 #   p02:8FD8  las tres de 0xC580 (p02:8FDB)
 #   p02:9112  la tabla de 0x913F
 #   p02:91B0  las de 0xC5B5 (p02:91C7 y p02:9275)
@@ -277,7 +282,7 @@ def por_nombre():
 NO_FICHAS = {
     0: [(0x5B96, 0x5C04)],
     1: [(0x71C0, 0x7300)],
-    2: [(0x8460, 0x847A), (0x8671, 0x8710), (0x8A30, 0x8B40), (0x8FD8, 0x9010),
+    2: [(0x8460, 0x847A), (0x8671, 0x8710), (0x8A30, 0x8D40), (0x8FD8, 0x9010),
         (0x9112, 0x9130), (0x91B0, 0x92A0), (0x9620, 0x9660)],
 }
 

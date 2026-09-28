@@ -552,7 +552,7 @@ L_4377:
 	ld a,005h		;4382
 	jp cambia_de_estado		;4384   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 L_4387:
-	ld hl,0c701h		;4387
+	ld hl,0c701h		;4387   ; apunta a lo que lleva Simon (un bit por objeto)
 	ld a,(hl)			;438a
 	and 0feh		;438b
 	ld (hl),a			;438d

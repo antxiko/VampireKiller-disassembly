@@ -624,6 +624,7 @@ C 0x4357 apunta a la FASE (0 el patio, 1-18)
 C 0x4366 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x437C cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x4384 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
+C 0x4387 apunta a lo que lleva Simon (un bit por objeto)
 C 0x439C apunta a la espera del estado, en cuadros
 C 0x43A1 apunta a el ESTADO del juego
 C 0x43AC guarda las banderas de la partida (bit 7: de verdad, no la demostracion)

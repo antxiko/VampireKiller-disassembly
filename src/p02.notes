@@ -500,6 +500,343 @@ C 0x894B y y x
 C 0x894F el patron
 C 0x8952 el segundo, 0xE4
 C 0x8958 el siguiente cascote
+B 0x898F LOS OBJETOS QUE SALEN. La lista de 0xC500 (ocho de 16 bytes: [estado][y][x][paso][tipo][...]) son las cosas que aparecen al romper un bloque o al matar algo. 0x8A37 busca un hueco libre. Si el objeto es el arma que Simon ya lleva, sale el tipo 1 en su lugar (0x8A29).
+C 0x8961 rellena 16 bytes con 2
+C 0x8966 16 con 0x4C
+C 0x896B 16 con 2
+C 0x8970 y 16 con 0x4C
+C 0x8972 16 bytes
+C 0x8974 del valor de A
+C 0x8979 el dibujo 5...
+C 0x897B ... de la fila 0x70
+C 0x897D la columna: A por 16
+C 0x8982 16 x 16 puntos
+C 0x8985 de la pagina 1 a la 0
+C 0x898A en la fila 0x70
+C 0x898F cambia el arma repetida por el tipo 1
+C 0x8992 que sale?
+C 0x8994 nada
+C 0x8996 el 0x15...
+C 0x899A los demas: sale una cosa?
+C 0x899D no hace falta
+C 0x899E un hueco en la lista
+C 0x89A1 no hay
+C 0x89A2 estado 1
+C 0x89A5 y
+C 0x89A7 x
+C 0x89A9 paso 0
+C 0x89AC el tipo
+C 0x89B1 el 0x15 y los de antes del 2...
+C 0x89B9 ... empiezan distinto
+C 0x89C3 0x10 mas abajo
+C 0x89C7 8 mas a la derecha
+C 0x89CB el tipo 1...
+C 0x89D0 ... es la cosa 0x1E
+C 0x89D4 los demas, la 0x26
+C 0x89D7 la crea
+C 0x89DA salio?
+C 0x89E3 el 0x15...
+C 0x89E6 ... va por el otro camino
+C 0x89E9 cambia el arma repetida
+C 0x89EC un hueco
+C 0x89EF no hay
+C 0x89F0 estado 0x83
+C 0x89F3 y
+C 0x89F5 x
+C 0x89F8 el tipo
+C 0x89FA 0xFF
+C 0x89FD guarda HL
+C 0x8A00 un hueco
+C 0x8A03 no hay
+C 0x8A04 lo llena
+C 0x8A07 el byte 9...
+C 0x8A0B ... y el 10 con lo guardado
+C 0x8A13 guarda HL
+C 0x8A16 un hueco
+C 0x8A19 no hay
+C 0x8A1B el tipo 0x19
+C 0x8A1D lo llena
+C 0x8A21 el byte 8...
+C 0x8A25 ... con B
+C 0x8A29 los tipos desde 0x1A son armas
+C 0x8A2C los de antes, tal cual
+C 0x8A30 0x19 + la que lleva
+C 0x8A32 es la misma?
+C 0x8A33 no
+C 0x8A34 si: el tipo 1 en su lugar
+C 0x8A38 la lista de objetos
+C 0x8A3D libre?
+C 0x8A41 el siguiente, 16 bytes mas alla
+C 0x8A45 ocho
+C 0x8A47 no hay hueco (nz)
+C 0x8A4A mueve los objetos
+C 0x8A4D ocho, y C cuenta cual es
+C 0x8A50 la lista de objetos
+C 0x8A54 IX = el objeto
+C 0x8A58 su estado
+C 0x8A5B vacio
+C 0x8A5D lo mueve
+C 0x8A60 y lo pinta
+C 0x8A65 el siguiente, 16 bytes mas alla
+C 0x8A6D su y
+C 0x8A70 su x
+C 0x8A73 el estado, a guardar
+C 0x8A74 el paso...
+C 0x8A77 ... 1?
+C 0x8A78 si: a recogerlo
+C 0x8A7B el estado
+C 0x8A7C desde 1
+C 0x8A7D sin el bit 7
+C 0x8A7F (sin tocar los registros de fuera)
+C 0x8A8A el destino, a la pila...
+C 0x8A8C ... y alla que va
+C 0x8A99 estado 1 (0x8A99): sube la cuenta
+C 0x8A9F cada 16 cuadros
+C 0x8AA2 pasa al estado siguiente
+C 0x8AA3 que tipo es?
+C 0x8AA7 nada: se quita
+C 0x8AAA el 0x15...
+C 0x8AAE los demas, con el bit 7
+C 0x8AB1 el 1...
+C 0x8AB5 ... y los otros, 2
+C 0x8ABB el tipo 1: se pone a caer
+C 0x8AD0 el 0x15: en el patio no sale nada
+C 0x8AD8 desde el bloque 1
+C 0x8ADB la cosa de cada bloque
+C 0x8AE1 C = el tipo
+C 0x8AE4 0x10 mas abajo
+C 0x8AE8 la crea
+C 0x8AED y el objeto se quita
+C 0x8AF8 estado 2 (0x8AF8): cae; 0x10 mas abajo...
+C 0x8AFC se salio por abajo?
+C 0x8B02 la celda debajo
+C 0x8B05 es suelo?
+C 0x8B09 si: se para
+C 0x8B0B el tipo 1...
+C 0x8B0F ... cae como una hoja
+C 0x8B12 los demas, 8 por cuadro
+C 0x8B1B fuera
+C 0x8B22 el tipo 1 cae meciendose:
+C 0x8B25 la y
+C 0x8B26 la cuenta
+C 0x8B2C un cuadro de cada dos...
+C 0x8B2F ... baja uno
+C 0x8B31 la x...
+C 0x8B35 ... en 16 bits
+C 0x8B36 mas la velocidad
+C 0x8B42 la velocidad...
+C 0x8B44 ... menos la aceleracion
+C 0x8B53 cada 32 cuadros...
+C 0x8B5C ... la aceleracion cambia de signo: va y vuelve
+C 0x8B68 se para: fuera la cuenta
+C 0x8B6C al estado siguiente
+C 0x8B70 estado 3 (0x8B70): se posa, alineado a 8
+C 0x8B83 lo pinta
+C 0x8B87 su tipo
+C 0x8B8B su dibujo
+C 0x8B8E del 0x17 al 0x19...
+C 0x8B95 ... dura 8
+C 0x8B99 ... los demas, siempre
+C 0x8B9B la cuenta de vida
+C 0x8B9E al estado siguiente
+C 0x8BA2 estado 4 (0x8BA2): esperando a que lo cojan
+C 0x8BA4 el paso 2...
+C 0x8BA9 ... se recoge
+C 0x8BAD su dibujo
+C 0x8BB5 la cuenta de vida
+C 0x8BB8 0xFF: no se acaba
+C 0x8BBA cada 16 cuadros...
+C 0x8BC0 ... baja
+C 0x8BC3 aun le queda
+C 0x8BC4 se acabo: se borra
+C 0x8BC7 y fuera
+C 0x8BCC estado 5 (0x8BCC): la cuenta
+C 0x8BD2 cada 32
+C 0x8BD5 vuelve al estado 2
+C 0x8BD7 que tipo?
+C 0x8BDB nada: fuera
+C 0x8BDF paso 1: lo coge Simon
+C 0x8BE3 lo toca Simon?
+C 0x8BE6 no
+C 0x8BE7 el estado
+C 0x8BEA el objeto se va
+C 0x8BEC estaba en el 4?
+C 0x8BF0 se borra su dibujo
+C 0x8BF3 el tipo 0x19...
+C 0x8BFA los demas: fuera
+C 0x8BFE y su efecto
+C 0x8C01 el 0x17...
+C 0x8C08 ... o el 0x18?
+C 0x8C0B su marca...
+C 0x8C11 ... a cero
+C 0x8C14 el 0x19: pasa a ser el de (ix+0x0D)
+C 0x8C1A y se lanza otra vez
+C 0x8C1D 0xC700 puesto?
+C 0x8C23 si no: fuera los bits 1 y 2 de lo que lleva
+C 0x8C2A y se repinta
+C 0x8C2F 8 mas arriba
+C 0x8C37 estado 5
+C 0x8C3F paso 2
+C 0x8C44 paso 2: recogido
+C 0x8C48 el tipo 0x0A...
+C 0x8C4F ... pasa a 0x0B
+C 0x8C53 se borra su dibujo
+C 0x8C58 el 0x0B...
+C 0x8C5B ... se queda
+C 0x8C60 PINTA EL OBJETO: el 0x19 no se pinta
+C 0x8C66 el estado 4 tampoco
+C 0x8C6E el paso
+C 0x8C72 0: parpadea
+C 0x8C75 1
+C 0x8C78 2
+C 0x8C7A si no, fuera de la pantalla
+C 0x8C7E un cuadro de cada dos
+C 0x8C85 cada cuatro cambia...
+C 0x8C87 ... entre el patron 0xF4...
+C 0x8C8B ... y el 0xF8
+C 0x8C8D color 8
+C 0x8C91 patron 0xE8, color 8
+C 0x8C96 patron 0xEC...
+C 0x8C99 ... con el color de la tabla de 0x8CBD
+C 0x8CA5 la y
+C 0x8CA8 al sprite de 0xD628
+C 0x8CAD la x
+C 0x8CB2 el patron
+C 0x8CB3 y los 16 colores de linea del sprite
+C 0x8CB8 del color C
+C 0x8CC1 el dibujo A: fila 0x50...
+C 0x8CC3 ... los 16 primeros
+C 0x8CC9 ... y fila 0x60 los demas
+C 0x8CCB la columna: A por 16
+C 0x8CD0 16 x 16 puntos
+C 0x8CD3 con TIMP (transparente), de la pagina 1 a la 0
+C 0x8CD5 copia
+C 0x8CD8 guarda lo que hay debajo del objeto:
+C 0x8CD9 su celda
+C 0x8CDD a (ix+7)
+C 0x8CE0 en 0xE520
+C 0x8CE3 2 x 2 celdas
+C 0x8CE6 BORRA EL DIBUJO DEL OBJETO: devuelve lo de debajo
+C 0x8CEA la celda guardada
+C 0x8CF2 su celda
+C 0x8CF5 las de ahora a 0xE800
+C 0x8CFB 2 x 2
+C 0x8D02 cuatro bytes por objeto
+C 0x8D08 las cuatro celdas
+C 0x8D0D la de ahora
+C 0x8D0E igual que la guardada?
+C 0x8D11 no: se devuelve
+C 0x8D19 al mapa
+C 0x8D1C repinta
+C 0x8D22 y los marcos
+C 0x8D29 EL EFECTO DE RECOGER un objeto de tipo (ix+4)
+C 0x8D2C el efecto de sonido que devuelva cada manejador...
+C 0x8D2F ... suena al volver
+C 0x8D30 el ultimo objeto recogido
+C 0x8D33 cambia el arma repetida
+C 0x8D36 desde 0x1A son armas
+C 0x8D3A desde el tipo 1
+C 0x8D70 las ARMAS: el numero de arma
+C 0x8D72 la 5...
+C 0x8D74 ... va aparte
+C 0x8D79 pinta el arma en el marcador
+C 0x8D7C con el bit 2 de 0xC431...
+C 0x8D81 ... dura 0xF0
+C 0x8D85 ... si no, 0x96
+C 0x8D87 la cuenta del arma
+C 0x8D8A efecto 0x12
+C 0x8D8D el bit 3 de lo que lleva
+C 0x8D8F se pone
+C 0x8D94 el bit 6
+C 0x8D98 lo del bit 5 se cambia...
+C 0x8D9D ... por lo del bit 4
+C 0x8DA1 lo del bit 4 se cambia...
+C 0x8DA6 ... por lo del bit 5
+C 0x8DA8 con 16 usos
+C 0x8DAF un corazon
+C 0x8DB1 a los corazones
+C 0x8DB4 efecto 0x0F
+C 0x8DB7 cinco corazones
+C 0x8DBB se borran todas las cosas de la habitacion
+C 0x8DC2 y repinta
+C 0x8DC5 0x18 cuadros
+C 0x8DC7 a 0xC43E
+C 0x8DCA efecto 0x1B
+C 0x8DCD la INVENCIBILIDAD: con el bit 2 de 0xC431...
+C 0x8DD2 ... dura 0xF0
+C 0x8DD6 ... si no, 0x96
+C 0x8DD8 0xC43A: lo que p02:85B1 mira para no hacer dano
+C 0x8DDB efecto 0x16
+C 0x8DDE 8 de vida
+C 0x8DE0 a la vida de Simon
+C 0x8DE5 otra cuenta: con el bit 2 de 0xC431...
+C 0x8DEA ... 0xF0
+C 0x8DEE ... si no, 0x96
+C 0x8DF0 a 0xC434
+C 0x8DF5 el bit 2 de 0xC431 (alarga las cuentas)
+C 0x8DFC el bit 3 de 0xC431
+C 0x8E03 el bit 4 de 0xC431
+C 0x8E0A efecto 0x12
+C 0x8E0D 0x20 de vida
+C 0x8E0F a la vida de Simon
+C 0x8E16 pinta los marcos de los bloques
+C 0x8E19 el bit 0 de 0xC702
+C 0x8E1D el bit 7 de 0xC702 se cambia...
+C 0x8E22 ... por el 6
+C 0x8E26 el 6 se cambia...
+C 0x8E2B ... por el 7
+C 0x8E2D se pone en 0xC702
+C 0x8E30 efecto 0x12
+C 0x8E33 el bit 6 de 0xC431
+C 0x8E38 0xC70F a 3
+C 0x8E3D y el bit 7 de lo que lleva
+C 0x8E42 5.000 puntos
+C 0x8E45 al marcador
+C 0x8E48 efecto 0x10
+C 0x8E4B 1.000 puntos
+C 0x8E50 el bit 1 de lo que lleva
+C 0x8E55 0xC700 a 1
+C 0x8E5A y se repinta
+C 0x8E5D efecto 0x14
+C 0x8E60 el bit 0 de lo que lleva
+C 0x8E65 se repinta
+C 0x8E68 efecto 0x14
+C 0x8E6D pone los bits de B en lo que lleva (0xC701)
+C 0x8E72 o en 0xC702
+C 0x8E79 el bit 1 de 0xC431
+C 0x8E7E fuera el bit 1 de lo que lleva...
+C 0x8E83 ... y el 2 puesto
+C 0x8E88 0xC700 a 3
+C 0x8E8D se repinta
+C 0x8E90 efecto 0x0F
+C 0x8E93 sin arma
+C 0x8E9A PINTA EL ARMA en su recuadro del marcador
+C 0x8E9D en la VRAM 0x800C
+C 0x8EA0 ninguna: el recuadro vacio
+C 0x8EA4 su dibujo: 0x19 + el arma...
+C 0x8EA6 ... menos 1
+C 0x8EA7 fila 0x50...
+C 0x8EAD ... o 0x60
+C 0x8EB1 copia el dibujo
+C 0x8EB4 repinta los dos recuadros
+C 0x8EBA en 0xA40C...
+C 0x8EBD ... el bit 0 de lo que lleva
+C 0x8EC2 no lo lleva: vacio
+C 0x8EC5 el dibujo 0x18
+C 0x8EC9 en 0x940C...
+C 0x8ECC ... los bits 1 y 2 de lo que lleva
+C 0x8ED2 ninguno: vacio
+C 0x8ED5 y con 0xC700...
+C 0x8ED9 ... a cero, vacio
+C 0x8EDC el bit 2...
+C 0x8EDE ... es el dibujo 0x12
+C 0x8EE2 ... si no, el 0x17
+C 0x8EE6 REPINTA LO QUE LLEVA: los cinco bits de arriba de 0xC701
+C 0x8EED cinco
+C 0x8EEF A cuenta cual
+C 0x8EF0 el bit de arriba...
+C 0x8EF2 ... puesto: se pinta
+C 0x8EF5 el siguiente
 
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
@@ -685,6 +1022,7 @@ C 0x84D9 lee el arma que lleva Simon (0, ninguna)
 C 0x84E3 lee el lado al que mira Simon (0 derecha)
 C 0x84E7 lee la X de Simon
 C 0x8544 hl_mas_a: HL += A
+C 0x85B1 lee la cuenta de la INVENCIBILIDAD
 C 0x85D8 hl_mas_a: HL += A
 C 0x85ED lee la X de Simon
 C 0x85FD lee la Y de Simon
@@ -717,75 +1055,22 @@ C 0x890F de_mas_a: DE += A
 C 0x8987 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x8A2D lee el arma que lleva Simon (0, ninguna)
 C 0x8A84 hl_mas_a: HL += A
-C 0x8AD0 lee el bloque de tres fases (0-5)
 C 0x8ADE hl_mas_a: HL += A
-C 0x8AE8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x8B02 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x8B29 lee el contador de cuadros
-C 0x8B44 lee el dibujo de la cosa
-C 0x8B47 lee la cuenta de cuadros del paso
-C 0x8B4D guarda la velocidad horizontal (parte baja)
-C 0x8B50 guarda la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0x8B53 lee si la cosa se mueve
-C 0x8B59 guarda si la cosa se mueve
-C 0x8B5E guarda el dibujo de la cosa
-C 0x8B64 guarda la cuenta de cuadros del paso
-C 0x8B68 la x de la cosa = 0xFF
-C 0x8B6C sube el tipo de la cosa
-C 0x8B7C guarda el paso en que va la cosa
-C 0x8B7F guarda la fraccion de la y de la cosa
-C 0x8B87 lee la fraccion de la x de la cosa
-C 0x8B8E lee la fraccion de la x de la cosa
-C 0x8B9B guarda si la cosa se mueve
-C 0x8B9E sube el tipo de la cosa
-C 0x8BA4 lee la y de la cosa
-C 0x8BAD lee la fraccion de la x de la cosa
-C 0x8BB5 lee si la cosa se mueve
-C 0x8BBA lee el contador de cuadros
-C 0x8BC0 baja si la cosa se mueve
-C 0x8BC7 el tipo de la cosa = 0x00
-C 0x8BCC sube si la cosa se mueve
-C 0x8BCF lee si la cosa se mueve
-C 0x8BD7 lee la fraccion de la x de la cosa
-C 0x8BDF la y de la cosa = 0x00
-C 0x8BF3 lee la fraccion de la x de la cosa
-C 0x8BFA la x de la cosa = 0xFF
-C 0x8C01 lee la fraccion de la x de la cosa
-C 0x8C14 lee la vida de la cosa
-C 0x8C17 guarda la fraccion de la x de la cosa
-C 0x8C2F lee el paso en que va la cosa
-C 0x8C34 guarda el paso en que va la cosa
-C 0x8C37 el tipo de la cosa = 0x05
-C 0x8C3B la cosa se queda quieta
-C 0x8C3F la x de la cosa = 0x02
-C 0x8C44 la y de la cosa = 0x00
-C 0x8C48 lee la fraccion de la x de la cosa
-C 0x8C4F la fraccion de la x de la cosa = 0x0B
-C 0x8C5B la cosa se mueve
-C 0x8C60 lee la fraccion de la x de la cosa
-C 0x8C66 lee el tipo de la cosa
-C 0x8C6E lee la x de la cosa
-C 0x8C7E lee el contador de cuadros
-C 0x8C99 lee el contador de cuadros
 C 0x8CA1 hl_mas_a: HL += A
-C 0x8CA5 lee el paso en que va la cosa
-C 0x8CAD lee la fraccion de la y de la cosa
-C 0x8CD9 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-C 0x8CDD guarda la velocidad vertical (parte baja)
-C 0x8CEA lee la velocidad vertical (parte baja)
-C 0x8CF2 celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
 C 0x8D05 hl_mas_a: HL += A
-C 0x8D29 lee la fraccion de la x de la cosa
 C 0x8D3B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x8D76 guarda el arma que lleva Simon (0, ninguna)
 C 0x8DAA guarda los usos que le quedan a lo que para golpes
 C 0x8E94 guarda el arma que lleva Simon (0, ninguna)
-C 0x8E9A lee el arma que lleva Simon (0, ninguna)
+C 0x8EE9 lee lo que lleva Simon (un bit por objeto)
 C 0x8F0B hl_mas_a: HL += A
+C 0x8F40 lee el ultimo objeto recogido
 C 0x8F52 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x8F5A lee el contador de cuadros
 C 0x8F69 lee la fraccion de la x de la cosa
 C 0x8F7D sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x8F94 apunta a lo que lleva Simon (un bit por objeto)
 C 0x8F9F lee la fase (0xD000) y la habitacion (0xD001) de un tiron
 C 0x9012 guarda el tipo de la cosa
 C 0x9015 guarda el paso en que va la cosa
@@ -817,6 +1102,7 @@ C 0x937E lee la velocidad horizontal (parte baja)
 C 0x9391 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x93A1 hl_mas_a: HL += A
 C 0x93C5 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
+C 0x9418 lee mas cosas que lleva (bit 0: se ven los bloques que se rompen)
 C 0x9453 lee la FASE (0 el patio, 1-18)
 C 0x945D hl_mas_a: HL += A
 C 0x9465 lee la HABITACION dentro de la fase
@@ -827,6 +1113,8 @@ C 0x94F1 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x94FE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x951A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x9552 lee las banderas de la partida (bit 7: de verdad, no la demostracion)
+C 0x956C lee lo que lleva Simon (un bit por objeto)
+C 0x957A apunta a lo que lleva Simon (un bit por objeto)
 C 0x958E rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x959B rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x95A0 sonido: arranca la musica o el efecto A (bit 7 = musica)

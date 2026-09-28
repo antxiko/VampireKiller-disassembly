@@ -988,7 +988,7 @@ L_85A6:
 	ld a,(0c42dh)		;85ac
 	and a			;85af
 	ret nz			;85b0
-	ld a,(0c43ah)		;85b1
+	ld a,(0c43ah)		;85b1   ; lee la cuenta de la INVENCIBILIDAD
 	and a			;85b4
 	ret nz			;85b5
 	ld hl,0c580h		;85b6   ; las tres de 0xC580, ocho bytes cada una
@@ -1622,65 +1622,69 @@ L_894A:
 	pop bc			;895b
 	djnz L_8943		;895c
 	ld hl,0d4a0h		;895e
-	ld a,002h		;8961
+	ld a,002h		;8961   ; rellena 16 bytes con 2
 	call L_8972		;8963
-	ld a,04ch		;8966
+	ld a,04ch		;8966   ; 16 con 0x4C
 	call L_8972		;8968
-	ld a,002h		;896b
+	ld a,002h		;896b   ; 16 con 2
 	call L_8972		;896d
-	ld a,04ch		;8970
+	ld a,04ch		;8970   ; y 16 con 0x4C
 L_8972:
-	ld b,010h		;8972
+	ld b,010h		;8972   ; 16 bytes
 L_8974:
-	ld (hl),a			;8974
+	ld (hl),a			;8974   ; del valor de A
 	inc hl			;8975
 	djnz L_8974		;8976
 	ret			;8978
 L_8979:
-	ld a,005h		;8979
-	ld l,070h		;897b
+	ld a,005h		;8979   ; el dibujo 5...
+	ld l,070h		;897b   ; ... de la fila 0x70
 L_897D:
-	add a,a			;897d
+	add a,a			;897d   ; la columna: A por 16
 	add a,a			;897e
 	add a,a			;897f
 	add a,a			;8980
 	ld h,a			;8981
-	ld bc,01010h		;8982
-	ld a,001h		;8985
+	ld bc,01010h		;8982   ; 16 x 16 puntos
+	ld a,001h		;8985   ; de la pagina 1 a la 0
 	jp 04946h		;8987   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_898A:
-	ld l,070h		;898a
+	ld l,070h		;898a   ; en la fila 0x70
 	jp L_8CCB		;898c
+
+; ----------------------------------------------------------------------
+; LOS OBJETOS QUE SALEN. La lista de 0xC500 (ocho de 16 bytes: [estado][y][x][paso][tipo][...]) son las cosas que aparecen al romper un bloque o al matar algo. 0x8A37 busca un hueco libre. Si el objeto es el arma que Simon ya lleva, sale el tipo 1 en su lugar (0x8A29).
+; ----------------------------------------------------------------------
 L_898F:
-	call L_8A29		;898f
+	call L_8A29		;898f   ; cambia el arma repetida por el tipo 1
 L_8992:
-	ld a,b			;8992
+	ld a,b			;8992   ; que sale?
 	or a			;8993
-	jr z,L_899E		;8994
-	cp 015h		;8996
+	jr z,L_899E		;8994   ; nada
+	cp 015h		;8996   ; el 0x15...
 	jr z,L_899E		;8998
-	call L_89BF		;899a
-	ret z			;899d
+	call L_89BF		;899a   ; los demas: sale una cosa?
+	ret z			;899d   ; no hace falta
 L_899E:
-	call L_8A37		;899e
-	ret nz			;89a1
-	ld (hl),001h		;89a2
+	call L_8A37		;899e   ; un hueco en la lista
+	ret nz			;89a1   ; no hay
+	ld (hl),001h		;89a2   ; estado 1
 	inc l			;89a4
-	ld (hl),e			;89a5
+	ld (hl),e			;89a5   ; y
 	inc l			;89a6
-	ld (hl),d			;89a7
+	ld (hl),d			;89a7   ; x
 	inc l			;89a8
-	ld (hl),000h		;89a9
+	ld (hl),000h		;89a9   ; paso 0
 	inc l			;89ab
-	ld (hl),b			;89ac
+	ld (hl),b			;89ac   ; el tipo
 	inc l			;89ad
 	ld (hl),000h		;89ae
 	ld a,b			;89b0
-	cp 015h		;89b1
+	cp 015h		;89b1   ; el 0x15 y los de antes del 2...
 	jr z,L_89BB		;89b3
 	cp 002h		;89b5
 	jr c,L_89BB		;89b7
-	ld (hl),002h		;89b9
+	ld (hl),002h		;89b9   ; ... empiezan distinto
 L_89BB:
 	inc l			;89bb
 	ld (hl),000h		;89bc
@@ -1689,145 +1693,145 @@ L_89BF:
 	push bc			;89bf
 	push de			;89c0
 	push ix		;89c1
-	ld a,e			;89c3
+	ld a,e			;89c3   ; 0x10 mas abajo
 	add a,010h		;89c4
 	ld e,a			;89c6
-	ld a,d			;89c7
+	ld a,d			;89c7   ; 8 mas a la derecha
 	add a,008h		;89c8
 	ld d,a			;89ca
-	ld a,b			;89cb
+	ld a,b			;89cb   ; el tipo 1...
 	cp 001h		;89cc
 	jr nz,L_89D4		;89ce
-	ld c,01eh		;89d0
+	ld c,01eh		;89d0   ; ... es la cosa 0x1E
 	jr L_89D6		;89d2
 L_89D4:
-	ld c,026h		;89d4
+	ld c,026h		;89d4   ; los demas, la 0x26
 L_89D6:
 	xor a			;89d6
-	call 05f1fh		;89d7
-	ld a,(0cf31h)		;89da
+	call 05f1fh		;89d7   ; la crea
+	ld a,(0cf31h)		;89da   ; salio?
 	dec a			;89dd
 	pop ix		;89de
 	pop de			;89e0
 	pop bc			;89e1
 	ret			;89e2
 L_89E3:
-	ld a,b			;89e3
+	ld a,b			;89e3   ; el 0x15...
 	cp 015h		;89e4
-	jp z,L_8992		;89e6
-	call L_8A29		;89e9
-	call L_8A37		;89ec
-	ret nz			;89ef
+	jp z,L_8992		;89e6   ; ... va por el otro camino
+	call L_8A29		;89e9   ; cambia el arma repetida
+	call L_8A37		;89ec   ; un hueco
+	ret nz			;89ef   ; no hay
 L_89F0:
-	ld (hl),083h		;89f0
+	ld (hl),083h		;89f0   ; estado 0x83
 	inc l			;89f2
-	ld (hl),e			;89f3
+	ld (hl),e			;89f3   ; y
 	inc l			;89f4
-	ld (hl),d			;89f5
+	ld (hl),d			;89f5   ; x
 	inc l			;89f6
 	inc l			;89f7
-	ld (hl),b			;89f8
+	ld (hl),b			;89f8   ; el tipo
 	inc l			;89f9
-	ld (hl),0ffh		;89fa
+	ld (hl),0ffh		;89fa   ; 0xFF
 	ret			;89fc
 L_89FD:
-	ld (0c70dh),hl		;89fd
-	call L_8A37		;8a00
-	ret nz			;8a03
-	call L_89F0		;8a04
-	ld a,l			;8a07
+	ld (0c70dh),hl		;89fd   ; guarda HL
+	call L_8A37		;8a00   ; un hueco
+	ret nz			;8a03   ; no hay
+	call L_89F0		;8a04   ; lo llena
+	ld a,l			;8a07   ; el byte 9...
 	add a,009h		;8a08
 	ld l,a			;8a0a
 L_8A0B:
-	ld de,(0c70dh)		;8a0b
+	ld de,(0c70dh)		;8a0b   ; ... y el 10 con lo guardado
 	ld (hl),d			;8a0f
 	inc l			;8a10
 	ld (hl),e			;8a11
 	ret			;8a12
 L_8A13:
-	ld (0c70dh),hl		;8a13
-	call L_8A37		;8a16
-	ret nz			;8a19
+	ld (0c70dh),hl		;8a13   ; guarda HL
+	call L_8A37		;8a16   ; un hueco
+	ret nz			;8a19   ; no hay
 	push bc			;8a1a
-	ld b,019h		;8a1b
-	call L_89F0		;8a1d
+	ld b,019h		;8a1b   ; el tipo 0x19
+	call L_89F0		;8a1d   ; lo llena
 	pop bc			;8a20
-	ld a,l			;8a21
+	ld a,l			;8a21   ; el byte 8...
 	add a,008h		;8a22
 	ld l,a			;8a24
-	ld (hl),b			;8a25
+	ld (hl),b			;8a25   ; ... con B
 	inc l			;8a26
 	jr L_8A0B		;8a27
 L_8A29:
-	ld a,b			;8a29
+	ld a,b			;8a29   ; los tipos desde 0x1A son armas
 	cp 01ah		;8a2a
-	ret c			;8a2c
+	ret c			;8a2c   ; los de antes, tal cual
 	ld a,(0c416h)		;8a2d   ; lee el arma que lleva Simon (0, ninguna)
-	add a,019h		;8a30
-	cp b			;8a32
-	ret nz			;8a33
-	ld b,001h		;8a34
+	add a,019h		;8a30   ; 0x19 + la que lleva
+	cp b			;8a32   ; es la misma?
+	ret nz			;8a33   ; no
+	ld b,001h		;8a34   ; si: el tipo 1 en su lugar
 	ret			;8a36
 L_8A37:
 	push bc			;8a37
-	ld hl,0c500h		;8a38
+	ld hl,0c500h		;8a38   ; la lista de objetos
 	ld b,008h		;8a3b
 L_8A3D:
-	ld a,(hl)			;8a3d
+	ld a,(hl)			;8a3d   ; libre?
 	or a			;8a3e
 	jr z,L_8A48		;8a3f
-	ld a,010h		;8a41
+	ld a,010h		;8a41   ; el siguiente, 16 bytes mas alla
 	add a,l			;8a43
 	ld l,a			;8a44
-	djnz L_8A3D		;8a45
-	or a			;8a47
+	djnz L_8A3D		;8a45   ; ocho
+	or a			;8a47   ; no hay hueco (nz)
 L_8A48:
 	pop bc			;8a48
 	ret			;8a49
 L_8A4A:
-	call L_8F55		;8a4a
-	ld bc,00800h		;8a4d
-	ld hl,0c500h		;8a50
+	call L_8F55		;8a4a   ; mueve los objetos
+	ld bc,00800h		;8a4d   ; ocho, y C cuenta cual es
+	ld hl,0c500h		;8a50   ; la lista de objetos
 L_8A53:
 	push hl			;8a53
-	pop ix		;8a54
+	pop ix		;8a54   ; IX = el objeto
 	push bc			;8a56
 	push hl			;8a57
-	ld a,(hl)			;8a58
+	ld a,(hl)			;8a58   ; su estado
 	ld b,a			;8a59
 	or a			;8a5a
-	jr z,L_8A63		;8a5b
-	call L_8A6D		;8a5d
-	call L_8C60		;8a60
+	jr z,L_8A63		;8a5b   ; vacio
+	call L_8A6D		;8a5d   ; lo mueve
+	call L_8C60		;8a60   ; y lo pinta
 L_8A63:
 	pop hl			;8a63
 	pop bc			;8a64
-	ld a,010h		;8a65
+	ld a,010h		;8a65   ; el siguiente, 16 bytes mas alla
 	add a,l			;8a67
 	ld l,a			;8a68
 	inc c			;8a69
 	djnz L_8A53		;8a6a
 	ret			;8a6c
 L_8A6D:
-	ld e,(ix+001h)		;8a6d
-	ld d,(ix+002h)		;8a70
-	ex af,af'			;8a73
-	ld a,(ix+003h)		;8a74
-	dec a			;8a77
-	jp z,L_8BDF		;8a78
-	ex af,af'			;8a7b
-	dec a			;8a7c
-	and 07fh		;8a7d
-	exx			;8a7f
+	ld e,(ix+001h)		;8a6d   ; su y
+	ld d,(ix+002h)		;8a70   ; su x
+	ex af,af'			;8a73   ; el estado, a guardar
+	ld a,(ix+003h)		;8a74   ; el paso...
+	dec a			;8a77   ; ... 1?
+	jp z,L_8BDF		;8a78   ; si: a recogerlo
+	ex af,af'			;8a7b   ; el estado
+	dec a			;8a7c   ; desde 1
+	and 07fh		;8a7d   ; sin el bit 7
+	exx			;8a7f   ; (sin tocar los registros de fuera)
 	ld hl,08a8dh		;8a80
 	add a,a			;8a83
 	call 04061h		;8a84   ; hl_mas_a: HL += A
 	ld e,(hl)			;8a87
 	inc hl			;8a88
 	ld d,(hl)			;8a89
-	push de			;8a8a
+	push de			;8a8a   ; el destino, a la pila...
 	exx			;8a8b
-	ret			;8a8c
+	ret			;8a8c   ; ... y alla que va
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_de_p02_8A80: seis destinos del despachador hecho a mano de
@@ -1843,49 +1847,49 @@ DATA_tabla_de_p02_8A80:
 
 
 L_8A99:
-	inc (ix+006h)		;8a99
+	inc (ix+006h)		;8a99   ; estado 1 (0x8A99): sube la cuenta
 	ld a,(ix+006h)		;8a9c
-	and 00fh		;8a9f
+	and 00fh		;8a9f   ; cada 16 cuadros
 	ret nz			;8aa1
-	inc (hl)			;8aa2
-	ld a,(ix+004h)		;8aa3
+	inc (hl)			;8aa2   ; pasa al estado siguiente
+	ld a,(ix+004h)		;8aa3   ; que tipo es?
 	or a			;8aa6
-	jp z,L_8B1B		;8aa7
-	cp 015h		;8aaa
+	jp z,L_8B1B		;8aa7   ; nada: se quita
+	cp 015h		;8aaa   ; el 0x15...
 	jr z,L_8AD0		;8aac
-	set 7,(hl)		;8aae
+	set 7,(hl)		;8aae   ; los demas, con el bit 7
 	dec a			;8ab0
-	ld a,001h		;8ab1
+	ld a,001h		;8ab1   ; el 1...
 	jr z,L_8AB7		;8ab3
-	ld a,002h		;8ab5
+	ld a,002h		;8ab5   ; ... y los otros, 2
 L_8AB7:
 	ld (ix+005h),a		;8ab7
 	ret nz			;8aba
-	ld (ix+006h),000h		;8abb
+	ld (ix+006h),000h		;8abb   ; el tipo 1: se pone a caer
 	ld (ix+009h),002h		;8abf
 	ld (ix+00ah),000h		;8ac3
 	ld (ix+00bh),000h		;8ac7
 	ld (ix+00ch),020h		;8acb
 	ret			;8acf
 L_8AD0:
-	ld a,(0d002h)		;8ad0   ; lee el bloque de tres fases (0-5)
+	ld a,(0d002h)		;8ad0   ; el 0x15: en el patio no sale nada
 	or a			;8ad3
 	ld b,a			;8ad4
 	jr z,L_8AED		;8ad5
 	ld a,b			;8ad7
-	dec a			;8ad8
+	dec a			;8ad8   ; desde el bloque 1
 	and 007h		;8ad9
-	ld hl,08af0h		;8adb
+	ld hl,08af0h		;8adb   ; la cosa de cada bloque
 	call 04061h		;8ade   ; hl_mas_a: HL += A
-	ld c,(hl)			;8ae1
+	ld c,(hl)			;8ae1   ; C = el tipo
 	push ix		;8ae2
-	ld a,e			;8ae4
+	ld a,e			;8ae4   ; 0x10 mas abajo
 	add a,010h		;8ae5
 	ld e,a			;8ae7
-	call 05f1dh		;8ae8   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
+	call 05f1dh		;8ae8   ; la crea
 	pop ix		;8aeb
 L_8AED:
-	jp L_8B1B		;8aed
+	jp L_8B1B		;8aed   ; y el objeto se quita
 
 ; ----------------------------------------------------------------------
 ; DATOS ocho_valores: ocho bytes que lee p02:8ADB, dentro del primer destino
@@ -1900,71 +1904,71 @@ DATA_ocho_valores:
 
 
 L_8AF8:
-	ld hl,00810h		;8af8
+	ld hl,00810h		;8af8   ; estado 2 (0x8AF8): cae; 0x10 mas abajo...
 	add hl,de			;8afb
-	ld a,0dbh		;8afc
+	ld a,0dbh		;8afc   ; se salio por abajo?
 	cp l			;8afe
 	jr c,L_8B1B		;8aff
 	ex de,hl			;8b01
-	call 07d2fh		;8b02   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	sub 001h		;8b05
+	call 07d2fh		;8b02   ; la celda debajo
+	sub 001h		;8b05   ; es suelo?
 	cp 009h		;8b07
-	jr c,L_8B68		;8b09
-	ld a,(ix+004h)		;8b0b
+	jr c,L_8B68		;8b09   ; si: se para
+	ld a,(ix+004h)		;8b0b   ; el tipo 1...
 	dec a			;8b0e
-	jp z,L_8B22		;8b0f
-	ld a,(ix+001h)		;8b12
+	jp z,L_8B22		;8b0f   ; ... cae como una hoja
+	ld a,(ix+001h)		;8b12   ; los demas, 8 por cuadro
 	add a,008h		;8b15
 	ld (ix+001h),a		;8b17
 	ret			;8b1a
 L_8B1B:
-	ld (ix+005h),0ffh		;8b1b
+	ld (ix+005h),0ffh		;8b1b   ; fuera
 	jp L_8BC7		;8b1f
 L_8B22:
-	push ix		;8b22
+	push ix		;8b22   ; el tipo 1 cae meciendose:
 	pop hl			;8b24
-	inc l			;8b25
-	inc (ix+006h)		;8b26
+	inc l			;8b25   ; la y
+	inc (ix+006h)		;8b26   ; la cuenta
 	ld a,(0c003h)		;8b29   ; lee el contador de cuadros
-	rra			;8b2c
+	rra			;8b2c   ; un cuadro de cada dos...
 	jr nc,L_8B30		;8b2d
-	inc (hl)			;8b2f
+	inc (hl)			;8b2f   ; ... baja uno
 L_8B30:
 	inc l			;8b30
-	ld d,(hl)			;8b31
+	ld d,(hl)			;8b31   ; la x...
 	ld e,(ix+008h)		;8b32
-	ex de,hl			;8b35
-	ld b,(ix+009h)		;8b36
+	ex de,hl			;8b35   ; ... en 16 bits
+	ld b,(ix+009h)		;8b36   ; mas la velocidad
 	ld c,(ix+00ah)		;8b39
 	add hl,bc			;8b3c
 	ex de,hl			;8b3d
 	ld (ix+008h),e		;8b3e
 	ld (hl),d			;8b41
-	ld h,b			;8b42
+	ld h,b			;8b42   ; la velocidad...
 	ld l,c			;8b43
-	ld b,(ix+00bh)		;8b44   ; lee el dibujo de la cosa
-	ld c,(ix+00ch)		;8b47   ; lee la cuenta de cuadros del paso
+	ld b,(ix+00bh)		;8b44   ; ... menos la aceleracion
+	ld c,(ix+00ch)		;8b47
 	and a			;8b4a
 	sbc hl,bc		;8b4b
-	ld (ix+009h),h		;8b4d   ; guarda la velocidad horizontal (parte baja)
-	ld (ix+00ah),l		;8b50   ; guarda la velocidad horizontal (el bit 7, hacia la izquierda)
-	ld a,(ix+006h)		;8b53   ; lee si la cosa se mueve
+	ld (ix+009h),h		;8b4d
+	ld (ix+00ah),l		;8b50
+	ld a,(ix+006h)		;8b53   ; cada 32 cuadros...
 	sub 020h		;8b56
 	ret nz			;8b58
-	ld (ix+006h),a		;8b59   ; guarda si la cosa se mueve
-	ld a,b			;8b5c
+	ld (ix+006h),a		;8b59
+	ld a,b			;8b5c   ; ... la aceleracion cambia de signo: va y vuelve
 	cpl			;8b5d
-	ld (ix+00bh),a		;8b5e   ; guarda el dibujo de la cosa
+	ld (ix+00bh),a		;8b5e
 	ld a,c			;8b61
 	neg		;8b62
-	ld (ix+00ch),a		;8b64   ; guarda la cuenta de cuadros del paso
+	ld (ix+00ch),a		;8b64
 	ret			;8b67
 L_8B68:
-	ld (ix+005h),0ffh		;8b68   ; la x de la cosa = 0xFF
-	inc (ix+000h)		;8b6c   ; sube el tipo de la cosa
+	ld (ix+005h),0ffh		;8b68   ; se para: fuera la cuenta
+	inc (ix+000h)		;8b6c   ; al estado siguiente
 	ret			;8b6f
 L_8B70:
-	ld a,e			;8b70
+	ld a,e			;8b70   ; estado 3 (0x8B70): se posa, alineado a 8
 	add a,004h		;8b71
 	and 0f8h		;8b73
 	ld e,a			;8b75
@@ -1972,169 +1976,169 @@ L_8B70:
 	add a,004h		;8b77
 	and 0f8h		;8b79
 	ld d,a			;8b7b
-	ld (ix+001h),e		;8b7c   ; guarda el paso en que va la cosa
-	ld (ix+002h),d		;8b7f   ; guarda la fraccion de la y de la cosa
+	ld (ix+001h),e		;8b7c
+	ld (ix+002h),d		;8b7f
 	push de			;8b82
-	call L_8CD8		;8b83
+	call L_8CD8		;8b83   ; lo pinta
 	pop de			;8b86
-	ld a,(ix+004h)		;8b87   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8b87   ; su tipo
 	dec a			;8b8a
-	call L_8CC1		;8b8b
-	ld a,(ix+004h)		;8b8e   ; lee la fraccion de la x de la cosa
+	call L_8CC1		;8b8b   ; su dibujo
+	ld a,(ix+004h)		;8b8e   ; del 0x17 al 0x19...
 	sub 017h		;8b91
 	cp 003h		;8b93
-	ld a,008h		;8b95
+	ld a,008h		;8b95   ; ... dura 8
 	jr nc,L_8B9B		;8b97
-	ld a,0ffh		;8b99
+	ld a,0ffh		;8b99   ; ... los demas, siempre
 L_8B9B:
-	ld (ix+006h),a		;8b9b   ; guarda si la cosa se mueve
-	inc (ix+000h)		;8b9e   ; sube el tipo de la cosa
+	ld (ix+006h),a		;8b9b   ; la cuenta de vida
+	inc (ix+000h)		;8b9e   ; al estado siguiente
 	ret			;8ba1
 L_8BA2:
-	set 7,(hl)		;8ba2
-	ld a,(ix+003h)		;8ba4   ; lee la y de la cosa
+	set 7,(hl)		;8ba2   ; estado 4 (0x8BA2): esperando a que lo cojan
+	ld a,(ix+003h)		;8ba4   ; el paso 2...
 	cp 002h		;8ba7
-	jp z,L_8C44		;8ba9
+	jp z,L_8C44		;8ba9   ; ... se recoge
 	push de			;8bac
-	ld a,(ix+004h)		;8bad   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8bad   ; su dibujo
 	dec a			;8bb0
 	call L_8CC1		;8bb1
 	pop de			;8bb4
-	ld a,(ix+006h)		;8bb5   ; lee si la cosa se mueve
-	inc a			;8bb8
+	ld a,(ix+006h)		;8bb5   ; la cuenta de vida
+	inc a			;8bb8   ; 0xFF: no se acaba
 	ret z			;8bb9
-	ld a,(0c003h)		;8bba   ; lee el contador de cuadros
+	ld a,(0c003h)		;8bba   ; cada 16 cuadros...
 	and 00fh		;8bbd
 	ret nz			;8bbf
-	dec (ix+006h)		;8bc0   ; baja si la cosa se mueve
-	ret nz			;8bc3
-	call L_8CE6		;8bc4
+	dec (ix+006h)		;8bc0   ; ... baja
+	ret nz			;8bc3   ; aun le queda
+	call L_8CE6		;8bc4   ; se acabo: se borra
 L_8BC7:
-	ld (ix+000h),000h		;8bc7   ; el tipo de la cosa = 0x00
+	ld (ix+000h),000h		;8bc7   ; y fuera
 	ret			;8bcb
 L_8BCC:
-	inc (ix+006h)		;8bcc   ; sube si la cosa se mueve
-	ld a,(ix+006h)		;8bcf   ; lee si la cosa se mueve
-	and 01fh		;8bd2
+	inc (ix+006h)		;8bcc   ; estado 5 (0x8BCC): la cuenta
+	ld a,(ix+006h)		;8bcf
+	and 01fh		;8bd2   ; cada 32
 	ret nz			;8bd4
-	ld (hl),002h		;8bd5
-	ld a,(ix+004h)		;8bd7   ; lee la fraccion de la x de la cosa
+	ld (hl),002h		;8bd5   ; vuelve al estado 2
+	ld a,(ix+004h)		;8bd7   ; que tipo?
 	or a			;8bda
-	jp z,L_8B1B		;8bdb
+	jp z,L_8B1B		;8bdb   ; nada: fuera
 	ret			;8bde
 L_8BDF:
-	ld (ix+003h),000h		;8bdf   ; la y de la cosa = 0x00
-	call L_8F68		;8be3
-	ret nz			;8be6
-	ld a,(hl)			;8be7
+	ld (ix+003h),000h		;8bdf   ; paso 1: lo coge Simon
+	call L_8F68		;8be3   ; lo toca Simon?
+	ret nz			;8be6   ; no
+	ld a,(hl)			;8be7   ; el estado
 	and 07fh		;8be8
-	ld (hl),000h		;8bea
-	cp 004h		;8bec
+	ld (hl),000h		;8bea   ; el objeto se va
+	cp 004h		;8bec   ; estaba en el 4?
 	jr nz,L_8BF3		;8bee
-	call L_8CE6		;8bf0
+	call L_8CE6		;8bf0   ; se borra su dibujo
 L_8BF3:
-	ld a,(ix+004h)		;8bf3   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8bf3   ; el tipo 0x19...
 	cp 019h		;8bf6
 	jr z,L_8C14		;8bf8
-	ld (ix+005h),0ffh		;8bfa   ; la x de la cosa = 0xFF
-	call L_8D29		;8bfe
-	ld a,(ix+004h)		;8c01   ; lee la fraccion de la x de la cosa
+	ld (ix+005h),0ffh		;8bfa   ; los demas: fuera
+	call L_8D29		;8bfe   ; y su efecto
+	ld a,(ix+004h)		;8c01   ; el 0x17...
 	cp 017h		;8c04
 	jr z,L_8C0B		;8c06
-	cp 018h		;8c08
+	cp 018h		;8c08   ; ... o el 0x18?
 	ret nz			;8c0a
 L_8C0B:
-	ld h,(ix+00eh)		;8c0b
+	ld h,(ix+00eh)		;8c0b   ; su marca...
 	ld l,(ix+00fh)		;8c0e
-	ld (hl),000h		;8c11
+	ld (hl),000h		;8c11   ; ... a cero
 	ret			;8c13
 L_8C14:
-	ld a,(ix+00dh)		;8c14   ; lee la vida de la cosa
-	ld (ix+004h),a		;8c17   ; guarda la fraccion de la x de la cosa
-	call L_8C2F		;8c1a
-	ld a,(0c700h)		;8c1d
+	ld a,(ix+00dh)		;8c14   ; el 0x19: pasa a ser el de (ix+0x0D)
+	ld (ix+004h),a		;8c17
+	call L_8C2F		;8c1a   ; y se lanza otra vez
+	ld a,(0c700h)		;8c1d   ; 0xC700 puesto?
 	or a			;8c20
 	jr nz,L_8C0B		;8c21
-	ld hl,0c701h		;8c23
+	ld hl,0c701h		;8c23   ; si no: fuera los bits 1 y 2 de lo que lleva
 	ld a,(hl)			;8c26
 	and 0f9h		;8c27
 	ld (hl),a			;8c29
-	call L_8EC9		;8c2a
+	call L_8EC9		;8c2a   ; y se repinta
 	jr L_8C0B		;8c2d
 L_8C2F:
-	ld a,(ix+001h)		;8c2f   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;8c2f   ; 8 mas arriba
 	sub 008h		;8c32
-	ld (ix+001h),a		;8c34   ; guarda el paso en que va la cosa
-	ld (ix+000h),005h		;8c37   ; el tipo de la cosa = 0x05
-	ld (ix+006h),000h		;8c3b   ; la cosa se queda quieta
-	ld (ix+005h),002h		;8c3f   ; la x de la cosa = 0x02
+	ld (ix+001h),a		;8c34
+	ld (ix+000h),005h		;8c37   ; estado 5
+	ld (ix+006h),000h		;8c3b
+	ld (ix+005h),002h		;8c3f   ; paso 2
 	ret			;8c43
 L_8C44:
-	ld (ix+003h),000h		;8c44   ; la y de la cosa = 0x00
-	ld a,(ix+004h)		;8c48   ; lee la fraccion de la x de la cosa
+	ld (ix+003h),000h		;8c44   ; paso 2: recogido
+	ld a,(ix+004h)		;8c48   ; el tipo 0x0A...
 	cp 00ah		;8c4b
 	jr nz,L_8C58		;8c4d
-	ld (ix+004h),00bh		;8c4f   ; la fraccion de la x de la cosa = 0x0B
-	call L_8CE6		;8c53
+	ld (ix+004h),00bh		;8c4f   ; ... pasa a 0x0B
+	call L_8CE6		;8c53   ; se borra su dibujo
 	jr L_8C2F		;8c56
 L_8C58:
-	cp 00bh		;8c58
+	cp 00bh		;8c58   ; el 0x0B...
 	ret nz			;8c5a
-	ld (ix+006h),001h		;8c5b   ; la cosa se mueve
+	ld (ix+006h),001h		;8c5b   ; ... se queda
 	ret			;8c5f
 L_8C60:
-	ld a,(ix+004h)		;8c60   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8c60   ; PINTA EL OBJETO: el 0x19 no se pinta
 	cp 019h		;8c63
 	ret z			;8c65
-	ld a,(ix+000h)		;8c66   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;8c66   ; el estado 4 tampoco
 	and 00fh		;8c69
 	cp 004h		;8c6b
 	ret z			;8c6d
-	ld a,(ix+005h)		;8c6e   ; lee la x de la cosa
+	ld a,(ix+005h)		;8c6e   ; el paso
 	or a			;8c71
-	jr z,L_8C7E		;8c72
+	jr z,L_8C7E		;8c72   ; 0: parpadea
 	dec a			;8c74
-	jr z,L_8C91		;8c75
+	jr z,L_8C91		;8c75   ; 1
 	dec a			;8c77
-	jr z,L_8C96		;8c78
-	ld a,0e0h		;8c7a
+	jr z,L_8C96		;8c78   ; 2
+	ld a,0e0h		;8c7a   ; si no, fuera de la pantalla
 	jr L_8CA8		;8c7c
 L_8C7E:
-	ld a,(0c003h)		;8c7e   ; lee el contador de cuadros
+	ld a,(0c003h)		;8c7e   ; un cuadro de cada dos
 	ld b,a			;8c81
 	and 001h		;8c82
 	ret nz			;8c84
-	bit 2,b		;8c85
-	ld b,0f4h		;8c87
+	bit 2,b		;8c85   ; cada cuatro cambia...
+	ld b,0f4h		;8c87   ; ... entre el patron 0xF4...
 	jr nz,L_8C8D		;8c89
-	ld b,0f8h		;8c8b
+	ld b,0f8h		;8c8b   ; ... y el 0xF8
 L_8C8D:
-	ld c,008h		;8c8d
+	ld c,008h		;8c8d   ; color 8
 	jr L_8CA5		;8c8f
 L_8C91:
-	ld bc,0e808h		;8c91
+	ld bc,0e808h		;8c91   ; patron 0xE8, color 8
 	jr L_8CA5		;8c94
 L_8C96:
-	ld bc,0ec0eh		;8c96
-	ld a,(0c003h)		;8c99   ; lee el contador de cuadros
+	ld bc,0ec0eh		;8c96   ; patron 0xEC...
+	ld a,(0c003h)		;8c99   ; ... con el color de la tabla de 0x8CBD
 	and 003h		;8c9c
 	ld hl,08cbdh		;8c9e
 	call 04061h		;8ca1   ; hl_mas_a: HL += A
 	ld c,(hl)			;8ca4
 L_8CA5:
-	ld a,(ix+001h)		;8ca5   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;8ca5   ; la y
 L_8CA8:
-	ld hl,0d628h		;8ca8
+	ld hl,0d628h		;8ca8   ; al sprite de 0xD628
 	ld (hl),a			;8cab
 	inc hl			;8cac
-	ld a,(ix+002h)		;8cad   ; lee la fraccion de la y de la cosa
+	ld a,(ix+002h)		;8cad   ; la x
 	ld (hl),a			;8cb0
 	inc hl			;8cb1
-	ld (hl),b			;8cb2
-	ld hl,0d4a0h		;8cb3
+	ld (hl),b			;8cb2   ; el patron
+	ld hl,0d4a0h		;8cb3   ; y los 16 colores de linea del sprite
 	ld b,010h		;8cb6
 L_8CB8:
-	ld (hl),c			;8cb8
+	ld (hl),c			;8cb8   ; del color C
 	inc hl			;8cb9
 	djnz L_8CB8		;8cba
 	ret			;8cbc
@@ -2152,54 +2156,54 @@ DATA_cuatro_valores_por_cuadro:
 
 
 L_8CC1:
-	ld l,050h		;8cc1
-	cp 010h		;8cc3
+	ld l,050h		;8cc1   ; el dibujo A: fila 0x50...
+	cp 010h		;8cc3   ; ... los 16 primeros
 	jr c,L_8CCB		;8cc5
 	sub 010h		;8cc7
-	ld l,060h		;8cc9
+	ld l,060h		;8cc9   ; ... y fila 0x60 los demas
 L_8CCB:
-	add a,a			;8ccb
+	add a,a			;8ccb   ; la columna: A por 16
 	add a,a			;8ccc
 	add a,a			;8ccd
 	add a,a			;8cce
 	ld h,a			;8ccf
-	ld bc,01010h		;8cd0
-	ld a,048h		;8cd3
-	jp 049dbh		;8cd5
+	ld bc,01010h		;8cd0   ; 16 x 16 puntos
+	ld a,048h		;8cd3   ; con TIMP (transparente), de la pagina 1 a la 0
+	jp 049dbh		;8cd5   ; copia
 L_8CD8:
-	push bc			;8cd8
-	call 07d2fh		;8cd9   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
+	push bc			;8cd8   ; guarda lo que hay debajo del objeto:
+	call 07d2fh		;8cd9   ; su celda
 	pop bc			;8cdc
-	ld (ix+007h),c		;8cdd   ; guarda la velocidad vertical (parte baja)
-	ld hl,0e520h		;8ce0
-	jp L_8744		;8ce3
+	ld (ix+007h),c		;8cdd   ; a (ix+7)
+	ld hl,0e520h		;8ce0   ; en 0xE520
+	jp L_8744		;8ce3   ; 2 x 2 celdas
 L_8CE6:
-	push ix		;8ce6
+	push ix		;8ce6   ; BORRA EL DIBUJO DEL OBJETO: devuelve lo de debajo
 	push de			;8ce8
 	push de			;8ce9
-	ld c,(ix+007h)		;8cea   ; lee la velocidad vertical (parte baja)
+	ld c,(ix+007h)		;8cea   ; la celda guardada
 	ld hl,0e520h		;8ced
 	push bc			;8cf0
 	push hl			;8cf1
-	call 07d2fh		;8cf2   ; celda_del_mapa: de una posicion en puntos (E, D) a su celda en el mapa de la habitacion
-	ld de,0e800h		;8cf5
+	call 07d2fh		;8cf2   ; su celda
+	ld de,0e800h		;8cf5   ; las de ahora a 0xE800
 	ld bc,00202h		;8cf8
-	call L_876C		;8cfb
+	call L_876C		;8cfb   ; 2 x 2
 	pop hl			;8cfe
 	pop bc			;8cff
 	push bc			;8d00
 	push hl			;8d01
-	ld a,c			;8d02
+	ld a,c			;8d02   ; cuatro bytes por objeto
 	add a,a			;8d03
 	add a,a			;8d04
 	call 04061h		;8d05   ; hl_mas_a: HL += A
-	ld b,004h		;8d08
+	ld b,004h		;8d08   ; las cuatro celdas
 	ld de,0e800h		;8d0a
 L_8D0D:
-	ld a,(de)			;8d0d
-	cp (hl)			;8d0e
+	ld a,(de)			;8d0d   ; la de ahora
+	cp (hl)			;8d0e   ; igual que la guardada?
 	jr z,L_8D12		;8d0f
-	ld (hl),a			;8d11
+	ld (hl),a			;8d11   ; no: se devuelve
 L_8D12:
 	inc hl			;8d12
 	inc de			;8d13
@@ -2207,24 +2211,24 @@ L_8D12:
 	pop hl			;8d16
 	pop bc			;8d17
 	pop de			;8d18
-	call L_884D		;8d19
-	call L_926C		;8d1c
+	call L_884D		;8d19   ; al mapa
+	call L_926C		;8d1c   ; repinta
 	call L_916E		;8d1f
-	call L_8707		;8d22
+	call L_8707		;8d22   ; y los marcos
 	pop de			;8d25
 	pop ix		;8d26
 	ret			;8d28
 L_8D29:
-	ld a,(ix+004h)		;8d29   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;8d29   ; EL EFECTO DE RECOGER un objeto de tipo (ix+4)
 L_8D2C:
-	ld hl,0509fh		;8d2c
-	push hl			;8d2f
+	ld hl,0509fh		;8d2c   ; el efecto de sonido que devuelva cada manejador...
+	push hl			;8d2f   ; ... suena al volver
 L_8D30:
-	ld (0c419h),a		;8d30
-	call L_8F23		;8d33
-	cp 01ah		;8d36
+	ld (0c419h),a		;8d30   ; el ultimo objeto recogido
+	call L_8F23		;8d33   ; cambia el arma repetida
+	cp 01ah		;8d36   ; desde 0x1A son armas
 	jr nc,$+56		;8d38
-	dec a			;8d3a
+	dec a			;8d3a   ; desde el tipo 1
 	call 0406bh		;8d3b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -2265,151 +2269,151 @@ DATA_tabla_8D3E:
 
 
 L_8D70:
-	sub 019h		;8d70
-	cp 005h		;8d72
-	jr z,L_8D8D		;8d74
+	sub 019h		;8d70   ; las ARMAS: el numero de arma
+	cp 005h		;8d72   ; la 5...
+	jr z,L_8D8D		;8d74   ; ... va aparte
 	ld (0c416h),a		;8d76   ; guarda el arma que lleva Simon (0, ninguna)
-	call L_8E9A		;8d79
+	call L_8E9A		;8d79   ; pinta el arma en el marcador
 L_8D7C:
-	ld a,(0c431h)		;8d7c
+	ld a,(0c431h)		;8d7c   ; con el bit 2 de 0xC431...
 	and 004h		;8d7f
-	ld a,0f0h		;8d81
+	ld a,0f0h		;8d81   ; ... dura 0xF0
 	jr nz,L_8D87		;8d83
-	ld a,096h		;8d85
+	ld a,096h		;8d85   ; ... si no, 0x96
 L_8D87:
-	ld (0c440h),a		;8d87
+	ld (0c440h),a		;8d87   ; la cuenta del arma
 L_8D8A:
-	ld a,012h		;8d8a
+	ld a,012h		;8d8a   ; efecto 0x12
 	ret			;8d8c
 L_8D8D:
-	ld b,008h		;8d8d
+	ld b,008h		;8d8d   ; el bit 3 de lo que lleva
 L_8D8F:
-	call L_8E6D		;8d8f
+	call L_8E6D		;8d8f   ; se pone
 	jr L_8D8A		;8d92
 L_8D94:
-	ld b,040h		;8d94
+	ld b,040h		;8d94   ; el bit 6
 	jr L_8D8F		;8d96
 L_8D98:
-	ld hl,0c701h		;8d98
+	ld hl,0c701h		;8d98   ; lo del bit 5 se cambia...
 	res 5,(hl)		;8d9b
-	ld b,010h		;8d9d
+	ld b,010h		;8d9d   ; ... por lo del bit 4
 	jr L_8DA8		;8d9f
 L_8DA1:
-	ld hl,0c701h		;8da1
+	ld hl,0c701h		;8da1   ; lo del bit 4 se cambia...
 	res 4,(hl)		;8da4
-	ld b,020h		;8da6
+	ld b,020h		;8da6   ; ... por lo del bit 5
 L_8DA8:
-	ld a,010h		;8da8
+	ld a,010h		;8da8   ; con 16 usos
 	ld (0c441h),a		;8daa   ; guarda los usos que le quedan a lo que para golpes
 	jr L_8D8F		;8dad
 L_8DAF:
-	ld b,001h		;8daf
+	ld b,001h		;8daf   ; un corazon
 L_8DB1:
-	call 04594h		;8db1
-	ld a,00fh		;8db4
+	call 04594h		;8db1   ; a los corazones
+	ld a,00fh		;8db4   ; efecto 0x0F
 	ret			;8db6
 L_8DB7:
-	ld b,005h		;8db7
+	ld b,005h		;8db7   ; cinco corazones
 	jr L_8DB1		;8db9
 L_8DBB:
-	push ix		;8dbb
+	push ix		;8dbb   ; se borran todas las cosas de la habitacion
 	call 07806h		;8dbd
 	pop ix		;8dc0
-	call L_928D		;8dc2
-	ld a,018h		;8dc5
-	ld (0c43eh),a		;8dc7
-	ld a,01bh		;8dca
+	call L_928D		;8dc2   ; y repinta
+	ld a,018h		;8dc5   ; 0x18 cuadros
+	ld (0c43eh),a		;8dc7   ; a 0xC43E
+	ld a,01bh		;8dca   ; efecto 0x1B
 	ret			;8dcc
 L_8DCD:
-	ld a,(0c431h)		;8dcd
+	ld a,(0c431h)		;8dcd   ; la INVENCIBILIDAD: con el bit 2 de 0xC431...
 	and 004h		;8dd0
-	ld a,0f0h		;8dd2
+	ld a,0f0h		;8dd2   ; ... dura 0xF0
 	jr nz,L_8DD8		;8dd4
-	ld a,096h		;8dd6
+	ld a,096h		;8dd6   ; ... si no, 0x96
 L_8DD8:
-	ld (0c43ah),a		;8dd8
-	ld a,016h		;8ddb
+	ld (0c43ah),a		;8dd8   ; 0xC43A: lo que p02:85B1 mira para no hacer dano
+	ld a,016h		;8ddb   ; efecto 0x16
 	ret			;8ddd
 L_8DDE:
-	ld b,008h		;8dde
-	call 04605h		;8de0
+	ld b,008h		;8dde   ; 8 de vida
+	call 04605h		;8de0   ; a la vida de Simon
 	jr L_8E0A		;8de3
 L_8DE5:
-	ld a,(0c431h)		;8de5
+	ld a,(0c431h)		;8de5   ; otra cuenta: con el bit 2 de 0xC431...
 	and 004h		;8de8
-	ld a,0f0h		;8dea
+	ld a,0f0h		;8dea   ; ... 0xF0
 	jr nz,L_8DF0		;8dec
-	ld a,096h		;8dee
+	ld a,096h		;8dee   ; ... si no, 0x96
 L_8DF0:
-	ld (0c434h),a		;8df0
+	ld (0c434h),a		;8df0   ; a 0xC434
 	jr L_8E0A		;8df3
 L_8DF5:
-	ld hl,0c431h		;8df5
+	ld hl,0c431h		;8df5   ; el bit 2 de 0xC431 (alarga las cuentas)
 	set 2,(hl)		;8df8
 	jr L_8E0A		;8dfa
 L_8DFC:
-	ld hl,0c431h		;8dfc
+	ld hl,0c431h		;8dfc   ; el bit 3 de 0xC431
 	set 3,(hl)		;8dff
 	jr L_8E0A		;8e01
 L_8E03:
-	ld hl,0c431h		;8e03
+	ld hl,0c431h		;8e03   ; el bit 4 de 0xC431
 	set 4,(hl)		;8e06
 	jr L_8E0A		;8e08
 L_8E0A:
-	jp L_8D8A		;8e0a
+	jp L_8D8A		;8e0a   ; efecto 0x12
 L_8E0D:
-	ld b,020h		;8e0d
-	call 04605h		;8e0f
+	ld b,020h		;8e0d   ; 0x20 de vida
+	call 04605h		;8e0f   ; a la vida de Simon
 	jr L_8E0A		;8e12
 L_8E14:
 	pop hl			;8e14
 	ret			;8e15
 L_8E16:
-	call L_870C		;8e16
-	ld b,001h		;8e19
+	call L_870C		;8e16   ; pinta los marcos de los bloques
+	ld b,001h		;8e19   ; el bit 0 de 0xC702
 	jr L_8E2D		;8e1b
 L_8E1D:
-	ld hl,0c702h		;8e1d
+	ld hl,0c702h		;8e1d   ; el bit 7 de 0xC702 se cambia...
 	res 7,(hl)		;8e20
-	ld b,040h		;8e22
+	ld b,040h		;8e22   ; ... por el 6
 	jr L_8E2D		;8e24
 L_8E26:
-	ld hl,0c702h		;8e26
+	ld hl,0c702h		;8e26   ; el 6 se cambia...
 	res 6,(hl)		;8e29
-	ld b,080h		;8e2b
+	ld b,080h		;8e2b   ; ... por el 7
 L_8E2D:
-	call L_8E72		;8e2d
-	ld a,012h		;8e30
+	call L_8E72		;8e2d   ; se pone en 0xC702
+	ld a,012h		;8e30   ; efecto 0x12
 	ret			;8e32
 L_8E33:
-	ld hl,0c431h		;8e33
+	ld hl,0c431h		;8e33   ; el bit 6 de 0xC431
 	set 6,(hl)		;8e36
-	ld a,003h		;8e38
+	ld a,003h		;8e38   ; 0xC70F a 3
 	ld (0c70fh),a		;8e3a
-	ld b,080h		;8e3d
+	ld b,080h		;8e3d   ; y el bit 7 de lo que lleva
 	jp L_8D8F		;8e3f
 L_8E42:
-	ld de,05000h		;8e42
+	ld de,05000h		;8e42   ; 5.000 puntos
 L_8E45:
-	call 044ech		;8e45
-	ld a,010h		;8e48
+	call 044ech		;8e45   ; al marcador
+	ld a,010h		;8e48   ; efecto 0x10
 	ret			;8e4a
 L_8E4B:
-	ld de,01000h		;8e4b
+	ld de,01000h		;8e4b   ; 1.000 puntos
 	jr L_8E45		;8e4e
 L_8E50:
-	ld b,002h		;8e50
+	ld b,002h		;8e50   ; el bit 1 de lo que lleva
 	call L_8E6D		;8e52
-	ld hl,0c700h		;8e55
+	ld hl,0c700h		;8e55   ; 0xC700 a 1
 	ld (hl),001h		;8e58
-	call L_8EC9		;8e5a
-	ld a,014h		;8e5d
+	call L_8EC9		;8e5a   ; y se repinta
+	ld a,014h		;8e5d   ; efecto 0x14
 	ret			;8e5f
 L_8E60:
-	ld b,001h		;8e60
+	ld b,001h		;8e60   ; el bit 0 de lo que lleva
 	call L_8E6D		;8e62
-	call L_8EBA		;8e65
-	ld a,014h		;8e68
+	call L_8EBA		;8e65   ; se repinta
+	ld a,014h		;8e68   ; efecto 0x14
 	ret			;8e6a
 
 ; ----------------------------------------------------------------------
@@ -2426,81 +2430,81 @@ DATA_codigo_sin_llamar_8E6B:
 
 
 L_8E6D:
-	ld hl,0c701h		;8e6d
+	ld hl,0c701h		;8e6d   ; pone los bits de B en lo que lleva (0xC701)
 	jr L_8E75		;8e70
 L_8E72:
-	ld hl,0c702h		;8e72
+	ld hl,0c702h		;8e72   ; o en 0xC702
 L_8E75:
 	ld a,b			;8e75
 	or (hl)			;8e76
 	ld (hl),a			;8e77
 	ret			;8e78
 L_8E79:
-	ld hl,0c431h		;8e79
+	ld hl,0c431h		;8e79   ; el bit 1 de 0xC431
 	set 1,(hl)		;8e7c
-	ld hl,0c701h		;8e7e
+	ld hl,0c701h		;8e7e   ; fuera el bit 1 de lo que lleva...
 	res 1,(hl)		;8e81
-	ld b,004h		;8e83
+	ld b,004h		;8e83   ; ... y el 2 puesto
 	call L_8E6D		;8e85
-	ld a,003h		;8e88
+	ld a,003h		;8e88   ; 0xC700 a 3
 	ld (0c700h),a		;8e8a
-	call L_8EC9		;8e8d
-	ld a,00fh		;8e90
+	call L_8EC9		;8e8d   ; se repinta
+	ld a,00fh		;8e90   ; efecto 0x0F
 	ret			;8e92
 L_8E93:
-	xor a			;8e93
+	xor a			;8e93   ; sin arma
 	ld (0c416h),a		;8e94   ; guarda el arma que lleva Simon (0, ninguna)
 	jp L_8E9A		;8e97
 L_8E9A:
-	ld a,(0c416h)		;8e9a   ; lee el arma que lleva Simon (0, ninguna)
-	ld de,0800ch		;8e9d
-	or a			;8ea0
+	ld a,(0c416h)		;8e9a   ; PINTA EL ARMA en su recuadro del marcador
+	ld de,0800ch		;8e9d   ; en la VRAM 0x800C
+	or a			;8ea0   ; ninguna: el recuadro vacio
 	jp z,L_8979		;8ea1
-	add a,019h		;8ea4
+	add a,019h		;8ea4   ; su dibujo: 0x19 + el arma...
 L_8EA6:
-	dec a			;8ea6
-	ld l,050h		;8ea7
+	dec a			;8ea6   ; ... menos 1
+	ld l,050h		;8ea7   ; fila 0x50...
 	cp 010h		;8ea9
 	jr c,L_8EB1		;8eab
-	sub 010h		;8ead
+	sub 010h		;8ead   ; ... o 0x60
 	ld l,060h		;8eaf
 L_8EB1:
-	jp L_897D		;8eb1
+	jp L_897D		;8eb1   ; copia el dibujo
 L_8EB4:
-	call L_8EC9		;8eb4
+	call L_8EC9		;8eb4   ; repinta los dos recuadros
 	jp L_8EBA		;8eb7
 L_8EBA:
-	ld de,0a40ch		;8eba
-	ld a,(0c701h)		;8ebd
+	ld de,0a40ch		;8eba   ; en 0xA40C...
+	ld a,(0c701h)		;8ebd   ; ... el bit 0 de lo que lleva
 	and 001h		;8ec0
-	jp z,L_8979		;8ec2
-	ld a,018h		;8ec5
+	jp z,L_8979		;8ec2   ; no lo lleva: vacio
+	ld a,018h		;8ec5   ; el dibujo 0x18
 	jr L_8EA6		;8ec7
 L_8EC9:
-	ld de,0940ch		;8ec9
-	ld a,(0c701h)		;8ecc
+	ld de,0940ch		;8ec9   ; en 0x940C...
+	ld a,(0c701h)		;8ecc   ; ... los bits 1 y 2 de lo que lleva
 	ld b,a			;8ecf
 	and 006h		;8ed0
-	jp z,L_8979		;8ed2
-	ld a,(0c700h)		;8ed5
+	jp z,L_8979		;8ed2   ; ninguno: vacio
+	ld a,(0c700h)		;8ed5   ; y con 0xC700...
 	or a			;8ed8
-	jp z,L_8979		;8ed9
-	bit 2,b		;8edc
-	ld a,012h		;8ede
+	jp z,L_8979		;8ed9   ; ... a cero, vacio
+	bit 2,b		;8edc   ; el bit 2...
+	ld a,012h		;8ede   ; ... es el dibujo 0x12
 	jr nz,L_8EE4		;8ee0
-	ld a,017h		;8ee2
+	ld a,017h		;8ee2   ; ... si no, el 0x17
 L_8EE4:
 	jr L_8EA6		;8ee4
 L_8EE6:
-	call L_8F4A		;8ee6
-	ld a,(0c701h)		;8ee9
+	call L_8F4A		;8ee6   ; REPINTA LO QUE LLEVA: los cinco bits de arriba de 0xC701
+	ld a,(0c701h)		;8ee9   ; lee lo que lleva Simon (un bit por objeto)
 	ld c,a			;8eec
-	ld b,005h		;8eed
-	xor a			;8eef
+	ld b,005h		;8eed   ; cinco
+	xor a			;8eef   ; A cuenta cual
 L_8EF0:
-	rl c		;8ef0
-	call c,L_8F05		;8ef2
-	inc a			;8ef5
+	rl c		;8ef0   ; el bit de arriba...
+	call c,L_8F05		;8ef2   ; ... puesto: se pinta
+	inc a			;8ef5   ; el siguiente
 	djnz L_8EF0		;8ef6
 	ret			;8ef8
 
@@ -2559,7 +2563,7 @@ L_8F2D:
 	ld (0c5e6h),a		;8f37
 	call L_8F4A		;8f3a
 	ld de,0d00ch		;8f3d
-	ld a,(0c419h)		;8f40
+	ld a,(0c419h)		;8f40   ; lee el ultimo objeto recogido
 	call L_8EA6		;8f43
 	pop af			;8f46
 	pop ix		;8f47
@@ -2613,7 +2617,7 @@ L_8F8F:
 	pop hl			;8f92
 	ret			;8f93
 L_8F94:
-	ld hl,0c701h		;8f94
+	ld hl,0c701h		;8f94   ; apunta a lo que lleva Simon (un bit por objeto)
 	ld a,(hl)			;8f97
 	and b			;8f98
 	ret			;8f99
@@ -3360,7 +3364,7 @@ L_940E:
 	djnz L_940E		;9415
 	ret			;9417
 L_9418:
-	ld a,(0c702h)		;9418
+	ld a,(0c702h)		;9418   ; lee mas cosas que lleva (bit 0: se ven los bloques que se rompen)
 	add a,a			;941b
 	jr c,L_9422		;941c
 	add a,a			;941e
@@ -3556,7 +3560,7 @@ L_9552:
 	ld a,(0c00bh)		;9566
 	bit 1,a		;9569
 	ret z			;956b
-	ld a,(0c701h)		;956c
+	ld a,(0c701h)		;956c   ; lee lo que lleva Simon (un bit por objeto)
 	add a,a			;956f
 	ret nc			;9570
 	ld hl,0c70fh		;9571
@@ -3565,7 +3569,7 @@ L_9552:
 	ret z			;9576
 	dec (hl)			;9577
 	jr nz,L_9582		;9578
-	ld hl,0c701h		;957a
+	ld hl,0c701h		;957a   ; apunta a lo que lleva Simon (un bit por objeto)
 	res 7,(hl)		;957d
 	call L_8EE6		;957f
 L_9582:

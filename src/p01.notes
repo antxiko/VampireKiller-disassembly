@@ -365,11 +365,16 @@ C 0x707A pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mi
 C 0x70A7 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70B4 apunta a los corazones, en BCD
+C 0x70CA guarda la cuenta de la INVENCIBILIDAD
 C 0x70D6 guarda la HABITACION dentro de la fase
+C 0x70DC lee lo que lleva Simon (un bit por objeto)
+C 0x70E1 guarda lo que lleva Simon (un bit por objeto)
 C 0x70E5 guarda el arma que lleva Simon (0, ninguna)
 C 0x70EE guarda los usos que le quedan a lo que para golpes
+C 0x70F4 guarda mas cosas que lleva (bit 0: se ven los bloques que se rompen)
 C 0x7109 guarda el lado por el que se sale de la habitacion
 C 0x7123 lee el arma que lleva Simon (0, ninguna)
+C 0x713B lee lo que lleva Simon (un bit por objeto)
 C 0x714D lee los corazones, en BCD
 C 0x7164 lee los corazones, en BCD
 C 0x7170 lee los corazones, en BCD
@@ -482,8 +487,10 @@ C 0x756A lee si la cosa se mueve
 C 0x757E lee el paso en que va la cosa
 C 0x75A3 lee el paso en que va la cosa
 C 0x75A9 lee el tipo de la cosa
+C 0x75E2 apunta a la cuenta de la INVENCIBILIDAD
 C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x761E lee lo que lleva Simon (un bit por objeto)
 C 0x7624 apunta a la pose de arriba de Simon
 C 0x7654 apunta a la pose de arriba de Simon
 C 0x765F lee el lado al que mira Simon (0 derecha)
@@ -499,6 +506,7 @@ C 0x76F2 lee el lado al que mira Simon (0 derecha)
 C 0x7718 lee el estado de la puerta de la fase
 C 0x771B despacha: salta a la entrada A de la tabla que va detras del call
 C 0x772A apunta a la Y de Simon
+C 0x7737 apunta a lo que lleva Simon (un bit por objeto)
 C 0x773A lee la FASE (0 el patio, 1-18)
 C 0x7752 apunta a el estado de la puerta de la fase
 C 0x7756 lee la FASE (0 el patio, 1-18)
@@ -533,6 +541,7 @@ C 0x78D2 lee el contador de cuadros
 C 0x78E4 lee la X de Simon
 C 0x790C lee el arma que lleva Simon (0, ninguna)
 C 0x7917 lee el estado de la puerta de la fase
+C 0x7924 lee la cuenta de la INVENCIBILIDAD
 C 0x792A lee el contador de cuadros
 C 0x7938 lee el contador de cuadros
 C 0x7955 lee la FASE (0 el patio, 1-18)
@@ -613,10 +622,12 @@ C 0x7E2F lee el arma que lleva Simon (0, ninguna)
 C 0x7E3C lee el tipo de la cosa
 C 0x7E42 hl_mas_a: HL += A
 C 0x7E4B lee el arma que lleva Simon (0, ninguna)
+C 0x7E72 lee la cuenta de la INVENCIBILIDAD
 C 0x7E83 lee el tipo de la cosa
 C 0x7E97 lee el tipo de la cosa
 C 0x7EBE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7ECD lee la velocidad horizontal (el bit 7, hacia la izquierda)
+C 0x7EEF lee la cuenta de la INVENCIBILIDAD
 C 0x7F01 lee el tipo de la cosa
 C 0x7F10 borra_la_cosa: tipo a cero y sus sprites libres
 C 0x7F27 lee la velocidad horizontal (el bit 7, hacia la izquierda)
@@ -627,4 +638,5 @@ C 0x7F88 lee el tipo de la cosa
 C 0x7F9B sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7FBD apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x7FD8 sonido: arranca la musica o el efecto A (bit 7 = musica)
+C 0x7FE7 apunta a los objetos que salen (ocho de 16 bytes)
 # --- fin de las anotaciones de anota.py ---

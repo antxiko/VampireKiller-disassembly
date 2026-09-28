@@ -2358,23 +2358,23 @@ L_70BF:
 	ld (0c421h),a		;70c1
 	ld (0c422h),a		;70c4
 	ld (0c434h),a		;70c7
-	ld (0c43ah),a		;70ca
+	ld (0c43ah),a		;70ca   ; guarda la cuenta de la INVENCIBILIDAD
 	ld (0c43bh),a		;70cd
 	ld (0c440h),a		;70d0
 	ld (0d010h),a		;70d3
 	ld (0d001h),a		;70d6   ; guarda la HABITACION dentro de la fase
 	ld (0c413h),a		;70d9
 L_70DC:
-	ld a,(0c701h)		;70dc
+	ld a,(0c701h)		;70dc   ; lee lo que lleva Simon (un bit por objeto)
 	and 080h		;70df
-	ld (0c701h),a		;70e1
+	ld (0c701h),a		;70e1   ; guarda lo que lleva Simon (un bit por objeto)
 	xor a			;70e4
 	ld (0c416h),a		;70e5   ; guarda el arma que lleva Simon (0, ninguna)
 	ld (0c431h),a		;70e8
 	ld (0c432h),a		;70eb
 	ld (0c441h),a		;70ee   ; guarda los usos que le quedan a lo que para golpes
 	ld (0c442h),a		;70f1
-	ld (0c702h),a		;70f4
+	ld (0c702h),a		;70f4   ; guarda mas cosas que lleva (bit 0: se ven los bloques que se rompen)
 	ld (0c700h),a		;70f7
 	ret			;70fa
 L_70FB:
@@ -2414,7 +2414,7 @@ L_7136:
 	ld a,(0c420h)		;7136
 	dec a			;7139
 	ret nz			;713a
-	ld a,(0c701h)		;713b
+	ld a,(0c701h)		;713b   ; lee lo que lleva Simon (un bit por objeto)
 	push af			;713e
 	rra			;713f
 	rra			;7140
@@ -3106,7 +3106,7 @@ L_75D4:
 	ld (0c43eh),a		;75de
 	ret			;75e1
 L_75E2:
-	ld hl,0c43ah		;75e2
+	ld hl,0c43ah		;75e2   ; apunta a la cuenta de la INVENCIBILIDAD
 	ld a,(hl)			;75e5
 	and a			;75e6
 	ret z			;75e7
@@ -3144,7 +3144,7 @@ L_7618:
 	ld a,(0c422h)		;7618
 	and a			;761b
 	jr nz,L_764E		;761c
-	ld a,(0c701h)		;761e
+	ld a,(0c701h)		;761e   ; lee lo que lleva Simon (un bit por objeto)
 	and 030h		;7621
 	ret z			;7623
 	ld hl,0c42eh		;7624   ; apunta a la pose de arriba de Simon
@@ -3337,7 +3337,7 @@ L_772A:
 	ld c,a			;7732
 	call 08580h		;7733
 	ret nc			;7736
-	ld hl,0c701h		;7737
+	ld hl,0c701h		;7737   ; apunta a lo que lleva Simon (un bit por objeto)
 	ld a,(0d000h)		;773a   ; lee la FASE (0 el patio, 1-18)
 	and a			;773d
 	jr z,L_7743		;773e
@@ -3629,7 +3629,7 @@ L_7917:
 	jr nz,L_7924		;791f
 	ld hl,0d480h		;7921
 L_7924:
-	ld a,(0c43ah)		;7924
+	ld a,(0c43ah)		;7924   ; lee la cuenta de la INVENCIBILIDAD
 	and a			;7927
 	jr z,L_7932		;7928
 	ld a,(0c003h)		;792a   ; lee el contador de cuadros
@@ -4317,7 +4317,7 @@ L_7E67:
 	ld a,(0c42dh)		;7e6d
 	and a			;7e70
 	ret nz			;7e71
-	ld a,(0c43ah)		;7e72
+	ld a,(0c43ah)		;7e72   ; lee la cuenta de la INVENCIBILIDAD
 	and a			;7e75
 	ret nz			;7e76
 	ld a,(0c420h)		;7e77
@@ -4382,7 +4382,7 @@ L_7EE4:
 	ld a,(0c42dh)		;7eea
 	and a			;7eed
 	ret nz			;7eee
-	ld a,(0c43ah)		;7eef
+	ld a,(0c43ah)		;7eef   ; lee la cuenta de la INVENCIBILIDAD
 	and a			;7ef2
 	ret nz			;7ef3
 	ld a,(0c420h)		;7ef4
@@ -4522,7 +4522,7 @@ L_7FE2:
 	ld a,(0c422h)		;7fe2
 	and a			;7fe5
 	ret nz			;7fe6
-	ld hl,0c500h		;7fe7
+	ld hl,0c500h		;7fe7   ; apunta a los objetos que salen (ocho de 16 bytes)
 	ld b,008h		;7fea
 L_7FEC:
 	push bc			;7fec
