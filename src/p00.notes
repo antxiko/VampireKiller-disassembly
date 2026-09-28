@@ -1014,6 +1014,238 @@ C 0x4BF9 (a 1, pulsada)
 C 0x4BFA ... sus bits 5-7, F1, F2 y F3...
 C 0x4BFD ... a los bits 0-2
 
+C 0x4D47 EL TITULO: pantalla apagada...
+C 0x4D4A ... la pagina 0 a cero...
+C 0x4D50 ... lo de 0x5727...
+C 0x4D53 ... y el color 0x0F en tres pasos...
+C 0x4D55 ... 0x6606, 0x4404 y 0x2202...
+C 0x4D63 ... con una espera de 0x800 vueltas
+C 0x4D6D el color del borde (registro 7) a 0...
+C 0x4D74 ... y el 0x0F, 0x0700
+C 0x4D7C sin sprites
+C 0x4D85 desde (0, 0x10), 256 x 0x68...
+C 0x4D8B ... del byte 0xFF
+C 0x4D92 lo de 0x7ACF, con 0x0516...
+C 0x4D98 ... y con 0x0569
+C 0x4D9E la BIOS en 0x002B: el juego de caracteres...
+C 0x4DA3 ... 0, el japones:
+C 0x4DA5 el rotulo de 0x4C38 en (0xA8, 0x18)...
+C 0x4DAE ... el de 0x4C53 en (0xA0, 0x38)...
+C 0x4DB7 ... y lo de 0x7AEF
+L 0x4DBC titulo_de_fuera
+C 0x4DBC los demas: el de 0x4C99 en (0x38, 0x28)...
+C 0x4DC5 ... y el de 0x4C38 en (0xB8, 0x30)
+L 0x4DCE titulo_rotulo
+C 0x4DCE el rotulo de 0x4D08...
+C 0x4DD1 ... y la pantalla encendida
+L 0x4DDB borra_la_pagina_0
+L 0x4DE7 prepara_la_demostracion
+L 0x4E20 un_cuadro_de_la_demostracion
+L 0x4E2E pulsacion_de_la_demostracion
+L 0x4E93 mueve_la_escena
+C 0x4E93 las siete cosas...
+C 0x4E96 ... sus sprites...
+C 0x4E99 ... y los de Simon
+L 0x4E9F crea_el_tipo_0x27
+C 0x4E9F EL TIPO 0x27, de la escena del estado 3...
+C 0x4EA1 ... en (0xE0, 0x48)
+L 0x4EA7 nace_el_tipo_0x27
+C 0x4EA7 al nacer: se mueve...
+C 0x4EAB ... con el dibujo 0x94
+L 0x4EB3 el_tipo_0x27
+C 0x4EB3 cada cuadro: sin velocidad vertical...
+C 0x4EBA ... y a -0x20, a la izquierda
+L 0x4EC0 crea_los_tipos_0x28_y_0x29
+C 0x4EC0 el 0x28 en (0x90, 0x38)...
+C 0x4EC8 ... y el 0x29 en (0x30, 0x68)
+L 0x4ED0 nacen_los_tipos_0x28_y_0x29
+C 0x4ED0 el 0x28: -0x20 en horizontal...
+C 0x4ED3 ... y nada en vertical
+C 0x4ED6 el 0x29 (bit 0 del tipo)...
+C 0x4EDC ... 0x20 en horizontal y -0x10 en vertical
+C 0x4EE9 se mueve...
+C 0x4EED ... con el dibujo 0x92
+L 0x4EF9 los_tipos_0x28_y_0x29
+C 0x4EF9 cada cuatro cuadros...
+C 0x4F06 ... el dibujo 0x92...
+C 0x4F0D ... o el 0x93
+L 0x4F17 crea_el_tipo_0x2a
+C 0x4F17 EL TIPO 0x2A en (0xF0, 0xC0)
+L 0x4F1F nace_el_tipo_0x2a
+C 0x4F1F al nacer: el dibujo 0x98...
+C 0x4F24 ... paso 0...
+C 0x4F30 ... y se mueve
+L 0x4F35 el_tipo_0x2a
+C 0x4F35 paso 1?
+C 0x4F3B paso 0: anda...
+C 0x4F3F ... a -0x80, a la izquierda...
+C 0x4F4D ... hasta la x 0x80
+C 0x4F53 entonces, el paso 1
+L 0x4F57 el_tipo_0x2a_quieto
+C 0x4F57 paso 1: quieto con el dibujo 0x97
+L 0x4F60 anda_el_tipo_0x2a
+C 0x4F60 0x90 mas en la cuenta de pasos...
+C 0x4F68 ... y con el acarreo, un paso
+C 0x4F6D uno de los cuatro dibujos de 0x4F7F, por el paso
+L 0x4F83 monta_esta_habitacion
+C 0x4F83 al bufer de 0xD100...
+C 0x4F86 ... la fase...
+C 0x4F8A ... y la habitacion de ahora
+B 0x4F91 PINTA LA HABITACION del bufer (desde 0xD140: 22 filas de 32 celdas) en la pantalla, desde (0, 0x20), dibujo a dibujo.
+L 0x4F91 pinta_la_habitacion
+C 0x4F91 desde la fila 2 del bufer...
+C 0x4F94 ... en (0, 0x20)...
+C 0x4F97 ... 22 filas
+C 0x4F9A de 32 celdas
+L 0x4F9C pinta_una_celda
+C 0x4F9C el dibujo de la celda...
+C 0x4F9D ... a la pantalla
+C 0x4FA1 ocho puntos a la derecha
+C 0x4FA8 la fila siguiente, ocho mas abajo
+L 0x4FAF monta_la_habitacion_bc
+L 0x5076 inicia_el_sonido
+L 0x5085 sonido_en_reposo
+
+B 0x53B6 LA FUENTE, a la pagina 1: del banco 8, el caracter 0 en blanco en (0, 0), 0x30 caracteres del color 0x0E desde (0, 0x40) y un dibujo de 8 x 8 en (0x80, 0x48).
+L 0x53B6 sube_la_fuente
+C 0x53B9 en (0, 0)...
+C 0x53BC ... del color 0: el caracter 0
+C 0x53C4 desde (0, 0x40)...
+C 0x53CA ... 0x30 caracteres del color 0x0E
+C 0x53D0 un dibujo...
+C 0x53D3 ... en (0x80, 0x48) de la pagina 1
+B 0x53DE MAS LETRAS, del banco 14: 0x0E caracteres en (0x80, 0x40) y 0x1A en (8, 0x48), del color 0x0E.
+L 0x53DE sube_mas_letras
+L 0x53FC pinta_la_puerta_de_la_fase
+C 0x53FC su estado a 1
+C 0x53FE en su sitio (0xC5AD: la y, la x)...
+C 0x5402 ... las seis piezas de 0x5421...
+C 0x5405 ... en columna
+L 0x5407 una_pieza_de_la_puerta
+C 0x540A el dibujo de la pieza...
+C 0x540E ... 8 x 8 por HMMC en la pagina 0
+C 0x5416 la siguiente...
+C 0x5419 ... ocho puntos mas abajo
+B 0x548D LOS OBJETOS Y LAS PUERTAS, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y las cinco puertas de los vendedores.
+L 0x548D sube_los_objetos
+C 0x5490 de 0x9000...
+C 0x5493 ... a (0, 0x50) de la pagina 1...
+C 0x5496 ... veinte
+C 0x549B de 0x9A00 a (0x50, 0x60), uno
+C 0x54A6 de 0x9A80, 8 x 4 puntos...
+C 0x54A9 ... en (0x8C, 0x70)
+C 0x54B4 y cuatro veces el de 0x9A90, 8 x 8...
+C 0x54B7 ... en (0x80, 0x74), (0x88, 0x74)...
+C 0x54C8 ocho a la derecha
+C 0x54D1 de 0xB9C8, ocho en (0x60, 0x60)
+C 0x54DC de 0xBDC8, cinco en (0, 0x70)
+C 0x54EA las puertas de los vendedores
+B 0x54F0 LAS CINCO PUERTAS DE LOS VENDEDORES (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
+L 0x54F0 las_puertas_de_los_vendedores
+C 0x54F0 los cinco colores
+C 0x54F4 en la VRAM 0xD000: (0, 0xA0) de la pagina 1
+C 0x54F7 cinco
+L 0x54F9 una_puerta_de_vendedor
+C 0x54FB se arma...
+C 0x54FE ... y se sube
+C 0x5501 la siguiente, 32 puntos mas alla
+C 0x5508 con el color siguiente
+L 0x550D arma_la_puerta
+C 0x550E en 0xE800...
+C 0x5511 ... desde el molde de 0xBDA7...
+C 0x5514 ... 256 bytes
+L 0x5516 un_byte_del_molde
+C 0x5517 dos puntos
+C 0x5519 el de la izquierda...
+C 0x5520 ... 0xF?
+C 0x5524 si: el color de esta puerta
+L 0x5527 a_la_izquierda
+C 0x5527 al nibble alto
+C 0x552C el de la derecha...
+C 0x552F ... 0xF?
+C 0x5533 si: el color
+L 0x5536 los_dos_puntos
+C 0x5536 junto con el de la izquierda...
+C 0x5537 ... al molde armado
+C 0x553C y 32 bytes a cero detras
+L 0x5548 sube_la_puerta
+C 0x5548 los 16 dibujos de 0x556E...
+C 0x554B ... cuatro filas...
+C 0x554F ... de cuatro
+L 0x5551 un_dibujo_de_la_puerta
+C 0x5553 el dibujo, en la RAM
+C 0x5557 a la VRAM
+C 0x555A ocho puntos a la derecha
+C 0x5566 la fila siguiente, ocho lineas mas abajo (0x400)
+
+B 0x5593 LOS PATRONES DEL ARMA que lleva Simon (0xC416), del banco 10: con las armas 2, 3 y 4, su rle de 0x55D7 a la VRAM 0xF8C0 y sus volteos (0x55DD-0x55E7: uno la 2, dos la 3 y la 4); con la 1 y la 5, nada.
+L 0x5593 sube_el_arma
+C 0x5596 el arma...
+C 0x5599 ... la 5...
+C 0x559D ... o la 1: nada
+C 0x55A0 las demas, desde la 2...
+C 0x55A2 ... su rle de 0x55D7...
+C 0x55AB ... a 0xF8C0
+C 0x55B4 la 4 o la 3...
+C 0x55BC ... la 2...
+C 0x55C0 ... un volteo
+L 0x55C8 dos_volteos
+C 0x55C8 la 3 y la 4: dos volteos
+L 0x55D4 sube_el_arma_fin
+B 0x55EC LOS SPRITES DE LA PUERTA DE LA FASE (estado 5, p01:778F): sus patrones (rle de 0xA0EA, banco 10) a la VRAM 0xF900 y ocho sprites en la copia de 0xD600, en dos filas de cuatro sobre la puerta (0xC5AD: la y menos uno, y 0x10 mas abajo la segunda fila), con los patrones 0x20-0x2C y los colores 0x0C, 0x0D, 0x0E y 2 (0xD400).
+L 0x55EC sprites_de_la_puerta
+C 0x55EF sus patrones...
+C 0x55F2 ... a 0xF900
+C 0x55FB en la copia de los atributos...
+C 0x55FE ... ocho, desde el sprite 0
+L 0x5601 un_sprite_de_la_puerta
+C 0x5601 la y de la puerta...
+C 0x5604 ... los cuatro primeros...
+C 0x560A ... y los otros, 0x10 mas abajo
+L 0x560C la_y_del_sprite
+C 0x560C (menos uno)
+C 0x560E la x de la puerta
+C 0x5613 el patron: 0x20, 0x24, 0x28, 0x2C...
+C 0x5619 el siguiente
+C 0x561E sus colores: los sprites 0 y 4, el 0x0C...
+C 0x5626 ... 1 y 5, el 0x0D...
+C 0x562E ... 2 y 6, el 0x0E...
+C 0x5636 ... 3 y 7, el 2
+L 0x563B color_de_dos_sprites
+C 0x563B y el mismo cuatro sprites mas alla (0x40)
+C 0x5642 dieciseis lineas
+L 0x5644 color_de_una_linea
+C 0x5644 el color C...
+C 0x5645 ... en los dos
+C 0x564F la fase...
+C 0x5652 ... desde la 13, bancos 7 y 8
+C 0x5657 sus dibujos, de 0x5742
+L 0x5665 sube_191_dibujos
+C 0x5665 desde (8, 0) de la pagina 1...
+C 0x5668 ... 0xBF dibujos
+L 0x5670 sube_los_dibujos_del_banco_9
+C 0x5670 los de 0x8000 del banco 9
+B 0x5678 LOS PATRONES DE SPRITES DE SIEMPRE, del banco 13: nueve rle a la VRAM, de 0xF800 a 0xFA00 de 0x40 en 0x40.
+L 0x5678 sube_los_patrones_de_siempre
+B 0x56E1 LOS PATRONES DE SIMON por sus poses: las piernas (0xC42E) por la tabla de 0xA281 a 0xF800 y el cuerpo (0xC42F) por la de 0xA2D1 a 0xF840.
+L 0x56E1 sube_los_patrones_de_simon
+C 0x56E4 las piernas...
+C 0x56E8 ... su rle...
+C 0x56F1 ... a 0xF800
+C 0x56F7 el cuerpo...
+C 0x56FB ... su rle...
+C 0x5704 ... a 0xF840
+L 0x570D pon_la_paleta_de_la_fase
+C 0x570D la base...
+C 0x5713 ... y la de la fase, de 0xBEA7
+L 0x5727 pon_la_paleta_base
+C 0x572A la de 0xBF88
+L 0x5733 pon_la_paleta_de_la_escena
+C 0x5733 la base...
+C 0x5739 ... y la de 0xBFA1
+
+L 0x4D47 pinta_el_titulo
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
 F 0x44E9 16
@@ -1248,7 +1480,6 @@ C 0x4B3A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRA
 C 0x4B64 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x4B77 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x4B92 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
-C 0x4D47 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x4D4D espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
 C 0x4D5A pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x4D79 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
@@ -1257,7 +1488,6 @@ C 0x4DAB rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
 C 0x4DB4 rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
 C 0x4DC2 rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
 C 0x4DCB rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
-C 0x4DD1 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x4DD4 enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 C 0x4DE4 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x4DFA guarda la HABITACION dentro de la fase
@@ -1271,37 +1501,22 @@ C 0x4E42 guarda la VIDA en marcha
 C 0x4E53 guarda la cuenta de la pulsacion de la demostracion
 C 0x4E58 guarda las teclas de la demostracion
 C 0x4EA4 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x4EA7 la cosa se mueve
-C 0x4EAB el dibujo de la cosa = 0x94
 C 0x4EB4 guarda la velocidad vertical
 C 0x4EB7 guarda la velocidad vertical (parte baja)
 C 0x4EBD pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x4EC5 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x4ECD crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x4ED6 mira el bit 0 de el tipo de la cosa
 C 0x4EE2 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x4EE6 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0x4EE9 la cosa se mueve
-C 0x4EED el dibujo de la cosa = 0x92
 C 0x4F09 el dibujo de la cosa = 0x92
 C 0x4F12 el dibujo de la cosa = 0x93
 C 0x4F1C crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x4F1F el dibujo de la cosa = 0x98
-C 0x4F24 guarda el paso en que va la cosa
-C 0x4F30 la cosa se mueve
-C 0x4F35 lee el paso en que va la cosa
-C 0x4F3F la velocidad horizontal (el bit 7, hacia la izquierda) = 0xFF
 C 0x4F43 la velocidad horizontal (parte baja) = 0x80
 C 0x4F47 guarda la velocidad vertical
 C 0x4F4A guarda la velocidad vertical (parte baja)
-C 0x4F4D lee la x de la cosa
-C 0x4F53 sube el paso en que va la cosa
-C 0x4F57 la cosa se queda quieta
 C 0x4F5B el dibujo de la cosa = 0x97
 C 0x4F77 hl_mas_a: HL += A
 C 0x4F7B guarda el dibujo de la cosa
-C 0x4F86 lee la FASE (0 el patio, 1-18)
-C 0x4F8A lee la HABITACION dentro de la fase
 C 0x4FAF guarda el destino del montaje de la habitacion
 C 0x4FB2 guarda la habitacion que se monta
 C 0x4FB7 apunta a la copia del banco de 0x6000
@@ -1411,7 +1626,6 @@ C 0x53DE bancos_14_15: pone el sonido (14 y 15) en 0x8000 y 0xA000
 C 0x53EA sube_letras: B caracteres de 1 bit de HL, pintados de color
 C 0x53F6 sube_letras: B caracteres de 1 bit de HL, pintados de color
 C 0x53F9 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-C 0x53FE lee donde esta la puerta de la fase
 C 0x5412 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 C 0x548D bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x5498 sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
@@ -1423,14 +1637,9 @@ C 0x54D9 sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 C 0x54E4 sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 C 0x54E7 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x54ED bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-C 0x54F4 apunta a la FASE (0 el patio, 1-18)
 C 0x5504 de_mas_a: DE += A
-C 0x5524 AND con el tipo de la cosa
-C 0x5533 AND con el tipo de la cosa
-C 0x5557 sube_un_dibujo: un dibujo de 8x8 a 4 bits (32 bytes) de HL a la VRAM de DE
 C 0x555C de_mas_a: DE += A
 C 0x5593 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-C 0x5596 lee el arma que lleva Simon (0, ninguna)
 C 0x55A5 hl_mas_a: HL += A
 C 0x55AE rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x55B1 lee el arma que lleva Simon (0, ninguna)
@@ -1441,16 +1650,12 @@ C 0x55D4 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x55EC bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x55F5 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x55F8 bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-C 0x5601 apunta a donde esta la puerta de la fase
 C 0x563F de_mas_a: DE += A
 C 0x564C bancos_4_5_6: pone los bancos 4, 5 y 6
-C 0x564F lee la FASE (0 el patio, 1-18)
 C 0x5654 bancos_7_8: pone los bancos 7 y 8 en 0x8000 y 0xA000
-C 0x5657 lee la FASE (0 el patio, 1-18)
 C 0x565E hl_mas_a: HL += A
 C 0x566A sube_dibujos: B dibujos de 8x8 a 4 bits de HL a la VRAM de DE
 C 0x566D bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-C 0x5670 bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 C 0x5678 bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
 C 0x5681 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x568A rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
@@ -1463,10 +1668,8 @@ C 0x56C0 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x56C9 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x56CC bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 C 0x56E1 bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
-C 0x56E4 lee la pose de las piernas de Simon
 C 0x56EB hl_mas_a: HL += A
 C 0x56F4 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
-C 0x56F7 lee la pose del cuerpo de Simon
 C 0x56FE hl_mas_a: HL += A
 C 0x5707 rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 C 0x570A bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3

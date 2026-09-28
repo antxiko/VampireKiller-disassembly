@@ -272,7 +272,7 @@ presentacion_espera:
 	ld hl,0c004h		;418c   ; subestado 2: al acabar la espera...
 	dec (hl)			;418f
 	ret nz			;4190
-	call L_4D47		;4191   ; ... el titulo...
+	call pinta_el_titulo		;4191   ; ... el titulo...
 	xor a			;4194   ; ... y al estado 1, sin espera
 	jp L_424B		;4195
 presentacion_empieza:
@@ -287,7 +287,7 @@ estado_1_el_titulo:
 	jp al_estado_siguiente		;41a8
 estado_2_la_demostracion:
 	djnz empieza_la_demostracion		;41ab
-	call L_4E20		;41ad   ; subestado 1: un cuadro de la demostracion
+	call un_cuadro_de_la_demostracion		;41ad   ; subestado 1: un cuadro de la demostracion
 	ld a,(0c413h)		;41b0   ; mientras dure...
 	or a			;41b3
 	ret nz			;41b4   ; ... sigue
@@ -300,7 +300,7 @@ cambia_de_estado:
 	jp subestado_0		;41be   ; y subestado 0
 empieza_la_demostracion:
 	call pantalla_en_negro		;41c1   ; subestado 0: pantalla en negro...
-	call L_4DE7		;41c4   ; ... y la demostracion
+	call prepara_la_demostracion		;41c4   ; ... y la demostracion
 	ld a,020h		;41c7   ; 0x20 cuadros
 espera_y_al_subestado_siguiente:
 	ld (0c004h),a		;41c9   ; A cuadros de espera
@@ -330,7 +330,7 @@ estado_3_prepara:
 	jp espera_y_al_subestado_siguiente		;41f8
 estado_3_mueve_las_cosas:
 	djnz suena_la_partida		;41fb
-	call L_4E93		;41fd   ; subestado 4: las cosas se mueven...
+	call mueve_la_escena		;41fd   ; subestado 4: las cosas se mueven...
 	ld hl,0c004h		;4200   ; apunta a la espera del estado, en cuadros
 	ld a,(0c003h)		;4203   ; ... y cada dos cuadros...
 	rra			;4206
@@ -587,7 +587,7 @@ al_titulo:
 	ld (hl),001h		;43ba   ; en el 0 y el 2: al estado 1...
 	ld a,000h		;43bc   ; ... callado...
 	call sonido		;43be   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	jp L_4D47		;43c1   ; ... y el titulo
+	jp pinta_el_titulo		;43c1   ; ... y el titulo
 al_menu_del_game_master:
 	xor a			;43c4   ; lo que da el Game Master, de partida: nada...
 	ld (0e604h),a		;43c5
@@ -1987,7 +1987,7 @@ la_posicion_siguiente:
 ; PREPARA LA PANTALLA: el sonido, sin sprites, SCREEN 5 por la BIOS, la pantalla apagada, las paginas 0 y 1 enteras a cero, cuatro registros del VDP de 0x4B95, los sprites escondidos y la pantalla encendida.
 ; ----------------------------------------------------------------------
 prepara_la_pantalla:
-	call L_5076		;4b59   ; el sonido
+	call inicia_el_sonido		;4b59   ; el sonido
 	call apaga_los_sprites		;4b5c   ; sin sprites
 	ld a,005h		;4b5f   ; SCREEN 5
 	call 0005fh		;4b61   ; BIOS CHGMOD - Switches to given screen mode
@@ -2043,7 +2043,7 @@ DATA_registros_del_vdp:
 lee_los_mandos:
 	ld a,(0c002h)		;4b9d   ; en una partida?
 	and 040h		;4ba0
-	jp z,L_4E2E		;4ba2   ; no: las de la demostracion
+	jp z,pulsacion_de_la_demostracion		;4ba2   ; no: las de la demostracion
 	call f1_a_f3		;4ba5   ; F1-F3...
 	ld hl,0c00ch		;4ba8   ; ... a 0xC00C
 	call recien_pulsado		;4bab
@@ -2208,13 +2208,13 @@ DATA_rotulo_4D3A:
 ; ======================================================================
 
 
-L_4D47:
-	call apaga_la_pantalla		;4d47   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-	call L_4DDB		;4d4a
+pinta_el_titulo:
+	call apaga_la_pantalla		;4d47   ; EL TITULO: pantalla apagada...
+	call borra_la_pagina_0		;4d4a   ; ... la pagina 0 a cero...
 	call espera_al_vdp		;4d4d   ; espera_al_vdp: espera a que el V9938 acabe la orden (bit 0 de S#2)
-	call L_5727		;4d50
-	ld b,003h		;4d53
-	ld de,06606h		;4d55
+	call pon_la_paleta_base		;4d50   ; ... lo de 0x5727...
+	ld b,003h		;4d53   ; ... y el color 0x0F en tres pasos...
+	ld de,06606h		;4d55   ; ... 0x6606, 0x4404 y 0x2202...
 L_4D58:
 	ld a,00fh		;4d58
 	call pon_un_color		;4d5a   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
@@ -2223,52 +2223,52 @@ L_4D58:
 	ld a,d			;4d5f
 	sub 022h		;4d60
 	ld d,a			;4d62
-	ld hl,00800h		;4d63
+	ld hl,00800h		;4d63   ; ... con una espera de 0x800 vueltas
 L_4D66:
 	dec hl			;4d66
 	ld a,h			;4d67
 	or l			;4d68
 	jr nz,L_4D66		;4d69
 	djnz L_4D58		;4d6b
-	ld b,000h		;4d6d
+	ld b,000h		;4d6d   ; el color del borde (registro 7) a 0...
 	ld c,007h		;4d6f
 	call 00047h		;4d71   ; BIOS WRTVDP - Writes data in the VDP-register
-	ld a,00fh		;4d74
+	ld a,00fh		;4d74   ; ... y el 0x0F, 0x0700
 	ld de,00700h		;4d76
 	call pon_un_color		;4d79   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-	call esconde_los_sprites		;4d7c
-	call L_53B6		;4d7f
+	call esconde_los_sprites		;4d7c   ; sin sprites
+	call sube_la_fuente		;4d7f
 	call L_59FB		;4d82
-	ld hl,00010h		;4d85
+	ld hl,00010h		;4d85   ; desde (0, 0x10), 256 x 0x68...
 	ld bc,00068h		;4d88
-	ld a,0ffh		;4d8b
+	ld a,0ffh		;4d8b   ; ... del byte 0xFF
 	ld d,000h		;4d8d
 	call rellena_rectangulo		;4d8f   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	ld hl,00516h		;4d92
+	ld hl,00516h		;4d92   ; lo de 0x7ACF, con 0x0516...
 	call 07acfh		;4d95
-	ld hl,00569h		;4d98
+	ld hl,00569h		;4d98   ; ... y con 0x0569
 	call 07acfh		;4d9b
-	ld a,(0002bh)		;4d9e
+	ld a,(0002bh)		;4d9e   ; la BIOS en 0x002B: el juego de caracteres...
 	and 00fh		;4da1
-	jr nz,L_4DBC		;4da3
-	ld de,0a818h		;4da5
+	jr nz,titulo_de_fuera		;4da3   ; ... 0, el japones:
+	ld de,0a818h		;4da5   ; el rotulo de 0x4C38 en (0xA8, 0x18)...
 	ld hl,04c38h		;4da8
 	call 07b32h		;4dab   ; rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
-	ld de,0a038h		;4dae
+	ld de,0a038h		;4dae   ; ... el de 0x4C53 en (0xA0, 0x38)...
 	ld hl,04c53h		;4db1
 	call 07b32h		;4db4   ; rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
-	call 07aefh		;4db7
-	jr L_4DCE		;4dba
-L_4DBC:
-	ld de,03828h		;4dbc
+	call 07aefh		;4db7   ; ... y lo de 0x7AEF
+	jr titulo_rotulo		;4dba
+titulo_de_fuera:
+	ld de,03828h		;4dbc   ; los demas: el de 0x4C99 en (0x38, 0x28)...
 	ld hl,04c99h		;4dbf
 	call 07b32h		;4dc2   ; rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
-	ld de,0b830h		;4dc5
+	ld de,0b830h		;4dc5   ; ... y el de 0x4C38 en (0xB8, 0x30)
 	ld hl,04c38h		;4dc8
 	call 07b32h		;4dcb   ; rotulo_por_filas: pinta caracteres; 0xFE [dx] baja una fila, 0xFF acaba
-L_4DCE:
-	ld hl,04d08h		;4dce
-	call rotulo		;4dd1   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
+titulo_rotulo:
+	ld hl,04d08h		;4dce   ; el rotulo de 0x4D08...
+	call rotulo		;4dd1   ; ... y la pantalla encendida
 	jp enciende_la_pantalla		;4dd4   ; enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 
 ; ----------------------------------------------------------------------
@@ -2284,7 +2284,7 @@ DATA_codigo_sin_llamar_4DD7:
 ; ======================================================================
 
 
-L_4DDB:
+borra_la_pagina_0:
 	ld d,000h		;4ddb   ; pagina 0
 	ld hl,00000h		;4ddd   ; desde (0, 0)
 	ld bc,00000h		;4de0   ; 256 x 256: toda
@@ -2294,7 +2294,7 @@ L_4DDB:
 ; ----------------------------------------------------------------------
 ; EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con la vida en marcha (0xC413) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
 ; ----------------------------------------------------------------------
-L_4DE7:
+prepara_la_demostracion:
 	ld hl,0c420h		;4de7   ; borra de 0xC420...
 	ld de,0c421h		;4dea
 	ld bc,01bdfh		;4ded   ; ... 0x1BE0 bytes
@@ -2317,7 +2317,7 @@ L_4DE7:
 	call 062d0h		;4e17   ; empieza una vida
 	call 062e6h		;4e1a   ; monta la fase
 	jp pinta_el_marcador		;4e1d   ; y el marcador
-L_4E20:
+un_cuadro_de_la_demostracion:
 	call L_5C25		;4e20
 	ld a,(0c41bh)		;4e23   ; lee el lado por el que se sale de la habitacion
 	and a			;4e26   ; se sale de la habitacion?
@@ -2328,7 +2328,7 @@ L_4E20:
 ; ----------------------------------------------------------------------
 ; UN CUADRO DE LA DEMOSTRACION: se entregan las teclas del par que toca hasta que se acaba su cuenta, y se pasa al siguiente. Unas teclas 0xFF la terminan.
 ; ----------------------------------------------------------------------
-L_4E2E:
+pulsacion_de_la_demostracion:
 	ld hl,0cf3ah		;4e2e   ; la cuenta del par
 	dec (hl)			;4e31
 	jr z,L_4E46		;4e32   ; se acabo: el siguiente
@@ -2377,102 +2377,102 @@ DATA_teclas_de_la_demostracion:
 ; ======================================================================
 
 
-L_4E93:
-	call 098ech		;4e93
-	call 09918h		;4e96
-	call 064ech		;4e99
+mueve_la_escena:
+	call 098ech		;4e93   ; las siete cosas...
+	call 09918h		;4e96   ; ... sus sprites...
+	call 064ech		;4e99   ; ... y los de Simon
 	jp 065a4h		;4e9c
-L_4E9F:
-	ld c,027h		;4e9f
-	ld de,0e048h		;4ea1
+crea_el_tipo_0x27:
+	ld c,027h		;4e9f   ; EL TIPO 0x27, de la escena del estado 3...
+	ld de,0e048h		;4ea1   ; ... en (0xE0, 0x48)
 	jp crea_una_cosa		;4ea4   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_4EA7:
-	ld (ix+006h),001h		;4ea7   ; la cosa se mueve
-	ld (ix+00bh),094h		;4eab   ; el dibujo de la cosa = 0x94
+nace_el_tipo_0x27:
+	ld (ix+006h),001h		;4ea7   ; al nacer: se mueve...
+	ld (ix+00bh),094h		;4eab   ; ... con el dibujo 0x94
 	ld (ix+00eh),a		;4eaf
 	ret			;4eb2
-L_4EB3:
-	xor a			;4eb3
+el_tipo_0x27:
+	xor a			;4eb3   ; cada cuadro: sin velocidad vertical...
 	ld (ix+008h),a		;4eb4   ; guarda la velocidad vertical
 	ld (ix+007h),a		;4eb7   ; guarda la velocidad vertical (parte baja)
-	ld de,0ffe0h		;4eba
+	ld de,0ffe0h		;4eba   ; ... y a -0x20, a la izquierda
 	jp 0a56ch		;4ebd   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-L_4EC0:
-	ld c,028h		;4ec0
+crea_los_tipos_0x28_y_0x29:
+	ld c,028h		;4ec0   ; el 0x28 en (0x90, 0x38)...
 	ld de,09038h		;4ec2
 	call crea_una_cosa		;4ec5   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-	ld c,029h		;4ec8
+	ld c,029h		;4ec8   ; ... y el 0x29 en (0x30, 0x68)
 	ld de,03068h		;4eca
 	jp crea_una_cosa		;4ecd   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_4ED0:
-	ld hl,0ffe0h		;4ed0
-	ld de,00000h		;4ed3
-	bit 0,(ix+000h)		;4ed6   ; mira el bit 0 de el tipo de la cosa
+nacen_los_tipos_0x28_y_0x29:
+	ld hl,0ffe0h		;4ed0   ; el 0x28: -0x20 en horizontal...
+	ld de,00000h		;4ed3   ; ... y nada en vertical
+	bit 0,(ix+000h)		;4ed6   ; el 0x29 (bit 0 del tipo)...
 	jr z,L_4EE2		;4eda
-	ld hl,00020h		;4edc
+	ld hl,00020h		;4edc   ; ... 0x20 en horizontal y -0x10 en vertical
 	ld de,0fff0h		;4edf
 L_4EE2:
 	call 0a55dh		;4ee2   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ex de,hl			;4ee5
 	call 0a56ch		;4ee6   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld (ix+006h),001h		;4ee9   ; la cosa se mueve
-	ld (ix+00bh),092h		;4eed   ; el dibujo de la cosa = 0x92
+	ld (ix+006h),001h		;4ee9   ; se mueve...
+	ld (ix+00bh),092h		;4eed   ; ... con el dibujo 0x92
 	xor a			;4ef1
 	ld (ix+010h),a		;4ef2
 	ld (ix+00eh),a		;4ef5
 	ret			;4ef8
-L_4EF9:
-	inc (ix+010h)		;4ef9
+los_tipos_0x28_y_0x29:
+	inc (ix+010h)		;4ef9   ; cada cuatro cuadros...
 	ld a,(ix+010h)		;4efc
 	cp 004h		;4eff
 	ret nz			;4f01
 	ld (ix+010h),000h		;4f02
-	inc (ix+011h)		;4f06
+	inc (ix+011h)		;4f06   ; ... el dibujo 0x92...
 	ld (ix+00bh),092h		;4f09   ; el dibujo de la cosa = 0x92
-	bit 0,(ix+011h)		;4f0d
+	bit 0,(ix+011h)		;4f0d   ; ... o el 0x93
 	ret z			;4f11
 	ld (ix+00bh),093h		;4f12   ; el dibujo de la cosa = 0x93
 	ret			;4f16
-L_4F17:
-	ld c,02ah		;4f17
+crea_el_tipo_0x2a:
+	ld c,02ah		;4f17   ; EL TIPO 0x2A en (0xF0, 0xC0)
 	ld de,0f0c0h		;4f19
 	jp crea_una_cosa		;4f1c   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_4F1F:
-	ld (ix+00bh),098h		;4f1f   ; el dibujo de la cosa = 0x98
+nace_el_tipo_0x2a:
+	ld (ix+00bh),098h		;4f1f   ; al nacer: el dibujo 0x98...
 	xor a			;4f23
-	ld (ix+001h),a		;4f24   ; guarda el paso en que va la cosa
+	ld (ix+001h),a		;4f24   ; ... paso 0...
 	ld (ix+013h),a		;4f27
 	ld (ix+014h),a		;4f2a
 	ld (ix+00eh),a		;4f2d
-	ld (ix+006h),001h		;4f30   ; la cosa se mueve
+	ld (ix+006h),001h		;4f30   ; ... y se mueve
 	ret			;4f34
-L_4F35:
-	ld a,(ix+001h)		;4f35   ; lee el paso en que va la cosa
+el_tipo_0x2a:
+	ld a,(ix+001h)		;4f35   ; paso 1?
 	dec a			;4f38
-	jr z,L_4F57		;4f39
-	call L_4F60		;4f3b
+	jr z,el_tipo_0x2a_quieto		;4f39
+	call anda_el_tipo_0x2a		;4f3b   ; paso 0: anda...
 	xor a			;4f3e
-	ld (ix+00ah),0ffh		;4f3f   ; la velocidad horizontal (el bit 7, hacia la izquierda) = 0xFF
+	ld (ix+00ah),0ffh		;4f3f   ; ... a -0x80, a la izquierda...
 	ld (ix+009h),080h		;4f43   ; la velocidad horizontal (parte baja) = 0x80
 	ld (ix+008h),a		;4f47   ; guarda la velocidad vertical
 	ld (ix+007h),a		;4f4a   ; guarda la velocidad vertical (parte baja)
-	ld a,(ix+005h)		;4f4d   ; lee la x de la cosa
+	ld a,(ix+005h)		;4f4d   ; ... hasta la x 0x80
 	cp 080h		;4f50
 	ret nc			;4f52
-	inc (ix+001h)		;4f53   ; sube el paso en que va la cosa
+	inc (ix+001h)		;4f53   ; entonces, el paso 1
 	ret			;4f56
-L_4F57:
-	ld (ix+006h),000h		;4f57   ; la cosa se queda quieta
+el_tipo_0x2a_quieto:
+	ld (ix+006h),000h		;4f57   ; paso 1: quieto con el dibujo 0x97
 	ld (ix+00bh),097h		;4f5b   ; el dibujo de la cosa = 0x97
 	ret			;4f5f
-L_4F60:
-	ld a,(ix+014h)		;4f60
+anda_el_tipo_0x2a:
+	ld a,(ix+014h)		;4f60   ; 0x90 mas en la cuenta de pasos...
 	add a,090h		;4f63
 	ld (ix+014h),a		;4f65
-	jr nc,L_4F6D		;4f68
+	jr nc,L_4F6D		;4f68   ; ... y con el acarreo, un paso
 	inc (ix+013h)		;4f6a
 L_4F6D:
-	ld a,(ix+013h)		;4f6d
+	ld a,(ix+013h)		;4f6d   ; uno de los cuatro dibujos de 0x4F7F, por el paso
 	rra			;4f70
 	rra			;4f71
 	and 003h		;4f72
@@ -2494,35 +2494,39 @@ DATA_cuatro_pasos:
 ; ======================================================================
 
 
-L_4F83:
-	ld hl,0d100h		;4f83
-	ld a,(0d000h)		;4f86   ; lee la FASE (0 el patio, 1-18)
+monta_esta_habitacion:
+	ld hl,0d100h		;4f83   ; al bufer de 0xD100...
+	ld a,(0d000h)		;4f86   ; ... la fase...
 	ld b,a			;4f89
-	ld a,(0d001h)		;4f8a   ; lee la HABITACION dentro de la fase
+	ld a,(0d001h)		;4f8a   ; ... y la habitacion de ahora
 	ld c,a			;4f8d
-	jp L_4FAF		;4f8e
-L_4F91:
-	ld hl,0d140h		;4f91
-	ld de,00020h		;4f94
-	ld b,016h		;4f97
+	jp monta_la_habitacion_bc		;4f8e
+
+; ----------------------------------------------------------------------
+; PINTA LA HABITACION del bufer (desde 0xD140: 22 filas de 32 celdas) en la pantalla, desde (0, 0x20), dibujo a dibujo.
+; ----------------------------------------------------------------------
+pinta_la_habitacion:
+	ld hl,0d140h		;4f91   ; desde la fila 2 del bufer...
+	ld de,00020h		;4f94   ; ... en (0, 0x20)...
+	ld b,016h		;4f97   ; ... 22 filas
 L_4F99:
 	push bc			;4f99
-	ld b,020h		;4f9a
-L_4F9C:
-	ld a,(hl)			;4f9c
-	call pinta_el_dibujo		;4f9d
+	ld b,020h		;4f9a   ; de 32 celdas
+pinta_una_celda:
+	ld a,(hl)			;4f9c   ; el dibujo de la celda...
+	call pinta_el_dibujo		;4f9d   ; ... a la pantalla
 	inc hl			;4fa0
-	ld a,d			;4fa1
+	ld a,d			;4fa1   ; ocho puntos a la derecha
 	add a,008h		;4fa2
 	ld d,a			;4fa4
-	djnz L_4F9C		;4fa5
+	djnz pinta_una_celda		;4fa5
 	pop bc			;4fa7
-	ld a,e			;4fa8
+	ld a,e			;4fa8   ; la fila siguiente, ocho mas abajo
 	add a,008h		;4fa9
 	ld e,a			;4fab
 	djnz L_4F99		;4fac
 	ret			;4fae
-L_4FAF:
+monta_la_habitacion_bc:
 	ld (0c5d5h),hl		;4faf   ; guarda el destino del montaje de la habitacion
 	ld (0c5d7h),bc		;4fb2   ; guarda la habitacion que se monta
 
@@ -2656,14 +2660,14 @@ L_5013:
 ; ----------------------------------------------------------------------
 ; INICIA EL SONIDO: el mezclador con los tres tonos abiertos (0xBC) y todos los canales a la rutina de reposo. 0x5085 es la parte que se usa tambien para callarlo todo (sonido 0).
 ; ----------------------------------------------------------------------
-L_5076:
+inicia_el_sonido:
 	ld a,0bch		;5076   ; 0xBC: tonos abiertos, ruidos cerrados, el puerto A de entrada (los mandos)
 	ld (0c097h),a		;5078   ; guarda la copia del registro 7 del PSG (el mezclador)
 	xor a			;507b   ; sin fundido
 	ld (0c0a5h),a		;507c   ; guarda la cuenta del fundido de la musica
 	ld (0c0a6h),a		;507f   ; guarda el volumen que se le resta a la musica
 	ld (0c0a7h),a		;5082
-L_5085:
+sonido_en_reposo:
 	xor a			;5085   ; sin efecto sonando
 	ld (0c096h),a		;5086   ; guarda la prioridad del efecto que suena
 	ld (0c098h),a		;5089   ; guarda las banderas del sonido (bit 0 pausa, bit 1 ...)
@@ -2825,7 +2829,7 @@ L_5194:
 	ld (0c016h),hl		;519e   ; guarda el manejador del efecto de sonido
 	jp L_5139		;51a1
 L_51A4:
-	call L_5085		;51a4   ; el 0: todo callado
+	call sonido_en_reposo		;51a4   ; el 0: todo callado
 	jp L_5139		;51a7
 L_51AA:
 	jp z,L_5276		;51aa   ; 0xFB
@@ -3078,22 +3082,30 @@ bancos_4_5_6:
 	ld (hl),a			;53b3
 	ei			;53b4
 	ret			;53b5
-L_53B6:
+
+; ----------------------------------------------------------------------
+; LA FUENTE, a la pagina 1: del banco 8, el caracter 0 en blanco en (0, 0), 0x30 caracteres del color 0x0E desde (0, 0x40) y un dibujo de 8 x 8 en (0x80, 0x48).
+; ----------------------------------------------------------------------
+sube_la_fuente:
 	call bancos_7_8		;53b6   ; bancos_7_8: pone los bancos 7 y 8 en 0x8000 y 0xA000
-	ld de,00000h		;53b9
-	ld c,000h		;53bc
+	ld de,00000h		;53b9   ; en (0, 0)...
+	ld c,000h		;53bc   ; ... del color 0: el caracter 0
 	ld hl,0bed8h		;53be
 	call sube_una_letra		;53c1   ; sube_una_letra: un caracter de 1 bit de HL
-	ld de,00040h		;53c4
+	ld de,00040h		;53c4   ; desde (0, 0x40)...
 	ld hl,0bd80h		;53c7
-	ld bc,0300eh		;53ca
+	ld bc,0300eh		;53ca   ; ... 0x30 caracteres del color 0x0E
 	call sube_letras		;53cd   ; sube_letras: B caracteres de 1 bit de HL, pintados de color
-	ld hl,0bf00h		;53d0
-	ld de,0a440h		;53d3
+	ld hl,0bf00h		;53d0   ; un dibujo...
+	ld de,0a440h		;53d3   ; ... en (0x80, 0x48) de la pagina 1
 	ld b,001h		;53d6
 	call sube_dibujos		;53d8   ; sube_dibujos: B dibujos de 8x8 a 4 bits de HL a la VRAM de DE
 	jp bancos_1_2_3		;53db   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_53DE:
+
+; ----------------------------------------------------------------------
+; MAS LETRAS, del banco 14: 0x0E caracteres en (0x80, 0x40) y 0x1A en (8, 0x48), del color 0x0E.
+; ----------------------------------------------------------------------
+sube_mas_letras:
 	call bancos_14_15		;53de   ; bancos_14_15: pone el sonido (14 y 15) en 0x8000 y 0xA000
 	ld de,08040h		;53e1
 	ld hl,08824h		;53e4
@@ -3104,31 +3116,31 @@ L_53DE:
 	ld bc,01a0eh		;53f3
 	call sube_letras		;53f6   ; sube_letras: B caracteres de 1 bit de HL, pintados de color
 	jp bancos_1_2_3		;53f9   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_53FC:
-	ld (hl),001h		;53fc
-	ld de,(0c5adh)		;53fe   ; lee donde esta la puerta de la fase
-	ld hl,05421h		;5402
-	ld b,006h		;5405
-L_5407:
+pinta_la_puerta_de_la_fase:
+	ld (hl),001h		;53fc   ; su estado a 1
+	ld de,(0c5adh)		;53fe   ; en su sitio (0xC5AD: la y, la x)...
+	ld hl,05421h		;5402   ; ... las seis piezas de 0x5421...
+	ld b,006h		;5405   ; ... en columna
+una_pieza_de_la_puerta:
 	push bc			;5407
 	push de			;5408
 	push hl			;5409
-	ld a,(hl)			;540a
+	ld a,(hl)			;540a   ; el dibujo de la pieza...
 	inc hl			;540b
 	ld h,(hl)			;540c
 	ld l,a			;540d
-	ld bc,00808h		;540e
+	ld bc,00808h		;540e   ; ... 8 x 8 por HMMC en la pagina 0
 	xor a			;5411
 	call hmmc		;5412   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 	pop hl			;5415
-	inc hl			;5416
+	inc hl			;5416   ; la siguiente...
 	inc hl			;5417
 	pop de			;5418
-	ld a,e			;5419
+	ld a,e			;5419   ; ... ocho puntos mas abajo
 	add a,008h		;541a
 	ld e,a			;541c
 	pop bc			;541d
-	djnz L_5407		;541e
+	djnz una_pieza_de_la_puerta		;541e
 	ret			;5420
 
 ; ----------------------------------------------------------------------
@@ -3178,23 +3190,27 @@ DATA_hmmc_546D:
 ; ======================================================================
 
 
-L_548D:
+
+; ----------------------------------------------------------------------
+; LOS OBJETOS Y LAS PUERTAS, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y las cinco puertas de los vendedores.
+; ----------------------------------------------------------------------
+sube_los_objetos:
 	call bancos_9_10		;548d   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld hl,09000h		;5490
-	ld de,0a800h		;5493
-	ld b,014h		;5496
+	ld hl,09000h		;5490   ; de 0x9000...
+	ld de,0a800h		;5493   ; ... a (0, 0x50) de la pagina 1...
+	ld b,014h		;5496   ; ... veinte
 	call sube_dibujos_de_16		;5498   ; sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
-	ld hl,09a00h		;549b
+	ld hl,09a00h		;549b   ; de 0x9A00 a (0x50, 0x60), uno
 	ld de,0b028h		;549e
 	ld b,001h		;54a1
 	call sube_dibujos_de_16		;54a3   ; sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
-	ld hl,09a80h		;54a6
-	ld de,08c70h		;54a9
+	ld hl,09a80h		;54a6   ; de 0x9A80, 8 x 4 puntos...
+	ld de,08c70h		;54a9   ; ... en (0x8C, 0x70)
 	ld bc,00804h		;54ac
 	ld a,001h		;54af
 	call hmmc		;54b1   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
-	ld de,08074h		;54b4
-	ld b,004h		;54b7
+	ld de,08074h		;54b4   ; y cuatro veces el de 0x9A90, 8 x 8...
+	ld b,004h		;54b7   ; ... en (0x80, 0x74), (0x88, 0x74)...
 L_54B9:
 	push bc			;54b9
 	push de			;54ba
@@ -3204,74 +3220,78 @@ L_54B9:
 	call hmmc		;54c3   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 	pop de			;54c6
 	pop bc			;54c7
-	ld a,d			;54c8
+	ld a,d			;54c8   ; ocho a la derecha
 	add a,008h		;54c9
 	ld d,a			;54cb
 	djnz L_54B9		;54cc
 	call bancos_4_5_6		;54ce   ; bancos_4_5_6: pone los bancos 4, 5 y 6
-	ld hl,0b9c8h		;54d1
+	ld hl,0b9c8h		;54d1   ; de 0xB9C8, ocho en (0x60, 0x60)
 	ld de,0b030h		;54d4
 	ld b,008h		;54d7
 	call sube_dibujos_de_16		;54d9   ; sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
-	ld hl,0bdc8h		;54dc
+	ld hl,0bdc8h		;54dc   ; de 0xBDC8, cinco en (0, 0x70)
 	ld de,0b800h		;54df
 	ld b,005h		;54e2
 	call sube_dibujos_de_16		;54e4   ; sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 	call bancos_9_10		;54e7   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	call L_54F0		;54ea
+	call las_puertas_de_los_vendedores		;54ea   ; las puertas de los vendedores
 	jp bancos_1_2_3		;54ed   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_54F0:
-	ld ix,0558eh		;54f0
-	ld de,0d000h		;54f4   ; apunta a la FASE (0 el patio, 1-18)
-	ld b,005h		;54f7
-L_54F9:
+
+; ----------------------------------------------------------------------
+; LAS CINCO PUERTAS DE LOS VENDEDORES (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
+; ----------------------------------------------------------------------
+las_puertas_de_los_vendedores:
+	ld ix,0558eh		;54f0   ; los cinco colores
+	ld de,0d000h		;54f4   ; en la VRAM 0xD000: (0, 0xA0) de la pagina 1
+	ld b,005h		;54f7   ; cinco
+una_puerta_de_vendedor:
 	push bc			;54f9
 	push de			;54fa
-	call L_550D		;54fb
-	call L_5548		;54fe
-	pop de			;5501
+	call arma_la_puerta		;54fb   ; se arma...
+	call sube_la_puerta		;54fe   ; ... y se sube
+	pop de			;5501   ; la siguiente, 32 puntos mas alla
 	ld a,010h		;5502
 	call de_mas_a		;5504   ; de_mas_a: DE += A
 	pop bc			;5507
-	inc ix		;5508
-	djnz L_54F9		;550a
+	inc ix		;5508   ; con el color siguiente
+	djnz una_puerta_de_vendedor		;550a
 	ret			;550c
-L_550D:
+arma_la_puerta:
 	exx			;550d
-	ld de,0e800h		;550e
-	ld hl,0bda7h		;5511
-	ld b,000h		;5514
-L_5516:
+	ld de,0e800h		;550e   ; en 0xE800...
+	ld hl,0bda7h		;5511   ; ... desde el molde de 0xBDA7...
+	ld b,000h		;5514   ; ... 256 bytes
+un_byte_del_molde:
 	push bc			;5516
-	ld a,(hl)			;5517
+	ld a,(hl)			;5517   ; dos puntos
 	inc hl			;5518
-	ld b,a			;5519
+	ld b,a			;5519   ; el de la izquierda...
 	rrca			;551a
 	rrca			;551b
 	rrca			;551c
 	rrca			;551d
 	and 00fh		;551e
-	cp 00fh		;5520
-	jr nz,L_5527		;5522
-	and (ix+000h)		;5524   ; AND con el tipo de la cosa
-L_5527:
-	add a,a			;5527
+	cp 00fh		;5520   ; ... 0xF?
+	jr nz,a_la_izquierda		;5522
+	and (ix+000h)		;5524   ; si: el color de esta puerta
+a_la_izquierda:
+	add a,a			;5527   ; al nibble alto
 	add a,a			;5528
 	add a,a			;5529
 	add a,a			;552a
 	ld c,a			;552b
-	ld a,b			;552c
+	ld a,b			;552c   ; el de la derecha...
 	and 00fh		;552d
-	cp 00fh		;552f
-	jr nz,L_5536		;5531
-	and (ix+000h)		;5533   ; AND con el tipo de la cosa
-L_5536:
-	or c			;5536
-	ld (de),a			;5537
+	cp 00fh		;552f   ; ... 0xF?
+	jr nz,los_dos_puntos		;5531
+	and (ix+000h)		;5533   ; si: el color
+los_dos_puntos:
+	or c			;5536   ; junto con el de la izquierda...
+	ld (de),a			;5537   ; ... al molde armado
 	inc de			;5538
 	pop bc			;5539
-	djnz L_5516		;553a
-	xor a			;553c
+	djnz un_byte_del_molde		;553a
+	xor a			;553c   ; y 32 bytes a cero detras
 	ld (de),a			;553d
 	ld h,d			;553e
 	ld l,e			;553f
@@ -3280,30 +3300,30 @@ L_5536:
 	ldir		;5544
 	exx			;5546
 	ret			;5547
-L_5548:
-	ld hl,0556eh		;5548
-	ld b,004h		;554b
+sube_la_puerta:
+	ld hl,0556eh		;5548   ; los 16 dibujos de 0x556E...
+	ld b,004h		;554b   ; ... cuatro filas...
 L_554D:
 	push bc			;554d
 	push de			;554e
-	ld b,004h		;554f
-L_5551:
+	ld b,004h		;554f   ; ... de cuatro
+un_dibujo_de_la_puerta:
 	push bc			;5551
 	push hl			;5552
-	ld a,(hl)			;5553
+	ld a,(hl)			;5553   ; el dibujo, en la RAM
 	inc hl			;5554
 	ld h,(hl)			;5555
 	ld l,a			;5556
-	call sube_un_dibujo		;5557   ; sube_un_dibujo: un dibujo de 8x8 a 4 bits (32 bytes) de HL a la VRAM de DE
-	ld a,004h		;555a
+	call sube_un_dibujo		;5557   ; a la VRAM
+	ld a,004h		;555a   ; ocho puntos a la derecha
 	call de_mas_a		;555c   ; de_mas_a: DE += A
 	pop hl			;555f
 	inc hl			;5560
 	inc hl			;5561
 	pop bc			;5562
-	djnz L_5551		;5563
+	djnz un_dibujo_de_la_puerta		;5563
 	pop de			;5565
-	ld a,d			;5566
+	ld a,d			;5566   ; la fila siguiente, ocho lineas mas abajo (0x400)
 	add a,004h		;5567
 	ld d,a			;5569
 	pop bc			;556a
@@ -3331,38 +3351,42 @@ DATA_cinco_colores:
 ; ======================================================================
 
 
-L_5593:
+
+; ----------------------------------------------------------------------
+; LOS PATRONES DEL ARMA que lleva Simon (0xC416), del banco 10: con las armas 2, 3 y 4, su rle de 0x55D7 a la VRAM 0xF8C0 y sus volteos (0x55DD-0x55E7: uno la 2, dos la 3 y la 4); con la 1 y la 5, nada.
+; ----------------------------------------------------------------------
+sube_el_arma:
 	call bancos_9_10		;5593   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld a,(0c416h)		;5596   ; lee el arma que lleva Simon (0, ninguna)
-	cp 005h		;5599
-	jr z,L_55D4		;559b
-	dec a			;559d
-	jr z,L_55D4		;559e
-	dec a			;55a0
+	ld a,(0c416h)		;5596   ; el arma...
+	cp 005h		;5599   ; ... la 5...
+	jr z,sube_el_arma_fin		;559b
+	dec a			;559d   ; ... o la 1: nada
+	jr z,sube_el_arma_fin		;559e
+	dec a			;55a0   ; las demas, desde la 2...
 	add a,a			;55a1
-	ld hl,055d7h		;55a2
+	ld hl,055d7h		;55a2   ; ... su rle de 0x55D7...
 	call hl_mas_a		;55a5   ; hl_mas_a: HL += A
 	ld e,(hl)			;55a8
 	inc hl			;55a9
 	ld d,(hl)			;55aa
-	ld hl,0f8c0h		;55ab
+	ld hl,0f8c0h		;55ab   ; ... a 0xF8C0
 	call rle_a_la_vram		;55ae   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 	ld a,(0c416h)		;55b1   ; lee el arma que lleva Simon (0, ninguna)
-	cp 004h		;55b4
-	jr z,L_55C8		;55b6
+	cp 004h		;55b4   ; la 4 o la 3...
+	jr z,dos_volteos		;55b6
 	cp 003h		;55b8
-	jr z,L_55C8		;55ba
-	cp 002h		;55bc
-	jr nz,L_55D4		;55be
-	ld hl,055e7h		;55c0
+	jr z,dos_volteos		;55ba
+	cp 002h		;55bc   ; ... la 2...
+	jr nz,sube_el_arma_fin		;55be
+	ld hl,055e7h		;55c0   ; ... un volteo
 	call voltea_dibujos		;55c3   ; voltea_dibujos: da la vuelta a dibujos que ya estan en la VRAM
-	jr L_55D4		;55c6
-L_55C8:
-	ld hl,055ddh		;55c8
+	jr sube_el_arma_fin		;55c6
+dos_volteos:
+	ld hl,055ddh		;55c8   ; la 3 y la 4: dos volteos
 	call voltea_dibujos		;55cb   ; voltea_dibujos: da la vuelta a dibujos que ya estan en la VRAM
 	ld hl,055e2h		;55ce
 	call voltea_dibujos		;55d1   ; voltea_dibujos: da la vuelta a dibujos que ya estan en la VRAM
-L_55D4:
+sube_el_arma_fin:
 	jp bancos_1_2_3		;55d4   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 
 ; ----------------------------------------------------------------------
@@ -3387,69 +3411,73 @@ DATA_tres_volteos:
 ; ======================================================================
 
 
-L_55EC:
+
+; ----------------------------------------------------------------------
+; LOS SPRITES DE LA PUERTA DE LA FASE (estado 5, p01:778F): sus patrones (rle de 0xA0EA, banco 10) a la VRAM 0xF900 y ocho sprites en la copia de 0xD600, en dos filas de cuatro sobre la puerta (0xC5AD: la y menos uno, y 0x10 mas abajo la segunda fila), con los patrones 0x20-0x2C y los colores 0x0C, 0x0D, 0x0E y 2 (0xD400).
+; ----------------------------------------------------------------------
+sprites_de_la_puerta:
 	call bancos_9_10		;55ec   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld de,0a0eah		;55ef
-	ld hl,0f900h		;55f2
+	ld de,0a0eah		;55ef   ; sus patrones...
+	ld hl,0f900h		;55f2   ; ... a 0xF900
 	call rle_a_la_vram		;55f5   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 	call bancos_1_2_3		;55f8   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-	ld hl,0d600h		;55fb
-	ld bc,00808h		;55fe
-L_5601:
-	ld de,0c5adh		;5601   ; apunta a donde esta la puerta de la fase
-	ld a,b			;5604
+	ld hl,0d600h		;55fb   ; en la copia de los atributos...
+	ld bc,00808h		;55fe   ; ... ocho, desde el sprite 0
+un_sprite_de_la_puerta:
+	ld de,0c5adh		;5601   ; la y de la puerta...
+	ld a,b			;5604   ; ... los cuatro primeros...
 	cp 005h		;5605
 	ld a,(de)			;5607
-	jr nc,L_560C		;5608
-	add a,010h		;560a
-L_560C:
-	dec a			;560c
+	jr nc,la_y_del_sprite		;5608
+	add a,010h		;560a   ; ... y los otros, 0x10 mas abajo
+la_y_del_sprite:
+	dec a			;560c   ; (menos uno)
 	ld (hl),a			;560d
-	inc hl			;560e
+	inc hl			;560e   ; la x de la puerta
 	inc de			;560f
 	ld a,(de)			;5610
 	ld (hl),a			;5611
 	inc hl			;5612
-	ld a,c			;5613
+	ld a,c			;5613   ; el patron: 0x20, 0x24, 0x28, 0x2C...
 	and 00bh		;5614
 	add a,a			;5616
 	add a,a			;5617
 	ld (hl),a			;5618
-	inc c			;5619
+	inc c			;5619   ; el siguiente
 	inc hl			;561a
 	inc hl			;561b
-	djnz L_5601		;561c
-	ld hl,0d400h		;561e
+	djnz un_sprite_de_la_puerta		;561c
+	ld hl,0d400h		;561e   ; sus colores: los sprites 0 y 4, el 0x0C...
 	ld c,00ch		;5621
-	call L_563B		;5623
-	ld hl,0d410h		;5626
+	call color_de_dos_sprites		;5623
+	ld hl,0d410h		;5626   ; ... 1 y 5, el 0x0D...
 	ld c,00dh		;5629
-	call L_563B		;562b
-	ld hl,0d420h		;562e
+	call color_de_dos_sprites		;562b
+	ld hl,0d420h		;562e   ; ... 2 y 6, el 0x0E...
 	ld c,00eh		;5631
-	call L_563B		;5633
-	ld hl,0d430h		;5636
+	call color_de_dos_sprites		;5633
+	ld hl,0d430h		;5636   ; ... 3 y 7, el 2
 	ld c,002h		;5639
-L_563B:
-	ld d,h			;563b
+color_de_dos_sprites:
+	ld d,h			;563b   ; y el mismo cuatro sprites mas alla (0x40)
 	ld e,l			;563c
 	ld a,040h		;563d
 	call de_mas_a		;563f   ; de_mas_a: DE += A
-	ld b,010h		;5642
-L_5644:
-	ld a,c			;5644
-	ld (hl),a			;5645
+	ld b,010h		;5642   ; dieciseis lineas
+color_de_una_linea:
+	ld a,c			;5644   ; el color C...
+	ld (hl),a			;5645   ; ... en los dos
 	ld (de),a			;5646
 	inc hl			;5647
 	inc de			;5648
-	djnz L_5644		;5649
+	djnz color_de_una_linea		;5649
 	ret			;564b
 sube_los_dibujos_de_la_fase:
 	call bancos_4_5_6		;564c   ; bancos_4_5_6: pone los bancos 4, 5 y 6
-	ld a,(0d000h)		;564f   ; lee la FASE (0 el patio, 1-18)
-	cp 00dh		;5652
+	ld a,(0d000h)		;564f   ; la fase...
+	cp 00dh		;5652   ; ... desde la 13, bancos 7 y 8
 	call nc,bancos_7_8		;5654   ; bancos_7_8: pone los bancos 7 y 8 en 0x8000 y 0xA000
-	ld a,(0d000h)		;5657   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;5657   ; sus dibujos, de 0x5742
 	add a,a			;565a
 	ld hl,05742h		;565b
 	call hl_mas_a		;565e   ; hl_mas_a: HL += A
@@ -3457,16 +3485,20 @@ sube_los_dibujos_de_la_fase:
 	inc hl			;5662
 	ld d,(hl)			;5663
 	ex de,hl			;5664
-L_5665:
-	ld de,08004h		;5665
-	ld b,0bfh		;5668
+sube_191_dibujos:
+	ld de,08004h		;5665   ; desde (8, 0) de la pagina 1...
+	ld b,0bfh		;5668   ; ... 0xBF dibujos
 	call sube_dibujos		;566a   ; sube_dibujos: B dibujos de 8x8 a 4 bits de HL a la VRAM de DE
 	jp bancos_1_2_3		;566d   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_5670:
-	call bancos_9_10		;5670   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
+sube_los_dibujos_del_banco_9:
+	call bancos_9_10		;5670   ; los de 0x8000 del banco 9
 	ld hl,08000h		;5673
-	jr L_5665		;5676
-L_5678:
+	jr sube_191_dibujos		;5676
+
+; ----------------------------------------------------------------------
+; LOS PATRONES DE SPRITES DE SIEMPRE, del banco 13: nueve rle a la VRAM, de 0xF800 a 0xFA00 de 0x40 en 0x40.
+; ----------------------------------------------------------------------
+sube_los_patrones_de_siempre:
 	call bancos_11_12_13		;5678   ; bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
 	ld hl,0f800h		;567b
 	ld de,0a319h		;567e
@@ -3511,31 +3543,35 @@ DATA_codigo_sin_llamar_56CF:
 ; ======================================================================
 
 
-L_56E1:
+
+; ----------------------------------------------------------------------
+; LOS PATRONES DE SIMON por sus poses: las piernas (0xC42E) por la tabla de 0xA281 a 0xF800 y el cuerpo (0xC42F) por la de 0xA2D1 a 0xF840.
+; ----------------------------------------------------------------------
+sube_los_patrones_de_simon:
 	call bancos_11_12_13		;56e1   ; bancos_11_12_13: pone los bancos del mapa (11, 12 y 13)
-	ld a,(0c42eh)		;56e4   ; lee la pose de las piernas de Simon
+	ld a,(0c42eh)		;56e4   ; las piernas...
 	add a,a			;56e7
-	ld hl,0a281h		;56e8
+	ld hl,0a281h		;56e8   ; ... su rle...
 	call hl_mas_a		;56eb   ; hl_mas_a: HL += A
 	ld e,(hl)			;56ee
 	inc hl			;56ef
 	ld d,(hl)			;56f0
-	ld hl,0f800h		;56f1
+	ld hl,0f800h		;56f1   ; ... a 0xF800
 	call rle_a_la_vram		;56f4   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
-	ld a,(0c42fh)		;56f7   ; lee la pose del cuerpo de Simon
+	ld a,(0c42fh)		;56f7   ; el cuerpo...
 	add a,a			;56fa
-	ld hl,0a2d1h		;56fb
+	ld hl,0a2d1h		;56fb   ; ... su rle...
 	call hl_mas_a		;56fe   ; hl_mas_a: HL += A
 	ld e,(hl)			;5701
 	inc hl			;5702
 	ld d,(hl)			;5703
-	ld hl,0f840h		;5704
+	ld hl,0f840h		;5704   ; ... a 0xF840
 	call rle_a_la_vram		;5707   ; rle_a_la_vram: descomprime a la VRAM (HL) el rle de DE
 	jp bancos_1_2_3		;570a   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_570D:
-	call L_5727		;570d
+pon_la_paleta_de_la_fase:
+	call pon_la_paleta_base		;570d   ; la base...
 	call bancos_9_10		;5710   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld hl,0bea7h		;5713
+	ld hl,0bea7h		;5713   ; ... y la de la fase, de 0xBEA7
 	ld a,(0d000h)		;5716   ; lee la FASE (0 el patio, 1-18)
 	add a,a			;5719
 	call hl_mas_a		;571a   ; hl_mas_a: HL += A
@@ -3545,15 +3581,15 @@ L_570D:
 	ex de,hl			;5720
 	call pon_paleta		;5721   ; pon_paleta: lista de [color][RB][G] hasta 0xFF
 	jp bancos_1_2_3		;5724   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_5727:
+pon_la_paleta_base:
 	call bancos_9_10		;5727   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld hl,0bf88h		;572a
+	ld hl,0bf88h		;572a   ; la de 0xBF88
 	call pon_paleta		;572d   ; pon_paleta: lista de [color][RB][G] hasta 0xFF
 	jp bancos_1_2_3		;5730   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
-L_5733:
-	call L_5727		;5733
+pon_la_paleta_de_la_escena:
+	call pon_la_paleta_base		;5733   ; la base...
 	call bancos_9_10		;5736   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	ld hl,0bfa1h		;5739
+	ld hl,0bfa1h		;5739   ; ... y la de 0xBFA1
 	call pon_paleta		;573c   ; pon_paleta: lista de [color][RB][G] hasta 0xFF
 	jp bancos_1_2_3		;573f   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 
@@ -3920,7 +3956,7 @@ L_59D9:
 	jr nz,L_59D9		;59e9
 	ret			;59eb
 L_59EC:
-	call L_5727		;59ec
+	call pon_la_paleta_base		;59ec
 	call bancos_9_10		;59ef   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
 	ld hl,0bf6fh		;59f2
 	call pon_paleta		;59f5   ; pon_paleta: lista de [color][RB][G] hasta 0xFF
@@ -4323,11 +4359,11 @@ L_5C25:
 	call z,0ad93h		;5c4c
 	ld a,001h		;5c4f
 	ld (0c40ah),a		;5c51
-	call L_56E1		;5c54
+	call sube_los_patrones_de_simon		;5c54
 	ld a,0fdh		;5c57
 	jp sonido		;5c59   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_5C5C:
-	call L_56E1		;5c5c
+	call sube_los_patrones_de_simon		;5c5c
 	call 06affh		;5c5f
 	call 07837h		;5c62
 	call 0b6abh		;5c65
