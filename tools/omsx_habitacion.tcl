@@ -7,7 +7,8 @@
 # de la pantalla. Cuando p01:6321 enciende la pantalla -la habitacion ya
 # montada y pintada, con sus puertas y sus bloques- espera medio segundo y
 # vuelca los 128 KB de la VRAM, la RAM de 0xC000 a 0xDFFF, la paleta y los
-# registros del VDP.
+# registros del VDP. Con VK_CAPTURA puesto guarda ademas lo que se ve
+# (screenshot -raw), para cotejar los sprites pintados.
 #
 #   VK_OUT=<dir> VK_FASE=<0..18> VK_HAB=<n> \
 #   openmsx -machine C-BIOS_MSX2_EU -cart vampirekiller.rom -script este.tcl
@@ -61,6 +62,7 @@ proc vuelca {} {
     close $f
     set r {}
     for {set i 0} {$i < 24} {incr i} { lappend r [format %02X [debug read "VDP regs" $i]] }
+    if {[info exists ::env(VK_CAPTURA)]} { screenshot -raw "$OUT/$NOMBRE.png" }
     say "volcado $NOMBRE  D000=[lee 0xD000] D001=[lee 0xD001] C41A=[lee 0xC41A] CE00=[lee 0xCE00]  R0-23=$r"
     exit 0
 }
@@ -69,6 +71,8 @@ proc encendida {} {
     if {$::volcada || !$::puesta} return
     set ::volcada 1
     say "pantalla encendida en p01:6321"
+    # sin freno openMSX se salta cuadros al pintar y la captura seria vieja
+    if {[info exists ::env(VK_CAPTURA)]} { set ::throttle on }
     after time 0.5 { seguro vuelca }
 }
 
