@@ -1,1 +1,20 @@
 # Notas del banco 12: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8000 0x80B1 bloques_7EE1_cola  29 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones (sigue del banco anterior, 0x7EE1); lo leen p00:5010 (177 bytes)
+F 0x8000 16
+D 0x80B1 0x84D1 bloques_80B1  66 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1056 bytes)
+F 0x80B1 16
+D 0x84D1 0x8791 bloques_84D1  44 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (704 bytes)
+F 0x84D1 16
+D 0x8791 0x8D21 bloques_8791  89 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1424 bytes)
+F 0x8791 16
+D 0x8D21 0x9121 bloques_8D21  64 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1024 bytes)
+F 0x8D21 16
+D 0x9121 0x9651 bloques_9121  83 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1328 bytes)
+F 0x9121 16
+D 0x9651 0x9AC1 bloques_9651  71 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1136 bytes)
+F 0x9651 16
+D 0x9AC1 0xA000 bloques_9AC1  88 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (1343 bytes)
+F 0x9AC1 16
+# --- fin de los bloques de bloques.py ---

@@ -1,6 +1,10 @@
 # Notas del banco 13: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA000 0xA041 bloques_9AC1_cola  88 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones (sigue del banco anterior, 0x9AC1); lo leen p00:5010 (65 bytes)
+F 0xA000 16
+D 0xA041 0xA281 bloques_A041  36 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen p00:5010 (576 bytes)
+F 0xA041 16
 D 0xA281 0xA2D1 tabla_A281  40 punteros a rle que lee p00:56F4; lo leen p00:56F4 (80 bytes)
 F 0xA281 2
 D 0xA2D1 0xA319 tabla_A2D1  36 punteros a rle que lee p00:5707; lo leen p00:5707 (72 bytes)
@@ -33,10 +37,16 @@ D 0xA5F6 0xA62F rle_A5F6  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4
 F 0xA5F6 16
 D 0xA62F 0xA671 rle_A62F  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (66 bytes)
 F 0xA62F 16
+D 0xA671 0xA6AD rle_sin_usar_A671  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xA671 16
 D 0xA6AD 0xA6E4 rle_A6AD  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
 F 0xA6AD 16
+D 0xA6E4 0xA720 rle_sin_usar_A6E4  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xA6E4 16
 D 0xA720 0xA759 rle_A720  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
 F 0xA720 16
+D 0xA759 0xA795 rle_sin_usar_A759  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xA759 16
 D 0xA795 0xA7C7 rle_A795  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (50 bytes)
 F 0xA795 16
 D 0xA7C7 0xA7FE rle_A7C7  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
@@ -101,10 +111,16 @@ D 0xAEFD 0xAF36 rle_AEFD  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4
 F 0xAEFD 16
 D 0xAF36 0xAF78 rle_AF36  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (66 bytes)
 F 0xAF36 16
+D 0xAF78 0xAFB4 rle_sin_usar_AF78  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xAF78 16
 D 0xAFB4 0xAFEA rle_AFB4  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (54 bytes)
 F 0xAFB4 16
+D 0xAFEA 0xB026 rle_sin_usar_AFEA  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xAFEA 16
 D 0xB026 0xB05F rle_B026  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
 F 0xB026 16
+D 0xB05F 0xB09B rle_sin_usar_B05F  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (60 bytes)
+F 0xB05F 16
 D 0xB09B 0xB0CE rle_B09B  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (51 bytes)
 F 0xB09B 16
 D 0xB0CE 0xB105 rle_B0CE  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
@@ -145,14 +161,66 @@ D 0xB52D 0xB556 rle_B52D  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707
 F 0xB52D 16
 D 0xB556 0xB5A1 rle_B556  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (75 bytes)
 F 0xB556 16
+D 0xB5A1 0xB719 filas_B5A1  dibujo de 32 filas para 0x582D: por fila, cuantos ceros van a la izquierda y los 12 - n bytes de dibujo (se completa a 16 en 0xE800); lo leen p00:57E5 (376 bytes)
+F 0xB5A1 16
+D 0xB719 0xB895 filas_B719  dibujo de 32 filas para 0x582D: por fila, cuantos ceros van a la izquierda y los 12 - n bytes de dibujo (se completa a 16 en 0xE800); lo leen p00:57FA (380 bytes)
+F 0xB719 16
 D 0xB895 0xB963 rle_B895  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:56C9 (206 bytes)
 F 0xB895 16
+D 0xB9D3 0xB9F9 salidas_de_cada_fase  19 punteros, uno por fase, a las salidas de sus habitaciones; lo leen p13:B9C0 (38 bytes)
+F 0xB9D3 2
+D 0xB9F9 0xB9FF salidas_fase_0  las salidas de las 3 habitaciones de la fase 0: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (6 bytes)
+F 0xB9F9 2
+D 0xB9FF 0xBA0F salidas_fase_1  las salidas de las 8 habitaciones de la fase 1: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+F 0xB9FF 2
+D 0xBA0F 0xBA1B salidas_fase_2  las salidas de las 6 habitaciones de la fase 2: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA0F 2
+D 0xBA1B 0xBA27 salidas_fase_3  las salidas de las 6 habitaciones de la fase 3: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA1B 2
+D 0xBA27 0xBA33 salidas_fase_4  las salidas de las 6 habitaciones de la fase 4: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA27 2
+D 0xBA33 0xBA3F salidas_fase_5  las salidas de las 6 habitaciones de la fase 5: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA33 2
+D 0xBA3F 0xBA4B salidas_fase_6  las salidas de las 6 habitaciones de la fase 6: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA3F 2
+D 0xBA4B 0xBA5D salidas_fase_7  las salidas de las 9 habitaciones de la fase 7: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+F 0xBA4B 2
+D 0xBA5D 0xBA6D salidas_fase_8  las salidas de las 8 habitaciones de la fase 8: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+F 0xBA5D 2
+D 0xBA6D 0xBA7F salidas_fase_9  las salidas de las 9 habitaciones de la fase 9: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+F 0xBA6D 2
+D 0xBA7F 0xBA91 salidas_fase_10  las salidas de las 9 habitaciones de la fase 10: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+F 0xBA7F 2
+D 0xBA91 0xBA9D salidas_fase_11  las salidas de las 6 habitaciones de la fase 11: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+F 0xBA91 2
+D 0xBA9D 0xBAB5 salidas_fase_12  las salidas de las 12 habitaciones de la fase 12: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+F 0xBA9D 2
+D 0xBAB5 0xBACD salidas_fase_13  las salidas de las 12 habitaciones de la fase 13: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+F 0xBAB5 2
+D 0xBACD 0xBADD salidas_fase_14  las salidas de las 8 habitaciones de la fase 14: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+F 0xBACD 2
+D 0xBADD 0xBAF1 salidas_fase_15  las salidas de las 10 habitaciones de la fase 15: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+F 0xBADD 2
+D 0xBAF1 0xBB05 salidas_fase_16  las salidas de las 10 habitaciones de la fase 16: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+F 0xBAF1 2
+D 0xBB05 0xBB1D salidas_fase_17  las salidas de las 12 habitaciones de la fase 17: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+F 0xBB05 2
+D 0xBB1D 0xBB31 salidas_fase_18  las salidas de las 10 habitaciones de la fase 18: dos bytes por habitacion, cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+F 0xBB1D 2
+D 0xBB61 0xBB9A puerta_de_cada_fase  tres bytes por fase: [habitacion (nibble bajo) y bandera (bit 7)][puntero que p13:BB52 deja en 0xC5AD]; lo leen p13:BB3A (57 bytes)
+F 0xBB61 3
+D 0xBBCD 0xBBF6 pasos_entre_habitaciones  10 registros de cuatro bytes [fase + 1][habitacion nueva << 4 | habitacion][puntero que p13:BBBA deja en 0xC5B2], y 0xFF; lo leen p13:BB9E (41 bytes)
+F 0xBBCD 4
 D 0xBBF6 0xBE58 rle_BBF6  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene), con el destino delante; lo leen p00:5A1E (610 bytes)
 F 0xBBF6 16
+D 0xBE58 0xBE59 rle_sin_usar_BE58  rle que no lee nadie (su direccion no aparece como palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (1 bytes)
+F 0xBE58 16
 D 0xBE59 0xBEC1 letras_BE59  13 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:531B (104 bytes)
 F 0xBE59 8
 D 0xBEC1 0xBF29 letras_BEC1  13 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:5327 (104 bytes)
 F 0xBEC1 8
 D 0xBF29 0xBFF9 letras_BF29  26 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:5333 (208 bytes)
 F 0xBF29 8
+D 0xBFF9 0xC000 relleno_p13  7 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (7 bytes)
+F 0xBFF9 16
 # --- fin de los bloques de bloques.py ---

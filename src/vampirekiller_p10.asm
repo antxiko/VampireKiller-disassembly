@@ -46,9 +46,23 @@ DATA_paleta_A013:
 	defb 0ffh	; a019
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa01a..0xa028  (14 bytes)
-DATA_A01A:
-	defb 004h,030h,000h,006h,050h,000h,0ffh,005h,030h,000h,007h,050h,000h,0ffh	; a01a  .0..P...0..P..
+; DATOS paleta_A01A: cambios de paleta ([color][RB][G], 0xFF acaba); p00:57D1
+;   elige esta o la otra segun la fase sea la 3; lo leen p00:57D9 (7 bytes)
+;   0xa01a..0xa021  (7 bytes)
+DATA_paleta_A01A:
+	defb 004h,030h,000h	; a01a
+	defb 006h,050h,000h	; a01d
+	defb 0ffh	; a020
+
+; ----------------------------------------------------------------------
+; DATOS paleta_A021: cambios de paleta ([color][RB][G], 0xFF acaba) que
+;   escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo
+;   leen p00:57D9 (7 bytes)
+;   0xa021..0xa028  (7 bytes)
+DATA_paleta_A021:
+	defb 005h,030h,000h	; a021
+	defb 007h,050h,000h	; a024
+	defb 0ffh	; a027
 
 ; ----------------------------------------------------------------------
 ; DATOS paleta_A028: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
@@ -837,8 +851,11 @@ DATA_rle_BC5A:
 	defb 0b2h,0f4h,0e4h,0cch,0ech,056h,076h,0a4h,024h,080h,080h,000h,000h	; bd9a  .....Vv.$....
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbda7..0xc000  (601 bytes)
-DATA_BDA7:
+; DATOS dibujo_de_cinco_colores: 256 bytes de dibujo (32x16 puntos a 4 bits)
+;   que p00:550D copia cinco veces cambiando el color 15 por los de 0x558E; lo
+;   leen p00:5511 (256 bytes)
+;   0xbda7..0xbea7  (256 bytes)
+DATA_dibujo_de_cinco_colores:
 	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; bda7  ................
 	defb 000h,000h,000h,000h,000h,002h,022h,022h,000h,02fh,0ffh,0ffh,002h,0f2h,02fh,0ffh	; bdb7  ......""./..../.
 	defb 000h,000h,000h,022h,000h,000h,002h,011h,000h,000h,021h,022h,000h,002h,012h,002h	; bdc7  ..."......!"....
@@ -855,25 +872,202 @@ DATA_BDA7:
 	defb 0ffh,0ffh,0ffh,0ffh,02fh,0f2h,0ffh,0ffh,02fh,02fh,022h,0f2h,022h,0f2h,022h,022h	; be77  ..../...//".".""
 	defb 0f2h,022h,0f2h,000h,0ffh,022h,022h,000h,02fh,0f2h,02fh,020h,0f2h,0ffh,02fh,020h	; be87  ."...""././ ../
 	defb 0ffh,02fh,02fh,020h,02fh,0f2h,0f2h,020h,02fh,022h,022h,000h,0f2h,022h,020h,000h	; be97  .// /.. /"".." .
-	defb 0cdh,0beh,0e3h,0beh,0f6h,0beh,0e3h,0beh,009h,0bfh,009h,0bfh,009h,0bfh,01ch,0bfh	; bea7  ................
-	defb 01ch,0bfh,01ch,0bfh,02fh,0bfh,02fh,0bfh,02fh,0bfh,03ch,0bfh,03ch,0bfh,03ch,0bfh	; beb7  ..../././.<.<.<.
-	defb 04fh,0bfh,04fh,0bfh,062h,0bfh,004h,041h,002h,005h,050h,004h,007h,000h,002h,009h	; bec7  O.O.b..A..P.....
-	defb 000h,003h,00ah,000h,005h,00bh,040h,003h,00dh,033h,003h,0ffh,005h,004h,000h,007h	; bed7  ......@..3......
-	defb 000h,002h,009h,030h,000h,00ah,040h,000h,00bh,041h,003h,00dh,022h,002h,0ffh,005h	; bee7  ...0..@..A.."...
-	defb 004h,000h,007h,000h,002h,009h,000h,003h,00ah,000h,005h,00bh,041h,003h,00dh,022h	; bef7  ............A.."
-	defb 002h,0ffh,004h,030h,002h,006h,052h,004h,009h,043h,003h,00ah,041h,003h,00bh,022h	; bf07  ...0..R..C..A.."
-	defb 002h,00dh,033h,003h,0ffh,004h,012h,002h,006h,041h,002h,009h,001h,003h,00ah,023h	; bf17  ..3......A.....#
-	defb 003h,00bh,051h,003h,00dh,022h,002h,0ffh,009h,022h,002h,00ah,004h,000h,00bh,027h	; bf27  ..Q.."...".....'
-	defb 003h,00dh,044h,004h,0ffh,004h,023h,003h,006h,040h,003h,009h,052h,001h,00ah,041h	; bf37  ..D...#..@..R..A
-	defb 003h,00bh,033h,003h,00dh,022h,002h,0ffh,004h,011h,005h,006h,022h,002h,009h,050h	; bf47  ..3.."......"..P
-	defb 003h,00ah,071h,005h,00bh,033h,003h,00dh,044h,004h,0ffh,009h,022h,002h,00ah,044h	; bf57  ..q..3..D..."..D
-	defb 004h,00bh,021h,000h,00dh,031h,001h,0ffh,004h,075h,005h,005h,021h,001h,006h,065h	; bf67  ..!..1...u..!..e
-	defb 005h,007h,064h,004h,009h,012h,002h,00ah,044h,004h,00bh,042h,002h,00dh,053h,003h	; bf77  ..d.....D..B..S.
-	defb 0ffh,000h,000h,000h,001h,074h,005h,002h,011h,001h,003h,063h,002h,008h,071h,000h	; bf87  .....t.....c..q.
-	defb 00ch,055h,005h,00eh,077h,007h,00fh,007h,000h,0ffh,004h,060h,004h,005h,012h,003h	; bf97  .U..w......`....
-	defb 006h,042h,003h,007h,031h,002h,008h,050h,000h,009h,030h,000h,00ah,022h,002h,00bh	; bfa7  .B..1..P..0.."..
-	defb 033h,003h,00ch,044h,004h,00dh,055h,005h,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfb7  3..D..U.........
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfc7  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd7  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe7  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff7  .........
+
+; ----------------------------------------------------------------------
+; DATOS tabla_BEA7: 19 punteros a paleta que lee p00:5721; lo leen p00:5721
+;   (38 bytes)
+;   0xbea7..0xbecd  (38 bytes)
+DATA_tabla_BEA7:
+	defb 0cdh,0beh	; bea7
+	defb 0e3h,0beh	; bea9
+	defb 0f6h,0beh	; beab
+	defb 0e3h,0beh	; bead
+	defb 009h,0bfh	; beaf
+	defb 009h,0bfh	; beb1
+	defb 009h,0bfh	; beb3
+	defb 01ch,0bfh	; beb5
+	defb 01ch,0bfh	; beb7
+	defb 01ch,0bfh	; beb9
+	defb 02fh,0bfh	; bebb
+	defb 02fh,0bfh	; bebd
+	defb 02fh,0bfh	; bebf
+	defb 03ch,0bfh	; bec1
+	defb 03ch,0bfh	; bec3
+	defb 03ch,0bfh	; bec5
+	defb 04fh,0bfh	; bec7
+	defb 04fh,0bfh	; bec9
+	defb 062h,0bfh	; becb
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BECD: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (22 bytes)
+;   0xbecd..0xbee3  (22 bytes)
+DATA_paleta_BECD:
+	defb 004h,041h,002h	; becd
+	defb 005h,050h,004h	; bed0
+	defb 007h,000h,002h	; bed3
+	defb 009h,000h,003h	; bed6
+	defb 00ah,000h,005h	; bed9
+	defb 00bh,040h,003h	; bedc
+	defb 00dh,033h,003h	; bedf
+	defb 0ffh	; bee2
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BEE3: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbee3..0xbef6  (19 bytes)
+DATA_paleta_BEE3:
+	defb 005h,004h,000h	; bee3
+	defb 007h,000h,002h	; bee6
+	defb 009h,030h,000h	; bee9
+	defb 00ah,040h,000h	; beec
+	defb 00bh,041h,003h	; beef
+	defb 00dh,022h,002h	; bef2
+	defb 0ffh	; bef5
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BEF6: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbef6..0xbf09  (19 bytes)
+DATA_paleta_BEF6:
+	defb 005h,004h,000h	; bef6
+	defb 007h,000h,002h	; bef9
+	defb 009h,000h,003h	; befc
+	defb 00ah,000h,005h	; beff
+	defb 00bh,041h,003h	; bf02
+	defb 00dh,022h,002h	; bf05
+	defb 0ffh	; bf08
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF09: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbf09..0xbf1c  (19 bytes)
+DATA_paleta_BF09:
+	defb 004h,030h,002h	; bf09
+	defb 006h,052h,004h	; bf0c
+	defb 009h,043h,003h	; bf0f
+	defb 00ah,041h,003h	; bf12
+	defb 00bh,022h,002h	; bf15
+	defb 00dh,033h,003h	; bf18
+	defb 0ffh	; bf1b
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF1C: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbf1c..0xbf2f  (19 bytes)
+DATA_paleta_BF1C:
+	defb 004h,012h,002h	; bf1c
+	defb 006h,041h,002h	; bf1f
+	defb 009h,001h,003h	; bf22
+	defb 00ah,023h,003h	; bf25
+	defb 00bh,051h,003h	; bf28
+	defb 00dh,022h,002h	; bf2b
+	defb 0ffh	; bf2e
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF2F: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (13 bytes)
+;   0xbf2f..0xbf3c  (13 bytes)
+DATA_paleta_BF2F:
+	defb 009h,022h,002h	; bf2f
+	defb 00ah,004h,000h	; bf32
+	defb 00bh,027h,003h	; bf35
+	defb 00dh,044h,004h	; bf38
+	defb 0ffh	; bf3b
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF3C: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbf3c..0xbf4f  (19 bytes)
+DATA_paleta_BF3C:
+	defb 004h,023h,003h	; bf3c
+	defb 006h,040h,003h	; bf3f
+	defb 009h,052h,001h	; bf42
+	defb 00ah,041h,003h	; bf45
+	defb 00bh,033h,003h	; bf48
+	defb 00dh,022h,002h	; bf4b
+	defb 0ffh	; bf4e
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF4F: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+;   0xbf4f..0xbf62  (19 bytes)
+DATA_paleta_BF4F:
+	defb 004h,011h,005h	; bf4f
+	defb 006h,022h,002h	; bf52
+	defb 009h,050h,003h	; bf55
+	defb 00ah,071h,005h	; bf58
+	defb 00bh,033h,003h	; bf5b
+	defb 00dh,044h,004h	; bf5e
+	defb 0ffh	; bf61
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF62: cambios de paleta ([color][RB][G], 0xFF acaba), de la
+;   tabla de 0xBEA7; lo leen p00:5721 (13 bytes)
+;   0xbf62..0xbf6f  (13 bytes)
+DATA_paleta_BF62:
+	defb 009h,022h,002h	; bf62
+	defb 00ah,044h,004h	; bf65
+	defb 00bh,021h,000h	; bf68
+	defb 00dh,031h,001h	; bf6b
+	defb 0ffh	; bf6e
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF6F: cambios de paleta ([color][RB][G], 0xFF acaba) que
+;   escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo
+;   leen p00:59F5 (25 bytes)
+;   0xbf6f..0xbf88  (25 bytes)
+DATA_paleta_BF6F:
+	defb 004h,075h,005h	; bf6f
+	defb 005h,021h,001h	; bf72
+	defb 006h,065h,005h	; bf75
+	defb 007h,064h,004h	; bf78
+	defb 009h,012h,002h	; bf7b
+	defb 00ah,044h,004h	; bf7e
+	defb 00bh,042h,002h	; bf81
+	defb 00dh,053h,003h	; bf84
+	defb 0ffh	; bf87
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BF88: cambios de paleta ([color][RB][G], 0xFF acaba) que
+;   escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo
+;   leen p00:572D (25 bytes)
+;   0xbf88..0xbfa1  (25 bytes)
+DATA_paleta_BF88:
+	defb 000h,000h,000h	; bf88
+	defb 001h,074h,005h	; bf8b
+	defb 002h,011h,001h	; bf8e
+	defb 003h,063h,002h	; bf91
+	defb 008h,071h,000h	; bf94
+	defb 00ch,055h,005h	; bf97
+	defb 00eh,077h,007h	; bf9a
+	defb 00fh,007h,000h	; bf9d
+	defb 0ffh	; bfa0
+
+; ----------------------------------------------------------------------
+; DATOS paleta_BFA1: cambios de paleta ([color][RB][G], 0xFF acaba) que
+;   escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo
+;   leen p00:573C (31 bytes)
+;   0xbfa1..0xbfc0  (31 bytes)
+DATA_paleta_BFA1:
+	defb 004h,060h,004h	; bfa1
+	defb 005h,012h,003h	; bfa4
+	defb 006h,042h,003h	; bfa7
+	defb 007h,031h,002h	; bfaa
+	defb 008h,050h,000h	; bfad
+	defb 009h,030h,000h	; bfb0
+	defb 00ah,022h,002h	; bfb3
+	defb 00bh,033h,003h	; bfb6
+	defb 00ch,044h,004h	; bfb9
+	defb 00dh,055h,005h	; bfbc
+	defb 0ffh	; bfbf
+
+; ----------------------------------------------------------------------
+; DATOS relleno_p10: 64 bytes a 0xFF hasta el final del banco: espacio libre;
+;   lo leen nadie (64 bytes)
+;   0xbfc0..0xc000  (64 bytes)
+DATA_relleno_p10:
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfc0  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd0  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe0  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff0  ................

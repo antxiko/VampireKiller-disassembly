@@ -224,9 +224,17 @@ L_6202:
 	ret			;623b
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x623c..0x624c  (16 bytes)
-DATA_623C:
-	defb 000h,000h,000h,001h,070h,003h,002h,060h,001h,003h,044h,004h,00fh,077h,007h,0ffh	; 623c  ....p..`..D..w..
+; DATOS paleta_623C: cambios de paleta ([color][RB][G], 0xFF acaba) que
+;   escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo
+;   leen p01:620B (16 bytes)
+;   0x623c..0x624c  (16 bytes)
+DATA_paleta_623C:
+	defb 000h,000h,000h	; 623c
+	defb 001h,070h,003h	; 623f
+	defb 002h,060h,001h	; 6242
+	defb 003h,044h,004h	; 6245
+	defb 00fh,077h,007h	; 6248
+	defb 0ffh	; 624b
 
 ; ======================================================================
 ; CODIGO 0x624c..0x628f  (67 bytes)

@@ -10,49 +10,59 @@
 
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa000..0xa281  (641 bytes)
-DATA_A000:
+; DATOS bloques_9AC1_cola: 88 bloques de 32x32 (16 bytes cada uno: 4 x 4
+;   dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones
+;   (sigue del banco anterior, 0x9AC1); lo leen p00:5010 (65 bytes)
+;   0xa000..0xa041  (65 bytes)
+DATA_bloques_9AC1_cola:
 	defb 000h,067h,071h,072h,073h,076h,000h,000h,077h,07ah,07bh,07ch,07dh,082h,083h,084h	; a000  .gqrsv..wz{|}...
 	defb 085h,074h,075h,000h,000h,078h,079h,000h,000h,07eh,07fh,080h,081h,086h,087h,088h	; a010  .tu..xy..~......
 	defb 089h,000h,000h,0e1h,0e0h,000h,000h,0e5h,0e4h,0edh,0ech,0ebh,0eah,0f5h,0f4h,0f3h	; a020  ................
 	defb 0f2h,0dfh,0deh,0ddh,0d3h,0e3h,000h,000h,0e2h,0e9h,0e8h,0e7h,0e6h,0f1h,0f0h,0efh	; a030  ................
-	defb 0eeh,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; a040  ................
-	defb 001h,001h,001h,001h,001h,017h,002h,001h,001h,003h,017h,001h,001h,004h,005h,001h	; a050  ................
-	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,008h,001h,001h,001h	; a060  ................
-	defb 018h,000h,000h,005h,006h,000h,000h,003h,004h,000h,000h,000h,007h,000h,000h,000h	; a070  ................
-	defb 000h,001h,001h,001h,001h,017h,002h,001h,001h,003h,017h,001h,001h,004h,005h,001h	; a080  ................
-	defb 001h,001h,001h,001h,001h,001h,001h,00ah,019h,001h,001h,00bh,01ah,001h,001h,000h	; a090  ................
-	defb 000h,001h,001h,001h,000h,00ch,00dh,013h,01bh,000h,01eh,001h,000h,000h,000h,00eh	; a0a0  ................
-	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; a0b0  ................
-	defb 000h,000h,000h,01eh,001h,000h,000h,01eh,012h,000h,000h,015h,013h,000h,000h,018h	; a0c0  ................
-	defb 014h,014h,00fh,000h,000h,011h,010h,000h,000h,003h,000h,000h,000h,004h,000h,000h	; a0d0  ................
-	defb 000h,016h,008h,001h,001h,01ch,018h,001h,001h,001h,01bh,001h,001h,001h,01bh,001h	; a0e0  ................
-	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; a0f0  ................
-	defb 025h,01fh,020h,001h,001h,021h,022h,001h,001h,023h,024h,001h,001h,026h,027h,001h	; a100  %. ..!"..#$..&'.
-	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,009h	; a110  ................
-	defb 00fh,01eh,000h,019h,00ch,013h,000h,000h,000h,00eh,000h,000h,000h,000h,000h,000h	; a120  ................
-	defb 000h,00eh,00dh,001h,001h,000h,01eh,001h,001h,000h,01dh,001h,001h,000h,015h,001h	; a130  ................
-	defb 001h,001h,001h,001h,001h,001h,001h,001h,00fh,001h,001h,011h,003h,001h,001h,00fh	; a140  ................
-	defb 004h,009h,00fh,004h,003h,004h,003h,000h,000h,007h,000h,000h,000h,000h,000h,000h	; a150  ................
-	defb 000h,000h,000h,01eh,001h,000h,000h,01dh,012h,000h,000h,017h,013h,000h,000h,018h	; a160  ................
-	defb 014h,001h,00fh,000h,000h,011h,010h,000h,000h,000h,000h,000h,000h,004h,000h,000h	; a170  ................
-	defb 000h,000h,000h,000h,000h,07bh,07ch,07ah,07bh,039h,03ah,03bh,03ch,040h,041h,042h	; a180  .....{|z{9:;<@AB
-	defb 043h,000h,000h,000h,000h,07bh,07ah,07ch,07ch,03dh,03eh,03ah,03bh,044h,045h,041h	; a190  C....{z||=>:;DEA
-	defb 042h,000h,000h,000h,000h,07ah,07bh,02ah,02ah,03eh,03fh,034h,035h,050h,046h,064h	; a1a0  B....z{**>?45PFd
-	defb 065h,000h,000h,000h,028h,02bh,02ch,02dh,02eh,036h,037h,038h,05eh,05fh,060h,066h	; a1b0  e...(+,-.678^_`f
-	defb 067h,047h,048h,042h,049h,050h,051h,052h,053h,07dh,07fh,080h,080h,000h,000h,000h	; a1c0  gGHBIPQRS}......
-	defb 000h,04ah,04bh,04ch,04dh,054h,055h,056h,042h,07dh,07eh,080h,080h,000h,000h,000h	; a1d0  .JKLMTUVB}~.....
-	defb 000h,04eh,04fh,06ch,06dh,043h,057h,074h,075h,07eh,07fh,07eh,07fh,000h,000h,000h	; a1e0  .NOlmCWtu~.~....
-	defb 000h,05fh,060h,06eh,06fh,036h,060h,076h,077h,07fh,07fh,080h,07dh,000h,000h,000h	; a1f0  ._`no6`vw...}...
-	defb 000h,029h,000h,000h,000h,02fh,02ah,030h,031h,05fh,060h,061h,05eh,05fh,060h,068h	; a200  .).../*01_`a^_`h
-	defb 069h,000h,000h,000h,000h,032h,033h,07bh,07ch,062h,063h,058h,03dh,06ah,06bh,059h	; a210  i....23{|bcX=jkY
-	defb 044h,000h,000h,000h,000h,07ah,07bh,07bh,07ah,03eh,03ah,03bh,05ch,047h,041h,042h	; a220  D....z{{z>:;\GAB
-	defb 045h,000h,000h,000h,000h,07ch,07ch,07ch,07bh,03eh,05ch,03ah,05dh,040h,043h,048h	; a230  E....|||{>\:]@CH
-	defb 052h,070h,05fh,071h,05eh,036h,078h,076h,077h,07eh,07fh,07dh,080h,000h,000h,000h	; a240  Rp_q^6xvw~.}....
-	defb 000h,072h,073h,05ah,045h,079h,074h,05bh,050h,07fh,07eh,07fh,080h,000h,000h,000h	; a250  .rsZEyt[P.~.....
-	defb 000h,040h,048h,042h,04ah,053h,051h,052h,054h,07dh,07eh,080h,080h,000h,000h,000h	; a260  .@HBJSQRT}~.....
-	defb 000h,04bh,049h,051h,042h,055h,045h,04ch,042h,07fh,07eh,07eh,080h,000h,000h,000h	; a270  .KIQBUELB.~~....
-	defb 000h	; a280
+	defb 0eeh	; a040
+
+; ----------------------------------------------------------------------
+; DATOS bloques_A041: 36 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de
+;   8x8); tantos como el indice mas alto que usan sus habitaciones; lo leen
+;   p00:5010 (576 bytes)
+;   0xa041..0xa281  (576 bytes)
+DATA_bloques_A041:
+	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; a041  ................
+	defb 001h,001h,001h,001h,017h,002h,001h,001h,003h,017h,001h,001h,004h,005h,001h,001h	; a051  ................
+	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,008h,001h,001h,001h,018h	; a061  ................
+	defb 000h,000h,005h,006h,000h,000h,003h,004h,000h,000h,000h,007h,000h,000h,000h,000h	; a071  ................
+	defb 001h,001h,001h,001h,017h,002h,001h,001h,003h,017h,001h,001h,004h,005h,001h,001h	; a081  ................
+	defb 001h,001h,001h,001h,001h,001h,00ah,019h,001h,001h,00bh,01ah,001h,001h,000h,000h	; a091  ................
+	defb 001h,001h,001h,000h,00ch,00dh,013h,01bh,000h,01eh,001h,000h,000h,000h,00eh,000h	; a0a1  ................
+	defb 000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; a0b1  ................
+	defb 000h,000h,01eh,001h,000h,000h,01eh,012h,000h,000h,015h,013h,000h,000h,018h,014h	; a0c1  ................
+	defb 014h,00fh,000h,000h,011h,010h,000h,000h,003h,000h,000h,000h,004h,000h,000h,000h	; a0d1  ................
+	defb 016h,008h,001h,001h,01ch,018h,001h,001h,001h,01bh,001h,001h,001h,01bh,001h,001h	; a0e1  ................
+	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,025h	; a0f1  ...............%
+	defb 01fh,020h,001h,001h,021h,022h,001h,001h,023h,024h,001h,001h,026h,027h,001h,001h	; a101  . ..!"..#$..&'..
+	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,009h,00fh	; a111  ................
+	defb 01eh,000h,019h,00ch,013h,000h,000h,000h,00eh,000h,000h,000h,000h,000h,000h,000h	; a121  ................
+	defb 00eh,00dh,001h,001h,000h,01eh,001h,001h,000h,01dh,001h,001h,000h,015h,001h,001h	; a131  ................
+	defb 001h,001h,001h,001h,001h,001h,001h,00fh,001h,001h,011h,003h,001h,001h,00fh,004h	; a141  ................
+	defb 009h,00fh,004h,003h,004h,003h,000h,000h,007h,000h,000h,000h,000h,000h,000h,000h	; a151  ................
+	defb 000h,000h,01eh,001h,000h,000h,01dh,012h,000h,000h,017h,013h,000h,000h,018h,014h	; a161  ................
+	defb 001h,00fh,000h,000h,011h,010h,000h,000h,000h,000h,000h,000h,004h,000h,000h,000h	; a171  ................
+	defb 000h,000h,000h,000h,07bh,07ch,07ah,07bh,039h,03ah,03bh,03ch,040h,041h,042h,043h	; a181  ....{|z{9:;<@ABC
+	defb 000h,000h,000h,000h,07bh,07ah,07ch,07ch,03dh,03eh,03ah,03bh,044h,045h,041h,042h	; a191  ....{z||=>:;DEAB
+	defb 000h,000h,000h,000h,07ah,07bh,02ah,02ah,03eh,03fh,034h,035h,050h,046h,064h,065h	; a1a1  ....z{**>?45PFde
+	defb 000h,000h,000h,028h,02bh,02ch,02dh,02eh,036h,037h,038h,05eh,05fh,060h,066h,067h	; a1b1  ...(+,-.678^_`fg
+	defb 047h,048h,042h,049h,050h,051h,052h,053h,07dh,07fh,080h,080h,000h,000h,000h,000h	; a1c1  GHBIPQRS}.......
+	defb 04ah,04bh,04ch,04dh,054h,055h,056h,042h,07dh,07eh,080h,080h,000h,000h,000h,000h	; a1d1  JKLMTUVB}~......
+	defb 04eh,04fh,06ch,06dh,043h,057h,074h,075h,07eh,07fh,07eh,07fh,000h,000h,000h,000h	; a1e1  NOlmCWtu~.~.....
+	defb 05fh,060h,06eh,06fh,036h,060h,076h,077h,07fh,07fh,080h,07dh,000h,000h,000h,000h	; a1f1  _`no6`vw...}....
+	defb 029h,000h,000h,000h,02fh,02ah,030h,031h,05fh,060h,061h,05eh,05fh,060h,068h,069h	; a201  ).../*01_`a^_`hi
+	defb 000h,000h,000h,000h,032h,033h,07bh,07ch,062h,063h,058h,03dh,06ah,06bh,059h,044h	; a211  ....23{|bcX=jkYD
+	defb 000h,000h,000h,000h,07ah,07bh,07bh,07ah,03eh,03ah,03bh,05ch,047h,041h,042h,045h	; a221  ....z{{z>:;\GABE
+	defb 000h,000h,000h,000h,07ch,07ch,07ch,07bh,03eh,05ch,03ah,05dh,040h,043h,048h,052h	; a231  ....|||{>\:]@CHR
+	defb 070h,05fh,071h,05eh,036h,078h,076h,077h,07eh,07fh,07dh,080h,000h,000h,000h,000h	; a241  p_q^6xvw~.}.....
+	defb 072h,073h,05ah,045h,079h,074h,05bh,050h,07fh,07eh,07fh,080h,000h,000h,000h,000h	; a251  rsZEyt[P.~......
+	defb 040h,048h,042h,04ah,053h,051h,052h,054h,07dh,07eh,080h,080h,000h,000h,000h,000h	; a261  @HBJSQRT}~......
+	defb 04bh,049h,051h,042h,055h,045h,04ch,042h,07fh,07eh,07eh,080h,000h,000h,000h,000h	; a271  KIQBUELB.~~.....
 
 ; ----------------------------------------------------------------------
 ; DATOS tabla_A281: 40 punteros a rle que lee p00:56F4; lo leen p00:56F4 (80
@@ -287,8 +297,11 @@ DATA_rle_A62F:
 	defb 000h,000h	; a66f
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa671..0xa6ad  (60 bytes)
-DATA_A671:
+; DATOS rle_sin_usar_A671: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xa671..0xa6ad  (60 bytes)
+DATA_rle_sin_usar_A671:
 	defb 003h,000h,08dh,060h,070h,078h,079h,013h,006h,02ch,018h,010h,004h,00fh,00fh,00ch	; a671  ...`pxy..,......
 	defb 006h,000h,09ah,080h,0c0h,000h,0e0h,040h,010h,0c0h,0e0h,088h,048h,000h,07ch,0feh	; a681  .......@....H.|.
 	defb 09eh,0dfh,09fh,0beh,0fdh,03fh,05fh,03fh,03fh,03bh,010h,011h,01fh,005h,000h,08bh	; a691  .....?_??;......
@@ -305,8 +318,11 @@ DATA_rle_A6AD:
 	defb 03fh,0ffh,0ffh,0dfh,008h,000h,000h	; a6dd
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa6e4..0xa720  (60 bytes)
-DATA_A6E4:
+; DATOS rle_sin_usar_A6E4: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xa6e4..0xa720  (60 bytes)
+DATA_rle_sin_usar_A6E4:
 	defb 002h,000h,08dh,060h,070h,078h,07bh,017h,004h,059h,030h,020h,001h,013h,03fh,03eh	; a6e4  ...`px{..Y0 ..?>
 	defb 006h,000h,09bh,080h,040h,0a0h,0c0h,0c0h,020h,060h,0a0h,080h,000h,080h,07ch,0fch	; a6f4  ....@... `....|.
 	defb 09eh,0deh,09fh,0bdh,0fbh,07fh,0feh,07fh,03fh,03eh,02dh,043h,043h,03fh,004h,000h	; a704  ........?>-CC?..
@@ -323,8 +339,11 @@ DATA_rle_A720:
 	defb 0c0h,003h,0f0h,002h,0e0h,082h,0c0h,000h,000h	; a750  .........
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa759..0xa795  (60 bytes)
-DATA_A759:
+; DATOS rle_sin_usar_A759: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xa759..0xa795  (60 bytes)
+DATA_rle_sin_usar_A759:
 	defb 003h,000h,08dh,060h,070h,078h,079h,013h,006h,02ch,018h,010h,004h,00fh,00fh,00ch	; a759  ...`pxy..,......
 	defb 006h,000h,09ah,080h,0c0h,000h,0e0h,040h,010h,0c0h,0e0h,088h,048h,000h,07ch,0feh	; a769  .......@....H.|.
 	defb 09eh,0dfh,09fh,0beh,0fdh,03fh,05fh,03fh,03fh,03bh,010h,011h,01fh,005h,000h,08bh	; a779  .....?_??;......
@@ -666,8 +685,11 @@ DATA_rle_AF36:
 	defb 000h,000h	; af76
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xaf78..0xafb4  (60 bytes)
-DATA_AF78:
+; DATOS rle_sin_usar_AF78: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xaf78..0xafb4  (60 bytes)
+DATA_rle_sin_usar_AF78:
 	defb 006h,000h,08ah,001h,003h,000h,007h,002h,008h,003h,007h,011h,012h,003h,000h,08dh	; af78  ................
 	defb 006h,00eh,01eh,09eh,0c8h,060h,034h,018h,008h,020h,0f0h,0f0h,030h,005h,000h,09bh	; af88  .....`4.. ..0...
 	defb 001h,003h,007h,007h,008h,01dh,01fh,01ch,01fh,03fh,03fh,000h,03eh,07fh,079h,0fbh	; af98  .........??.>.y.
@@ -684,8 +706,11 @@ DATA_rle_AFB4:
 	defb 03ch,083h,07ch,07eh,01fh,000h	; afe4
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xafea..0xb026  (60 bytes)
-DATA_AFEA:
+; DATOS rle_sin_usar_AFEA: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xafea..0xb026  (60 bytes)
+DATA_rle_sin_usar_AFEA:
 	defb 005h,000h,09ah,001h,002h,005h,003h,003h,004h,006h,005h,001h,000h,001h,000h,000h	; afea  ................
 	defb 006h,00eh,01eh,0deh,0e8h,020h,09ah,00ch,004h,080h,0c8h,0fch,07ch,005h,000h,088h	; affa  ..... ......|...
 	defb 001h,003h,003h,006h,004h,004h,003h,00bh,004h,00fh,090h,03eh,03fh,079h,07bh,0f9h	; b00a  ...........>?y{.
@@ -702,8 +727,11 @@ DATA_rle_B026:
 	defb 0f8h,0e0h,003h,0c0h,002h,0e0h,081h,000h,000h	; b056  .........
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb05f..0xb09b  (60 bytes)
-DATA_B05F:
+; DATOS rle_sin_usar_B05F: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie
+;   (60 bytes)
+;   0xb05f..0xb09b  (60 bytes)
+DATA_rle_sin_usar_B05F:
 	defb 006h,000h,08ah,001h,003h,000h,007h,002h,008h,003h,007h,011h,012h,003h,000h,08dh	; b05f  ................
 	defb 006h,00eh,01eh,09eh,0c8h,060h,034h,018h,008h,020h,0f0h,0f0h,030h,005h,000h,09bh	; b06f  .....`4.. ..0...
 	defb 001h,003h,007h,007h,008h,01dh,01fh,01ch,01fh,03fh,03fh,000h,03eh,07fh,079h,0fbh	; b07f  .........??.>.y.
@@ -920,8 +948,11 @@ DATA_rle_B556:
 	defb 01ch,000h,085h,0a0h,0d0h,0e8h,0c8h,070h,010h,000h,000h	; b596  .......p...
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb5a1..0xb895  (756 bytes)
-DATA_B5A1:
+; DATOS filas_B5A1: dibujo de 32 filas para 0x582D: por fila, cuantos ceros
+;   van a la izquierda y los 12 - n bytes de dibujo (se completa a 16 en
+;   0xE800); lo leen p00:57E5 (376 bytes)
+;   0xb5a1..0xb719  (376 bytes)
+DATA_filas_B5A1:
 	defb 004h,002h,082h,022h,022h,022h,088h,082h,022h,004h,002h,082h,022h,022h,022h,088h	; b5a1  ...""".."...""".
 	defb 022h,082h,004h,022h,088h,022h,022h,022h,022h,028h,082h,003h,002h,082h,028h,022h	; b5b1  "..".""""(....("
 	defb 022h,022h,0a2h,028h,088h,003h,022h,082h,022h,022h,022h,022h,028h,088h,082h,003h	; b5c1  "".(..".""""(...
@@ -945,31 +976,38 @@ DATA_B5A1:
 	defb 028h,088h,088h,028h,088h,088h,088h,000h,002h,088h,082h,088h,022h,022h,088h,088h	; b6e1  (..(........""..
 	defb 082h,088h,088h,088h,001h,028h,082h,088h,082h,022h,088h,088h,088h,088h,088h,088h	; b6f1  .....(..."......
 	defb 001h,028h,088h,028h,088h,022h,088h,088h,088h,028h,088h,088h,001h,028h,088h,088h	; b701  .(.(."...(...(..
-	defb 088h,082h,028h,088h,088h,082h,088h,088h,004h,002h,082h,022h,022h,022h,088h,082h	; b711  ..(........"""..
-	defb 000h,004h,002h,082h,022h,022h,022h,088h,022h,000h,004h,022h,088h,022h,022h,022h	; b721  ....""".".."."""
-	defb 022h,022h,020h,003h,002h,082h,028h,022h,022h,022h,0a2h,028h,022h,003h,022h,082h	; b731  "" ...(""".(".".
-	defb 022h,022h,022h,022h,028h,088h,022h,003h,028h,082h,0a2h,022h,022h,0a2h,088h,088h	; b741  """"(.".(..""...
-	defb 082h,003h,028h,022h,022h,0a2h,0a2h,028h,082h,088h,082h,002h,002h,082h,02ah,022h	; b751  ..(""..(......*"
-	defb 022h,022h,028h,088h,028h,088h,002h,002h,082h,02ah,022h,02ah,022h,022h,088h,088h	; b761  ""(.(....*"*""..
-	defb 082h,002h,028h,022h,022h,0a2h,0aah,0a2h,0a2h,088h,082h,028h,001h,002h,028h,022h	; b771  ..(""......(..("
-	defb 0a2h,022h,0aah,0a2h,022h,088h,088h,088h,001h,022h,088h,02ah,022h,022h,0aah,0a2h	; b781  .".."....".*""..
-	defb 022h,028h,088h,088h,001h,028h,082h,02ah,02ah,022h,02ah,022h,0aah,028h,088h,028h	; b791  "(...(.**"*".(.(
-	defb 000h,002h,028h,082h,0a2h,022h,0a2h,022h,0a2h,022h,028h,088h,022h,000h,002h,088h	; b7a1  ..(.."."."(."...
-	defb 022h,0a2h,022h,02ah,0a2h,0a2h,0aah,028h,088h,02ah,000h,002h,088h,02ah,022h,02ah	; b7b1  "."*...(.*...*"*
-	defb 022h,022h,022h,022h,028h,082h,02ah,000h,022h,082h,02ah,022h,02ah,022h,022h,0a2h	; b7c1  """"(.*.".*"*"".
-	defb 022h,022h,082h,02ah,000h,028h,082h,022h,022h,022h,0aah,0a2h,0a2h,0aah,022h,082h	; b7d1  "".*.(."""....".
-	defb 0a2h,000h,028h,022h,022h,022h,022h,022h,022h,022h,022h,028h,082h,0a2h,000h,028h	; b7e1  ..(""""""""(...(
-	defb 028h,022h,082h,02ah,022h,022h,0a2h,022h,088h,02ah,022h,000h,028h,022h,088h,022h	; b7f1  (".*"".".*".("."
-	defb 022h,0aah,0a2h,0a2h,0aah,088h,02ah,022h,000h,028h,022h,022h,022h,022h,022h,022h	; b801  ".....*".(""""""
-	defb 022h,022h,082h,0a2h,022h,000h,028h,082h,022h,028h,022h,02ah,0aah,022h,0a2h,082h	; b811  ""..".(."("*."..
-	defb 0a2h,022h,000h,022h,088h,022h,028h,022h,02ah,02ah,08ah,0a2h,088h,028h,082h,000h	; b821  ."."."("**...(..
-	defb 022h,082h,082h,028h,022h,02ah,0a2h,0aah,022h,088h,088h,082h,000h,002h,088h,022h	; b831  "..("*.."......"
-	defb 022h,022h,022h,0a2h,0a8h,022h,088h,022h,088h,000h,002h,088h,028h,028h,022h,022h	; b841  """.."."....((""
-	defb 0aah,022h,028h,088h,082h,022h,000h,002h,088h,028h,022h,088h,022h,022h,022h,028h	; b851  ."(.."...("."""(
-	defb 088h,088h,022h,000h,002h,088h,082h,082h,022h,02ah,0a2h,0a2h,088h,028h,088h,088h	; b861  .."....."*...(..
-	defb 001h,028h,082h,088h,022h,02ah,0a2h,022h,088h,028h,088h,088h,001h,028h,088h,028h	; b871  .(.."*.".(...(.(
-	defb 088h,022h,022h,028h,082h,088h,088h,088h,001h,028h,088h,088h,088h,082h,022h,088h	; b881  .""(.....(....".
-	defb 028h,088h,088h,088h	; b891
+	defb 088h,082h,028h,088h,088h,082h,088h,088h	; b711  ..(.....
+
+; ----------------------------------------------------------------------
+; DATOS filas_B719: dibujo de 32 filas para 0x582D: por fila, cuantos ceros
+;   van a la izquierda y los 12 - n bytes de dibujo (se completa a 16 en
+;   0xE800); lo leen p00:57FA (380 bytes)
+;   0xb719..0xb895  (380 bytes)
+DATA_filas_B719:
+	defb 004h,002h,082h,022h,022h,022h,088h,082h,000h,004h,002h,082h,022h,022h,022h,088h	; b719  ..."""......""".
+	defb 022h,000h,004h,022h,088h,022h,022h,022h,022h,022h,020h,003h,002h,082h,028h,022h	; b729  "..".""""" ...("
+	defb 022h,022h,0a2h,028h,022h,003h,022h,082h,022h,022h,022h,022h,028h,088h,022h,003h	; b739  "".(".".""""(.".
+	defb 028h,082h,0a2h,022h,022h,0a2h,088h,088h,082h,003h,028h,022h,022h,0a2h,0a2h,028h	; b749  (.."".....(""..(
+	defb 082h,088h,082h,002h,002h,082h,02ah,022h,022h,022h,028h,088h,028h,088h,002h,002h	; b759  ......*"""(.(...
+	defb 082h,02ah,022h,02ah,022h,022h,088h,088h,082h,002h,028h,022h,022h,0a2h,0aah,0a2h	; b769  .*"*""....(""...
+	defb 0a2h,088h,082h,028h,001h,002h,028h,022h,0a2h,022h,0aah,0a2h,022h,088h,088h,088h	; b779  ...(..(".".."...
+	defb 001h,022h,088h,02ah,022h,022h,0aah,0a2h,022h,028h,088h,088h,001h,028h,082h,02ah	; b789  .".*"".."(...(.*
+	defb 02ah,022h,02ah,022h,0aah,028h,088h,028h,000h,002h,028h,082h,0a2h,022h,0a2h,022h	; b799  *"*".(.(..(.."."
+	defb 0a2h,022h,028h,088h,022h,000h,002h,088h,022h,0a2h,022h,02ah,0a2h,0a2h,0aah,028h	; b7a9  ."(."..."."*...(
+	defb 088h,02ah,000h,002h,088h,02ah,022h,02ah,022h,022h,022h,022h,028h,082h,02ah,000h	; b7b9  .*...*"*""""(.*.
+	defb 022h,082h,02ah,022h,02ah,022h,022h,0a2h,022h,022h,082h,02ah,000h,028h,082h,022h	; b7c9  ".*"*""."".*.(."
+	defb 022h,022h,0aah,0a2h,0a2h,0aah,022h,082h,0a2h,000h,028h,022h,022h,022h,022h,022h	; b7d9  ""...."...("""""
+	defb 022h,022h,022h,028h,082h,0a2h,000h,028h,028h,022h,082h,02ah,022h,022h,0a2h,022h	; b7e9  """(...((".*""."
+	defb 088h,02ah,022h,000h,028h,022h,088h,022h,022h,0aah,0a2h,0a2h,0aah,088h,02ah,022h	; b7f9  .*".("."".....*"
+	defb 000h,028h,022h,022h,022h,022h,022h,022h,022h,022h,082h,0a2h,022h,000h,028h,082h	; b809  .(""""""""..".(.
+	defb 022h,028h,022h,02ah,0aah,022h,0a2h,082h,0a2h,022h,000h,022h,088h,022h,028h,022h	; b819  "("*."..."."."("
+	defb 02ah,02ah,08ah,0a2h,088h,028h,082h,000h,022h,082h,082h,028h,022h,02ah,0a2h,0aah	; b829  **...(.."..("*..
+	defb 022h,088h,088h,082h,000h,002h,088h,022h,022h,022h,022h,0a2h,0a8h,022h,088h,022h	; b839  "......"""".."."
+	defb 088h,000h,002h,088h,028h,028h,022h,022h,0aah,022h,028h,088h,082h,022h,000h,002h	; b849  ....((""."(.."..
+	defb 088h,028h,022h,088h,022h,022h,022h,028h,088h,088h,022h,000h,002h,088h,082h,082h	; b859  .("."""(..".....
+	defb 022h,02ah,0a2h,0a2h,088h,028h,088h,088h,001h,028h,082h,088h,022h,02ah,0a2h,022h	; b869  "*...(...(.."*."
+	defb 088h,028h,088h,088h,001h,028h,088h,028h,088h,022h,022h,028h,082h,088h,088h,088h	; b879  .(...(.(.""(....
+	defb 001h,028h,088h,088h,088h,082h,022h,088h,028h,088h,088h,088h	; b889  .(....".(...
 
 ; ----------------------------------------------------------------------
 ; DATOS rle_B895: rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van
@@ -1077,30 +1115,318 @@ L_B9BD:
 	ret			;b9d2
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb9d3..0xbb31  (350 bytes)
-DATA_B9D3:
-	defb 0f9h,0b9h,0ffh,0b9h,00fh,0bah,01bh,0bah,027h,0bah,033h,0bah,03fh,0bah,04bh,0bah	; b9d3  ........'.3.?.K.
-	defb 05dh,0bah,06dh,0bah,07fh,0bah,091h,0bah,09dh,0bah,0b5h,0bah,0cdh,0bah,0ddh,0bah	; b9e3  ].m.............
-	defb 0f1h,0bah,005h,0bbh,01dh,0bbh,0ffh,0f1h,0ffh,002h,0ffh,01fh,0ffh,031h,05fh,002h	; b9f3  .............1_.
-	defb 0ffh,013h,07fh,020h,0ffh,0f5h,0f1h,046h,0ffh,057h,0f3h,06fh,024h,0f1h,0f5h,00fh	; ba03  ... ...F.W.o$...
-	defb 0f0h,033h,0ffh,022h,00fh,0f5h,01fh,04fh,0f4h,031h,0ffh,002h,0ffh,013h,0ffh,020h	; ba13  .3."...O.1.....
-	defb 00fh,0f5h,0ffh,0ffh,0ffh,021h,04fh,002h,05fh,010h,0f0h,0f4h,0f1h,035h,0f2h,04fh	; ba23  .....!O._....5.O
-	defb 0ffh,01fh,0ffh,020h,05fh,0f1h,0ffh,04fh,0f1h,053h,0f2h,0f4h,03fh,01fh,0ffh,020h	; ba33  ... _..O.S..?..
-	defb 0ffh,0f1h,0f0h,04fh,0ffh,053h,0ffh,0ffh,0ffh,01fh,0ffh,020h,05fh,0f1h,0ffh,04fh	; ba43  ...O.S..... _..O
-	defb 0ffh,053h,082h,0f4h,0f3h,07fh,0f4h,086h,0f5h,0f7h,0ffh,0f1h,0ffh,002h,05fh,01fh	; ba53  .S............_.
-	defb 0ffh,0f4h,0f7h,03fh,0f2h,0f6h,0f3h,057h,0f4h,06fh,0ffh,0f1h,0ffh,002h,0ffh,013h	; ba63  ...?...W.o......
-	defb 0ffh,024h,0ffh,035h,068h,04fh,0f5h,0ffh,0ffh,0ffh,05fh,07fh,0ffh,051h,06fh,002h	; ba73  .$.5hO...._..Qo.
-	defb 0ffh,013h,0ffh,024h,0ffh,035h,08fh,040h,0f1h,077h,0ffh,066h,0f5h,0ffh,0ffh,0f1h	; ba83  ...$.5.@.w.f....
-	defb 0ffh,002h,0ffh,013h,0ffh,024h,0ffh,035h,0ffh,04fh,0ffh,021h,0ffh,002h,0ffh,010h	; ba93  .....$.5.O.!....
-	defb 0ffh,0f4h,0ffh,035h,0ffh,046h,0ffh,0ffh,0ffh,088h,0ffh,077h,0ffh,0bah,0ffh,09bh	; baa3  ...5.F.....w....
-	defb 0ffh,0a9h,03fh,0f1h,0ffh,002h,057h,01fh,0f0h,064h,0ffh,035h,0f2h,046h,0bfh,053h	; bab3  ..?...W..d.5.F.S
-	defb 029h,0ffh,0ffh,0f9h,07fh,08ah,0fbh,09fh,0a6h,09fh,03fh,0ffh,0ffh,02fh,0f5h,0f1h	; bac3  ).........?../..
-	defb 0f0h,04fh,0f1h,053h,0ffh,064h,0ffh,075h,0ffh,0f6h,02fh,01fh,0ffh,0f0h,040h,033h	; bad3  .O.S.d.u../...@3
-	defb 0ffh,022h,072h,055h,0f3h,044h,0ffh,07fh,0f4h,086h,0f5h,097h,0ffh,0ffh,0f6h,01fh	; bae3  ."rU.D..........
-	defb 0f7h,020h,0f8h,031h,0f9h,042h,0ffh,053h,0ffh,0f4h,00fh,07fh,0ffh,086h,0ffh,097h	; baf3  . .1.B.S........
-	defb 0ffh,0f8h,03fh,01fh,04fh,020h,05fh,0f1h,0f0h,04fh,0f1h,053h,062h,0f4h,095h,07fh	; bb03  ..?.O _..O.Sb...
-	defb 0afh,086h,0bfh,0f7h,0f6h,0afh,0f7h,0b9h,0f8h,0ffh,0ffh,01fh,0ffh,020h,03fh,0f1h	; bb13  ............. ?.
-	defb 052h,0ffh,065h,055h,043h,044h,074h,0ffh,0f6h,08fh,0ffh,097h,0ffh,0ffh	; bb23  R.eUCDt.......
+; DATOS salidas_de_cada_fase: 19 punteros, uno por fase, a las salidas de sus
+;   habitaciones; lo leen p13:B9C0 (38 bytes)
+;   0xb9d3..0xb9f9  (38 bytes)
+DATA_salidas_de_cada_fase:
+	defb 0f9h,0b9h	; b9d3
+	defb 0ffh,0b9h	; b9d5
+	defb 00fh,0bah	; b9d7
+	defb 01bh,0bah	; b9d9
+	defb 027h,0bah	; b9db
+	defb 033h,0bah	; b9dd
+	defb 03fh,0bah	; b9df
+	defb 04bh,0bah	; b9e1
+	defb 05dh,0bah	; b9e3
+	defb 06dh,0bah	; b9e5
+	defb 07fh,0bah	; b9e7
+	defb 091h,0bah	; b9e9
+	defb 09dh,0bah	; b9eb
+	defb 0b5h,0bah	; b9ed
+	defb 0cdh,0bah	; b9ef
+	defb 0ddh,0bah	; b9f1
+	defb 0f1h,0bah	; b9f3
+	defb 005h,0bbh	; b9f5
+	defb 01dh,0bbh	; b9f7
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_0: las salidas de las 3 habitaciones de la fase 0: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (6 bytes)
+;   0xb9f9..0xb9ff  (6 bytes)
+DATA_salidas_fase_0:
+	defb 0ffh,0f1h	; b9f9
+	defb 0ffh,002h	; b9fb
+	defb 0ffh,01fh	; b9fd
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_1: las salidas de las 8 habitaciones de la fase 1: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+;   0xb9ff..0xba0f  (16 bytes)
+DATA_salidas_fase_1:
+	defb 0ffh,031h	; b9ff
+	defb 05fh,002h	; ba01
+	defb 0ffh,013h	; ba03
+	defb 07fh,020h	; ba05
+	defb 0ffh,0f5h	; ba07
+	defb 0f1h,046h	; ba09
+	defb 0ffh,057h	; ba0b
+	defb 0f3h,06fh	; ba0d
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_2: las salidas de las 6 habitaciones de la fase 2: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba0f..0xba1b  (12 bytes)
+DATA_salidas_fase_2:
+	defb 024h,0f1h	; ba0f
+	defb 0f5h,00fh	; ba11
+	defb 0f0h,033h	; ba13
+	defb 0ffh,022h	; ba15
+	defb 00fh,0f5h	; ba17
+	defb 01fh,04fh	; ba19
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_3: las salidas de las 6 habitaciones de la fase 3: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba1b..0xba27  (12 bytes)
+DATA_salidas_fase_3:
+	defb 0f4h,031h	; ba1b
+	defb 0ffh,002h	; ba1d
+	defb 0ffh,013h	; ba1f
+	defb 0ffh,020h	; ba21
+	defb 00fh,0f5h	; ba23
+	defb 0ffh,0ffh	; ba25
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_4: las salidas de las 6 habitaciones de la fase 4: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba27..0xba33  (12 bytes)
+DATA_salidas_fase_4:
+	defb 0ffh,021h	; ba27
+	defb 04fh,002h	; ba29
+	defb 05fh,010h	; ba2b
+	defb 0f0h,0f4h	; ba2d
+	defb 0f1h,035h	; ba2f
+	defb 0f2h,04fh	; ba31
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_5: las salidas de las 6 habitaciones de la fase 5: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba33..0xba3f  (12 bytes)
+DATA_salidas_fase_5:
+	defb 0ffh,01fh	; ba33
+	defb 0ffh,020h	; ba35
+	defb 05fh,0f1h	; ba37
+	defb 0ffh,04fh	; ba39
+	defb 0f1h,053h	; ba3b
+	defb 0f2h,0f4h	; ba3d
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_6: las salidas de las 6 habitaciones de la fase 6: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba3f..0xba4b  (12 bytes)
+DATA_salidas_fase_6:
+	defb 03fh,01fh	; ba3f
+	defb 0ffh,020h	; ba41
+	defb 0ffh,0f1h	; ba43
+	defb 0f0h,04fh	; ba45
+	defb 0ffh,053h	; ba47
+	defb 0ffh,0ffh	; ba49
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_7: las salidas de las 9 habitaciones de la fase 7: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+;   0xba4b..0xba5d  (18 bytes)
+DATA_salidas_fase_7:
+	defb 0ffh,01fh	; ba4b
+	defb 0ffh,020h	; ba4d
+	defb 05fh,0f1h	; ba4f
+	defb 0ffh,04fh	; ba51
+	defb 0ffh,053h	; ba53
+	defb 082h,0f4h	; ba55
+	defb 0f3h,07fh	; ba57
+	defb 0f4h,086h	; ba59
+	defb 0f5h,0f7h	; ba5b
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_8: las salidas de las 8 habitaciones de la fase 8: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+;   0xba5d..0xba6d  (16 bytes)
+DATA_salidas_fase_8:
+	defb 0ffh,0f1h	; ba5d
+	defb 0ffh,002h	; ba5f
+	defb 05fh,01fh	; ba61
+	defb 0ffh,0f4h	; ba63
+	defb 0f7h,03fh	; ba65
+	defb 0f2h,0f6h	; ba67
+	defb 0f3h,057h	; ba69
+	defb 0f4h,06fh	; ba6b
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_9: las salidas de las 9 habitaciones de la fase 9: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+;   0xba6d..0xba7f  (18 bytes)
+DATA_salidas_fase_9:
+	defb 0ffh,0f1h	; ba6d
+	defb 0ffh,002h	; ba6f
+	defb 0ffh,013h	; ba71
+	defb 0ffh,024h	; ba73
+	defb 0ffh,035h	; ba75
+	defb 068h,04fh	; ba77
+	defb 0f5h,0ffh	; ba79
+	defb 0ffh,0ffh	; ba7b
+	defb 05fh,07fh	; ba7d
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_10: las salidas de las 9 habitaciones de la fase 10: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (18 bytes)
+;   0xba7f..0xba91  (18 bytes)
+DATA_salidas_fase_10:
+	defb 0ffh,051h	; ba7f
+	defb 06fh,002h	; ba81
+	defb 0ffh,013h	; ba83
+	defb 0ffh,024h	; ba85
+	defb 0ffh,035h	; ba87
+	defb 08fh,040h	; ba89
+	defb 0f1h,077h	; ba8b
+	defb 0ffh,066h	; ba8d
+	defb 0f5h,0ffh	; ba8f
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_11: las salidas de las 6 habitaciones de la fase 11: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (12 bytes)
+;   0xba91..0xba9d  (12 bytes)
+DATA_salidas_fase_11:
+	defb 0ffh,0f1h	; ba91
+	defb 0ffh,002h	; ba93
+	defb 0ffh,013h	; ba95
+	defb 0ffh,024h	; ba97
+	defb 0ffh,035h	; ba99
+	defb 0ffh,04fh	; ba9b
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_12: las salidas de las 12 habitaciones de la fase 12: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+;   0xba9d..0xbab5  (24 bytes)
+DATA_salidas_fase_12:
+	defb 0ffh,021h	; ba9d
+	defb 0ffh,002h	; ba9f
+	defb 0ffh,010h	; baa1
+	defb 0ffh,0f4h	; baa3
+	defb 0ffh,035h	; baa5
+	defb 0ffh,046h	; baa7
+	defb 0ffh,0ffh	; baa9
+	defb 0ffh,088h	; baab
+	defb 0ffh,077h	; baad
+	defb 0ffh,0bah	; baaf
+	defb 0ffh,09bh	; bab1
+	defb 0ffh,0a9h	; bab3
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_13: las salidas de las 12 habitaciones de la fase 13: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+;   0xbab5..0xbacd  (24 bytes)
+DATA_salidas_fase_13:
+	defb 03fh,0f1h	; bab5
+	defb 0ffh,002h	; bab7
+	defb 057h,01fh	; bab9
+	defb 0f0h,064h	; babb
+	defb 0ffh,035h	; babd
+	defb 0f2h,046h	; babf
+	defb 0bfh,053h	; bac1
+	defb 029h,0ffh	; bac3
+	defb 0ffh,0f9h	; bac5
+	defb 07fh,08ah	; bac7
+	defb 0fbh,09fh	; bac9
+	defb 0a6h,09fh	; bacb
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_14: las salidas de las 8 habitaciones de la fase 14: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (16 bytes)
+;   0xbacd..0xbadd  (16 bytes)
+DATA_salidas_fase_14:
+	defb 03fh,0ffh	; bacd
+	defb 0ffh,02fh	; bacf
+	defb 0f5h,0f1h	; bad1
+	defb 0f0h,04fh	; bad3
+	defb 0f1h,053h	; bad5
+	defb 0ffh,064h	; bad7
+	defb 0ffh,075h	; bad9
+	defb 0ffh,0f6h	; badb
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_15: las salidas de las 10 habitaciones de la fase 15: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+;   0xbadd..0xbaf1  (20 bytes)
+DATA_salidas_fase_15:
+	defb 02fh,01fh	; badd
+	defb 0ffh,0f0h	; badf
+	defb 040h,033h	; bae1
+	defb 0ffh,022h	; bae3
+	defb 072h,055h	; bae5
+	defb 0f3h,044h	; bae7
+	defb 0ffh,07fh	; bae9
+	defb 0f4h,086h	; baeb
+	defb 0f5h,097h	; baed
+	defb 0ffh,0ffh	; baef
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_16: las salidas de las 10 habitaciones de la fase 16: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+;   0xbaf1..0xbb05  (20 bytes)
+DATA_salidas_fase_16:
+	defb 0f6h,01fh	; baf1
+	defb 0f7h,020h	; baf3
+	defb 0f8h,031h	; baf5
+	defb 0f9h,042h	; baf7
+	defb 0ffh,053h	; baf9
+	defb 0ffh,0f4h	; bafb
+	defb 00fh,07fh	; bafd
+	defb 0ffh,086h	; baff
+	defb 0ffh,097h	; bb01
+	defb 0ffh,0f8h	; bb03
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_17: las salidas de las 12 habitaciones de la fase 17: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (24 bytes)
+;   0xbb05..0xbb1d  (24 bytes)
+DATA_salidas_fase_17:
+	defb 03fh,01fh	; bb05
+	defb 04fh,020h	; bb07
+	defb 05fh,0f1h	; bb09
+	defb 0f0h,04fh	; bb0b
+	defb 0f1h,053h	; bb0d
+	defb 062h,0f4h	; bb0f
+	defb 095h,07fh	; bb11
+	defb 0afh,086h	; bb13
+	defb 0bfh,0f7h	; bb15
+	defb 0f6h,0afh	; bb17
+	defb 0f7h,0b9h	; bb19
+	defb 0f8h,0ffh	; bb1b
+
+; ----------------------------------------------------------------------
+; DATOS salidas_fase_18: las salidas de las 10 habitaciones de la fase 18: dos
+;   bytes por habitacion, cuatro nibbles con la habitacion vecina por cada
+;   lado (0xF, no hay); lo leen p13:B9A2 (20 bytes)
+;   0xbb1d..0xbb31  (20 bytes)
+DATA_salidas_fase_18:
+	defb 0ffh,01fh	; bb1d
+	defb 0ffh,020h	; bb1f
+	defb 03fh,0f1h	; bb21
+	defb 052h,0ffh	; bb23
+	defb 065h,055h	; bb25
+	defb 043h,044h	; bb27
+	defb 074h,0ffh	; bb29
+	defb 0f6h,08fh	; bb2b
+	defb 0ffh,097h	; bb2d
+	defb 0ffh,0ffh	; bb2f
 
 ; ======================================================================
 ; CODIGO 0xbb31..0xbb61  (48 bytes)
@@ -1140,12 +1466,30 @@ L_BB5D:
 	ret			;bb60
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbb61..0xbb9a  (57 bytes)
-DATA_BB61:
-	defb 042h,090h,0e0h,087h,030h,0ech,081h,030h,0ech,084h,080h,0ech,083h,030h,00ch,085h	; bb61  B...0..0.....0..
-	defb 050h,00ch,084h,050h,00ch,086h,060h,0ech,087h,040h,0ech,088h,080h,00ch,088h,080h	; bb71  P..P..`..@......
-	defb 0ech,085h,080h,0ech,085h,080h,0ech,088h,080h,00ch,087h,080h,00ch,088h,080h,00ch	; bb81  ................
-	defb 085h,040h,00ch,08bh,040h,00ch,088h,080h,00ch	; bb91  .@..@....
+; DATOS puerta_de_cada_fase: tres bytes por fase: [habitacion (nibble bajo) y
+;   bandera (bit 7)][puntero que p13:BB52 deja en 0xC5AD]; lo leen p13:BB3A
+;   (57 bytes)
+;   0xbb61..0xbb9a  (57 bytes)
+DATA_puerta_de_cada_fase:
+	defb 042h,090h,0e0h	; bb61
+	defb 087h,030h,0ech	; bb64
+	defb 081h,030h,0ech	; bb67
+	defb 084h,080h,0ech	; bb6a
+	defb 083h,030h,00ch	; bb6d
+	defb 085h,050h,00ch	; bb70
+	defb 084h,050h,00ch	; bb73
+	defb 086h,060h,0ech	; bb76
+	defb 087h,040h,0ech	; bb79
+	defb 088h,080h,00ch	; bb7c
+	defb 088h,080h,0ech	; bb7f
+	defb 085h,080h,0ech	; bb82
+	defb 085h,080h,0ech	; bb85
+	defb 088h,080h,00ch	; bb88
+	defb 087h,080h,00ch	; bb8b
+	defb 088h,080h,00ch	; bb8e
+	defb 085h,040h,00ch	; bb91
+	defb 08bh,040h,00ch	; bb94
+	defb 088h,080h,00ch	; bb97
 
 ; ======================================================================
 ; CODIGO 0xbb9a..0xbbcd  (51 bytes)
@@ -1192,11 +1536,22 @@ L_BBB5:
 	ret			;bbcc
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbbcd..0xbbf6  (41 bytes)
-DATA_BBCD:
-	defb 00ch,030h,0a8h,058h,00ch,041h,088h,0b8h,00ch,0b2h,0a8h,098h,00ch,003h,0a8h,058h	; bbcd  .0.X.A.........X
-	defb 00ch,014h,088h,0b8h,00ch,085h,0a8h,058h,00ch,0a7h,0a8h,038h,00ch,058h,0a8h,058h	; bbdd  .......X...8.X.X
-	defb 00ch,07ah,0a8h,038h,00ch,02bh,0a8h,098h,0ffh	; bbed  .z.8.+...
+; DATOS pasos_entre_habitaciones: 10 registros de cuatro bytes [fase +
+;   1][habitacion nueva << 4 | habitacion][puntero que p13:BBBA deja en
+;   0xC5B2], y 0xFF; lo leen p13:BB9E (41 bytes)
+;   0xbbcd..0xbbf6  (41 bytes)
+DATA_pasos_entre_habitaciones:
+	defb 00ch,030h,0a8h,058h	; bbcd
+	defb 00ch,041h,088h,0b8h	; bbd1
+	defb 00ch,0b2h,0a8h,098h	; bbd5
+	defb 00ch,003h,0a8h,058h	; bbd9
+	defb 00ch,014h,088h,0b8h	; bbdd
+	defb 00ch,085h,0a8h,058h	; bbe1
+	defb 00ch,0a7h,0a8h,038h	; bbe5
+	defb 00ch,058h,0a8h,058h	; bbe9
+	defb 00ch,07ah,0a8h,038h	; bbed
+	defb 00ch,02bh,0a8h,098h	; bbf1
+	defb 0ffh	; bbf5
 
 ; ----------------------------------------------------------------------
 ; DATOS rle_BBF6: rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van
@@ -1245,8 +1600,11 @@ DATA_rle_BBF6:
 	defb 000h,000h	; be56
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbe58..0xbe59  (1 bytes)
-DATA_BE58:
+; DATOS rle_sin_usar_BE58: rle que no lee nadie (su direccion no aparece como
+;   palabra en el cartucho) y que cierra clavado en el hueco; lo leen nadie (1
+;   bytes)
+;   0xbe58..0xbe59  (1 bytes)
+DATA_rle_sin_usar_BE58:
 	defb 000h	; be58
 
 ; ----------------------------------------------------------------------
@@ -1320,6 +1678,8 @@ DATA_letras_BF29:
 	defb 080h,040h,020h,0a0h,020h,0a0h,040h,080h	; bff1  .@ . .@.
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbff9..0xc000  (7 bytes)
-DATA_BFF9:
+; DATOS relleno_p13: 7 bytes a 0xFF hasta el final del banco: espacio libre;
+;   lo leen nadie (7 bytes)
+;   0xbff9..0xc000  (7 bytes)
+DATA_relleno_p13:
 	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff9

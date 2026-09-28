@@ -1,8 +1,180 @@
 # Notas del banco 14: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8000 0x800C listas_de_cada_bloque  6 punteros, uno por bloque de tres fases (0xD002), a la lista que p00:5A67 copia a 0xE000; lo leen p00:5AA3 (12 bytes)
+F 0x8000 2
+D 0x800C 0x8019 lista_800C  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); es la del patio, la fase 0; lo leen p00:5A67 (13 bytes)
+F 0x800C 16
+D 0x8019 0x80E7 lista_8019  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (206 bytes)
+F 0x8019 16
+D 0x80E7 0x81B3 lista_80E7  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (204 bytes)
+F 0x80E7 16
+D 0x81B3 0x82B1 lista_81B3  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (254 bytes)
+F 0x81B3 16
+D 0x82B1 0x8398 lista_82B1  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (231 bytes)
+F 0x82B1 16
+D 0x8398 0x8497 lista_8398  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (255 bytes)
+F 0x8398 16
+D 0x8497 0x85A6 lista_8497  lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro grupo, pares de bytes y un tercero si el segundo es 0x7F); lo leen p00:5A67 (271 bytes)
+F 0x8497 16
+D 0x85A6 0x85CC cosas_de_cada_habitacion  19 punteros, uno por fase, a un byte por habitacion; lo leen p00:5EDB (38 bytes)
+F 0x85A6 2
+D 0x85CC 0x85CF cosas_fase_0  un byte por cada una de las 3 habitaciones de la fase 0: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (3 bytes)
+F 0x85CC 3
+D 0x85CF 0x85D7 cosas_fase_1  un byte por cada una de las 8 habitaciones de la fase 1: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (8 bytes)
+F 0x85CF 8
+D 0x85D7 0x85DD cosas_fase_2  un byte por cada una de las 6 habitaciones de la fase 2: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x85D7 6
+D 0x85DD 0x85E3 cosas_fase_3  un byte por cada una de las 6 habitaciones de la fase 3: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x85DD 6
+D 0x85E3 0x85E9 cosas_fase_4  un byte por cada una de las 6 habitaciones de la fase 4: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x85E3 6
+D 0x85E9 0x85EF cosas_fase_5  un byte por cada una de las 6 habitaciones de la fase 5: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x85E9 6
+D 0x85EF 0x85F5 cosas_fase_6  un byte por cada una de las 6 habitaciones de la fase 6: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x85EF 6
+D 0x85F5 0x85FE cosas_fase_7  un byte por cada una de las 9 habitaciones de la fase 7: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (9 bytes)
+F 0x85F5 9
+D 0x85FE 0x8606 cosas_fase_8  un byte por cada una de las 8 habitaciones de la fase 8: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (8 bytes)
+F 0x85FE 8
+D 0x8606 0x860F cosas_fase_9  un byte por cada una de las 9 habitaciones de la fase 9: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (9 bytes)
+F 0x8606 9
+D 0x860F 0x8618 cosas_fase_10  un byte por cada una de las 9 habitaciones de la fase 10: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (9 bytes)
+F 0x860F 9
+D 0x8618 0x861E cosas_fase_11  un byte por cada una de las 6 habitaciones de la fase 11: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (6 bytes)
+F 0x8618 6
+D 0x861E 0x862A cosas_fase_12  un byte por cada una de las 12 habitaciones de la fase 12: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (12 bytes)
+F 0x861E 12
+D 0x862A 0x8636 cosas_fase_13  un byte por cada una de las 12 habitaciones de la fase 13: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (12 bytes)
+F 0x862A 12
+D 0x8636 0x863E cosas_fase_14  un byte por cada una de las 8 habitaciones de la fase 14: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (8 bytes)
+F 0x8636 8
+D 0x863E 0x8648 cosas_fase_15  un byte por cada una de las 10 habitaciones de la fase 15: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (10 bytes)
+F 0x863E 10
+D 0x8648 0x8652 cosas_fase_16  un byte por cada una de las 10 habitaciones de la fase 16: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (10 bytes)
+F 0x8648 10
+D 0x8652 0x865E cosas_fase_17  un byte por cada una de las 12 habitaciones de la fase 17: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (12 bytes)
+F 0x8652 12
+D 0x865E 0x8668 cosas_fase_18  un byte por cada una de las 10 habitaciones de la fase 18: cada bit puesto llama a una de las siete rutinas de p00:5EF6-p00:5F19; lo leen p00:5EE7 (10 bytes)
+F 0x865E 10
+D 0x8668 0x8674 tres_listas_de_cada_bloque  6 punteros, uno por bloque de tres fases, a las tres listas que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00; lo leen p01:61A1 (12 bytes)
+F 0x8668 2
+D 0x8674 0x868E tres_listas_8674  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (26 bytes)
+F 0x8674 16
+D 0x868E 0x86B6 tres_listas_868E  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (40 bytes)
+F 0x868E 16
+D 0x86B6 0x8706 tres_listas_86B6  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (80 bytes)
+F 0x86B6 16
+D 0x8706 0x873F tres_listas_8706  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (57 bytes)
+F 0x8706 16
+D 0x873F 0x87CE tres_listas_873F  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (143 bytes)
+F 0x873F 16
+D 0x87CE 0x8824 tres_listas_87CE  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (86 bytes)
+F 0x87CE 16
 D 0x8824 0x8894 letras_8824  14 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:53EA (112 bytes)
 F 0x8824 8
 D 0x8894 0x8964 letras_8894  26 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:53F6 (208 bytes)
 F 0x8894 8
+D 0x8A45 0x8A5D mascaras_del_mezclador  cuatro tablas de 6 bytes, [AND][OR] por canal, para abrir o cerrar tono y ruido en el registro 7 del PSG (p14:8A2C); lo leen p14:8A14 (24 bytes)
+F 0x8A45 6
+D 0x8B81 0x8B99 periodos_de_las_notas  doce palabras: el periodo de tono del PSG de cada nota (do a si) de la octava mas grave; las otras octavas se sacan dividiendo; lo leen p14:8B1F (24 bytes)
+F 0x8B81 2
+D 0x8D8F 0x8DC9 efectos_de_sonido  29 punteros, los de los efectos 1 a 29 (0x8D8D + 2 * A; la entrada 0 serian los `scf / ret` de 0x8D8D); lo leen p00:518C (58 bytes)
+F 0x8D8F 2
+D 0x8DC9 0x8E29 musicas  16 musicas, seis bytes cada una: los tres canales del PSG (el numero de p00:509F con el bit 7); lo leen p00:50E7 (96 bytes)
+F 0x8DC9 6
+D 0x8E29 0x8E2B palabra_suelta  0xA822 otra vez, detras de la tabla de musicas: el canal de una musica 16 que no existe (la tabla acaba en la 15 y el efecto 1 empieza aqui al lado); lo leen nadie (2 bytes)
+F 0x8E29 2
+D 0x8E2B 0x8E58 efecto_8E2B  guion de un efecto de sonido (p14:8CB9); lo leen efecto 1 (45 bytes)
+F 0x8E2B 16
+D 0x8E58 0x8E69 efecto_8E58  guion de un efecto de sonido (p14:8CB9); lo leen efecto 2 (17 bytes)
+F 0x8E58 16
+D 0x8E69 0x8E8A efecto_8E69  guion de un efecto de sonido (p14:8CB9); lo leen efecto 29 (33 bytes)
+F 0x8E69 16
+D 0x8E8A 0x8E99 efecto_8E8A  guion de un efecto de sonido (p14:8CB9); lo leen efecto 3 (15 bytes)
+F 0x8E8A 16
+D 0x8E99 0x8EAE efecto_8E99  guion de un efecto de sonido (p14:8CB9); lo leen efecto 4 (21 bytes)
+F 0x8E99 16
+D 0x8EAE 0x8ECB efecto_8EAE  guion de un efecto de sonido (p14:8CB9); lo leen efecto 5 (29 bytes)
+F 0x8EAE 16
+D 0x8ECB 0x8EE4 efecto_8ECB  guion de un efecto de sonido (p14:8CB9); lo leen efecto 6 (25 bytes)
+F 0x8ECB 16
+D 0x8EE4 0x8EF3 efecto_8EE4  guion de un efecto de sonido (p14:8CB9); lo leen efecto 7 (15 bytes)
+F 0x8EE4 16
+D 0x8EF3 0x8F25 efecto_8EF3  guion de un efecto de sonido (p14:8CB9); lo leen efecto 8 (50 bytes)
+F 0x8EF3 16
+D 0x8F25 0x8F56 efecto_8F25  guion de un efecto de sonido (p14:8CB9); lo leen efecto 9 (49 bytes)
+F 0x8F25 16
+D 0x8F56 0x8F75 efecto_8F56  guion de un efecto de sonido (p14:8CB9); lo leen efecto 10 (31 bytes)
+F 0x8F56 16
+D 0x8F75 0x8FB9 efecto_8F75  guion de un efecto de sonido (p14:8CB9); lo leen efecto 11 (68 bytes)
+F 0x8F75 16
+D 0x8FB9 0x8FDD efecto_8FB9  guion de un efecto de sonido (p14:8CB9); lo leen efecto 12 (36 bytes)
+F 0x8FB9 16
+D 0x8FDD 0x902E efecto_8FDD  guion de un efecto de sonido (p14:8CB9); lo leen efecto 13 (81 bytes)
+F 0x8FDD 16
+D 0x902E 0x9065 efecto_902E  guion de un efecto de sonido (p14:8CB9); lo leen efecto 14 (55 bytes)
+F 0x902E 16
+D 0x9065 0x909A efecto_9065  guion de un efecto de sonido (p14:8CB9); lo leen efecto 15 (53 bytes)
+F 0x9065 16
+D 0x909A 0x90C7 efecto_909A  guion de un efecto de sonido (p14:8CB9); lo leen efecto 16 (45 bytes)
+F 0x909A 16
+D 0x90C7 0x90E6 efecto_90C7  guion de un efecto de sonido (p14:8CB9); lo leen efecto 17 (31 bytes)
+F 0x90C7 16
+D 0x90E6 0x9137 efecto_90E6  guion de un efecto de sonido (p14:8CB9); lo leen efecto 18 (81 bytes)
+F 0x90E6 16
+D 0x9137 0x9152 efecto_9137  guion de un efecto de sonido (p14:8CB9); lo leen efecto 19 (27 bytes)
+F 0x9137 16
+D 0x9152 0x9179 efecto_9152  guion de un efecto de sonido (p14:8CB9); lo leen efecto 20 (39 bytes)
+F 0x9152 16
+D 0x9179 0x9212 efecto_9179  guion de un efecto de sonido (p14:8CB9); lo leen efecto 21 (153 bytes)
+F 0x9179 16
+D 0x9212 0x9275 efecto_9212  guion de un efecto de sonido (p14:8CB9); lo leen efecto 22 (99 bytes)
+F 0x9212 16
+D 0x9275 0x92D8 efecto_9275  guion de un efecto de sonido (p14:8CB9); lo leen efecto 23 (99 bytes)
+F 0x9275 16
+D 0x92D8 0x931A efecto_92D8  guion de un efecto de sonido (p14:8CB9); lo leen efecto 24 (66 bytes)
+F 0x92D8 16
+D 0x931A 0x939F efecto_931A  guion de un efecto de sonido (p14:8CB9); lo leen efecto 26 (133 bytes)
+F 0x931A 16
+D 0x939F 0x9463 efecto_939F  guion de un efecto de sonido (p14:8CB9); se solapan 2 bloques (0x939F-0x9463, 0x93CA-0x9463); lo leen efecto 27, efecto 28 (196 bytes)
+F 0x939F 16
+D 0x9463 0x9470 musica_9463  partitura de un canal de musica (p14:8AD0); lo leen p00:5224 (13 bytes)
+F 0x9463 16
+D 0x9470 0x948B efecto_9470  guion de un efecto de sonido (p14:8CB9); lo leen efecto 25 (27 bytes)
+F 0x9470 16
+D 0x948B 0x9501 musica_948B  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0x948B-0x9501, 0x949B-0x9501, 0x94A9-0x9501); lo leen musica 0, p00:52C0 (118 bytes)
+F 0x948B 16
+D 0x9501 0x9598 musica_9501  partitura de un canal de musica (p14:8AD0); se solapan 2 bloques (0x9501-0x9598, 0x9516-0x9598); lo leen musica 0 (151 bytes)
+F 0x9501 16
+D 0x9598 0x9669 musica_9598  partitura de un canal de musica (p14:8AD0); se solapan 2 bloques (0x9598-0x9669, 0x95C2-0x9669); lo leen musica 0 (209 bytes)
+F 0x9598 16
+D 0x9669 0x96C7 musica_9669  partitura de un canal de musica (p14:8AD0); se solapan 5 bloques (0x9669-0x96C7, 0x9683-0x96C7, 0x969D-0x96C7, 0x96AA-0x96C7, 0x96B8-0x96C7); lo leen musica 1 (94 bytes)
+F 0x9669 16
+D 0x96C7 0x976D musica_96C7  partitura de un canal de musica (p14:8AD0); se solapan 8 bloques (0x96C7-0x976D, 0x96E7-0x976D, 0x96F8-0x976D, 0x973B-0x976D, 0x9743-0x976D, 0x974A-0x976D); lo leen musica 1 (166 bytes)
+F 0x96C7 16
+D 0x976D 0x97DA musica_976D  partitura de un canal de musica (p14:8AD0); se solapan 5 bloques (0x976D-0x97DA, 0x977B-0x97DA, 0x9792-0x97DA, 0x97A7-0x97DA, 0x97C2-0x97DA); lo leen musica 1 (109 bytes)
+F 0x976D 16
+D 0x97DA 0x9891 musica_97DA  partitura de un canal de musica (p14:8AD0); se solapan 4 bloques (0x97DA-0x9891, 0x97EF-0x9891, 0x9808-0x9891, 0x982A-0x9891); lo leen musica 2 (183 bytes)
+F 0x97DA 16
+D 0x9891 0x993D musica_9891  partitura de un canal de musica (p14:8AD0); se solapan 5 bloques (0x9891-0x993D, 0x98B5-0x993D, 0x98D3-0x993D, 0x98E4-0x993D, 0x98F9-0x993D); lo leen musica 2 (172 bytes)
+F 0x9891 16
+D 0x993D 0x9A58 musica_993D  partitura de un canal de musica (p14:8AD0); se solapan 6 bloques (0x993D-0x9A58, 0x993F-0x9A58, 0x9948-0x9A58, 0x9952-0x9A58, 0x9991-0x9A58, 0x99C6-0x9A58); lo leen musica 2 (283 bytes)
+F 0x993D 16
+D 0x9A58 0x9AB8 musica_9A58  partitura de un canal de musica (p14:8AD0); se solapan 4 bloques (0x9A58-0x9AB8, 0x9A5D-0x9AB8, 0x9A6E-0x9AB8, 0x9A89-0x9AB8); lo leen musica 3 (96 bytes)
+F 0x9A58 16
+D 0x9AB8 0x9B6A musica_9AB8  partitura de un canal de musica (p14:8AD0); se solapan 10 bloques (0x9AB8-0x9B6A, 0x9AD4-0x9B6A, 0x9AFB-0x9B6A, 0x9B02-0x9B6A, 0x9B09-0x9B6A, 0x9B10-0x9B6A); lo leen musica 3 (178 bytes)
+F 0x9AB8 16
+D 0x9B6A 0x9C15 musica_9B6A  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0x9B6A-0x9C15, 0x9B76-0x9C15, 0x9BBF-0x9C15); lo leen musica 3 (171 bytes)
+F 0x9B6A 16
+D 0x9C15 0x9CDB musica_9C15  partitura de un canal de musica (p14:8AD0); se solapan 4 bloques (0x9C15-0x9CDB, 0x9C43-0x9CDB, 0x9C88-0x9CDB, 0x9CAA-0x9CDB); lo leen musica 4 (198 bytes)
+F 0x9C15 16
+D 0x9CDB 0x9DF8 musica_9CDB  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0x9CDB-0x9DF8, 0x9D08-0x9DF8, 0x9D46-0x9DF8); lo leen musica 4 (285 bytes)
+F 0x9CDB 16
+D 0x9DF8 0x9EC1 musica_9DF8  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0x9DF8-0x9EC1, 0x9E15-0x9EC1, 0x9E54-0x9EC1); lo leen musica 4 (201 bytes)
+F 0x9DF8 16
+D 0x9EC1 0x9F89 musica_9EC1  partitura de un canal de musica (p14:8AD0); se solapan 5 bloques (0x9EC1-0x9F89, 0x9EC8-0x9F89, 0x9ED1-0x9F89, 0x9ED9-0x9F89, 0x9EDF-0x9F89); lo leen musica 5 (200 bytes)
+F 0x9EC1 16
+D 0x9F89 0xA000 musica_9F89  partitura de un canal de musica (p14:8AD0); se solapan 7 bloques (0x9F89-0xA000, 0x9F8E-0xA000, 0x9F96-0xA000, 0x9F9C-0xA000, 0x9FAD-0xA000, 0x9FC0-0xA000); lo leen musica 5 (119 bytes)
+F 0x9F89 16
 # --- fin de los bloques de bloques.py ---

@@ -7,4 +7,6 @@ D 0xBD80 0xBF00 letras_BD80  48 caracteres de 8x8 a 1 bit (8 bytes cada uno) que
 F 0xBD80 8
 D 0xBF00 0xBF20 dibujos_BF00  1 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:53D8 (32 bytes)
 F 0xBF00 32
+D 0xBFD1 0xC000 relleno_p08  47 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (47 bytes)
+F 0xBFD1 16
 # --- fin de los bloques de bloques.py ---

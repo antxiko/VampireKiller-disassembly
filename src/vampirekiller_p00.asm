@@ -3068,10 +3068,16 @@ L_5551:
 	ret			;556d
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x556e..0x5593  (37 bytes)
+; DATOS sin identificar  0x556e..0x558e  (32 bytes)
 DATA_556E:
 	defb 000h,0e9h,000h,0e9h,000h,0e9h,000h,0e9h,000h,0e9h,000h,0e8h,020h,0e8h,040h,0e8h	; 556e  ............ .@.
 	defb 000h,0e9h,060h,0e8h,080h,0e8h,000h,0e9h,0a0h,0e8h,0c0h,0e8h,0e0h,0e8h,000h,0e9h	; 557e  ..`.............
+
+; ----------------------------------------------------------------------
+; DATOS cinco_colores: los cinco colores con los que p00:5524 pinta el dibujo
+;   de 0xBDA7; lo leen p00:54F0 (5 bytes)
+;   0x558e..0x5593  (5 bytes)
+DATA_cinco_colores:
 	defb 003h,008h,002h,00eh,00fh	; 558e
 
 ; ======================================================================

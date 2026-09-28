@@ -1,1 +1,6 @@
 # Notas del banco 01: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x623C 0x624C paleta_623C  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p01:620B (16 bytes)
+F 0x623C 3
+# --- fin de los bloques de bloques.py ---

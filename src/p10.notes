@@ -9,6 +9,10 @@ D 0xA00C 0xA013 paleta_A00C  cambios de paleta ([color][RB][G], 0xFF acaba) que 
 F 0xA00C 3
 D 0xA013 0xA01A paleta_A013  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
 F 0xA013 3
+D 0xA01A 0xA021 paleta_A01A  cambios de paleta ([color][RB][G], 0xFF acaba); p00:57D1 elige esta o la otra segun la fase sea la 3; lo leen p00:57D9 (7 bytes)
+F 0xA01A 3
+D 0xA021 0xA028 paleta_A021  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p00:57D9 (7 bytes)
+F 0xA021 3
 D 0xA028 0xA02F paleta_A028  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
 F 0xA028 3
 D 0xA02F 0xA036 paleta_A02F  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
@@ -97,4 +101,34 @@ D 0xBAB9 0xBC5A rle_BAB9  rle a la VRAM 0xFA00, mandado por el guion de 0x9D4E; 
 F 0xBAB9 16
 D 0xBC5A 0xBDA7 rle_BC5A  rle a la VRAM 0xFA00, mandado por el guion de 0x9F91; lo leen guion 0x9F91 (333 bytes)
 F 0xBC5A 16
+D 0xBDA7 0xBEA7 dibujo_de_cinco_colores  256 bytes de dibujo (32x16 puntos a 4 bits) que p00:550D copia cinco veces cambiando el color 15 por los de 0x558E; lo leen p00:5511 (256 bytes)
+F 0xBDA7 16
+D 0xBEA7 0xBECD tabla_BEA7  19 punteros a paleta que lee p00:5721; lo leen p00:5721 (38 bytes)
+F 0xBEA7 2
+D 0xBECD 0xBEE3 paleta_BECD  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (22 bytes)
+F 0xBECD 3
+D 0xBEE3 0xBEF6 paleta_BEE3  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBEE3 3
+D 0xBEF6 0xBF09 paleta_BEF6  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBEF6 3
+D 0xBF09 0xBF1C paleta_BF09  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBF09 3
+D 0xBF1C 0xBF2F paleta_BF1C  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBF1C 3
+D 0xBF2F 0xBF3C paleta_BF2F  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (13 bytes)
+F 0xBF2F 3
+D 0xBF3C 0xBF4F paleta_BF3C  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBF3C 3
+D 0xBF4F 0xBF62 paleta_BF4F  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (19 bytes)
+F 0xBF4F 3
+D 0xBF62 0xBF6F paleta_BF62  cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla de 0xBEA7; lo leen p00:5721 (13 bytes)
+F 0xBF62 3
+D 0xBF6F 0xBF88 paleta_BF6F  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p00:59F5 (25 bytes)
+F 0xBF6F 3
+D 0xBF88 0xBFA1 paleta_BF88  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p00:572D (25 bytes)
+F 0xBF88 3
+D 0xBFA1 0xBFC0 paleta_BFA1  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p00:573C (31 bytes)
+F 0xBFA1 3
+D 0xBFC0 0xC000 relleno_p10  64 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (64 bytes)
+F 0xBFC0 16
 # --- fin de los bloques de bloques.py ---

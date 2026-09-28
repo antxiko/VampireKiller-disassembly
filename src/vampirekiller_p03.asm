@@ -4036,8 +4036,10 @@ L_BFAE:
 	jp L_BEA6		;bfbd
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbfc0..0xc000  (64 bytes)
-DATA_BFC0:
+; DATOS relleno_p03: 64 bytes a 0xFF hasta el final del banco: espacio libre;
+;   lo leen nadie (64 bytes)
+;   0xbfc0..0xc000  (64 bytes)
+DATA_relleno_p03:
 	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfc0  ................
 	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd0  ................
 	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe0  ................

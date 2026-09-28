@@ -9,6 +9,8 @@ D 0x544D 0x546D hmmc_544D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 
 F 0x544D 8
 D 0x546D 0x548D hmmc_546D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A; lo leen p00:5412 (32 bytes)
 F 0x546D 8
+D 0x558E 0x5593 cinco_colores  los cinco colores con los que p00:5524 pinta el dibujo de 0xBDA7; lo leen p00:54F0 (5 bytes)
+F 0x558E 5
 D 0x55D7 0x55DD tabla_55D7  3 punteros a rle que lee p00:55AE; lo leen p00:55AE (6 bytes)
 F 0x55D7 2
 D 0x5742 0x5768 dibujos_de_cada_fase  19 punteros, uno por fase (0 el patio, 1-18): de donde salen los 191 dibujos de 8x8 de su decorado; los lee p00:565B con la fase de 0xD000; lo leen p00:565B (38 bytes)

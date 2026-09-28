@@ -1,1 +1,6 @@
 # Notas del banco 03: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xBFC0 0xC000 relleno_p03  64 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (64 bytes)
+F 0xBFC0 16
+# --- fin de los bloques de bloques.py ---

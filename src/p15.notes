@@ -1,16 +1,186 @@
 # Notas del banco 15: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
-D 0xABFB 0xACFB dibujos_ABFB  8 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:589D (256 bytes)
+D 0xA000 0xA051 musica_9F89_cola  partitura de un canal de musica (p14:8AD0) (sigue del banco anterior, 0x9F8E); se solapan 6 bloques (0xA000-0xA051, 0xA007-0xA051, 0xA010-0xA051, 0xA01E-0xA051, 0xA027-0xA051, 0xA035-0xA051); lo leen musica 5 (81 bytes)
+F 0xA000 16
+D 0xA051 0xA157 musica_A051  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0xA051-0xA157, 0xA053-0xA157, 0xA062-0xA157); lo leen musica 5 (262 bytes)
+F 0xA051 16
+D 0xA157 0xA1B9 musica_A157  partitura de un canal de musica (p14:8AD0); se solapan 4 bloques (0xA157-0xA1B9, 0xA176-0xA1B9, 0xA194-0xA1B9, 0xA1A6-0xA1B9); lo leen musica 6 (98 bytes)
+F 0xA157 16
+D 0xA1B9 0xA217 musica_A1B9  partitura de un canal de musica (p14:8AD0); se solapan 4 bloques (0xA1B9-0xA217, 0xA1CB-0xA217, 0xA1E6-0xA217, 0xA1FF-0xA217); lo leen musica 6 (94 bytes)
+F 0xA1B9 16
+D 0xA217 0xA2C5 musica_A217  partitura de un canal de musica (p14:8AD0); se solapan 6 bloques (0xA217-0xA2C5, 0xA21B-0xA2C5, 0xA226-0xA2C5, 0xA230-0xA2C5, 0xA23A-0xA2C5, 0xA28F-0xA2C5); lo leen musica 6 (174 bytes)
+F 0xA217 16
+D 0xA2C5 0xA303 musica_A2C5  partitura de un canal de musica (p14:8AD0); se solapan 8 bloques (0xA2C5-0xA303, 0xA2C8-0xA303, 0xA2D0-0xA303, 0xA2D8-0xA303, 0xA2E0-0xA303, 0xA2E8-0xA303); lo leen musica 7 (62 bytes)
+F 0xA2C5 16
+D 0xA303 0xA35B musica_A303  partitura de un canal de musica (p14:8AD0); lo leen musica 7 (88 bytes)
+F 0xA303 16
+D 0xA35B 0xA39E musica_A35B  partitura de un canal de musica (p14:8AD0); se solapan 7 bloques (0xA35B-0xA39E, 0xA362-0xA39E, 0xA36A-0xA39E, 0xA372-0xA39E, 0xA37A-0xA39E, 0xA382-0xA39E); lo leen musica 7 (67 bytes)
+F 0xA35B 16
+D 0xA39E 0xA3E4 musica_A39E  partitura de un canal de musica (p14:8AD0); se solapan 6 bloques (0xA39E-0xA3E4, 0xA3AF-0xA3E4, 0xA3B4-0xA3E4, 0xA3BA-0xA3E4, 0xA3C2-0xA3E4, 0xA3CA-0xA3E4); lo leen musica 8 (70 bytes)
+F 0xA39E 16
+D 0xA3E4 0xA43C musica_A3E4  partitura de un canal de musica (p14:8AD0); se solapan 2 bloques (0xA3E4-0xA43C, 0xA3EE-0xA43C); lo leen musica 8 (88 bytes)
+F 0xA3E4 16
+D 0xA43C 0xA49B musica_A43C  partitura de un canal de musica (p14:8AD0); se solapan 2 bloques (0xA43C-0xA49B, 0xA448-0xA49B); lo leen musica 8 (95 bytes)
+F 0xA43C 16
+D 0xA49B 0xA4B0 musica_A49B  partitura de un canal de musica (p14:8AD0); lo leen musica 9 (21 bytes)
+F 0xA49B 16
+D 0xA4B0 0xA4C4 musica_A4B0  partitura de un canal de musica (p14:8AD0); lo leen musica 9 (20 bytes)
+F 0xA4B0 16
+D 0xA4C4 0xA4D1 musica_A4C4  partitura de un canal de musica (p14:8AD0); lo leen musica 9 (13 bytes)
+F 0xA4C4 16
+D 0xA4D1 0xA506 musica_A4D1  partitura de un canal de musica (p14:8AD0); lo leen musica 10 (53 bytes)
+F 0xA4D1 16
+D 0xA506 0xA51D musica_A506  partitura de un canal de musica (p14:8AD0); lo leen musica 10 (23 bytes)
+F 0xA506 16
+D 0xA51D 0xA54D musica_A51D  partitura de un canal de musica (p14:8AD0); se solapan 2 bloques (0xA51D-0xA54D, 0xA52A-0xA54D); lo leen musica 10 (48 bytes)
+F 0xA51D 16
+D 0xA54D 0xA54E ff_de_mas  un 0xFF de mas: la musica 10 ya acabo en el de 0xA54C y la 11 empieza en 0xA54E; lo leen nadie (1 bytes)
+F 0xA54D 1
+D 0xA54E 0xA573 musica_A54E  partitura de un canal de musica (p14:8AD0); lo leen musica 11 (37 bytes)
+F 0xA54E 16
+D 0xA573 0xA5A5 musica_A573  partitura de un canal de musica (p14:8AD0); lo leen musica 11 (50 bytes)
+F 0xA573 16
+D 0xA5A5 0xA5DF musica_A5A5  partitura de un canal de musica (p14:8AD0); lo leen musica 11 (58 bytes)
+F 0xA5A5 16
+D 0xA5DF 0xA5FD musica_A5DF  partitura de un canal de musica (p14:8AD0); lo leen musica 12 (30 bytes)
+F 0xA5DF 16
+D 0xA5FD 0xA621 musica_A5FD  partitura de un canal de musica (p14:8AD0); lo leen musica 12 (36 bytes)
+F 0xA5FD 16
+D 0xA621 0xA671 musica_A621  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0xA621-0xA671, 0xA62D-0xA671, 0xA64C-0xA671); lo leen musica 12 (80 bytes)
+F 0xA621 16
+D 0xA671 0xA68F musica_A671  partitura de un canal de musica (p14:8AD0); lo leen musica 13 (30 bytes)
+F 0xA671 16
+D 0xA68F 0xA6AA musica_A68F  partitura de un canal de musica (p14:8AD0); lo leen musica 13 (27 bytes)
+F 0xA68F 16
+D 0xA6AA 0xA6C4 musica_A6AA  partitura de un canal de musica (p14:8AD0); se solapan 3 bloques (0xA6AA-0xA6C4, 0xA6AF-0xA6C4, 0xA6B7-0xA6C4); lo leen musica 13 (26 bytes)
+F 0xA6AA 16
+D 0xA6C4 0xA765 musica_A6C4  partitura de un canal de musica (p14:8AD0); lo leen musica 14 (161 bytes)
+F 0xA6C4 16
+D 0xA765 0xA800 musica_A765  partitura de un canal de musica (p14:8AD0); lo leen musica 14 (155 bytes)
+F 0xA765 16
+D 0xA800 0xA822 musica_A800  partitura de un canal de musica (p14:8AD0); lo leen musica 14 (34 bytes)
+F 0xA800 16
+D 0xA822 0xA823 musica_A822  partitura de un canal de musica (p14:8AD0); lo leen musica 15 (1 bytes)
+F 0xA822 16
+D 0xA823 0xA833 musica_A823  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (16 bytes)
+F 0xA823 16
+D 0xA833 0xA83A musica_A833  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (7 bytes)
+F 0xA833 16
+D 0xA83A 0xA84A musica_A83A  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (16 bytes)
+F 0xA83A 16
+D 0xA84A 0xA85F musica_A84A  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (21 bytes)
+F 0xA84A 16
+D 0xA85F 0xA866 musica_A85F  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (7 bytes)
+F 0xA85F 16
+D 0xA866 0xA887 musica_A866  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (33 bytes)
+F 0xA866 16
+D 0xA887 0xA8AC musica_A887  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (37 bytes)
+F 0xA887 16
+D 0xA8AC 0xA8B7 musica_A8AC  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (11 bytes)
+F 0xA8AC 16
+D 0xA8B7 0xA8C2 musica_A8B7  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (11 bytes)
+F 0xA8B7 16
+D 0xA8C2 0xA8CB musica_A8C2  partitura de un canal de musica (p14:8AD0); lo leen musica 1 (9 bytes)
+F 0xA8C2 16
+D 0xA8CB 0xA8D4 musica_A8CB  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (9 bytes)
+F 0xA8CB 16
+D 0xA8D4 0xA8DF musica_A8D4  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (11 bytes)
+F 0xA8D4 16
+D 0xA8DF 0xA8E7 musica_A8DF  partitura de un canal de musica (p14:8AD0); lo leen musica 5 (8 bytes)
+F 0xA8DF 16
+D 0xA8E7 0xA8EE musica_A8E7  partitura de un canal de musica (p14:8AD0); lo leen musica 5 (7 bytes)
+F 0xA8E7 16
+D 0xA8EE 0xA8F6 musica_A8EE  partitura de un canal de musica (p14:8AD0); lo leen musica 5 (8 bytes)
+F 0xA8EE 16
+D 0xA8F6 0xA8FD musica_A8F6  partitura de un canal de musica (p14:8AD0); lo leen musica 6 (7 bytes)
+F 0xA8F6 16
+D 0xA8FD 0xA912 musica_A8FD  partitura de un canal de musica (p14:8AD0); lo leen musica 6 (21 bytes)
+F 0xA8FD 16
+D 0xA912 0xA927 musica_A912  partitura de un canal de musica (p14:8AD0); lo leen musica 6 (21 bytes)
+F 0xA912 16
+D 0xA927 0xA92E musica_A927  partitura de un canal de musica (p14:8AD0); lo leen musica 6 (7 bytes)
+F 0xA927 16
+D 0xA92E 0xA933 musica_A92E  partitura de un canal de musica (p14:8AD0); lo leen musica 11 (5 bytes)
+F 0xA92E 16
+D 0xA933 0xA939 musica_A933  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (6 bytes)
+F 0xA933 16
+D 0xA939 0xA94D musica_A939  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (20 bytes)
+F 0xA939 16
+D 0xA94D 0xA953 musica_A94D  partitura de un canal de musica (p14:8AD0); lo leen musica 0 (6 bytes)
+F 0xA94D 16
+D 0xA953 0xA961 musica_A953  partitura de un canal de musica (p14:8AD0); lo leen musica 1 (14 bytes)
+F 0xA953 16
+D 0xA961 0xA96B musica_A961  partitura de un canal de musica (p14:8AD0); lo leen musica 1 (10 bytes)
+F 0xA961 16
+D 0xA96B 0xA978 musica_A96B  partitura de un canal de musica (p14:8AD0); lo leen musica 1 (13 bytes)
+F 0xA96B 16
+D 0xA978 0xA97D musica_A978  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (5 bytes)
+F 0xA978 16
+D 0xA97D 0xA985 musica_A97D  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (8 bytes)
+F 0xA97D 16
+D 0xA985 0xA98D musica_A985  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (8 bytes)
+F 0xA985 16
+D 0xA98D 0xA996 musica_A98D  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (9 bytes)
+F 0xA98D 16
+D 0xA996 0xA99C musica_A996  partitura de un canal de musica (p14:8AD0); lo leen musica 2 (6 bytes)
+F 0xA996 16
+D 0xA99C 0xA9AB musica_A99C  partitura de un canal de musica (p14:8AD0); lo leen musica 3 (15 bytes)
+F 0xA99C 16
+D 0xA9AB 0xA9B4 musica_A9AB  partitura de un canal de musica (p14:8AD0); lo leen musica 3 (9 bytes)
+F 0xA9AB 16
+D 0xA9B4 0xA9BB musica_A9B4  partitura de un canal de musica (p14:8AD0); lo leen musica 5 (7 bytes)
+F 0xA9B4 16
+D 0xA9BB 0xA9CF musica_A9BB  partitura de un canal de musica (p14:8AD0); lo leen musica 6 (20 bytes)
+F 0xA9BB 16
+D 0xA9CF 0xA9D8 musica_A9CF  partitura de un canal de musica (p14:8AD0); lo leen musica 10 (9 bytes)
+F 0xA9CF 16
+D 0xA9D8 0xAA0D musica_A9D8  partitura de un canal de musica (p14:8AD0); lo leen musica 4 (53 bytes)
+F 0xA9D8 16
+D 0xAA0D 0xAA21 musica_AA0D  partitura de un canal de musica (p14:8AD0); lo leen musica 4 (20 bytes)
+F 0xAA0D 16
+D 0xAA21 0xAA59 musica_AA21  partitura de un canal de musica (p14:8AD0); lo leen musica 4 (56 bytes)
+F 0xAA21 16
+D 0xAA59 0xAA93 musica_AA59  partitura de un canal de musica (p14:8AD0); lo leen musica 4 (58 bytes)
+F 0xAA59 16
+D 0xAA93 0xAAA7 musica_AA93  partitura de un canal de musica (p14:8AD0); lo leen musica 4 (20 bytes)
+F 0xAA93 16
+D 0xAAA7 0xAAC0 musica_AAA7  partitura de un canal de musica (p14:8AD0); lo leen musica 7 (25 bytes)
+F 0xAAA7 16
+D 0xAAC0 0xAAD9 musica_AAC0  partitura de un canal de musica (p14:8AD0); lo leen musica 7 (25 bytes)
+F 0xAAC0 16
+D 0xAAD9 0xAAF1 percusion_AAD9  12 punteros, uno por nota, al guion del golpe de percusion que suena en su lugar; lo leen p14:8B5A (24 bytes)
+F 0xAAD9 2
+D 0xAAF1 0xAB09 percusion_AAF1  12 punteros, uno por nota, al guion del golpe de percusion que suena en su lugar (canales con el bit 2); lo leen p14:8B7B (24 bytes)
+F 0xAAF1 2
+D 0xAB09 0xAB0F golpe_AB09  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (6 bytes)
+F 0xAB09 16
+D 0xAB0F 0xAB1F golpe_AB0F  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (16 bytes)
+F 0xAB0F 16
+D 0xAB1F 0xAB32 golpe_AB1F  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xAB1F 16
+D 0xAB32 0xAB48 golpe_AB32  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (22 bytes)
+F 0xAB32 16
+D 0xAB48 0xAB63 golpe_AB48  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (27 bytes)
+F 0xAB48 16
+D 0xAB63 0xAB76 golpe_AB63  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xAB63 16
+D 0xAB76 0xAB89 golpe_AB76  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xAB76 16
+D 0xAB89 0xAB9C golpe_AB89  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xAB89 16
+D 0xAB9C 0xABAF golpe_AB9C  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xAB9C 16
+D 0xABAF 0xABC2 golpe_ABAF  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xABAF 16
+D 0xABC2 0xABD5 golpe_ABC2  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xABC2 16
+D 0xABD5 0xABE8 golpe_ABD5  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xABD5 16
+D 0xABE8 0xABFB golpe_ABE8  guion de un golpe de percusion (p14:8CA7); lo leen p14:8B68 (19 bytes)
+F 0xABE8 16
+D 0xABFB 0xBFDC dibujos_ABFB  8 dibujos de 8x8 a 4 bits (32 bytes cada uno); se solapan 8 bloques (0xABFB-0xACFB, 0xABFB-0xBFDC, 0xACFB-0xAD3B, 0xAD3B-0xAD7B, 0xAD7B-0xAD9B, 0xAD9B-0xBB1B); lo leen nadie, p00:589D, p00:58A8, p00:58B3, p00:58BE, p00:58C9, p00:5993, p14:8B68 (5089 bytes)
 F 0xABFB 32
-D 0xACFB 0xAD3B dibujos_ACFB  2 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58A8 (64 bytes)
-F 0xACFB 32
-D 0xAD3B 0xAD7B dibujos_AD3B  2 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58B3 (64 bytes)
-F 0xAD3B 32
-D 0xAD7B 0xAD9B dibujos_AD7B  1 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58BE (32 bytes)
-F 0xAD7B 32
-D 0xAD9B 0xBB1B dibujos_AD9B  108 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58C9 (3456 bytes)
-F 0xAD9B 32
-D 0xBBDB 0xBFDB dibujos16_BBDB  8 dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube en dieciseis filas de 8); lo leen p00:5993 (1024 bytes)
-F 0xBBDB 8
+D 0xBFDC 0xC000 relleno_p15  36 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (36 bytes)
+F 0xBFDC 16
 # --- fin de los bloques de bloques.py ---

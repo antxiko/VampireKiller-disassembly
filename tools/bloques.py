@@ -173,10 +173,19 @@ def tabla_antes(p, pc):
     if idx is None:
         return None
     txt = [t for _, t in filas[max(0, idx - 8):idx]]
-    for k in range(len(txt) - 4):
+    for k in range(len(txt)):
         m = re.match(r"ld hl,([0-9a-f]+h)$", txt[k])
-        if m and txt[k + 1] in ("call L_4061", "call 04061h") and txt[k + 2] == "ld e,(hl)"                 and txt[k + 3] == "inc hl" and txt[k + 4] == "ld d,(hl)":
-            return num(m.group(1))
+        if not m:
+            continue
+        # entre el `ld hl` y el `call 0x4061` puede ir el calculo del indice
+        # (`ld a,(0xD000) / add a,a`), que no toca HL
+        for j in range(k + 1, min(k + 4, len(txt) - 3)):
+            if txt[j] in ("call L_4061", "call 04061h"):
+                if txt[j + 1] == "ld e,(hl)" and txt[j + 2] == "inc hl" and txt[j + 3] == "ld d,(hl)":
+                    return num(m.group(1))
+                break
+            if "hl" in txt[j] or txt[j].startswith(("call", "jp", "jr")):
+                break
     return None
 
 
@@ -213,6 +222,17 @@ def fin_rle(rom, s, a, con_destino):
         else:
             a += 1
     raise FueraDelBanco("rle sin fin desde 0x%04X" % a)
+
+
+def fin_filas(rom, s, a):
+    """0x582D: 32 filas; cada una un byte n (ceros por la izquierda) y 12 - n
+    bytes de dibujo. Rellena con ceros hasta 16 por fila en 0xE800."""
+    for _ in range(32):
+        n = byte(rom, s, a)
+        if n > 12:
+            raise FueraDelBanco("fila con %d ceros en 0x%04X" % (n, a))
+        a += 1 + 12 - n
+    return a
 
 
 def recorre_guion(rom, s, a, bl, quien, nom):
@@ -276,9 +296,11 @@ LECTORES = {
     0x4675: ("crudo", "hl"),
     0x4A90: ("dibujos16", "hl"),
     0x498A: ("hmmc", "hl"),
+    0x582D: ("filas", "hl"),
+    0x483E: ("paleta", "hl"),
 }
 # Los lectores se llaman entre ellos: esas llamadas no traen un puntero nuevo.
-DENTRO_DE_LOS_LECTORES = (0x4600, 0x4800)
+DENTRO_DE_LOS_LECTORES = (0x4600, 0x4900)
 DENTRO_2 = (0x4A00, 0x4AD0)
 
 
@@ -300,7 +322,7 @@ def llamadas_a_lectores(rom, t, bl):
             continue                # la fuente esta en RAM: no es del cartucho
         if ptr is None:
             base = tabla_antes(b, pc)
-            if base is None or fmt not in ("rle", "rle_dest", "guion"):
+            if base is None or fmt not in ("rle", "rle_dest", "guion", "paleta"):
                 if (b, pc) not in DE_LOS_RECORRIDOS:
                     bl.avisos.append("%s -> %s: puntero sin saber" % (quien, fmt))
                 continue
@@ -312,6 +334,10 @@ def llamadas_a_lectores(rom, t, bl):
                 for w in sorted(set(ptrs)):
                     if fmt == "guion":
                         recorre_guion(rom, s, w, bl, quien, "guion_%04X" % w)
+                    elif fmt == "paleta":
+                        bl.anota(s, w, fin_paleta(rom, s, w), "paleta_%04X" % w,
+                                 "cambios de paleta ([color][RB][G], 0xFF acaba), de la tabla "
+                                 "de 0x%04X" % base, quien, ancho=3)
                     else:
                         bl.anota(s, w, fin_rle(rom, s, w, fmt == "rle_dest"), "rle_%04X" % w,
                                  "rle a la VRAM, de la tabla de 0x%04X" % base, quien)
@@ -343,6 +369,15 @@ def llamadas_a_lectores(rom, t, bl):
                 bl.anota(s, ptr, ptr + n, "hmmc_%04X" % ptr,
                          "%dx%d puntos a 4 bits (%d bytes) que 0x498A manda al V9938 con una "
                          "orden HMMC" % (bc >> 8, bc & 0xFF, n), quien, ancho=8)
+            elif fmt == "filas":
+                bl.anota(s, ptr, fin_filas(rom, s, ptr), "filas_%04X" % ptr,
+                         "dibujo de 32 filas para 0x582D: por fila, cuantos ceros van a la "
+                         "izquierda y los 12 - n bytes de dibujo (se completa a 16 en 0xE800)",
+                         quien)
+            elif fmt == "paleta":
+                bl.anota(s, ptr, fin_paleta(rom, s, ptr), "paleta_%04X" % ptr,
+                         "cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en "
+                         "el registro 16 del V9938 y en la copia de 0xF680", quien, ancho=3)
             elif fmt == "letras":
                 n = registro_antes(b, pc, "b")
                 if n is None:
@@ -435,10 +470,404 @@ def tabla_5421(rom, t, bl):
                  "8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A", "p00:5412", ancho=8)
 
 
-# Llamadas cuyo puntero ya lo pone un recorrido de arriba.
-DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5), (0, 0x5412)}
+def mapas(rom, t, bl):
+    """p00:4FB6: el decorado de cada habitacion, con los bancos 11-12-13.
 
-RECORRIDOS = [dibujos_de_cada_fase, llamadas_a_lectores, habitaciones, tabla_5421]
+    - 0x6000: 19 bytes, uno por fase, con el numero de su primera habitacion.
+    - 0x6013: un puntero por habitacion; se entra con (0x6000 + fase) + la
+      habitacion de 0xC5D7, por dos.
+    - cada habitacion: 8 x 6 bytes (48), uno por bloque de 32x32 puntos.
+    - 0x7EBB: por fase, el juego de bloques; cada bloque son 16 bytes, 4 x 4
+      dibujos de 8x8, que 0x5020 copia de cuatro en cuatro (`ldi` x4) a filas
+      de 32.
+    - Con 0xC41A distinto de cero no hay tabla: la habitacion es la de 0x614B
+      y los bloques salen de 0xA041 (p00:4FD0 y p00:5001).
+    """
+    s = (11, 12, 13)
+    prim = [byte(rom, s, 0x6000 + i) for i in range(19)]
+    npt = (0x614B - 0x6013) // 2
+    ptrs = [palabra(rom, s, 0x6013 + 2 * i) for i in range(npt)]
+    bl.anota(s, 0x6000, 0x6013, "primera_habitacion_de_cada_fase",
+             "19 bytes: el numero de la primera habitacion de cada fase en la tabla de 0x6013",
+             "p00:4FDC", ancho=19)
+    bl.anota(s, 0x6013, 0x614B, "habitaciones",
+             "%d punteros, uno por habitacion de todo el castillo, a sus 8x6 bloques" % npt,
+             "p00:4FEC", ancho=2)
+    juegos = [palabra(rom, s, 0x7EBB + 2 * i) for i in range(19)]
+    bl.anota(s, 0x7EBB, 0x7EE1, "bloques_de_cada_fase",
+             "19 punteros, uno por fase, al juego de bloques de 32x32 de su decorado",
+             "p00:500D", ancho=2)
+    usados = defaultdict(int)
+    for f in range(19):
+        fin = prim[f + 1] if f + 1 < 19 else npt
+        for h in range(prim[f], fin):
+            w = ptrs[h]
+            celdas = [byte(rom, s, w + i) for i in range(48)]
+            bl.anota(s, w, w + 48, "habitacion_%d" % h,
+                     "fase %d, habitacion %d: 8 x 6 bloques de 32x32 del juego de 0x%04X"
+                     % (f, h - prim[f], juegos[f]), "p00:4FF9", ancho=8)
+            usados[juegos[f]] = max(usados[juegos[f]], max(celdas) + 1)
+    especial = [byte(rom, s, 0x614B + i) for i in range(48)]
+    bl.anota(s, 0x614B, 0x617B, "habitacion_especial",
+             "la habitacion que se monta con 0xC41A puesto (p00:4FD0): 8 x 6 bloques del "
+             "juego de 0xA041", "p00:4FD0", ancho=8)
+    usados[0xA041] = max(usados[0xA041], max(especial) + 1)
+    for j, n in sorted(usados.items()):
+        bl.anota(s, j, j + 16 * n, "bloques_%04X" % j,
+                 "%d bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como "
+                 "el indice mas alto que usan sus habitaciones" % n, "p00:5010", ancho=16)
+
+
+def salidas_y_puertas(rom, t, bl):
+    """Las tres tablas que lee el codigo del banco 13 (se llama con 11-12-13).
+
+    - 0xB9D3 (p13:B9BD): un puntero por fase a sus habitaciones, dos bytes
+      por habitacion (0xD001): cuatro nibbles, la habitacion a la que se sale
+      por cada lado; 0xF es que por ahi no hay salida (p13:B984 y p13:B9AD).
+      Cuantas habitaciones tiene cada fase lo dice la tabla de 0x6000.
+    - 0xBB61 (p13:BB37): tres bytes por fase: [habitacion en el nibble bajo,
+      bit 7 una bandera][puntero que va a 0xC5AD].
+    - 0xBBCD (p13:BB9A): registros de cuatro bytes [fase + 1][habitacion
+      nueva << 4 | habitacion][puntero que va a 0xC5B2], hasta un 0xFF.
+    """
+    s = (11, 12, 13)
+    prim = [byte(rom, s, 0x6000 + i) for i in range(19)] + [(0x614B - 0x6013) // 2]
+    ptrs = [palabra(rom, s, 0xB9D3 + 2 * i) for i in range(19)]
+    bl.anota(s, 0xB9D3, 0xB9F9, "salidas_de_cada_fase",
+             "19 punteros, uno por fase, a las salidas de sus habitaciones", "p13:B9C0", ancho=2)
+    for f, w in enumerate(ptrs):
+        n = prim[f + 1] - prim[f]
+        bl.anota(s, w, w + 2 * n, "salidas_fase_%d" % f,
+                 "las salidas de las %d habitaciones de la fase %d: dos bytes por habitacion, "
+                 "cuatro nibbles con la habitacion vecina por cada lado (0xF, no hay)" % (n, f),
+                 "p13:B9A2", ancho=2)
+    bl.anota(s, 0xBB61, 0xBB61 + 3 * 19, "puerta_de_cada_fase",
+             "tres bytes por fase: [habitacion (nibble bajo) y bandera (bit 7)][puntero que "
+             "p13:BB52 deja en 0xC5AD]", "p13:BB3A", ancho=3)
+    a = 0xBBCD
+    while byte(rom, s, a) != 0xFF:
+        a += 4
+    bl.anota(s, 0xBBCD, a + 1, "pasos_entre_habitaciones",
+             "%d registros de cuatro bytes [fase + 1][habitacion nueva << 4 | habitacion]"
+             "[puntero que p13:BBBA deja en 0xC5B2], y 0xFF" % ((a - 0xBBCD) // 4),
+             "p13:BB9E", ancho=4)
+
+
+def huecos_que_cierran(rom, t, bl):
+    """Rle a los que no apunta nadie, pero que cierran CLAVADOS en su hueco.
+
+    Entre los rle que si se leen quedan tramos de 60 bytes (banco 13) que
+    ninguna tabla nombra: buscada su direccion como palabra en los 128 KB, no
+    aparece. Recorridos con el lenguaje del rle acaban justo donde empieza el
+    bloque siguiente, sin un byte de mas ni de menos: son rle que el juego no
+    usa. Solo se declara lo que cierra exacto.
+    """
+    for b, s in ((13, (11, 12, 13)), (10, (1, 9, 10))):
+        ocup = ocupado(b)
+        for (i, f) in list(bl.d.get(b, {})):
+            for x in range(i - ORG[b], f - ORG[b]):
+                ocup[x] = 1
+        x = 0
+        while x < TAM_PAGINA:
+            if ocup[x]:
+                x += 1
+                continue
+            y = x
+            while y < TAM_PAGINA and not ocup[y]:
+                y += 1
+            a, f = ORG[b] + x, ORG[b] + y
+            try:
+                pos = a
+                while pos < f:
+                    pos = fin_rle(rom, s, pos, False)
+                if pos == f:
+                    bl.anota(s, a, f, "rle_sin_usar_%04X" % a,
+                             "rle que no lee nadie (su direccion no aparece como palabra en el "
+                             "cartucho) y que cierra clavado en el hueco", "nadie")
+            except FueraDelBanco:
+                pass
+            x = y
+
+
+def rellenos(rom, t, bl):
+    """Los 0xFF seguidos del final de cada banco: espacio que sobro.
+
+    Solo se declara la cola de 0xFF que llega hasta el ultimo byte del banco
+    y que no pisa nada ya explicado.
+    """
+    for b in range(N_PAGINAS):
+        blq = rom[b * TAM_PAGINA:(b + 1) * TAM_PAGINA]
+        n = len(blq) - len(blq.rstrip(bytes([0xFF])))
+        if n >= 4:
+            a = ORG[b] + TAM_PAGINA - n
+            ocup = ocupado(b)
+            for (i, f) in bl.d.get(b, {}):
+                for x in range(max(i, a) - ORG[b], f - ORG[b]):
+                    ocup[x] = 1
+            while a < ORG[b] + TAM_PAGINA and ocup[a - ORG[b]]:
+                a += 1
+            if ORG[b] + TAM_PAGINA - a >= 4:
+                s = tuple(b if ORG[b] == r else 0 for r in (0x6000, 0x8000, 0xA000))
+                bl.d[b].setdefault((a, ORG[b] + TAM_PAGINA), {
+                    "nom": "relleno_%s" % nombre(b),
+                    "que": "%d bytes a 0xFF hasta el final del banco: espacio libre"
+                           % (ORG[b] + TAM_PAGINA - a),
+                    "desde": {"nadie"}, "ancho": 16})
+
+
+def sueltos_de_p00(rom, t, bl):
+    """Punteros fijos que el trazador no puede dar por un camino que se junta.
+
+    - p00:57D1: `ld hl,0xA01A / jr z / ld hl,0xA021 / call 0x483E`: dos
+      paletas segun sea la fase 3 o no.
+    - p00:550D: 256 bytes de dibujo (32x16 a 4 bits) que se copian a 0xE800
+      cambiando el color 15 por el de la tabla de 0x558E, una vez por cada uno
+      de sus cinco colores (p00:54F0, `ld b,5`).
+    """
+    s = (1, 9, 10)
+    for w in (0xA01A, 0xA021):
+        bl.anota(s, w, fin_paleta(rom, s, w), "paleta_%04X" % w,
+                 "cambios de paleta ([color][RB][G], 0xFF acaba); p00:57D1 elige esta o la "
+                 "otra segun la fase sea la 3", "p00:57D9", ancho=3)
+    bl.anota(s, 0xBDA7, 0xBEA7, "dibujo_de_cinco_colores",
+             "256 bytes de dibujo (32x16 puntos a 4 bits) que p00:550D copia cinco veces "
+             "cambiando el color 15 por los de 0x558E", "p00:5511", ancho=16)
+    bl.anota((1, 2, 3), 0x558E, 0x5593, "cinco_colores",
+             "los cinco colores con los que p00:5524 pinta el dibujo de 0xBDA7", "p00:54F0",
+             ancho=5)
+
+
+def listas_del_banco_14(rom, t, bl):
+    """Las dos tablas por bloque de tres fases que hay al principio del banco 14.
+
+    - p00:5A98: con la fase 0 (el patio) la lista esta en 0x800C; si no, la da
+      la tabla de 0x8000 con el bloque de 0xD002. p00:5A67 la copia a 0xE000:
+      0x00 acaba, 0xFF baja 0x180 bytes (otra fila), 0xFE avanza 0x18, y si no
+      van dos bytes tal cual, y un tercero si el segundo es 0x7F.
+    - p01:619E: la tabla de 0x8668, tambien por bloque, apunta a TRES listas
+      seguidas que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00: 0xFF acaba cada
+      una, 0x00 salta 16 bytes en el destino, y si no, dos bytes.
+    """
+    s = (1, 14, 15)
+
+    def fin_5a67(a):
+        while True:
+            x = byte(rom, s, a)
+            if x == 0:
+                return a + 1
+            if x in (0xFF, 0xFE):
+                a += 1
+                continue
+            a += 3 if byte(rom, s, a + 1) == 0x7F else 2
+
+    def fin_6181(a):
+        for _ in range(3):
+            while True:
+                x = byte(rom, s, a)
+                a += 1
+                if x == 0xFF:
+                    break
+                if x:
+                    a += 1
+        return a
+
+    ptrs = [palabra(rom, s, 0x8000 + 2 * i) for i in range(6)]
+    bl.anota(s, 0x8000, 0x800C, "listas_de_cada_bloque",
+             "6 punteros, uno por bloque de tres fases (0xD002), a la lista que p00:5A67 "
+             "copia a 0xE000", "p00:5AA3", ancho=2)
+    for w in [0x800C] + ptrs:
+        bl.anota(s, w, fin_5a67(w), "lista_%04X" % w,
+                 "lista que p00:5A67 copia a 0xE000 (0x00 acaba, 0xFF otra fila, 0xFE otro "
+                 "grupo, pares de bytes y un tercero si el segundo es 0x7F)%s"
+                 % ("; es la del patio, la fase 0" if w == 0x800C else ""), "p00:5A67")
+    ptrs = [palabra(rom, s, 0x8668 + 2 * i) for i in range(6)]
+    bl.anota(s, 0x8668, 0x8674, "tres_listas_de_cada_bloque",
+             "6 punteros, uno por bloque de tres fases, a las tres listas que p01:6181 copia "
+             "a 0xDB00, 0xDC00 y 0xDD00", "p01:61A1", ancho=2)
+    for w in ptrs:
+        bl.anota(s, w, fin_6181(w), "tres_listas_%04X" % w,
+                 "tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el "
+                 "destino, y si no, pares de bytes)", "p01:6185")
+
+
+def por_habitacion_y_sonido(rom, t, bl):
+    """Tres tablas pequenas del banco 14.
+
+    - 0x85A6 (p00:5EDB, `ld de,0x85A6 / call 0x6542` con la fase): 19
+      punteros, uno por fase, a un byte por habitacion (0xD001). p00:5EE8 lo
+      va soltando bit a bit (`rra`) y cada bit puesto llama a una rutina
+      (0x9CE6, 0x9D4B, 0x9D52, 0x9D97, 0x9DC3, 0x9DD5, 0x9DE7).
+    - 0x8A45 (p14:8A14..8A29): cuatro tablas de seis bytes, [AND][OR] por
+      canal, con las que el reproductor abre y cierra tono y ruido en el
+      registro 7 del PSG.
+    - 0x8B81 (p14:8B1F): doce palabras, el periodo de tono de cada nota de
+      la octava mas grave; las demas salen desplazando.
+    """
+    s = (1, 14, 15)
+    prim = [byte(rom, (11, 12, 13), 0x6000 + i) for i in range(19)] + [(0x614B - 0x6013) // 2]
+    ptrs = [palabra(rom, s, 0x85A6 + 2 * i) for i in range(19)]
+    bl.anota(s, 0x85A6, 0x85CC, "cosas_de_cada_habitacion",
+             "19 punteros, uno por fase, a un byte por habitacion", "p00:5EDB", ancho=2)
+    for f, w in enumerate(ptrs):
+        n = prim[f + 1] - prim[f]
+        bl.anota(s, w, w + n, "cosas_fase_%d" % f,
+                 "un byte por cada una de las %d habitaciones de la fase %d: cada bit puesto "
+                 "llama a una de las siete rutinas de p00:5EF6-p00:5F19" % (n, f),
+                 "p00:5EE7", ancho=n)
+    bl.anota(s, 0x8A45, 0x8A5D, "mascaras_del_mezclador",
+             "cuatro tablas de 6 bytes, [AND][OR] por canal, para abrir o cerrar tono y ruido "
+             "en el registro 7 del PSG (p14:8A2C)", "p14:8A14", ancho=6)
+    bl.anota(s, 0x8B81, 0x8B99, "periodos_de_las_notas",
+             "doce palabras: el periodo de tono del PSG de cada nota (do a si) de la octava "
+             "mas grave; las otras octavas se sacan dividiendo", "p14:8B1F", ancho=2)
+
+
+def _tramos_de_musica(rom, s, a, vistos):
+    """Recorre un canal de musica como p14:8AD0. Devuelve [(ini, fin)] de los
+    tramos lineales y sigue saltos, llamadas y bucles."""
+    fuera, pend = [], [a]
+    while pend:
+        a = pend.pop()
+        if a in vistos:
+            continue
+        vistos.add(a)
+        ini = a
+        while True:
+            c = byte(rom, s, a)
+            a += 1
+            if c < 0xE0 or c == 0xFF and False:
+                continue                     # nota, silencio o tempo: un byte
+            if c == 0xFF:
+                break                        # el canal acaba
+            if c >= 0xF0:
+                if c == 0xFE:                # bucle: [n][direccion]
+                    pend.append(palabra(rom, s, a + 1))
+                    a += 3
+                else:
+                    a += 1                   # envolvente: un byte mas
+                continue
+            k = c & 0x0F                     # 0xE0..0xEF
+            if k == 0x0A:                    # salto
+                pend.append(palabra(rom, s, a))
+                a += 2
+                break
+            if k == 0x0D:                    # llamada
+                pend.append(palabra(rom, s, a))
+                a += 2
+                continue
+            if k == 0x0E:                    # vuelta
+                break
+        fuera.append((ini, a))
+    return fuera
+
+
+def _tramos_de_efecto(rom, s, a, vistos):
+    """Recorre un efecto como p14:8CB9."""
+    fuera, pend = [], [a]
+    while pend:
+        a = pend.pop()
+        if a in vistos:
+            continue
+        vistos.add(a)
+        ini = a
+        while True:
+            c = byte(rom, s, a)
+            a += 1
+            if c == 0xFF:
+                break
+            if c == 0xFE:
+                pend.append(palabra(rom, s, a + 1))
+                a += 3
+                continue
+            h = c & 0xF0
+            if h == 0x20:
+                a += 1 + (2 if c >= 0x28 else 0)
+            elif h == 0x10:
+                a += 2
+            else:
+                a += 1
+        fuera.append((ini, a))
+    return fuera
+
+
+def sonido(rom, t, bl):
+    """La musica y los efectos, con los bancos 14 y 15 puestos.
+
+    p00:509F recibe el numero de sonido en A. Con el bit 7 puesto es una
+    musica: 0x8DC9 + (A AND 0x7F) * 6 da tres punteros, uno por canal del PSG
+    (p00:50E7). Si no, es un efecto: 0x8D8D + A * 2 (p00:518C). Aparte, la
+    musica de la pausa (0x9463, p00:5224) y la de 0x948B (p00:52C0).
+    """
+    s = (1, 14, 15)
+    # Los efectos van del 1 al 29: la entrada 0 caeria en 0x8D8D, que son los
+    # dos ultimos bytes del reproductor (`scf / ret`, 0x37 0xC9).
+    n_ef = (0x8DC9 - 0x8D8F) // 2
+    efectos = [palabra(rom, s, 0x8D8F + 2 * i) for i in range(n_ef)]
+    bl.anota(s, 0x8D8F, 0x8DC9, "efectos_de_sonido",
+             "%d punteros, los de los efectos 1 a %d (0x8D8D + 2 * A; la entrada 0 serian los "
+             "`scf / ret` de 0x8D8D)" % (n_ef, n_ef), "p00:518C", ancho=2)
+    canciones = []
+    a = 0x8DC9
+    while a < min([0xC000] + [x for tri in canciones for x in tri]):
+        tri = [palabra(rom, s, a + 2 * k) for k in range(3)]
+        if not all(0x8000 <= x < 0xC000 for x in tri):
+            break
+        canciones.append(tri)
+        a += 6
+    # Detras de la ultima musica queda una palabra suelta, 0xA822 -la direccion
+    # del silencio que usan los tres canales de la musica 15-, que no lee nadie:
+    # el efecto 1 empieza en 0x8E2B.
+    bl.anota(s, a, a + 2, "palabra_suelta",
+             "0xA822 otra vez, detras de la tabla de musicas: el canal de una musica 16 que "
+             "no existe (la tabla acaba en la 15 y el efecto 1 empieza aqui al lado)", "nadie",
+             ancho=2)
+    bl.anota(s, 0xA54D, 0xA54E, "ff_de_mas",
+             "un 0xFF de mas: la musica 10 ya acabo en el de 0xA54C y la 11 empieza en 0xA54E",
+             "nadie", ancho=1)
+    bl.anota(s, 0xBB1B, 0xBBDB, "ceros_sin_usar",
+             "192 ceros entre las partituras: no los lee nada", "nadie")
+    bl.anota(s, 0x8DC9, a, "musicas",
+             "%d musicas, seis bytes cada una: los tres canales del PSG (el numero de p00:509F "
+             "con el bit 7)" % len(canciones), "p00:50E7", ancho=6)
+    vistos = set()
+    for i, tri in enumerate(canciones):
+        for k, w in enumerate(tri):
+            for x, y in _tramos_de_musica(rom, s, w, vistos):
+                bl.anota(s, x, y, "musica_%04X" % x,
+                         "partitura de un canal de musica (p14:8AD0)", "musica %d" % i)
+    for w, quien in ((0x9463, "p00:5224"), (0x948B, "p00:52C0")):
+        for x, y in _tramos_de_musica(rom, s, w, vistos):
+            bl.anota(s, x, y, "musica_%04X" % x, "partitura de un canal de musica (p14:8AD0)", quien)
+    # La percusion: en un canal sin tono (bit 0 de (ix+2) a cero) el nibble
+    # alto de la nota elige en 0xAAD9 -o en 0xAAF1 si lleva el bit 2- un guion
+    # en el lenguaje de los efectos (p14:8B53-p14:8B7E).
+    golpes = []
+    for base, quien in ((0xAAD9, "p14:8B5A"), (0xAAF1, "p14:8B7B")):
+        ws = [palabra(rom, s, base + 2 * i) for i in range(12)]
+        golpes += ws
+        bl.anota(s, base, base + 24, "percusion_%04X" % base,
+                 "12 punteros, uno por nota, al guion del golpe de percusion que suena en su "
+                 "lugar%s" % (" (canales con el bit 2)" if base == 0xAAF1 else ""), quien, ancho=2)
+    vistos = set()
+    for w in sorted(set(golpes)):
+        for x, y in _tramos_de_efecto(rom, s, w, vistos):
+            bl.anota(s, x, y, "golpe_%04X" % x, "guion de un golpe de percusion (p14:8CA7)",
+                     "p14:8B68")
+    for i, w in enumerate(efectos, 1):
+        if w == 0:
+            continue
+        for x, y in _tramos_de_efecto(rom, s, w, vistos):
+            bl.anota(s, x, y, "efecto_%04X" % x, "guion de un efecto de sonido (p14:8CB9)",
+                     "efecto %d" % i)
+
+
+# Llamadas cuyo puntero ya lo pone un recorrido de arriba.
+DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5), (0, 0x5412), (0, 0x57AE)}
+
+RECORRIDOS = [dibujos_de_cada_fase, llamadas_a_lectores, habitaciones, tabla_5421, mapas,
+              salidas_y_puertas, sueltos_de_p00, listas_del_banco_14,
+              por_habitacion_y_sonido, sonido, huecos_que_cierran,
+              rellenos]
 
 
 # ------------------------------------------------------------------ escritura

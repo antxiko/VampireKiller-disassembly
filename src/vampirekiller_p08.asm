@@ -317,7 +317,7 @@ DATA_dibujos_BF00:
 	defb 008h,080h,008h,080h,088h,0e8h,088h,088h,08eh,088h,088h,088h,08eh,088h,088h,088h,088h,088h,088h,088h,008h,088h,088h,080h,000h,088h,088h,000h,000h,008h,080h,000h	; bf00  ................................
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbf20..0xc000  (224 bytes)
+; DATOS sin identificar  0xbf20..0xbfd1  (177 bytes)
 DATA_BF20:
 	defb 008h,020h,053h,04fh,000h,054h,048h,045h,000h,042h,052h,041h,056h,045h,000h,059h	; bf20  . SO.THE.BRAVE.Y
 	defb 04fh,055h,04eh,047h,000h,04dh,041h,04eh,0ffh,018h,020h,050h,055h,054h,000h,044h	; bf30  OUNG.MAN.. PUT.D
@@ -330,6 +330,13 @@ DATA_BF20:
 	defb 049h,04eh,044h,000h,04fh,046h,000h,048h,055h,04dh,041h,04eh,042h,045h,049h,04eh	; bfa0  IND.OF.HUMANBEIN
 	defb 047h,053h,000h,057h,049h,04ch,04ch,0ffh,078h,020h,04eh,04fh,054h,000h,04ch,045h	; bfb0  GS.WILL.x NOT.LE
 	defb 054h,000h,044h,052h,041h,043h,055h,04ch,041h,000h,043h,04fh,04dh,045h,000h,054h	; bfc0  T.DRACULA.COME.T
-	defb 04fh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd0  O...............
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe0  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff0  ................
+	defb 04fh	; bfd0
+
+; ----------------------------------------------------------------------
+; DATOS relleno_p08: 47 bytes a 0xFF hasta el final del banco: espacio libre;
+;   lo leen nadie (47 bytes)
+;   0xbfd1..0xc000  (47 bytes)
+DATA_relleno_p08:
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd1  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe1  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff1  ...............
