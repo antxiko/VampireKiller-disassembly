@@ -1406,7 +1406,7 @@ L_8831:
 	ld a,c			;8837
 	and 003h		;8838   ; los dos de abajo
 	ld c,a			;883a   ; C
-	jp L_9179		;883b   ; sale lo otro
+	jp sale_un_vendedor		;883b   ; sale lo otro
 L_883E:
 	ld b,a			;883e
 	pop de			;883f
@@ -2212,7 +2212,7 @@ L_8D12:
 	pop bc			;8d17
 	pop de			;8d18
 	call L_884D		;8d19   ; al mapa
-	call L_926C		;8d1c   ; repinta
+	call repinta_los_vendedores		;8d1c   ; repinta
 	call puerta_de_la_fase_a_0xff		;8d1f
 	call L_8707		;8d22   ; y los marcos
 	pop de			;8d25
@@ -2319,7 +2319,7 @@ L_8DBB:
 	push ix		;8dbb   ; se borran todas las cosas de la habitacion
 	call 07806h		;8dbd
 	pop ix		;8dc0
-	call L_928D		;8dc2   ; y repinta
+	call la_cruz_y_los_vendedores		;8dc2   ; y repinta
 	ld a,018h		;8dc5   ; 0x18 cuadros
 	ld (0c43eh),a		;8dc7   ; a 0xC43E
 	ld a,01bh		;8dca   ; efecto 0x1B
@@ -2962,213 +2962,229 @@ puerta_de_la_fase_a_0xff:
 	ret nz			;9173   ; no: nada
 	ld (hl),0ffh		;9174   ; si: 0xFF, y a 0x53FC
 	jp abre_la_puerta_de_la_fase		;9176
-L_9179:
-	ld (0c70dh),hl		;9179
-	call L_91A2		;917c
-	ret nz			;917f
-	ld hl,0c5b5h		;9180
-	dec a			;9183
+
+; ----------------------------------------------------------------------
+; LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar el bloque); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
+; ----------------------------------------------------------------------
+sale_un_vendedor:
+	ld (0c70dh),hl		;9179   ; guarda el secreto de 0xE000
+	call busca_su_hueco		;917c   ; busca lo que vende entre los dos huecos...
+	ret nz			;917f   ; ... y si no esta, no sale
+	ld hl,0c5b5h		;9180   ; el hueco 0 va a 0xC5B5...
+	dec a			;9183   ; (A = 2: el hueco 0)
 	jr nz,L_9189		;9184
-	ld hl,0c5c5h		;9186
+	ld hl,0c5c5h		;9186   ; ... y el 1 a 0xC5C5
 L_9189:
-	ld (hl),001h		;9189
+	ld (hl),001h		;9189   ; estado 1: recien salido
 	inc l			;918b
-	ld (hl),e			;918c
+	ld (hl),e			;918c   ; la y
 	inc l			;918d
-	ld (hl),d			;918e
+	ld (hl),d			;918e   ; la x
 	inc l			;918f
-	ld (hl),000h		;9190
+	ld (hl),000h		;9190   ; ningun golpe
 	inc l			;9192
-	ld (hl),b			;9193
+	ld (hl),b			;9193   ; cual es (lo que vende)
 	inc l			;9194
-	ld (hl),c			;9195
+	ld (hl),c			;9195   ; su clase
 	inc l			;9196
 	ld (hl),000h		;9197
 	inc l			;9199
-	ld de,(0c70dh)		;919a
+	ld de,(0c70dh)		;919a   ; y el secreto de 0xE000, alto y bajo
 	ld (hl),d			;919e
 	inc l			;919f
 	ld (hl),e			;91a0
 	ret			;91a1
-L_91A2:
-	ld a,b			;91a2
+busca_su_hueco:
+	ld a,b			;91a2   ; A = cual...
 	exx			;91a3
-	ld hl,05b0bh		;91a4
+	ld hl,05b0bh		;91a4   ; ... y C = lo que vende, de 0x5B0B
 	call 04061h		;91a7   ; hl_mas_a: HL += A
 	ld c,(hl)			;91aa
-	ld b,002h		;91ab
+	ld b,002h		;91ab   ; los dos huecos de la habitacion
 L_91AD:
 	push bc			;91ad
-	ld a,002h		;91ae
+	ld a,002h		;91ae   ; A = 0 y luego 1
 	sub b			;91b0
-	call L_944F		;91b1
+	call hueco_en_0xde00		;91b1   ; el hueco en 0xDE00
 	ld a,(hl)			;91b4
 	pop bc			;91b5
-	cp c			;91b6
-	jr z,L_91BB		;91b7
+	cp c			;91b6   ; vende eso?
+	jr z,L_91BB		;91b7   ; si: Z, con B = 2 (hueco 0) o 1 (hueco 1)
 	djnz L_91AD		;91b9
 L_91BB:
-	ld a,b			;91bb
+	ld a,b			;91bb   ; A = B (sin tocar las banderas)
 	exx			;91bc
 	ret			;91bd
-L_91BE:
+
+; ----------------------------------------------------------------------
+; LOS DOS VENDEDORES, cada cuadro: la ficha de 0xC5B5 y la de 0xC5C5, con IX en ella y C = el hueco, a 0x91D8 si esta puesta.
+; ----------------------------------------------------------------------
+mueve_los_vendedores:
 	ld hl,0c5b5h		;91be
-	ld bc,00200h		;91c1
+	ld bc,00200h		;91c1   ; dos, desde el hueco 0
 L_91C4:
-	push bc			;91c4
+	push bc			;91c4   ; IX = la ficha
 	push hl			;91c5
 	push hl			;91c6
 	pop ix		;91c7
 	ld a,(hl)			;91c9
-	or a			;91ca
-	call nz,L_91D8		;91cb
+	or a			;91ca   ; puesta?
+	call nz,segun_el_estado_del_vendedor		;91cb   ; si: segun su estado
 	pop hl			;91ce
-	ld a,010h		;91cf
+	ld a,010h		;91cf   ; la siguiente, 16 bytes mas
 	add a,l			;91d1
 	ld l,a			;91d2
 	pop bc			;91d3
-	inc c			;91d4
+	inc c			;91d4   ; el hueco siguiente
 	djnz L_91C4		;91d5
 	ret			;91d7
-L_91D8:
-	inc l			;91d8
+segun_el_estado_del_vendedor:
+	inc l			;91d8   ; E = la y...
 	ld e,(hl)			;91d9
-	inc l			;91da
+	inc l			;91da   ; ... D = la x
 	ld d,(hl)			;91db
 	dec l			;91dc
 	dec l			;91dd
-	and 00fh		;91de
-	dec a			;91e0
-	jr z,L_91EA		;91e1
-	dec a			;91e3
-	jr z,L_91F2		;91e4
-	dec a			;91e6
-	jr z,L_9229		;91e7
+	and 00fh		;91de   ; el estado, sin el bit 7:
+	dec a			;91e0   ; 1, recien salido...
+	jr z,vendedor_recien_salido		;91e1
+	dec a			;91e3   ; ... 2, esperando un golpe...
+	jr z,vendedor_esperando		;91e4
+	dec a			;91e6   ; ... 3, dando lo que toca
+	jr z,vendedor_dando		;91e7
 	ret			;91e9
-L_91EA:
-	ld (ix+009h),c		;91ea
-	ld (hl),082h		;91ed
-	jp L_924C		;91ef
-L_91F2:
-	inc l			;91f2
+vendedor_recien_salido:
+	ld (ix+009h),c		;91ea   ; apunta su hueco
+	ld (hl),082h		;91ed   ; estado 2, pintado (bit 7)
+	jp pinta_el_vendedor		;91ef   ; y se pinta
+vendedor_esperando:
+	inc l			;91f2   ; los golpes (0x80E5 los sube; 0x928D pone 0xFF)
 	inc l			;91f3
 	inc l			;91f4
 	ld a,(hl)			;91f5
-	or a			;91f6
+	or a			;91f6   ; ninguno: nada
 	ret z			;91f7
-	ld (hl),000h		;91f8
+	ld (hl),000h		;91f8   ; se gastan
 	inc l			;91fa
-	ld b,(hl)			;91fb
+	ld b,(hl)			;91fb   ; B = cual...
 	inc l			;91fc
-	ld c,(hl)			;91fd
+	ld c,(hl)			;91fd   ; ... C = la clase
 	inc l			;91fe
-	cp 0ffh		;91ff
-	jr z,L_9215		;9201
-	call L_9221		;9203
-	res 7,(hl)		;9206
+	cp 0ffh		;91ff   ; 0xFF, la cruz?
+	jr z,la_cruz_lo_quita		;9201
+	call su_cuenta_de_visitas		;9203   ; no: una visita mas en su hueco...
+	res 7,(hl)		;9206   ; ... la que cuenta (sin el bit 7)
 	inc (hl)			;9208
-	call L_92BB		;9209
+	call lo_que_toca		;9209   ; lo que toca en esta visita
 L_920C:
-	ld (ix+00ah),020h		;920c
-	ld (ix+000h),003h		;9210
+	ld (ix+00ah),020h		;920c   ; 0x20 cuadros...
+	ld (ix+000h),003h		;9210   ; ... en el estado 3
 	ret			;9214
-L_9215:
-	ld a,006h		;9215
+la_cruz_lo_quita:
+	ld a,006h		;9215   ; el desenlace 6 (se va)...
 	ld (0c70ch),a		;9217
-	ld a,003h		;921a
+	ld a,003h		;921a   ; ... con el dibujo 3
 	ld (0c70bh),a		;921c
 	jr L_920C		;921f
-L_9221:
-	ld a,(ix+009h)		;9221
-	call L_944F		;9224
-	inc hl			;9227
+su_cuenta_de_visitas:
+	ld a,(ix+009h)		;9221   ; el hueco de la ficha...
+	call hueco_en_0xde00		;9224   ; ... en 0xDE00...
+	inc hl			;9227   ; ... su segundo byte: las visitas
 	ret			;9228
-L_9229:
-	dec (ix+00ah)		;9229
+vendedor_dando:
+	dec (ix+00ah)		;9229   ; un cuadro menos
 	ld a,(ix+00ah)		;922c
-	push af			;922f
+	push af			;922f   ; en los impares...
 	rra			;9230
-	ld a,002h		;9231
+	ld a,002h		;9231   ; ... el dibujo 2...
 	jr c,L_9238		;9233
-	ld a,(0c70bh)		;9235
+	ld a,(0c70bh)		;9235   ; ... y en los pares el que toca: parpadea
 L_9238:
-	push de			;9238
-	call L_925E		;9239
+	push de			;9238   ; lo pinta
+	call pinta_un_dibujo_de_vendedor		;9239
 	pop de			;923c
 	pop af			;923d
-	ret nz			;923e
-	ld a,(0c70bh)		;923f
-	call L_925E		;9242
-	ld (ix+000h),082h		;9245
-	jp L_92A7		;9249
-L_924C:
-	push de			;924c
+	ret nz			;923e   ; hasta el ultimo cuadro
+	ld a,(0c70bh)		;923f   ; entonces se queda el que toca...
+	call pinta_un_dibujo_de_vendedor		;9242
+	ld (ix+000h),082h		;9245   ; ... vuelve al estado 2...
+	jp pasa_lo_que_toca		;9249   ; ... y pasa lo que toca
+pinta_el_vendedor:
+	push de			;924c   ; guarda las 4 x 4 celdas del mapa que tapa (16 bytes por hueco en 0xE580)
 	ld hl,0e580h		;924d
 	call L_8757		;9250
 	pop de			;9253
-	call L_9221		;9254
-	bit 7,(hl)		;9257
+	call su_cuenta_de_visitas		;9254   ; las visitas del hueco:
+	bit 7,(hl)		;9257   ; la tienda quedo abierta sin comprar (bit 7)?
 	jr z,L_925C		;9259
-	dec (hl)			;925b
+	dec (hl)			;925b   ; si: esa visita no cuenta
 L_925C:
-	ld a,003h		;925c
-L_925E:
-	rrca			;925e
+	ld a,003h		;925c   ; el dibujo 3, la puerta
+pinta_un_dibujo_de_vendedor:
+	rrca			;925e   ; el dibujo A de la fila 0xA0 de la pagina 1, x = A * 32...
 	rrca			;925f
 	rrca			;9260
 	ld h,a			;9261
 	ld l,0a0h		;9262
-	ld a,048h		;9264
-	ld bc,02020h		;9266
+	ld a,048h		;9264   ; ... con TIMP de la pagina 1 a la 0...
+	ld bc,02020h		;9266   ; ... 32 x 32 puntos, a (D, E)
 	jp 049dbh		;9269
-L_926C:
+
+; ----------------------------------------------------------------------
+; REPINTA LOS VENDEDORES que estan puestos, con el dibujo de la puerta (tras borrar la pantalla: p02:8D1C, 95C2).
+; ----------------------------------------------------------------------
+repinta_los_vendedores:
 	ld hl,0c5b5h		;926c
-	ld bc,00200h		;926f
+	ld bc,00200h		;926f   ; dos
 L_9272:
 	push bc			;9272
 	push hl			;9273
 	push hl			;9274
-	pop ix		;9275
+	pop ix		;9275   ; IX = la ficha
 	ld a,(hl)			;9277
-	or a			;9278
-	call nz,L_9286		;9279
+	or a			;9278   ; puesta?
+	call nz,repinta_uno		;9279
 	pop hl			;927c
-	ld a,010h		;927d
+	ld a,010h		;927d   ; la siguiente, 16 bytes mas
 	add a,l			;927f
 	ld l,a			;9280
 	pop bc			;9281
 	inc c			;9282
 	djnz L_9272		;9283
 	ret			;9285
-L_9286:
-	inc l			;9286
+repinta_uno:
+	inc l			;9286   ; E = la y, D = la x
 	ld e,(hl)			;9287
 	inc l			;9288
 	ld d,(hl)			;9289
-	jp L_925C		;928a
-L_928D:
+	jp L_925C		;928a   ; y la puerta
+
+; ----------------------------------------------------------------------
+; LA CRUZ (p02:8DC2) se lleva a los vendedores pintados: pone 0xFF en sus golpes, y 0x91F2 les da el desenlace 6.
+; ----------------------------------------------------------------------
+la_cruz_y_los_vendedores:
 	ld hl,0c5b5h		;928d
 	ld b,002h		;9290
 L_9292:
 	push hl			;9292
-	ld a,(hl)			;9293
+	ld a,(hl)			;9293   ; puesta...
 	or a			;9294
 	jr z,L_929F		;9295
-	add a,a			;9297
+	add a,a			;9297   ; ... y pintada (bit 7)?
 	jr nc,L_929F		;9298
-	inc l			;929a
+	inc l			;929a   ; si: los golpes...
 	inc l			;929b
 	inc l			;929c
-	ld (hl),0ffh		;929d
+	ld (hl),0ffh		;929d   ; ... a 0xFF
 L_929F:
 	pop hl			;929f
-	ld a,010h		;92a0
+	ld a,010h		;92a0   ; la siguiente, 16 bytes mas
 	add a,l			;92a2
 	ld l,a			;92a3
 	djnz L_9292		;92a4
 	ret			;92a6
-L_92A7:
-	ld a,(0c70ch)		;92a7
+pasa_lo_que_toca:
+	ld a,(0c70ch)		;92a7   ; el desenlace (0 a 6), por la tabla de detras
 	call 0406bh		;92aa   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -3190,40 +3206,44 @@ DATA_tabla_92AD:
 ; ======================================================================
 
 
-L_92BB:
+
+; ----------------------------------------------------------------------
+; LO QUE TOCA EN ESTA VISITA: la fila de la clase en 0x9300 (ocho bytes), en la columna de la visita (la octava y siguientes, la ultima). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
+; ----------------------------------------------------------------------
+lo_que_toca:
 	ld de,09300h		;92bb
-	ld a,(ix+005h)		;92be   ; lee la x de la cosa
+	ld a,(ix+005h)		;92be   ; (su clase, por ocho)
 	add a,a			;92c1
 	add a,a			;92c2
 	add a,a			;92c3
-	call 04066h		;92c4   ; de_mas_a: DE += A
-	ld a,(hl)			;92c7
+	call 04066h		;92c4   ; la fila de la clase
+	ld a,(hl)			;92c7   ; la visita, desde 0...
 	dec a			;92c8
-	cp 008h		;92c9
+	cp 008h		;92c9   ; ... hasta la octava
 	jr c,L_92CF		;92cb
 	ld a,007h		;92cd
 L_92CF:
-	call 04066h		;92cf   ; de_mas_a: DE += A
-	ld a,(de)			;92d2
+	call 04066h		;92cf   ; su columna
+	ld a,(de)			;92d2   ; el desenlace
 	ld (0c70ch),a		;92d3
-	sub 007h		;92d6
+	sub 007h		;92d6   ; 7 o mas se sortea:
 	jr c,L_92F2		;92d8
-	ld hl,00305h		;92da
+	ld hl,00305h		;92da   ; 7: el 3 o el 5
 	jr z,L_92E8		;92dd
 	dec a			;92df
-	ld hl,00405h		;92e0
+	ld hl,00405h		;92e0   ; 8: el 4 o el 5
 	jr z,L_92E8		;92e3
-	ld hl,00304h		;92e5
+	ld hl,00304h		;92e5   ; 9: el 3 o el 4
 L_92E8:
-	ld a,r		;92e8
+	ld a,r		;92e8   ; un bit de R
 	rra			;92ea
-	ld a,h			;92eb
+	ld a,h			;92eb   ; H...
 	jr c,L_92EF		;92ec
-	ld a,l			;92ee
+	ld a,l			;92ee   ; ... o L
 L_92EF:
-	ld (0c70ch),a		;92ef
+	ld (0c70ch),a		;92ef   ; el desenlace sorteado
 L_92F2:
-	ld a,(0c70ch)		;92f2
+	ld a,(0c70ch)		;92f2   ; su dibujo, de 0x9320
 	ld hl,09320h		;92f5
 	call 04061h		;92f8   ; hl_mas_a: HL += A
 	ld a,(hl)			;92fb
@@ -3231,9 +3251,10 @@ L_92F2:
 	ret			;92ff
 
 ; ----------------------------------------------------------------------
-; DATOS tres_tablas_pequenas: la de 0x9300 la lee p02:92BB con (ix+5) * 4; la
-;   de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320 la indexa
-;   p02:92F5 con 0xC70C
+; DATOS tres_tablas_pequenas: la de 0x9300, lo que toca a cada vendedor: una
+;   fila de ocho visitas por clase (p02:92BB, con la clase * 8); la de 0x930B
+;   la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320, el dibujo de cada
+;   desenlace (p02:92F5, con 0xC70C)
 ;   0x9300..0x9327  (39 bytes)
 DATA_tres_tablas_pequenas:
 	defb 000h,007h,007h,007h,008h,008h,005h,006h,000h,003h,003h,001h,005h,005h,005h,006h	; 9300  ................
@@ -3245,151 +3266,155 @@ DATA_tres_tablas_pequenas:
 ; ======================================================================
 
 
-L_9327:
-	ld a,0ffh		;9327
+abre_la_tienda:
+	ld a,0ffh		;9327   ; 0: la tienda (0xC40C a 0xFF; el estado del juego la abre)
 	ld (0c40ch),a		;9329
 	ld a,(ix+009h)		;932c   ; lee la velocidad horizontal (parte baja)
-	ld (0c703h),a		;932f
+	ld (0c703h),a		;932f   ; con el hueco de este vendedor
 	ret			;9332
-L_9333:
-	ld hl,0d012h		;9333   ; apunta a la VUELTA (0, 1 o 2)
+una_vuelta_mas:
+	ld hl,0d012h		;9333   ; 1: una VUELTA mas, hasta 3
 	ld a,(hl)			;9336
 	cp 003h		;9337
 	ret z			;9339
 	inc (hl)			;933a
 	ret			;933b
-L_933C:
-	ld hl,0d012h		;933c   ; apunta a la VUELTA (0, 1 o 2)
+una_vuelta_menos:
+	ld hl,0d012h		;933c   ; 2: una VUELTA menos, hasta 0
 	ld a,(hl)			;933f
 	or a			;9340
 	ret z			;9341
 	dec (hl)			;9342
-L_9343:
-	ret			;9343
-L_9344:
-	ld a,00fh		;9344
+no_pasa_nada:
+	ret			;9343   ; 5: nada
+da_cinco_corazones:
+	ld a,00fh		;9344   ; 3: efecto 0x0F...
 	call 0509fh		;9346   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld b,005h		;9349
+	ld b,005h		;9349   ; ... y cinco corazones mas
 	jp 04594h		;934b
-L_934E:
-	ld a,01dh		;934e
+quita_cinco_corazones:
+	ld a,01dh		;934e   ; 4: efecto 0x1D...
 	call 0509fh		;9350   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld b,005h		;9353
+	ld b,005h		;9353   ; ... y cinco corazones menos
 	jp 045a0h		;9355
-L_9358:
-	ld (ix+000h),000h		;9358   ; el tipo de la cosa = 0x00
-	call L_9378		;935c
-	ld hl,0e580h		;935f
+el_vendedor_se_va:
+	ld (ix+000h),000h		;9358   ; 6: fuera la ficha
+	call devuelve_lo_que_tapaba		;935c   ; devuelve a la pantalla lo que tapaba
+	ld hl,0e580h		;935f   ; y al mapa
 	call L_889C		;9362
-	ld h,(ix+007h)		;9365   ; lee la velocidad vertical (parte baja)
+	ld h,(ix+007h)		;9365   ; el secreto de 0xE000...
 	ld l,(ix+008h)		;9368   ; lee la velocidad vertical
-	ld (hl),000h		;936b
-	ld a,010h		;936d
+	ld (hl),000h		;936b   ; ... se borra: ya no vuelve
+	ld a,010h		;936d   ; efecto 0x10...
 	call 0509fh		;936f   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld de,05000h		;9372
+	ld de,05000h		;9372   ; ... y 5.000 puntos
 	jp 044ech		;9375
-L_9378:
-	ld e,(ix+001h)		;9378   ; lee el paso en que va la cosa
-	ld d,(ix+002h)		;937b   ; lee la fraccion de la y de la cosa
-	ld c,(ix+009h)		;937e   ; lee la velocidad horizontal (parte baja)
-	ld hl,0e580h		;9381
+devuelve_lo_que_tapaba:
+	ld e,(ix+001h)		;9378   ; E = la y...
+	ld d,(ix+002h)		;937b   ; ... D = la x...
+	ld c,(ix+009h)		;937e   ; ... C = el hueco
+	ld hl,0e580h		;9381   ; las 4 x 4 celdas guardadas en 0xE580
 	jp L_8861		;9384
-L_9387:
-	call L_93FF		;9387
-	ld a,014h		;938a
+
+; ----------------------------------------------------------------------
+; LA TIENDA (el estado del juego, p00:440E): lo que vende y su precio, 0x14 plazos de 32 cuadros para decidir, efecto 0x19, y la ventana: 0x50 x 0x20 puntos junto al vendedor (a su izquierda desde la x 0x80), con el fondo guardado en (0xB0, 0x80) de la pagina 1, dos rotulos, el precio en corazones y el objeto en un marco.
+; ----------------------------------------------------------------------
+abre_la_ventana_de_la_tienda:
+	call lo_que_vende_y_su_precio		;9387   ; lo que vende y su precio
+	ld a,014h		;938a   ; 0x14 plazos
 	ld (0c706h),a		;938c
-	ld a,019h		;938f
+	ld a,019h		;938f   ; efecto 0x19
 	call 0509fh		;9391   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	jp L_9397		;9394
-L_9397:
-	ld a,(0c703h)		;9397
+	jp pinta_la_ventana_de_la_tienda		;9394
+pinta_la_ventana_de_la_tienda:
+	ld a,(0c703h)		;9397   ; la ficha del hueco (0xC703 * 16)
 	ld hl,0c5b5h		;939a
 	add a,a			;939d
 	add a,a			;939e
 	add a,a			;939f
 	add a,a			;93a0
 	call 04061h		;93a1   ; hl_mas_a: HL += A
-	inc hl			;93a4
+	inc hl			;93a4   ; E = la y...
 	ld e,(hl)			;93a5
-	inc hl			;93a6
+	inc hl			;93a6   ; ... D = la x
 	ld d,(hl)			;93a7
-	ld a,d			;93a8
+	ld a,d			;93a8   ; a la derecha de la mitad?
 	cp 080h		;93a9
 	jr nc,L_93B1		;93ab
-	sub 010h		;93ad
+	sub 010h		;93ad   ; no: la ventana 0x10 a la izquierda
 	jr L_93B3		;93af
 L_93B1:
-	sub 020h		;93b1
+	sub 020h		;93b1   ; si: 0x20 a la izquierda
 L_93B3:
 	ld h,a			;93b3
-	ld a,e			;93b4
+	ld a,e			;93b4   ; y 0x18 mas arriba
 	sub 018h		;93b5
 	ld l,a			;93b7
-	ld (0c704h),hl		;93b8
-	ld de,0b080h		;93bb
-	ld bc,05020h		;93be
-	ld a,004h		;93c1
+	ld (0c704h),hl		;93b8   ; el sitio de la ventana
+	ld de,0b080h		;93bb   ; su fondo, a (0xB0, 0x80)...
+	ld bc,05020h		;93be   ; ... 0x50 x 0x20...
+	ld a,004h		;93c1   ; ... de la pagina 0 a la 1
 	push hl			;93c3
 	push bc			;93c4
 	call 04946h		;93c5   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop bc			;93c8
 	pop hl			;93c9
-	call 05d0eh		;93ca
-	ld bc,03806h		;93cd
-	call L_94AF		;93d0
-	ld hl,01314h		;93d3
+	call 05d0eh		;93ca   ; el fondo de la ventana
+	ld bc,03806h		;93cd   ; (0x38, 6) mas alla...
+	call en_la_ventana		;93d0
+	ld hl,01314h		;93d3   ; ... un marco de 0x13 x 0x14...
 	ex de,hl			;93d6
-	ld c,00eh		;93d7
+	ld c,00eh		;93d7   ; ... (C = 0x0E)
 	call 048dch		;93d9
-	ld bc,00804h		;93dc
+	ld bc,00804h		;93dc   ; en (8, 4), el rotulo de 0x9485
 	ld hl,09485h		;93df
-	call L_949F		;93e2
-	ld bc,00810h		;93e5
+	call pinta_un_rotulo_de_la_tienda		;93e2
+	ld bc,00810h		;93e5   ; en (8, 0x10), el de 0x948A
 	ld hl,0948ah		;93e8
-	call L_949F		;93eb
-	call L_9491		;93ee
-	ld bc,03908h		;93f1
-	call L_94AF		;93f4
-	ld a,(0c708h)		;93f7
+	call pinta_un_rotulo_de_la_tienda		;93eb
+	call pinta_el_precio		;93ee   ; el precio
+	ld bc,03908h		;93f1   ; y en (0x39, 8)...
+	call en_la_ventana		;93f4
+	ld a,(0c708h)		;93f7   ; ... el dibujo de lo que vende
 	dec a			;93fa
 	call L_8CC1		;93fb
 	ret			;93fe
-L_93FF:
-	call L_944C		;93ff
-	ld a,(hl)			;9402
+lo_que_vende_y_su_precio:
+	call el_hueco_del_vendedor		;93ff   ; su hueco en 0xDE00
+	ld a,(hl)			;9402   ; lo que vende, a 0xC708
 	ld (0c708h),a		;9403
-	inc hl			;9406
-	set 7,(hl)		;9407
-	ld hl,09428h		;9409
+	inc hl			;9406   ; las visitas...
+	set 7,(hl)		;9407   ; ... con el bit 7: tienda abierta sin comprar
+	ld hl,09428h		;9409   ; buscalo entre los nueve de 0x9428
 	ld b,009h		;940c
 L_940E:
-	cp (hl)			;940e
+	cp (hl)			;940e   ; es este?
 	inc hl			;940f
-	jr z,L_9418		;9410
-	inc hl			;9412
+	jr z,el_precio_que_toca		;9410
+	inc hl			;9412   ; no: cuatro bytes mas
 	inc hl			;9413
 	inc hl			;9414
 	djnz L_940E		;9415
 	ret			;9417
-L_9418:
+el_precio_que_toca:
 	ld a,(0c702h)		;9418   ; lee mas cosas que lleva (bit 0: se ven los bloques que se rompen)
-	add a,a			;941b
-	jr c,L_9422		;941c
-	add a,a			;941e
-	jr nc,L_9423		;941f
-	inc hl			;9421
+	add a,a			;941b   ; con el libro blanco (bit 7), mas barato...
+	jr c,L_9422		;941c   ; ... el tercer byte
+	add a,a			;941e   ; con el libro rojo (bit 6), mas caro...
+	jr nc,L_9423		;941f   ; ... el cuarto
+	inc hl			;9421   ; (sin ninguno, el segundo)
 L_9422:
 	inc hl			;9422
 L_9423:
-	ld a,(hl)			;9423
+	ld a,(hl)			;9423   ; el precio, en corazones BCD, a 0xC707
 	ld (0c707h),a		;9424
 	ret			;9427
 
 ; ----------------------------------------------------------------------
-; DATOS nueve_pares_y_mas: lo que compara p02:9409 (`ld b,9`, `cp (hl)` y `inc
-;   hl`)
+; DATOS lo_que_venden: los nueve de la tienda (p02:9409): lo que vende y su
+;   precio en corazones BCD, sin libro, con el blanco y con el rojo
 ;   0x9428..0x944c  (36 bytes)
-DATA_nueve_pares_y_mas:
+DATA_lo_que_venden:
 	defb 00eh,020h,015h,060h,012h,030h,020h,060h,003h,020h,010h,060h,004h,020h,010h,080h	; 9428  . .`.0 `. .`. ..
 	defb 00ah,040h,020h,080h,016h,040h,015h,080h,01eh,030h,010h,050h,01dh,020h,010h,080h	; 9438  .@ ..@...0.P. ..
 	defb 01bh,050h,030h,090h	; 9448
@@ -3399,36 +3424,40 @@ DATA_nueve_pares_y_mas:
 ; ======================================================================
 
 
-L_944C:
-	ld a,(0c703h)		;944c
-L_944F:
+el_hueco_del_vendedor:
+	ld a,(0c703h)		;944c   ; A = el hueco de la tienda
+
+; ----------------------------------------------------------------------
+; EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][visitas] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
+; ----------------------------------------------------------------------
+hueco_en_0xde00:
 	push af			;944f
-	ld bc,00000h		;9450
+	ld bc,00000h		;9450   ; columna 0 en el patio
 	ld a,(0d000h)		;9453   ; lee la FASE (0 el patio, 1-18)
 	or a			;9456
 	jr z,L_9461		;9457
-	dec a			;9459
+	dec a			;9459   ; fase 1-18: la columna de 0x9473
 	ld hl,09473h		;945a
 	call 04061h		;945d   ; hl_mas_a: HL += A
 	ld c,(hl)			;9460
 L_9461:
-	ld hl,0de00h		;9461
-	add hl,bc			;9464
+	ld hl,0de00h		;9461   ; 0xDE00...
+	add hl,bc			;9464   ; ... mas la columna...
 	ld a,(0d001h)		;9465   ; lee la HABITACION dentro de la fase
-	add a,a			;9468
+	add a,a			;9468   ; ... mas cuatro por habitacion
 	add a,a			;9469
 	call 04061h		;946a   ; hl_mas_a: HL += A
 	pop af			;946d
-	or a			;946e
+	or a			;946e   ; el hueco 0...
 	ret z			;946f
-	inc hl			;9470
+	inc hl			;9470   ; ... o dos bytes mas, el 1
 	inc hl			;9471
 	ret			;9472
 
 ; ----------------------------------------------------------------------
-; DATOS columna_y_dos_rotulos: 18 bytes, uno por fase (1-18), que p02:945A usa
-;   de columna (0x00, 0x40 o 0x80); detras, los dos trozos de 0x9485 y 0x948A
-;   que p02:93DF y 93E8 pasan a 0x949F
+; DATOS columna_y_dos_rotulos: 18 bytes, uno por fase (1-18): su columna del
+;   bloque en 0xDE00 (0x00, 0x40 o 0x80; p02:945A); detras, los dos rotulos de
+;   la tienda (0x9485 y 0x948A, p02:93DF y 93E8)
 ;   0x9473..0x9491  (30 bytes)
 DATA_columna_y_dos_rotulos:
 	defb 000h,040h,080h,000h,040h,080h,000h,040h,080h,000h,040h,080h,000h,040h,080h,000h	; 9473  .@..@..@..@..@..
@@ -3439,118 +3468,126 @@ DATA_columna_y_dos_rotulos:
 ; ======================================================================
 
 
-L_9491:
-	ld bc,01810h		;9491
-	call L_94AF		;9494
-	ld hl,0c707h		;9497
+pinta_el_precio:
+	ld bc,01810h		;9491   ; en (0x18, 0x10)...
+	call en_la_ventana		;9494
+	ld hl,0c707h		;9497   ; ... un byte BCD, el precio
 	ld b,001h		;949a
 	jp 04578h		;949c
-L_949F:
-	call L_94AF		;949f
+pinta_un_rotulo_de_la_tienda:
+	call en_la_ventana		;949f   ; en la ventana, (B, C) mas alla
 L_94A2:
-	ld a,(hl)			;94a2
+	ld a,(hl)			;94a2   ; hasta el 0xFF
 	inc a			;94a3
 	ret z			;94a4
 	dec a			;94a5
-	call 04ae7h		;94a6
-	call 04b4fh		;94a9
+	call 04ae7h		;94a6   ; la letra A...
+	call 04b4fh		;94a9   ; ... se pinta
 	inc hl			;94ac
 	jr L_94A2		;94ad
-L_94AF:
-	ld de,(0c704h)		;94af
-	ld a,d			;94b3
+en_la_ventana:
+	ld de,(0c704h)		;94af   ; DE = el sitio de la ventana...
+	ld a,d			;94b3   ; ... mas B en la x...
 	add a,b			;94b4
 	ld d,a			;94b5
-	ld a,e			;94b6
+	ld a,e			;94b6   ; ... y C en la y
 	add a,c			;94b7
 	ld e,a			;94b8
 	ret			;94b9
-L_94BA:
-	ld a,(0c003h)		;94ba   ; lee el contador de cuadros
+
+; ----------------------------------------------------------------------
+; LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja la visita contada); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
+; ----------------------------------------------------------------------
+la_tienda_cada_cuadro:
+	ld a,(0c003h)		;94ba   ; uno de cada 32 cuadros...
 	and 01fh		;94bd
-	jr nz,L_94C7		;94bf
-	ld hl,0c706h		;94c1
+	jr nz,lee_la_compra		;94bf
+	ld hl,0c706h		;94c1   ; ... un plazo menos
 	dec (hl)			;94c4
-	jr z,L_94FC		;94c5
-L_94C7:
-	call L_951F		;94c7
-	jr z,L_9503		;94ca
-	rra			;94cc
-	jr nc,L_94FC		;94cd
-	ld a,(0c707h)		;94cf
+	jr z,sale_de_la_tienda		;94c5   ; sin plazos: fuera
+lee_la_compra:
+	call los_botones_recien_pulsados		;94c7   ; una tecla recien pulsada?
+	jr z,sigue_la_tienda		;94ca   ; ninguna: sigue
+	rra			;94cc   ; el bit 0 (disparo o espacio)?
+	jr nc,sale_de_la_tienda		;94cd   ; no, el otro: fuera
+	ld a,(0c707h)		;94cf   ; el precio...
 	ld b,a			;94d2
-	ld a,(0c417h)		;94d3   ; lee los corazones, en BCD
+	ld a,(0c417h)		;94d3   ; ... contra los corazones
 	cp b			;94d6
-	jr c,L_94FC		;94d7
-	ld a,(0c704h)		;94d9
+	jr c,sale_de_la_tienda		;94d7   ; no llega: fuera
+	ld a,(0c704h)		;94d9   ; la ventana llega al marcador (y < 0x20)?
 	cp 020h		;94dc
 	push af			;94de
-	call c,L_950D		;94df
-	call 045a0h		;94e2
-	ld a,(0c708h)		;94e5
+	call c,devuelve_el_fondo_de_la_ventana		;94df   ; si: se quita antes de repintar los corazones
+	call 045a0h		;94e2   ; quita el precio de los corazones
+	ld a,(0c708h)		;94e5   ; da lo que vende
 	call L_8D30		;94e8
 	pop af			;94eb
-	call c,L_9397		;94ec
-	ld a,012h		;94ef
+	call c,pinta_la_ventana_de_la_tienda		;94ec   ; y vuelve la ventana, si se quito
+	ld a,012h		;94ef   ; efecto 0x12
 	call 0509fh		;94f1   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	call L_944C		;94f4
+	call el_hueco_del_vendedor		;94f4   ; la visita queda contada...
 	inc hl			;94f7
-	res 7,(hl)		;94f8
-	xor a			;94fa
+	res 7,(hl)		;94f8   ; ... (sin el bit 7)
+	xor a			;94fa   ; Z: se cierra
 	ret			;94fb
-L_94FC:
-	ld a,002h		;94fc
+sale_de_la_tienda:
+	ld a,002h		;94fc   ; efecto 2
 	call 0509fh		;94fe   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	xor a			;9501
+	xor a			;9501   ; Z: se cierra
 	ret			;9502
-L_9503:
-	ld a,0ffh		;9503
+sigue_la_tienda:
+	ld a,0ffh		;9503   ; NZ: sigue abierta
 	or a			;9505
 	ret			;9506
-L_9507:
-	call L_950D		;9507
-	jp L_8707		;950a
-L_950D:
+cierra_la_tienda:
+	call devuelve_el_fondo_de_la_ventana		;9507   ; devuelve el fondo...
+	jp L_8707		;950a   ; ... y los marcos
+devuelve_el_fondo_de_la_ventana:
 	push bc			;950d
-	ld hl,0b080h		;950e
-	ld de,(0c704h)		;9511
-	ld bc,05020h		;9515
-	ld a,001h		;9518
+	ld hl,0b080h		;950e   ; de (0xB0, 0x80) de la pagina 1...
+	ld de,(0c704h)		;9511   ; ... a la ventana...
+	ld bc,05020h		;9515   ; ... 0x50 x 0x20...
+	ld a,001h		;9518   ; ... en la pagina 0
 	call 04946h		;951a   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop bc			;951d
 	ret			;951e
-L_951F:
-	ld e,08fh		;951f
+
+; ----------------------------------------------------------------------
+; LOS DOS BOTONES, recien pulsados: bit 0 = el disparo 1 del mando 1 o el ESPACIO, bit 1 = el disparo 2 o SHIFT. Guarda lo de este cuadro en 0xC709 y devuelve solo lo que no estaba pulsado en el anterior (Z si nada).
+; ----------------------------------------------------------------------
+los_botones_recien_pulsados:
+	ld e,08fh		;951f   ; el registro 15 del PSG a 0x8F...
 	ld a,00fh		;9521
 	call 00093h		;9523   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,00eh		;9526
+	ld a,00eh		;9526   ; ... y el 14: los disparos del mando
 	di			;9528
 	call 00096h		;9529   ; BIOS RDPSG - Reads value from PSG-register
 	ei			;952c
-	cpl			;952d
-	and 030h		;952e
-	rrca			;9530
+	cpl			;952d   ; (a 0, pulsado)
+	and 030h		;952e   ; los dos disparos...
+	rrca			;9530   ; ... a los bits 0 y 1
 	rrca			;9531
 	rrca			;9532
 	rrca			;9533
 	ld d,a			;9534
-	ld a,006h		;9535
-	call L_954B		;9537
-	add a,a			;953a
+	ld a,006h		;9535   ; la fila 6 del teclado (SHIFT)...
+	call tecla_de_la_fila		;9537
+	add a,a			;953a   ; ... al bit 1
 	or d			;953b
 	ld d,a			;953c
-	ld a,008h		;953d
-	call L_954B		;953f
-	or d			;9542
-	ld hl,0c709h		;9543
+	ld a,008h		;953d   ; la fila 8 (ESPACIO)...
+	call tecla_de_la_fila		;953f
+	or d			;9542   ; ... al bit 0
+	ld hl,0c709h		;9543   ; lo del cuadro anterior
 	ld c,(hl)			;9546
-	ld (hl),a			;9547
-	xor c			;9548
-	and (hl)			;9549
+	ld (hl),a			;9547   ; y se guarda el de este
+	xor c			;9548   ; lo que ha cambiado...
+	and (hl)			;9549   ; ... y esta pulsado
 	ret			;954a
-L_954B:
-	call 00141h		;954b   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix
-	cpl			;954e
+tecla_de_la_fila:
+	call 00141h		;954b   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix | la fila A...
+	cpl			;954e   ; ... su bit 0, a 1 si esta pulsada
 	and 001h		;954f
 	ret			;9551
 L_9552:
@@ -3610,7 +3647,7 @@ L_95B3:
 	call 04f91h		;95b9
 	call las_trampas_de_cadena		;95bc
 	call puerta_de_la_fase_a_0xff		;95bf
-	call L_926C		;95c2
+	call repinta_los_vendedores		;95c2
 	call L_8707		;95c5
 	call 04809h		;95c8
 	xor a			;95cb

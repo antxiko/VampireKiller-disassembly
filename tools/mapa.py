@@ -11,7 +11,7 @@ juego, montadas desde las tablas con lo que esconden, y sus salidas.
             los bordes se enlazan con la del otro lado.
   Cada habitacion se monta con tools/graficos.py y tools/secretos.py: las
   velas, los bloques que se rompen, los cofres, los objetos a la vista, las
-  puertas cerradas y la puerta de salida de la fase.
+  vendedores y la puerta de salida de la fase.
 
 Uso:  mapa.py [fase ...]      docs/imagenes/fase_NN.png (todas si no se dice,
                               y entonces tambien castillo.png)
@@ -32,7 +32,7 @@ ESCALA = 2                           # la habitacion a 2x; los secretos, a 1x en
 ANCHO, ALTO = 256 * ESCALA, 176 * ESCALA
 HUECO = 24
 MARCO_BLOQUE = (255, 230, 0)         # un bloque que se rompe
-MARCO_PUERTA = (255, 0, 255)         # una puerta cerrada, o lo que la saca
+MARCO_PUERTA = (255, 0, 255)         # un vendedor, o lo que lo saca
 MARCO_BICHO = (255, 40, 40)          # sale un bicho
 NEGRO = (0, 0, 0)
 FONDO = (24, 24, 24)

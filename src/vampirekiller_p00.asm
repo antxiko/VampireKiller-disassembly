@@ -4041,10 +4041,12 @@ L_5B00:
 	jr L_5AE2		;5b09
 
 ; ----------------------------------------------------------------------
-; DATOS dieciseis_valores: 16 bytes que p00:5AEB (y p02:91A4) indexan con los
-;   bits 2-5 del byte que leen
+; DATOS lo_que_vende_cada_vendedor: lo que vende el vendedor de un secreto
+;   11x, por los bits 5-2 del secreto (p00:5AEB al empezar el bloque, p02:91A4
+;   al salir): vela, baston, escudo rojo, escudo, reloj de arena, vida llena,
+;   frasco, cruz que vuelve y daga
 ;   0x5b0b..0x5b1b  (16 bytes)
-DATA_dieciseis_valores:
+DATA_lo_que_vende_cada_vendedor:
 	defb 00eh,012h,003h,004h,00ah,016h,01eh,01dh,01bh,000h,000h,000h,000h,000h,000h,000h	; 5b0b  ................
 
 ; ======================================================================

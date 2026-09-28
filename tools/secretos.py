@@ -20,9 +20,12 @@ como lo pinta el juego.
               (4 x 4), con lo de los bits 0-4 dentro; 0x1F es que lo dice el
               tercer byte.
       10x     un COFRE (p02:8A13: el objeto 0x19) con lo de los bits 0-4.
-      11x     una PUERTA cerrada (p02:9179, dos por habitacion en 0xC5B5 y
-              0xC5C5): la abre el objeto que dicen los bits 5-2 en la tabla
-              de 0x5B0B, y los bits 1-0 son su clase.
+      11x     un VENDEDOR tras una puerta (p02:9179, dos por habitacion en
+              0xC5B5 y 0xC5C5): vende lo que dicen los bits 5-2 en la tabla
+              de 0x5B0B, y los bits 1-0 son su clase, la fila de 0x9300 que
+              dice lo que pasa en cada visita (p02:92BB): la tienda, cinco
+              corazones mas o menos, una VUELTA mas o menos, nada, o se va
+              con 5.000 puntos.
   p02:8CC1  los objetos se pintan con LMMM y transparencia desde la pagina 1:
             el dibujo A -el tipo menos uno- esta en la fila 0x50 (los dieciseis
             primeros) o en la 0x60, columna A * 16. Las velas, que no son
@@ -49,7 +52,7 @@ from graficos import (Cartucho, B123, B111213, cuantas_habitaciones,  # noqa: E4
 B14 = (1, 14, 15)
 LISTAS_DE_CADA_BLOQUE = 0x8000       # banco 14
 LISTA_DEL_PATIO = 0x800C             # banco 14, la fase 0
-DIECISEIS_VALORES = 0x5B0B           # banco 0: lo que abre cada puerta
+LO_QUE_VENDEN = 0x5B0B               # banco 0: lo que vende cada vendedor
 DIBUJOS_DE_LOS_BLOQUES = {0: 0x8792, 1: 0x87A6}   # banco 2, p02:86CF
 FILA_DE_LOS_OBJETOS = (0x50, 0x60)   # p02:8CC1
 FILA_DE_LAS_VELAS = 0x70
@@ -107,10 +110,12 @@ def decodifica(cart, b1, b2, b3):
         e.update(que="vela", contenido=bajo)
     elif clase in (2, 3):
         e.update(que="bloque", tamano=clase, contenido=b3 if bajo == 0x1F else bajo)
+        if bajo == 0x1F and b3 & 0xC0 == 0xC0:      # un vendedor dentro (p02:8831)
+            e.update(vende=cart.leer(LO_QUE_VENDEN + ((b3 >> 2) & 0x0F), B123), clase=b3 & 3)
     elif clase in (4, 5):
         e.update(que="cofre", contenido=bajo)
     else:
-        e.update(que="puerta", llave=cart.leer(DIECISEIS_VALORES + ((b2 >> 2) & 0x0F), B123),
+        e.update(que="puerta", vende=cart.leer(LO_QUE_VENDEN + ((b2 >> 2) & 0x0F), B123),
                  clase=b2 & 3)
     return e
 
@@ -176,8 +181,8 @@ BICHO = 0x15
 
 def que_sale(e):
     """Lo que esconde una entrada: (que, tipo). que es 'objeto', 'cofre' (un
-    cofre con el tipo dentro, tercer byte 10xxxxxx: p02:8827) o 'puerta' (una
-    puerta cerrada, tercer byte 11xxxxxx: p02:8831)."""
+    cofre con el tipo dentro, tercer byte 10xxxxxx: p02:8827) o 'puerta' (un
+    vendedor, tercer byte 11xxxxxx: p02:8831)."""
     if e["que"] == "bloque" and e["bytes"][2] is not None:
         b3 = e["bytes"][2]
         if b3 & 0xC0 == 0xC0:
@@ -195,11 +200,12 @@ def que_sale(e):
 def describe(e):
     que, tipo = que_sale(e)
     if e["que"] == "puerta":
-        return "puerta cerrada (%d, clase %d)" % (e["llave"], e["clase"])
+        return "vendedor de %s (clase %d)" % (NOMBRES.get(e["vende"], "tipo %d" % e["vende"]), e["clase"])
     donde = {"vela": "vela", "bloque": "bloque que se rompe" + (" grande" if e.get("tamano") == 3 else ""),
              "cofre": "cofre", "objeto": "a la vista"}[e["que"]]
     if que == "puerta":
-        return "%s: sale una puerta cerrada" % donde
+        return "%s: sale un vendedor de %s (clase %d)" % (
+            donde, NOMBRES.get(e["vende"], "tipo %d" % e["vende"]), e["clase"])
     if que == "cofre" and e["que"] != "cofre":
         return "%s: sale un cofre con %s" % (donde, NOMBRES.get(tipo, "tipo %d" % tipo))
     return "%s: %s" % (donde, NOMBRES.get(tipo, "tipo %d" % tipo))

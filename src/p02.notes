@@ -1005,6 +1005,270 @@ C 0x8EF0 el bit de arriba...
 C 0x8EF2 ... puesto: se pinta
 C 0x8EF5 el siguiente
 
+B 0x9179 LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar el bloque); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
+L 0x9179 sale_un_vendedor
+C 0x9179 guarda el secreto de 0xE000
+C 0x917C busca lo que vende entre los dos huecos...
+C 0x917F ... y si no esta, no sale
+C 0x9180 el hueco 0 va a 0xC5B5...
+C 0x9183 (A = 2: el hueco 0)
+C 0x9186 ... y el 1 a 0xC5C5
+C 0x9189 estado 1: recien salido
+C 0x918C la y
+C 0x918E la x
+C 0x9190 ningun golpe
+C 0x9193 cual es (lo que vende)
+C 0x9195 su clase
+C 0x919A y el secreto de 0xE000, alto y bajo
+L 0x91A2 busca_su_hueco
+C 0x91A2 A = cual...
+C 0x91A4 ... y C = lo que vende, de 0x5B0B
+C 0x91AB los dos huecos de la habitacion
+C 0x91AE A = 0 y luego 1
+C 0x91B1 el hueco en 0xDE00
+C 0x91B6 vende eso?
+C 0x91B7 si: Z, con B = 2 (hueco 0) o 1 (hueco 1)
+C 0x91BB A = B (sin tocar las banderas)
+B 0x91BE LOS DOS VENDEDORES, cada cuadro: la ficha de 0xC5B5 y la de 0xC5C5, con IX en ella y C = el hueco, a 0x91D8 si esta puesta.
+L 0x91BE mueve_los_vendedores
+C 0x91C1 dos, desde el hueco 0
+C 0x91C4 IX = la ficha
+C 0x91CA puesta?
+C 0x91CB si: segun su estado
+C 0x91CF la siguiente, 16 bytes mas
+C 0x91D4 el hueco siguiente
+L 0x91D8 segun_el_estado_del_vendedor
+C 0x91D8 E = la y...
+C 0x91DA ... D = la x
+C 0x91DE el estado, sin el bit 7:
+C 0x91E0 1, recien salido...
+C 0x91E3 ... 2, esperando un golpe...
+C 0x91E6 ... 3, dando lo que toca
+L 0x91EA vendedor_recien_salido
+C 0x91EA apunta su hueco
+C 0x91ED estado 2, pintado (bit 7)
+C 0x91EF y se pinta
+L 0x91F2 vendedor_esperando
+C 0x91F2 los golpes (0x80E5 los sube; 0x928D pone 0xFF)
+C 0x91F6 ninguno: nada
+C 0x91F8 se gastan
+C 0x91FB B = cual...
+C 0x91FD ... C = la clase
+C 0x91FF 0xFF, la cruz?
+C 0x9203 no: una visita mas en su hueco...
+C 0x9206 ... la que cuenta (sin el bit 7)
+C 0x9209 lo que toca en esta visita
+C 0x920C 0x20 cuadros...
+C 0x9210 ... en el estado 3
+L 0x9215 la_cruz_lo_quita
+C 0x9215 el desenlace 6 (se va)...
+C 0x921A ... con el dibujo 3
+L 0x9221 su_cuenta_de_visitas
+C 0x9221 el hueco de la ficha...
+C 0x9224 ... en 0xDE00...
+C 0x9227 ... su segundo byte: las visitas
+L 0x9229 vendedor_dando
+C 0x9229 un cuadro menos
+C 0x922F en los impares...
+C 0x9231 ... el dibujo 2...
+C 0x9235 ... y en los pares el que toca: parpadea
+C 0x9238 lo pinta
+C 0x923E hasta el ultimo cuadro
+C 0x923F entonces se queda el que toca...
+C 0x9245 ... vuelve al estado 2...
+C 0x9249 ... y pasa lo que toca
+L 0x924C pinta_el_vendedor
+C 0x924C guarda las 4 x 4 celdas del mapa que tapa (16 bytes por hueco en 0xE580)
+C 0x9254 las visitas del hueco:
+C 0x9257 la tienda quedo abierta sin comprar (bit 7)?
+C 0x925B si: esa visita no cuenta
+C 0x925C el dibujo 3, la puerta
+L 0x925E pinta_un_dibujo_de_vendedor
+C 0x925E el dibujo A de la fila 0xA0 de la pagina 1, x = A * 32...
+C 0x9264 ... con TIMP de la pagina 1 a la 0...
+C 0x9266 ... 32 x 32 puntos, a (D, E)
+B 0x926C REPINTA LOS VENDEDORES que estan puestos, con el dibujo de la puerta (tras borrar la pantalla: p02:8D1C, 95C2).
+L 0x926C repinta_los_vendedores
+C 0x926F dos
+C 0x9275 IX = la ficha
+C 0x9278 puesta?
+C 0x927D la siguiente, 16 bytes mas
+L 0x9286 repinta_uno
+C 0x9286 E = la y, D = la x
+C 0x928A y la puerta
+B 0x928D LA CRUZ (p02:8DC2) se lleva a los vendedores pintados: pone 0xFF en sus golpes, y 0x91F2 les da el desenlace 6.
+L 0x928D la_cruz_y_los_vendedores
+C 0x928F dos
+C 0x9293 puesta...
+C 0x9297 ... y pintada (bit 7)?
+C 0x929A si: los golpes...
+C 0x929D ... a 0xFF
+C 0x92A0 la siguiente, 16 bytes mas
+L 0x92A7 pasa_lo_que_toca
+C 0x92A7 el desenlace (0 a 6), por la tabla de detras
+B 0x92BB LO QUE TOCA EN ESTA VISITA: la fila de la clase en 0x9300 (ocho bytes), en la columna de la visita (la octava y siguientes, la ultima). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
+L 0x92BB lo_que_toca
+C 0x92BE (su clase, por ocho)
+C 0x92C4 la fila de la clase
+C 0x92C7 la visita, desde 0...
+C 0x92C9 ... hasta la octava
+C 0x92CF su columna
+C 0x92D2 el desenlace
+C 0x92D6 7 o mas se sortea:
+C 0x92DA 7: el 3 o el 5
+C 0x92E0 8: el 4 o el 5
+C 0x92E5 9: el 3 o el 4
+C 0x92E8 un bit de R
+C 0x92EB H...
+C 0x92EE ... o L
+C 0x92EF el desenlace sorteado
+C 0x92F2 su dibujo, de 0x9320
+L 0x9327 abre_la_tienda
+C 0x9327 0: la tienda (0xC40C a 0xFF; el estado del juego la abre)
+C 0x932F con el hueco de este vendedor
+L 0x9333 una_vuelta_mas
+C 0x9333 1: una VUELTA mas, hasta 3
+L 0x933C una_vuelta_menos
+C 0x933C 2: una VUELTA menos, hasta 0
+L 0x9343 no_pasa_nada
+C 0x9343 5: nada
+L 0x9344 da_cinco_corazones
+C 0x9344 3: efecto 0x0F...
+C 0x9349 ... y cinco corazones mas
+L 0x934E quita_cinco_corazones
+C 0x934E 4: efecto 0x1D...
+C 0x9353 ... y cinco corazones menos
+L 0x9358 el_vendedor_se_va
+C 0x9358 6: fuera la ficha
+C 0x935C devuelve a la pantalla lo que tapaba
+C 0x935F y al mapa
+C 0x9365 el secreto de 0xE000...
+C 0x936B ... se borra: ya no vuelve
+C 0x936D efecto 0x10...
+C 0x9372 ... y 5.000 puntos
+L 0x9378 devuelve_lo_que_tapaba
+C 0x9378 E = la y...
+C 0x937B ... D = la x...
+C 0x937E ... C = el hueco
+C 0x9381 las 4 x 4 celdas guardadas en 0xE580
+B 0x9387 LA TIENDA (el estado del juego, p00:440E): lo que vende y su precio, 0x14 plazos de 32 cuadros para decidir, efecto 0x19, y la ventana: 0x50 x 0x20 puntos junto al vendedor (a su izquierda desde la x 0x80), con el fondo guardado en (0xB0, 0x80) de la pagina 1, dos rotulos, el precio en corazones y el objeto en un marco.
+L 0x9387 abre_la_ventana_de_la_tienda
+C 0x9387 lo que vende y su precio
+C 0x938A 0x14 plazos
+C 0x938F efecto 0x19
+L 0x9397 pinta_la_ventana_de_la_tienda
+C 0x9397 la ficha del hueco (0xC703 * 16)
+C 0x93A4 E = la y...
+C 0x93A6 ... D = la x
+C 0x93A8 a la derecha de la mitad?
+C 0x93AD no: la ventana 0x10 a la izquierda
+C 0x93B1 si: 0x20 a la izquierda
+C 0x93B4 y 0x18 mas arriba
+C 0x93B8 el sitio de la ventana
+C 0x93BB su fondo, a (0xB0, 0x80)...
+C 0x93BE ... 0x50 x 0x20...
+C 0x93C1 ... de la pagina 0 a la 1
+C 0x93CA el fondo de la ventana
+C 0x93CD (0x38, 6) mas alla...
+C 0x93D3 ... un marco de 0x13 x 0x14...
+C 0x93D7 ... (C = 0x0E)
+C 0x93DC en (8, 4), el rotulo de 0x9485
+C 0x93E5 en (8, 0x10), el de 0x948A
+C 0x93EE el precio
+C 0x93F1 y en (0x39, 8)...
+C 0x93F7 ... el dibujo de lo que vende
+L 0x93FF lo_que_vende_y_su_precio
+C 0x93FF su hueco en 0xDE00
+C 0x9402 lo que vende, a 0xC708
+C 0x9406 las visitas...
+C 0x9407 ... con el bit 7: tienda abierta sin comprar
+C 0x9409 buscalo entre los nueve de 0x9428
+C 0x940E es este?
+C 0x9412 no: cuatro bytes mas
+L 0x9418 el_precio_que_toca
+C 0x941B con el libro blanco (bit 7), mas barato...
+C 0x941C ... el tercer byte
+C 0x941E con el libro rojo (bit 6), mas caro...
+C 0x941F ... el cuarto
+C 0x9421 (sin ninguno, el segundo)
+C 0x9423 el precio, en corazones BCD, a 0xC707
+L 0x944C el_hueco_del_vendedor
+C 0x944C A = el hueco de la tienda
+B 0x944F EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][visitas] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
+L 0x944F hueco_en_0xde00
+C 0x9450 columna 0 en el patio
+C 0x9459 fase 1-18: la columna de 0x9473
+C 0x9461 0xDE00...
+C 0x9464 ... mas la columna...
+C 0x9468 ... mas cuatro por habitacion
+C 0x946E el hueco 0...
+C 0x9470 ... o dos bytes mas, el 1
+L 0x9491 pinta_el_precio
+C 0x9491 en (0x18, 0x10)...
+C 0x9497 ... un byte BCD, el precio
+L 0x949F pinta_un_rotulo_de_la_tienda
+C 0x949F en la ventana, (B, C) mas alla
+C 0x94A2 hasta el 0xFF
+C 0x94A6 la letra A...
+C 0x94A9 ... se pinta
+L 0x94AF en_la_ventana
+C 0x94AF DE = el sitio de la ventana...
+C 0x94B3 ... mas B en la x...
+C 0x94B6 ... y C en la y
+B 0x94BA LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja la visita contada); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
+L 0x94BA la_tienda_cada_cuadro
+C 0x94BA uno de cada 32 cuadros...
+C 0x94C1 ... un plazo menos
+C 0x94C5 sin plazos: fuera
+L 0x94C7 lee_la_compra
+C 0x94C7 una tecla recien pulsada?
+C 0x94CA ninguna: sigue
+C 0x94CC el bit 0 (disparo o espacio)?
+C 0x94CD no, el otro: fuera
+C 0x94CF el precio...
+C 0x94D3 ... contra los corazones
+C 0x94D7 no llega: fuera
+C 0x94D9 la ventana llega al marcador (y < 0x20)?
+C 0x94DF si: se quita antes de repintar los corazones
+C 0x94E2 quita el precio de los corazones
+C 0x94E5 da lo que vende
+C 0x94EC y vuelve la ventana, si se quito
+C 0x94EF efecto 0x12
+C 0x94F4 la visita queda contada...
+C 0x94F8 ... (sin el bit 7)
+C 0x94FA Z: se cierra
+L 0x94FC sale_de_la_tienda
+C 0x94FC efecto 2
+C 0x9501 Z: se cierra
+L 0x9503 sigue_la_tienda
+C 0x9503 NZ: sigue abierta
+L 0x9507 cierra_la_tienda
+C 0x9507 devuelve el fondo...
+C 0x950A ... y los marcos
+L 0x950D devuelve_el_fondo_de_la_ventana
+C 0x950E de (0xB0, 0x80) de la pagina 1...
+C 0x9511 ... a la ventana...
+C 0x9515 ... 0x50 x 0x20...
+C 0x9518 ... en la pagina 0
+B 0x951F LOS DOS BOTONES, recien pulsados: bit 0 = el disparo 1 del mando 1 o el ESPACIO, bit 1 = el disparo 2 o SHIFT. Guarda lo de este cuadro en 0xC709 y devuelve solo lo que no estaba pulsado en el anterior (Z si nada).
+L 0x951F los_botones_recien_pulsados
+C 0x951F el registro 15 del PSG a 0x8F...
+C 0x9526 ... y el 14: los disparos del mando
+C 0x952D (a 0, pulsado)
+C 0x952E los dos disparos...
+C 0x9530 ... a los bits 0 y 1
+C 0x9535 la fila 6 del teclado (SHIFT)...
+C 0x953A ... al bit 1
+C 0x953D la fila 8 (ESPACIO)...
+C 0x9542 ... al bit 0
+C 0x9543 lo del cuadro anterior
+C 0x9547 y se guarda el de este
+C 0x9548 lo que ha cambiado...
+C 0x9549 ... y esta pulsado
+L 0x954B tecla_de_la_fila
+C 0x954B la fila A...
+C 0x954E ... su bit 0, a 1 si esta pulsada
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
 F 0x8000 16
@@ -1030,11 +1294,11 @@ D 0x906C 0x909B dos_listas  dos listas que termina un 0xFF: la de 0x906C la reco
 F 0x906C 16
 D 0x913F 0x9147 cuatro_pares  cuatro pares que p02:9112 recorre con IX (`ld b,4`)
 F 0x913F 16
-D 0x9300 0x9327 tres_tablas_pequenas  la de 0x9300 la lee p02:92BB con (ix+5) * 4; la de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320 la indexa p02:92F5 con 0xC70C
+D 0x9300 0x9327 tres_tablas_pequenas  la de 0x9300, lo que toca a cada vendedor: una fila de ocho visitas por clase (p02:92BB, con la clase * 8); la de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320, el dibujo de cada desenlace (p02:92F5, con 0xC70C)
 F 0x9300 16
-D 0x9428 0x944C nueve_pares_y_mas  lo que compara p02:9409 (`ld b,9`, `cp (hl)` y `inc hl`)
+D 0x9428 0x944C lo_que_venden  los nueve de la tienda (p02:9409): lo que vende y su precio en corazones BCD, sin libro, con el blanco y con el rojo
 F 0x9428 16
-D 0x9473 0x9491 columna_y_dos_rotulos  18 bytes, uno por fase (1-18), que p02:945A usa de columna (0x00, 0x40 o 0x80); detras, los dos trozos de 0x9485 y 0x948A que p02:93DF y 93E8 pasan a 0x949F
+D 0x9473 0x9491 columna_y_dos_rotulos  18 bytes, uno por fase (1-18): su columna del bloque en 0xDE00 (0x00, 0x40 o 0x80; p02:945A); detras, los dos rotulos de la tienda (0x9485 y 0x948A, p02:93DF y 93E8)
 F 0x9473 16
 D 0x95F6 0x9609 un_tope_por_fase  19 bytes, uno por fase, contra los que p02:95F2 compara
 F 0x95F6 16
@@ -1249,22 +1513,12 @@ C 0x916A guarda el estado de la puerta de la fase
 C 0x916E apunta a el estado de la puerta de la fase
 C 0x91A7 hl_mas_a: HL += A
 C 0x92AA despacha: salta a la entrada A de la tabla que va detras del call
-C 0x92BE lee la x de la cosa
-C 0x92C4 de_mas_a: DE += A
-C 0x92CF de_mas_a: DE += A
 C 0x92F8 hl_mas_a: HL += A
 C 0x932C lee la velocidad horizontal (parte baja)
-C 0x9333 apunta a la VUELTA (0, 1 o 2)
-C 0x933C apunta a la VUELTA (0, 1 o 2)
 C 0x9346 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x9350 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x9358 el tipo de la cosa = 0x00
-C 0x9365 lee la velocidad vertical (parte baja)
 C 0x9368 lee la velocidad vertical
 C 0x936F sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x9378 lee el paso en que va la cosa
-C 0x937B lee la fraccion de la y de la cosa
-C 0x937E lee la velocidad horizontal (parte baja)
 C 0x9391 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x93A1 hl_mas_a: HL += A
 C 0x93C5 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
@@ -1273,8 +1527,6 @@ C 0x9453 lee la FASE (0 el patio, 1-18)
 C 0x945D hl_mas_a: HL += A
 C 0x9465 lee la HABITACION dentro de la fase
 C 0x946A hl_mas_a: HL += A
-C 0x94BA lee el contador de cuadros
-C 0x94D3 lee los corazones, en BCD
 C 0x94F1 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x94FE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x951A copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)

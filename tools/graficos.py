@@ -270,7 +270,7 @@ def carga_las_puertas(cart, vram):
     nibble 0xF de comodin- coloreada cinco veces (p00:550D, un color por
     vuelta) y subida como 4 x 4 piezas (p00:5548) en la fila 0xA0 de la
     pagina 1, una puerta cada 32 puntos. La cuarta, la blanca (color 14), es
-    la puerta cerrada de las habitaciones (p02:925E con A = 3)."""
+    la puerta de los vendedores (p02:925E con A = 3)."""
     for k, color in enumerate(COLORES_DE_LAS_PUERTAS):
         ram = bytearray(0x120)                        # 0xE800-0xE91F
         for i in range(256):
