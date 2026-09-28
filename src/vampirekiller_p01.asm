@@ -45,35 +45,35 @@ L_6028:
 	ret			;6028
 L_6029:
 	ld a,(ix+020h)		;6029   ; lee cuantos sprites lleva la cosa
-	and a			;602c
-	ret z			;602d
+	and a			;602c   ; sin sprites
+	ret z			;602d   ; nada que colorear
 	ld a,(ix+000h)		;602e   ; lee el tipo de la cosa
 	call palabra_de_la_tabla		;6031   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	ld hl,(0cff3h)		;6034   ; lee la ficha de la cosa que se crea
-	set 5,l		;6037
-	ld b,(hl)			;6039
-	ld a,005h		;603a
+	set 5,l		;6037   ; los sprites de la ficha, desde +0x20
+	ld b,(hl)			;6039   ; cuantos
+	ld a,005h		;603a   ; el color va 5 mas alla
 	add a,l			;603c
 	ld l,a			;603d
 L_603E:
-	ld a,(de)			;603e
+	ld a,(de)			;603e   ; el color del sprite
 	inc de			;603f
 	ld (hl),a			;6040
 	ld a,l			;6041
-	add a,005h		;6042
+	add a,005h		;6042   ; el siguiente sprite, 5 bytes mas alla
 	ld l,a			;6044
-	djnz L_603E		;6045
+	djnz L_603E		;6045   ; uno por sprite
 	ret			;6047
 L_6048:
-	push hl			;6048
+	push hl			;6048   ; apunta el hueco de sprite D en el sprite E de la ficha
 	ld hl,(0cff3h)		;6049   ; lee la ficha de la cosa que se crea
-	ld a,e			;604c
+	ld a,e			;604c   ; E * 5...
 	add a,a			;604d
 	add a,a			;604e
 	add a,e			;604f
-	add a,021h		;6050
+	add a,021h		;6050   ; ... + 0x21
 	call 04061h		;6052   ; hl_mas_a: HL += A
-	ld (hl),d			;6055
+	ld (hl),d			;6055   ; el hueco
 	pop hl			;6056
 	ret			;6057
 
@@ -128,144 +128,144 @@ DATA_listas_de_colores:
 
 
 L_6154:
-	di			;6154
-	ld a,00eh		;6155
+	di			;6154   ; LAS COSAS DE LAS HABITACIONES del bloque, con el banco 14
+	ld a,00eh		;6155   ; el banco 14
 	ld (08000h),a		;6157   ; el mapper: pone en 0x8000 el banco de A
 	ld (0f0f2h),a		;615a   ; guarda la copia del banco de 0x8000
 	ei			;615d
-	call L_61A9		;615e
-	call L_619E		;6161
-	ld de,0db00h		;6164
+	call L_61A9		;615e   ; las tres listas, en blanco
+	call L_619E		;6161   ; las del bloque de 0xD002
+	ld de,0db00h		;6164   ; la de la primera fase del bloque
 	call L_6181		;6167
-	ld de,0dc00h		;616a
+	ld de,0dc00h		;616a   ; la de la segunda
 	call L_6181		;616d
-	ld de,0dd00h		;6170
+	ld de,0dd00h		;6170   ; la de la tercera
 	call L_6181		;6173
-	di			;6176
+	di			;6176   ; vuelve el banco 2
 	ld a,002h		;6177
 	ld (08000h),a		;6179   ; el mapper: pone en 0x8000 el banco de A
 	ld (0f0f2h),a		;617c   ; guarda la copia del banco de 0x8000
 	ei			;617f
 	ret			;6180
 L_6181:
-	ld (0cff0h),de		;6181   ; guarda el tipo de la cosa que se crea
+	ld (0cff0h),de		;6181   ; el principio de la habitacion (0xCFF0 de temporal)
 L_6185:
-	ld a,(hl)			;6185
+	ld a,(hl)			;6185   ; el tipo
 	inc hl			;6186
-	inc a			;6187
+	inc a			;6187   ; 0xFF: acabo la lista
 	ret z			;6188
 	dec a			;6189
-	jr z,L_6194		;618a
-	ld (de),a			;618c
+	jr z,L_6194		;618a   ; 0x00: la habitacion siguiente
+	ld (de),a			;618c   ; el tipo
 	inc de			;618d
-	ldi		;618e
-	inc de			;6190
+	ldi		;618e   ; y la posicion
+	inc de			;6190   ; salta los otros dos bytes
 	inc de			;6191
 	jr L_6185		;6192
 L_6194:
-	ld de,(0cff0h)		;6194   ; lee el tipo de la cosa que se crea
+	ld de,(0cff0h)		;6194   ; la habitacion siguiente...
 	ld a,e			;6198
-	add a,010h		;6199
+	add a,010h		;6199   ; ... 16 bytes mas alla
 	ld e,a			;619b
 	jr L_6181		;619c
 L_619E:
-	ld a,(0d002h)		;619e   ; lee el bloque de tres fases (0-5)
-	ld de,08668h		;61a1
+	ld a,(0d002h)		;619e   ; el bloque
+	ld de,08668h		;61a1   ; la tabla de las tres listas de cada bloque
 	call palabra_de_la_tabla		;61a4   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-	ex de,hl			;61a7
+	ex de,hl			;61a7   ; HL = sus listas
 	ret			;61a8
 L_61A9:
-	ld hl,0db00h		;61a9
-	ld c,001h		;61ac
+	ld hl,0db00h		;61a9   ; las tres listas en blanco: 0xC0 cosas
+	ld c,001h		;61ac   ; numeradas desde 1
 	ld b,0c0h		;61ae
 L_61B0:
-	ld (hl),000h		;61b0
+	ld (hl),000h		;61b0   ; sin tipo
 	inc hl			;61b2
 	inc hl			;61b3
 	inc hl			;61b4
-	ld (hl),c			;61b5
-	inc c			;61b6
+	ld (hl),c			;61b5   ; el cuarto byte, su numero
+	inc c			;61b6   ; (cada cosa lleva el suyo)
 	inc hl			;61b7
 	djnz L_61B0		;61b8
 	ret			;61ba
 L_61BB:
-	ld a,(0d002h)		;61bb   ; lee el bloque de tres fases (0-5)
+	ld a,(0d002h)		;61bb   ; CREA LAS COSAS DE LA HABITACION: el bloque...
 	ld c,a			;61be
-	add a,a			;61bf
+	add a,a			;61bf   ; ... por tres
 	add a,c			;61c0
 	ld c,a			;61c1
 	ld a,(0d000h)		;61c2   ; lee la FASE (0 el patio, 1-18)
-	dec a			;61c5
-	ret m			;61c6
-	sub c			;61c7
-	ld h,a			;61c8
+	dec a			;61c5   ; la fase, desde 1
+	ret m			;61c6   ; el patio no tiene
+	sub c			;61c7   ; la fase dentro del bloque
+	ld h,a			;61c8   ; 256 bytes por fase
 	ld l,000h		;61c9
-	ld de,0db00h		;61cb
+	ld de,0db00h		;61cb   ; en las listas
 	add hl,de			;61ce
 	ld a,(0d001h)		;61cf   ; lee la HABITACION dentro de la fase
-	add a,a			;61d2
+	add a,a			;61d2   ; 16 bytes por habitacion
 	add a,a			;61d3
 	add a,a			;61d4
 	add a,a			;61d5
 	call 04061h		;61d6   ; hl_mas_a: HL += A
-	ld b,004h		;61d9
+	ld b,004h		;61d9   ; cuatro cosas
 L_61DB:
 	push bc			;61db
 	push hl			;61dc
-	ld a,(hl)			;61dd
+	ld a,(hl)			;61dd   ; el tipo
 	and a			;61de
-	jr z,L_61F9		;61df
+	jr z,L_61F9		;61df   ; no hay
 	ld b,000h		;61e1
-	and 07fh		;61e3
-	ld c,a			;61e5
+	and 07fh		;61e3   ; sin la bandera
+	ld c,a			;61e5   ; C = el tipo
 	inc hl			;61e6
-	ld a,(hl)			;61e7
-	and 0f0h		;61e8
+	ld a,(hl)			;61e7   ; la posicion:
+	and 0f0h		;61e8   ; la y, el nibble alto
 	ld e,a			;61ea
-	ld a,(hl)			;61eb
+	ld a,(hl)			;61eb   ; la x...
 	and 00fh		;61ec
-	add a,a			;61ee
+	add a,a			;61ee   ; ... por 16
 	add a,a			;61ef
 	add a,a			;61f0
 	add a,a			;61f1
-	ld d,a			;61f2
+	ld d,a			;61f2   ; D
 	inc hl			;61f3
 	inc hl			;61f4
-	ld a,(hl)			;61f5
-	call 05f1fh		;61f6
+	ld a,(hl)			;61f5   ; su numero
+	call 05f1fh		;61f6   ; crea la cosa
 L_61F9:
 	pop hl			;61f9
 	pop bc			;61fa
-	inc hl			;61fb
+	inc hl			;61fb   ; la siguiente, 4 bytes mas alla
 	inc hl			;61fc
 	inc hl			;61fd
 	inc hl			;61fe
-	djnz L_61DB		;61ff
+	djnz L_61DB		;61ff   ; cuatro
 	ret			;6201
 L_6202:
-	call 047d4h		;6202   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
+	call 047d4h		;6202   ; LA PANTALLA DEL TITULO
 	call 05727h		;6205
-	ld hl,0623ch		;6208
+	ld hl,0623ch		;6208   ; su paleta
 	call 0483eh		;620b   ; pon_paleta: lista de [color][RB][G] hasta 0xFF
-	ld b,00fh		;620e
-	ld c,007h		;6210
+	ld b,00fh		;620e   ; el borde...
+	ld c,007h		;6210   ; ... registro 7 = 0x0F
 	call 00047h		;6212   ; BIOS WRTVDP - Writes data in the VDP-register
-	ld hl,02840h		;6215
-	ld bc,0a848h		;6218
-	xor a			;621b
-	ld d,001h		;621c
+	ld hl,02840h		;6215   ; un rectangulo...
+	ld bc,0a848h		;6218   ; ... de 0xA8 x 0x48 en (0x28, 0x40)...
+	xor a			;621b   ; ... de color 0...
+	ld d,001h		;621c   ; ... en la pagina 1
 	call 0490ah		;621e   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 	call 0530fh		;6221
-	ld de,04040h		;6224
-	ld hl,0628fh		;6227
+	ld de,04040h		;6224   ; en (0x40, 0x40)...
+	ld hl,0628fh		;6227   ; ... el logotipo, del guion de 0x628F
 	call L_626F		;622a
 	call 047c7h		;622d   ; enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
-	ld hl,0c420h		;6230
+	ld hl,0c420h		;6230   ; la cuenta del telon
 	ld (hl),03ch		;6233
 	inc hl			;6235
-	ld (hl),031h		;6236
+	ld (hl),031h		;6236   ; 0x31 lineas
 	inc hl			;6238
-	ld (hl),000h		;6239
+	ld (hl),000h		;6239   ; sin acabar
 	ret			;623b
 
 ; ----------------------------------------------------------------------
@@ -287,49 +287,49 @@ DATA_paleta_623C:
 
 
 L_624C:
-	ld hl,0c420h		;624c
+	ld hl,0c420h		;624c   ; EL TELON DEL TITULO: la cuenta
 	dec (hl)			;624f
-	ld a,(hl)			;6250
+	ld a,(hl)			;6250   ; un cuadro de cada dos
 	and 001h		;6251
 	ret nz			;6253
-	inc hl			;6254
+	inc hl			;6254   ; una linea menos
 	dec (hl)			;6255
-	jr nz,L_625E		;6256
-	ld a,001h		;6258
-	ld (0c422h),a		;625a
+	jr nz,L_625E		;6256   ; quedan
+	ld a,001h		;6258   ; se acabo:
+	ld (0c422h),a		;625a   ; el titulo, listo
 	ret			;625d
 L_625E:
-	ld a,031h		;625e
+	ld a,031h		;625e   ; 0x31 menos las que quedan
 	sub (hl)			;6260
-	ld c,a			;6261
-	ld b,0a8h		;6262
-	ld hl,02840h		;6264
-	ld de,02840h		;6267
+	ld c,a			;6261   ; C = las lineas que se ven
+	ld b,0a8h		;6262   ; 0xA8 de ancho
+	ld hl,02840h		;6264   ; de (0x28, 0x40) de la pagina 1...
+	ld de,02840h		;6267   ; ... a (0x28, 0x40) de la 0
 	ld a,001h		;626a
 	jp 04946h		;626c   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_626F:
-	push de			;626f
+	push de			;626f   ; la posicion de la fila
 L_6270:
-	ld a,(hl)			;6270
+	ld a,(hl)			;6270   ; el dibujo
 	inc hl			;6271
 	ld c,a			;6272
-	inc a			;6273
+	inc a			;6273   ; 0xFF acaba
 	jr z,L_628D		;6274
-	inc a			;6276
+	inc a			;6276   ; 0xFE: fila nueva
 	jr nz,L_6284		;6277
-	pop de			;6279
-	ld a,(hl)			;627a
+	pop de			;6279   ; vuelve al principio de la fila...
+	ld a,(hl)			;627a   ; ... corrida dx
 	inc hl			;627b
 	add a,d			;627c
 	ld d,a			;627d
-	ld a,008h		;627e
+	ld a,008h		;627e   ; y 8 puntos mas abajo
 	add a,e			;6280
 	ld e,a			;6281
 	jr L_626F		;6282
 L_6284:
-	ld a,c			;6284
-	call 04b2fh		;6285
-	call 04b4fh		;6288
+	ld a,c			;6284   ; el dibujo
+	call 04b2fh		;6285   ; lo pinta
+	call 04b4fh		;6288   ; la posicion siguiente
 	jr L_6270		;628b
 L_628D:
 	pop de			;628d
@@ -353,73 +353,73 @@ DATA_logotipo:
 
 
 L_62D0:
-	ld a,020h		;62d0
+	ld a,020h		;62d0   ; EMPIEZA UNA VIDA: vida llena...
 	ld (0c415h),a		;62d2   ; guarda la vida de Simon
 L_62D5:
-	ld a,080h		;62d5
+	ld a,080h		;62d5   ; ... y la barra del enemigo llena
 	ld (0c418h),a		;62d7   ; guarda la vida del enemigo (barra ENEMY)
-	call L_70DC		;62da
-	call 0548dh		;62dd
-	call 05768h		;62e0
-	jp 053b6h		;62e3
+	call L_70DC		;62da   ; fuera armas y cuentas
+	call 0548dh		;62dd   ; los dibujos de las armas
+	call 05768h		;62e0   ; y los de la fase
+	jp 053b6h		;62e3   ; y los de la pantalla
 L_62E6:
 	call 0564ch		;62e6   ; sube_los_dibujos_de_la_fase: los 191 dibujos del decorado de la fase de 0xD000
-	call 0570dh		;62e9
-	call L_63B7		;62ec
-	call L_6402		;62ef
-	call 05a49h		;62f2
+	call 0570dh		;62e9   ; la paleta de la fase
+	call L_63B7		;62ec   ; borra lo de Simon (0xC420-0xC46F)
+	call L_6402		;62ef   ; Simon a la salida de la fase
+	call 05a49h		;62f2   ; la lista de cosas de la fase
 L_62F5:
-	call L_63C5		;62f5
-	call L_6382		;62f8
-	call 05780h		;62fb
-	call 056e1h		;62fe
-	call 04f83h		;6301
+	call L_63C5		;62f5   ; todos los sprites fuera
+	call L_6382		;62f8   ; vacia las listas de la habitacion
+	call 05780h		;62fb   ; la carga de la habitacion
+	call 056e1h		;62fe   ; los dibujos de su decorado
+	call 04f83h		;6301   ; monta la habitacion
 	call 047d4h		;6304   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-	call L_6333		;6307
-	call 04f91h		;630a
-	call 091beh		;630d
-	call 08671h		;6310
-	call 09147h		;6313
-	call 08ee6h		;6316
-	ld a,(0ce00h)		;6319
+	call L_6333		;6307   ; mira si es la habitacion especial
+	call 04f91h		;630a   ; la pinta
+	call 091beh		;630d   ; las puertas
+	call 08671h		;6310   ; los bloques que se rompen
+	call 09147h		;6313   ; otra lista
+	call 08ee6h		;6316   ; lo que lleva, en el marcador
+	ld a,(0ce00h)		;6319   ; la especial 6...
 	cp 006h		;631c
-	call z,L_632D		;631e
+	call z,L_632D		;631e   ; ... trae lo suyo
 	call 047c7h		;6321   ; enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
-	call 09ca9h		;6324
-	call L_6154		;6327
-	jp L_61BB		;632a
+	call 09ca9h		;6324   ; los plazos de las siete cosas
+	call L_6154		;6327   ; las cosas de las habitaciones
+	jp L_61BB		;632a   ; y las de esta
 L_632D:
 	call L_6914		;632d
 	jp L_69A0		;6330
 L_6333:
-	xor a			;6333
+	xor a			;6333   ; a cero lo de la habitacion especial
 	ld (0ce40h),a		;6334
 	ld (0ce00h),a		;6337
 	ld (0ce0bh),a		;633a
 	ld (0ce08h),a		;633d
 	ld (0ce15h),a		;6340
 	ld a,(0d000h)		;6343   ; lee la FASE (0 el patio, 1-18)
-	ld hl,0636fh		;6346
+	ld hl,0636fh		;6346   ; la habitacion especial de cada fase
 	call 04061h		;6349   ; hl_mas_a: HL += A
 	ld a,(0d001h)		;634c   ; lee la HABITACION dentro de la fase
-	ld c,a			;634f
-	ld a,(hl)			;6350
+	ld c,a			;634f   ; C = la habitacion en la que se esta
+	ld a,(hl)			;6350   ; el byte de la fase
 	ld b,a			;6351
-	rra			;6352
+	rra			;6352   ; la habitacion, el nibble alto
 	rra			;6353
 	rra			;6354
 	rra			;6355
 	and 00fh		;6356
-	cp c			;6358
-	ret nz			;6359
-	ld a,b			;635a
+	cp c			;6358   ; es esta?
+	ret nz			;6359   ; no
+	ld a,b			;635a   ; si: el nibble bajo...
 	and 00fh		;635b
-	ld l,a			;635d
+	ld l,a			;635d   ; ... a 0xCE00
 	ld h,000h		;635e
 	ld (0ce00h),hl		;6360
-	cp 006h		;6363
+	cp 006h		;6363   ; vale 6?
 	ret nz			;6365
-	call 059ech		;6366
+	call 059ech		;6366   ; si: los dibujos grandes de 0x57DF (0xB5A1 y 0xB719)
 	call 05880h		;6369
 	jp 057dfh		;636c
 
@@ -439,29 +439,29 @@ DATA_habitacion_especial_de_cada_fase:
 
 L_6382:
 	ld hl,0c470h		;6382   ; apunta a los bloques que se rompen (ocho de 16 bytes)
-	ld de,0c471h		;6385
+	ld de,0c471h		;6385   ; vacia las listas de la habitacion...
 	ld (hl),000h		;6388
-	ld bc,0028fh		;638a
+	ld bc,0028fh		;638a   ; ... 0x290 bytes
 	ldir		;638d
-	call 05b1bh		;638f
+	call 05b1bh		;638f   ; los bloques que se rompen
 	call 05a40h		;6392
 	call 0902dh		;6395
 	call 0909bh		;6398
 	call 05a37h		;639b
-	call L_7513		;639e
-	ld hl,0c800h		;63a1
-	ld de,00080h		;63a4
+	call L_7513		;639e   ; fuera las armas
+	ld hl,0c800h		;63a1   ; las siete fichas de 0xC800...
+	ld de,00080h		;63a4   ; de 0x80 en 0x80
 	ld b,007h		;63a7
-	call L_63B1		;63a9
-	ld hl,0d700h		;63ac
+	call L_63B1		;63a9   ; vacias
+	ld hl,0d700h		;63ac   ; y las ocho de 0xD700
 	ld b,008h		;63af
 L_63B1:
-	ld (hl),000h		;63b1
-	add hl,de			;63b3
+	ld (hl),000h		;63b1   ; tipo 0: vacia
+	add hl,de			;63b3   ; la siguiente
 	djnz L_63B1		;63b4
 	ret			;63b6
 L_63B7:
-	ld hl,0c420h		;63b7
+	ld hl,0c420h		;63b7   ; borra lo de Simon: 0xC420 a 0xC46F
 	ld d,h			;63ba
 	ld e,l			;63bb
 	inc de			;63bc
@@ -470,22 +470,22 @@ L_63B7:
 	ldir		;63c2
 	ret			;63c4
 L_63C5:
-	ld hl,0d600h		;63c5
+	ld hl,0d600h		;63c5   ; los 32 sprites de 0xD600...
 	ld b,020h		;63c8
 L_63CA:
-	ld (hl),0e0h		;63ca
-	inc l			;63cc
+	ld (hl),0e0h		;63ca   ; ... con la y a 0xE0: fuera de la pantalla
+	inc l			;63cc   ; 4 bytes cada uno
 	inc l			;63cd
 	inc l			;63ce
 	inc l			;63cf
 	djnz L_63CA		;63d0
 	ret			;63d2
 L_63D3:
-	call 047b9h		;63d3
-	ld a,080h		;63d6
+	call 047b9h		;63d3   ; LA PANTALLA DE UNA ESCENA:
+	ld a,080h		;63d6   ; Simon en el centro (0x80, 0x80)
 	ld (0c425h),a		;63d8   ; guarda la Y de Simon
 	ld (0c427h),a		;63db   ; guarda la X de Simon
-	call 05670h		;63de
+	call 05670h		;63de   ; los 191 dibujos del banco 9
 	call 05733h		;63e1
 	call 05678h		;63e4
 	call L_63C5		;63e7
@@ -493,24 +493,24 @@ L_63D3:
 	call 04ec0h		;63ed
 	call 04f17h		;63f0
 	call 047d4h		;63f3   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-	call 04513h		;63f6
-	call 04f83h		;63f9
-	call 04f91h		;63fc
+	call 04513h		;63f6   ; el marcador
+	call 04f83h		;63f9   ; monta la habitacion
+	call 04f91h		;63fc   ; la pinta
 	jp 047c7h		;63ff   ; enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
 L_6402:
 	ld a,(0d000h)		;6402   ; lee la FASE (0 el patio, 1-18)
-	ld hl,0641fh		;6405
-	add a,a			;6408
+	ld hl,0641fh		;6405   ; la salida de Simon en cada fase
+	add a,a			;6408   ; dos bytes por fase
 	call 04061h		;6409   ; hl_mas_a: HL += A
-	ld a,(hl)			;640c
+	ld a,(hl)			;640c   ; la y (el bit 0 es el lado)
 	inc hl			;640d
 	ld c,a			;640e
 	and 0feh		;640f
 	ld (0c425h),a		;6411   ; guarda la Y de Simon
-	ld a,(hl)			;6414
+	ld a,(hl)			;6414   ; la x
 	ld (0c427h),a		;6415   ; guarda la X de Simon
 	ld a,c			;6418
-	and 001h		;6419
+	and 001h		;6419   ; el lado
 	ld (0c42ch),a		;641b   ; guarda el lado al que mira Simon (0 derecha)
 	ret			;641e
 
@@ -530,93 +530,93 @@ DATA_salida_de_simon:
 
 
 L_6445:
-	ld a,(ix+000h)		;6445   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;6445   ; COMPONE LOS SPRITES DE LA COSA: el tipo 0x0E...
 	cp 00eh		;6448
 	ret z			;644a
-	cp 017h		;644b
+	cp 017h		;644b   ; ... y el 0x17 no
 	ret z			;644d
 	di			;644e
-	ld a,006h		;644f
+	ld a,006h		;644f   ; el banco 6 en 0xA000
 	ld (0a000h),a		;6451   ; el mapper: pone en 0xA000 el banco de A
 	ld (0f0f3h),a		;6454   ; guarda la copia del banco de 0xA000
 	ei			;6457
 	ld a,(ix+00bh)		;6458   ; lee el dibujo de la cosa
-	ld de,0b473h		;645b
+	ld de,0b473h		;645b   ; como se compone cada dibujo
 	call palabra_de_la_tabla		;645e   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-	push ix		;6461
+	push ix		;6461   ; los sprites de la ficha
 	pop hl			;6463
-	set 5,l		;6464
-	ld b,(hl)			;6466
-	inc l			;6467
+	set 5,l		;6464   ; +0x20
+	ld b,(hl)			;6466   ; cuantos
+	inc l			;6467   ; a la y del primero (+0x22)
 	inc l			;6468
-	ld a,(de)			;6469
+	ld a,(de)			;6469   ; 0x80, 0x81 y 0x82...
 	cp 080h		;646a
 	jr z,L_64A3		;646c
 	cp 081h		;646e
 	jr z,L_649D		;6470
-	cp 082h		;6472
+	cp 082h		;6472   ; ... son composiciones fijas
 	jr z,L_6497		;6474
 L_6476:
-	ld a,(de)			;6476
+	ld a,(de)			;6476   ; dy
 	inc de			;6477
 	add a,(ix+003h)		;6478   ; le suma la y de la cosa
-	ld (hl),a			;647b
+	ld (hl),a			;647b   ; la y del sprite
 	inc l			;647c
-	ld a,(de)			;647d
+	ld a,(de)			;647d   ; dx
 	add a,(ix+005h)		;647e   ; le suma la x de la cosa
-	ld (hl),a			;6481
+	ld (hl),a			;6481   ; la x del sprite
 	inc de			;6482
 	inc l			;6483
-	ld a,(de)			;6484
+	ld a,(de)			;6484   ; el patron
 	ld (hl),a			;6485
 	inc de			;6486
 	inc l			;6487
-	inc l			;6488
+	inc l			;6488   ; al siguiente sprite (5 bytes)
 	inc l			;6489
-	djnz L_6476		;648a
+	djnz L_6476		;648a   ; uno por sprite
 	di			;648c
-	ld a,003h		;648d
+	ld a,003h		;648d   ; vuelve el banco 3
 	ld (0a000h),a		;648f   ; el mapper: pone en 0xA000 el banco de A
 	ld (0f0f3h),a		;6492   ; guarda la copia del banco de 0xA000
 	ei			;6495
 	ret			;6496
 L_6497:
-	exx			;6497
+	exx			;6497   ; la 0x82: posiciones de 0x64D9
 	ld hl,064d9h		;6498
 	jr L_64A7		;649b
 L_649D:
-	exx			;649d
+	exx			;649d   ; la 0x81: de 0x64D5
 	ld hl,064d5h		;649e
 	jr L_64A7		;64a1
 L_64A3:
-	exx			;64a3
+	exx			;64a3   ; la 0x80: de 0x64CD
 	ld hl,064cdh		;64a4
 L_64A7:
 	exx			;64a7
 L_64A8:
 	exx			;64a8
-	ld a,(hl)			;64a9
+	ld a,(hl)			;64a9   ; dy fijo
 	inc hl			;64aa
 	add a,(ix+003h)		;64ab   ; le suma la y de la cosa
 	exx			;64ae
-	ld (hl),a			;64af
+	ld (hl),a			;64af   ; la y del sprite
 	inc l			;64b0
 	exx			;64b1
-	ld a,(hl)			;64b2
+	ld a,(hl)			;64b2   ; dx fijo
 	inc hl			;64b3
 	add a,(ix+005h)		;64b4   ; le suma la x de la cosa
 	exx			;64b7
-	ld (hl),a			;64b8
+	ld (hl),a			;64b8   ; la x del sprite
 	inc l			;64b9
-	inc de			;64ba
+	inc de			;64ba   ; el patron
 	ld a,(de)			;64bb
 	ld (hl),a			;64bc
-	inc l			;64bd
+	inc l			;64bd   ; al siguiente sprite
 	inc l			;64be
 	inc l			;64bf
-	djnz L_64A8		;64c0
+	djnz L_64A8		;64c0   ; uno por sprite
 	di			;64c2
-	ld a,003h		;64c3
+	ld a,003h		;64c3   ; vuelve el banco 3
 	ld (0a000h),a		;64c5   ; el mapper: pone en 0xA000 el banco de A
 	ld (0f0f3h),a		;64c8   ; guarda la copia del banco de 0xA000
 	ei			;64cb
@@ -637,139 +637,139 @@ DATA_posiciones_fijas:
 
 
 L_64E5:
-	ld hl,0d700h		;64e5
+	ld hl,0d700h		;64e5   ; LOS SPRITES A LA TABLA: las ocho de 0xD700
 	ld b,008h		;64e8
 	jr L_64F1		;64ea
 L_64EC:
-	ld hl,0c800h		;64ec
+	ld hl,0c800h		;64ec   ; o las siete de 0xC800
 	ld b,007h		;64ef
 L_64F1:
 	push bc			;64f1
 	push hl			;64f2
-	ld a,(hl)			;64f3
+	ld a,(hl)			;64f3   ; vacia?
 	and a			;64f4
-	call nz,L_6501		;64f5
+	call nz,L_6501		;64f5   ; sus sprites
 	pop hl			;64f8
 	pop bc			;64f9
-	ld de,00080h		;64fa
+	ld de,00080h		;64fa   ; la siguiente ficha
 	add hl,de			;64fd
 	djnz L_64F1		;64fe
 	ret			;6500
 L_6501:
-	set 5,l		;6501
+	set 5,l		;6501   ; +0x20: cuantos
 	ld b,(hl)			;6503
 	ld a,b			;6504
-	and a			;6505
+	and a			;6505   ; ninguno
 	ret z			;6506
-	inc l			;6507
+	inc l			;6507   ; el primero
 L_6508:
 	push bc			;6508
-	ld a,(hl)			;6509
+	ld a,(hl)			;6509   ; su hueco en la tabla
 	ld b,a			;650a
 	inc l			;650b
-	add a,a			;650c
+	add a,a			;650c   ; cuatro bytes por hueco
 	add a,a			;650d
-	ld de,0d638h		;650e
+	ld de,0d638h		;650e   ; en la copia de la tabla de atributos (0xD638)
 	add a,e			;6511
 	ld e,a			;6512
 	ld c,0ffh		;6513
-	ldi		;6515
+	ldi		;6515   ; y, x y patron
 	ldi		;6517
 	ldi		;6519
-	ld a,(hl)			;651b
+	ld a,(hl)			;651b   ; el color
 	and a			;651c
-	jr nz,L_6528		;651d
+	jr nz,L_6528		;651d   ; si es 0...
 	dec e			;651f
 	dec e			;6520
 	dec e			;6521
-	ld a,0e1h		;6522
+	ld a,0e1h		;6522   ; ... la y a 0xE1: no se ve
 	ld (de),a			;6524
 	inc e			;6525
 	inc e			;6526
 	inc e			;6527
 L_6528:
 	ex de,hl			;6528
-	ld hl,06a70h		;6529
+	ld hl,06a70h		;6529   ; los colores de linea de ese hueco:
 	ld a,b			;652c
 	add a,a			;652d
 	add a,a			;652e
 	add a,a			;652f
-	ld c,a			;6530
+	ld c,a			;6530   ; (0x6A70 + 8 * hueco) * 2 = 0xD4E0 + 16 * hueco
 	ld b,000h		;6531
 	add hl,bc			;6533
 	add hl,hl			;6534
 	ex de,hl			;6535
-	ld a,(hl)			;6536
-	ld b,010h		;6537
+	ld a,(hl)			;6536   ; el color
+	ld b,010h		;6537   ; en las 16 lineas del sprite (modo 2)
 L_6539:
 	ld (de),a			;6539
 	inc e			;653a
 	djnz L_6539		;653b
 	pop bc			;653d
-	inc l			;653e
+	inc l			;653e   ; el siguiente sprite de la ficha
 	djnz L_6508		;653f
 	ret			;6541
 palabra_de_la_tabla:
-	ld l,a			;6542
+	ld l,a			;6542   ; HL = A...
 	ld h,000h		;6543
-	add hl,hl			;6545
-	add hl,de			;6546
-	ld e,(hl)			;6547
+	add hl,hl			;6545   ; ... por dos
+	add hl,de			;6546   ; + la tabla
+	ld e,(hl)			;6547   ; la palabra
 	inc hl			;6548
 	ld d,(hl)			;6549
 	ret			;654a
 L_654B:
-	ld a,(0ce0ch)		;654b
+	ld a,(0ce0ch)		;654b   ; LOS SPRITES A LA VRAM, cada cuadro. Sin 0xCE0C...
 	or a			;654e
-	jp nz,L_65A4		;654f
-	ld a,(0ce00h)		;6552
+	jp nz,L_65A4		;654f   ; ... tal cual
+	ld a,(0ce00h)		;6552   ; en la habitacion especial 5...
 	cp 005h		;6555
-	jr z,L_65A4		;6557
+	jr z,L_65A4		;6557   ; ... tal cual
 	ld a,(0c5ach)		;6559   ; lee el estado de la puerta de la fase
-	cp 005h		;655c
-	jr z,L_65A4		;655e
-	ld hl,0c00fh		;6560
+	cp 005h		;655c   ; y con la puerta en 5...
+	jr z,L_65A4		;655e   ; ... tal cual
+	ld hl,0c00fh		;6560   ; si no, el orden se rota cada cuadro...
 	ld a,(hl)			;6563
-	add a,068h		;6564
-	and 078h		;6566
+	add a,068h		;6564   ; ... 0x68 posiciones...
+	and 078h		;6566   ; ... (multiplo de 8)
 	ld (hl),a			;6568
-	ld a,(00007h)		;6569
+	ld a,(00007h)		;6569   ; el puerto de datos
 	ld c,a			;656c
-	call L_658A		;656d
-	ld hl,0f600h		;6570
+	call L_658A		;656d   ; los colores, en ese orden
+	ld hl,0f600h		;6570   ; la tabla de atributos de la VRAM
 	call 046afh		;6573   ; vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-	ld a,(0c00fh)		;6576
-	ld d,010h		;6579
-	ld h,0d6h		;657b
+	ld a,(0c00fh)		;6576   ; desde el sprite que toque
+	ld d,010h		;6579   ; 16 tandas...
+	ld h,0d6h		;657b   ; ... de la copia de 0xD600
 L_657D:
-	ld b,008h		;657d
+	ld b,008h		;657d   ; de dos sprites (8 bytes)
 	ld l,a			;657f
 	otir		;6580
-	add a,048h		;6582
+	add a,048h		;6582   ; la tanda siguiente, rotando
 	and 078h		;6584
 	dec d			;6586
 	jr nz,L_657D		;6587
 	ret			;6589
 L_658A:
-	ld hl,0f400h		;658a
+	ld hl,0f400h		;658a   ; la tabla de colores de sprite de la VRAM
 	call 046afh		;658d   ; vram_para_escribir: prepara el V9938 para escribir en la direccion HL
-	ld a,(0c00fh)		;6590
-	ld d,010h		;6593
-	add a,a			;6595
+	ld a,(0c00fh)		;6590   ; el mismo orden
+	ld d,010h		;6593   ; 16 tandas
+	add a,a			;6595   ; de la copia de 0xD400...
 L_6596:
 	ld h,06ah		;6596
 	ld l,a			;6598
 	add hl,hl			;6599
-	ld b,020h		;659a
+	ld b,020h		;659a   ; ... dos sprites de 16 lineas
 	otir		;659c
-	add a,090h		;659e
+	add a,090h		;659e   ; rotando
 	dec d			;65a0
 	jr nz,L_6596		;65a1
 	ret			;65a3
 L_65A4:
-	ld hl,0d400h		;65a4
-	ld de,0f400h		;65a7
-	ld bc,00280h		;65aa
+	ld hl,0d400h		;65a4   ; sin rotar: la copia de 0xD400...
+	ld de,0f400h		;65a7   ; ... a 0xF400 de la VRAM...
+	ld bc,00280h		;65aa   ; ... colores y atributos de golpe
 	jp 04675h		;65ad   ; copia_a_la_vram: BC bytes de HL a la VRAM de DE
 L_65B0:
 	ld a,(0ce01h)		;65b0   ; lee el paso de la escena
@@ -799,16 +799,16 @@ DATA_tabla_65B6:
 
 
 L_65CC:
-	xor a			;65cc
+	xor a			;65cc   ; LA ESCENA DEL FINAL: paso 0
 	ld (0ce16h),a		;65cd
 	ld (0ce0eh),a		;65d0
-	ld de,0c0d0h		;65d3
-	ld c,011h		;65d6
+	ld de,0c0d0h		;65d3   ; en (0xC0, 0xD0)...
+	ld c,011h		;65d6   ; ... la cosa 0x11
 	call 05f1dh		;65d8   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	jp 0be3dh		;65db   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_65DE:
-	call 0ad93h		;65de
-	ld a,(0ce16h)		;65e1
+	call 0ad93h		;65de   ; paso 1
+	ld a,(0ce16h)		;65e1   ; espera...
 	and a			;65e4
 	ret z			;65e5
 	xor a			;65e6
@@ -817,14 +817,14 @@ L_65DE:
 	call 0ad93h		;65ed
 	jp 0be3dh		;65f0   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_65F3:
-	xor a			;65f3
+	xor a			;65f3   ; paso 2
 	ld (0ce12h),a		;65f4
 	call L_684F		;65f7
-	ld a,078h		;65fa
+	ld a,078h		;65fa   ; 0x78 cuadros
 	ld (0ce02h),a		;65fc
 	jp 0be3dh		;65ff   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_6602:
-	ld hl,0ce02h		;6602
+	ld hl,0ce02h		;6602   ; paso 3: la cuenta
 	ld a,(hl)			;6605
 	and a			;6606
 	jr z,L_660A		;6607
@@ -832,21 +832,21 @@ L_6602:
 L_660A:
 	ld (hl),a			;660a
 	ret nz			;660b
-	ld a,(0c800h)		;660c
+	ld a,(0c800h)		;660c   ; y que no quede nadie en 0xC800
 	and a			;660f
 	ret nz			;6610
-	ld a,000h		;6611
+	ld a,000h		;6611   ; silencio
 	call 0509fh		;6613   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	jp 0be3dh		;6616   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_6619:
-	ld a,088h		;6619
+	ld a,088h		;6619   ; paso 4: la musica 0x88
 	call 0509fh		;661b   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,080h		;661e
+	ld a,080h		;661e   ; la barra del enemigo, llena
 	ld (0c418h),a		;6620   ; guarda la vida del enemigo (barra ENEMY)
 	call 045e5h		;6623
 	call L_6984		;6626
-	ld c,017h		;6629
-	ld de,08049h		;662b
+	ld c,017h		;6629   ; la cosa 0x17...
+	ld de,08049h		;662b   ; ... en (0x49, 0x80)
 	call 05f1dh		;662e   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	call 057b4h		;6631
 	xor a			;6634
@@ -854,8 +854,8 @@ L_6619:
 	ld (0ce37h),a		;6638
 	jp 0be3dh		;663b   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_663E:
-	call L_68C4		;663e
-	ld a,(0ce36h)		;6641
+	call L_68C4		;663e   ; paso 5
+	ld a,(0ce36h)		;6641   ; espera a que 0xCE36 llegue a 2
 	sub 002h		;6644
 	ret nz			;6646
 	ld (0ce38h),a		;6647
@@ -864,55 +864,55 @@ L_663E:
 	ld (0ce37h),a		;664f
 	jp 0be3dh		;6652   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_6655:
-	ld a,(0ce15h)		;6655
+	ld a,(0ce15h)		;6655   ; paso 6
 	and a			;6658
 	jr nz,L_6667		;6659
-	call L_67E4		;665b
+	call L_67E4		;665b   ; el destello
 	call L_686E		;665e
 	call L_6818		;6661
 	jp L_6A49		;6664
 L_6667:
 	call L_69A0		;6667
 	call L_6810		;666a
-	call L_7806		;666d
+	call L_7806		;666d   ; borra todas las cosas
 	xor a			;6670
 	ld (0ce37h),a		;6671
 	jp 0be3dh		;6674   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_6677:
-	call L_68A8		;6677
+	call L_68A8		;6677   ; paso 7
 	ld a,(0ce36h)		;667a
 	and a			;667d
 	ret nz			;667e
-	ld a,08dh		;667f
+	ld a,08dh		;667f   ; la musica 0x8D
 	call 0509fh		;6681   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,0b4h		;6684
+	ld a,0b4h		;6684   ; 0xB4 cuadros
 	ld (0ce02h),a		;6686
 	jp 0be3dh		;6689   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_668C:
-	ld hl,0ce02h		;668c
+	ld hl,0ce02h		;668c   ; paso 8: la cuenta
 	dec (hl)			;668f
 	ret nz			;6690
 	call L_69FC		;6691
 	jp 0be3dh		;6694   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_6697:
-	call L_6A0E		;6697
+	call L_6A0E		;6697   ; paso 9
 	ret nz			;669a
 	call 047b1h		;669b
 	call 047feh		;669e
-	ld a,008h		;66a1
+	ld a,008h		;66a1   ; 8 cuadros
 	ld (0ce02h),a		;66a3
 	jp 0be3dh		;66a6   ; siguiente_paso: sube el paso de la escena (0xCE01)
 L_66A9:
-	ld hl,0ce02h		;66a9
+	ld hl,0ce02h		;66a9   ; paso 10: la cuenta
 	dec (hl)			;66ac
 	ret nz			;66ad
 	ld hl,00000h		;66ae
 	ld (0ce00h),hl		;66b1
-	ld a,001h		;66b4
+	ld a,001h		;66b4   ; y a los textos del final
 	ld (0ce40h),a		;66b6
 	ret			;66b9
 L_66BA:
-	ld a,(0ce40h)		;66ba
+	ld a,(0ce40h)		;66ba   ; EL TEXTO DEL FINAL, por pasos (0xCE40)
 	dec a			;66bd
 	call 0406bh		;66be   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -932,72 +932,72 @@ DATA_tabla_66C1:
 
 
 L_66C9:
-	ld a,08eh		;66c9
+	ld a,08eh		;66c9   ; la musica 0x8E
 	call 0509fh		;66cb   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	call L_6712		;66ce
+	call L_6712		;66ce   ; prepara la pantalla del texto
 L_66D1:
-	ld hl,0ce40h		;66d1
+	ld hl,0ce40h		;66d1   ; el paso siguiente
 	inc (hl)			;66d4
 	ret			;66d5
 L_66D6:
-	call L_672F		;66d6
-	ld a,(0ce32h)		;66d9
+	call L_672F		;66d6   ; los renglones
+	ld a,(0ce32h)		;66d9   ; hasta el ultimo
 	and a			;66dc
 	ret z			;66dd
 	jr L_66D1		;66de
 L_66E0:
 	call 05309h		;66e0
 	ret nz			;66e3
-	ld a,01eh		;66e4
+	ld a,01eh		;66e4   ; 0x1E cuadros
 	ld (0ce02h),a		;66e6
 	call 047b1h		;66e9
 	call 047d4h		;66ec   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 	jr L_66D1		;66ef
 L_66F1:
-	ld hl,0ce02h		;66f1
+	ld hl,0ce02h		;66f1   ; la cuenta
 	dec (hl)			;66f4
 	ret nz			;66f5
-	xor a			;66f6
+	xor a			;66f6   ; se acabo:
 	ld (0ce34h),a		;66f7
 	ld (0ce40h),a		;66fa
 	inc a			;66fd
 	ld (0c409h),a		;66fe
-	ld hl,0d012h		;6701
+	ld hl,0d012h		;6701   ; LA VUELTA: una mas...
 	ld a,(hl)			;6704
 	inc a			;6705
-	cp 003h		;6706
+	cp 003h		;6706   ; ... hasta la 2
 	jr nc,L_670B		;6708
 	ld (hl),a			;670a
 L_670B:
-	ld b,000h		;670b
-	ld c,017h		;670d
+	ld b,000h		;670b   ; y el desplazamiento vertical...
+	ld c,017h		;670d   ; ... (registro 23) a cero
 	jp 00047h		;670f   ; BIOS WRTVDP - Writes data in the VDP-register
 L_6712:
-	call 053deh		;6712
-	xor a			;6715
+	call 053deh		;6712   ; la pantalla del texto
+	xor a			;6715   ; todo a cero
 	ld (0ce30h),a		;6716
 	ld (0ce33h),a		;6719   ; guarda la cuenta del texto del final
 	ld (0ce31h),a		;671c   ; guarda el renglon del final que toca
 	ld (0ce32h),a		;671f
 	inc a			;6722
 	ld (0ce34h),a		;6723
-	ld a,00eh		;6726
-	ld d,0ffh		;6728
+	ld a,00eh		;6726   ; el color 14...
+	ld d,0ffh		;6728   ; ... blanco (0xFF, 0x0F)
 	ld e,00fh		;672a
 	jp 04814h		;672c   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 L_672F:
-	call L_6738		;672f
-	call L_6743		;6732
-	jp L_682A		;6735
+	call L_6738		;672f   ; cada cuadro: la cuenta
+	call L_6743		;6732   ; el renglon
+	jp L_682A		;6735   ; y lo demas
 L_6738:
 	ld a,(0c003h)		;6738   ; lee el contador de cuadros
-	and 003h		;673b
+	and 003h		;673b   ; cada cuatro cuadros...
 	ret nz			;673d
 	ld hl,0ce33h		;673e   ; apunta a la cuenta del texto del final
-	inc (hl)			;6741
+	inc (hl)			;6741   ; ... sube la cuenta del texto
 	ret			;6742
 L_6743:
-	di			;6743
+	di			;6743   ; los bancos 8 y 5, donde estan los renglones
 	ld a,008h		;6744
 	ld (0a000h),a		;6746   ; el mapper: pone en 0xA000 el banco de A
 	ld (0f0f3h),a		;6749   ; guarda la copia del banco de 0xA000

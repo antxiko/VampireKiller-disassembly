@@ -126,6 +126,7 @@ C 0xA078 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA07B lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA0E7 lee la y de la cosa
 C 0xA0EA lee la x de la cosa
+C 0xA0EE lee la VUELTA (0, 1 o 2)
 C 0xA0F5 guarda el tipo de la cosa que se crea
 C 0xA117 lee la posicion de la cosa que se crea
 C 0xA11B niega_de: DE = -DE
@@ -140,6 +141,7 @@ C 0xA166 lee la posicion de la cosa que se crea
 C 0xA184 lee el tipo de la cosa que se crea
 C 0xA231 lee el paso en que va la cosa
 C 0xA23E sube el paso en que va la cosa
+C 0xA245 lee la VUELTA (0, 1 o 2)
 C 0xA268 sube el paso en que va la cosa
 C 0xA271 mira el bit 0 de el dibujo de la cosa
 C 0xA27A lee la y de la cosa
@@ -167,6 +169,7 @@ C 0xA33B lee la y de la cosa
 C 0xA348 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 C 0xA352 lee la y de la cosa
 C 0xA357 guarda la y de la cosa
+C 0xA35A lee la VUELTA (0, 1 o 2)
 C 0xA372 el paso en que va la cosa = 0x01
 C 0xA37D pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xA380 lee la y de la cosa
@@ -257,6 +260,7 @@ C 0xA647 lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA64A niega_de: DE = -DE
 C 0xA64D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA655 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
+C 0xA65A lee la VUELTA (0, 1 o 2)
 C 0xA667 niega_de: DE = -DE
 C 0xA66D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA674 el dibujo de la cosa = 0x89

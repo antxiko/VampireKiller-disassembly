@@ -1090,6 +1090,8 @@ C 0x92C4 de_mas_a: DE += A
 C 0x92CF de_mas_a: DE += A
 C 0x92F8 hl_mas_a: HL += A
 C 0x932C lee la velocidad horizontal (parte baja)
+C 0x9333 apunta a la VUELTA (0, 1 o 2)
+C 0x933C apunta a la VUELTA (0, 1 o 2)
 C 0x9346 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x9350 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x9358 el tipo de la cosa = 0x00
@@ -1224,6 +1226,7 @@ C 0x9CA6 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con top
 C 0x9CA9 apunta a los plazos de las siete cosas de la habitacion
 C 0x9CC4 apunta a el reloj de los plazos
 C 0x9CD5 de_mas_a: DE += A
+C 0x9CD8 lee la VUELTA (0, 1 o 2)
 C 0x9CE6 apunta a los plazos de las siete cosas de la habitacion
 C 0x9CF9 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9CFC lee la Y de Simon

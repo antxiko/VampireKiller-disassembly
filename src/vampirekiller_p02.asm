@@ -3244,14 +3244,14 @@ L_9327:
 	ld (0c703h),a		;932f
 	ret			;9332
 L_9333:
-	ld hl,0d012h		;9333
+	ld hl,0d012h		;9333   ; apunta a la VUELTA (0, 1 o 2)
 	ld a,(hl)			;9336
 	cp 003h		;9337
 	ret z			;9339
 	inc (hl)			;933a
 	ret			;933b
 L_933C:
-	ld hl,0d012h		;933c
+	ld hl,0d012h		;933c   ; apunta a la VUELTA (0, 1 o 2)
 	ld a,(hl)			;933f
 	or a			;9340
 	ret z			;9341
@@ -4494,7 +4494,7 @@ L_9CC3:
 	dec l			;9cd2
 	and 007h		;9cd3
 	call 04066h		;9cd5   ; de_mas_a: DE += A
-	ld a,(0d012h)		;9cd8
+	ld a,(0d012h)		;9cd8   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;9cdb
 	ld c,a			;9cdc
 	ld a,(de)			;9cdd

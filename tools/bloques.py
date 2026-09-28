@@ -825,8 +825,12 @@ def listas_del_banco_14(rom, t, bl):
              "a 0xDB00, 0xDC00 y 0xDD00", "p01:61A1", ancho=2)
     for w in ptrs:
         bl.anota(s, w, fin_6181(w), "tres_listas_%04X" % w,
-                 "tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el "
-                 "destino, y si no, pares de bytes)", "p01:6185")
+                 "LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, "
+                 "una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por "
+                 "habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a "
+                 "la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la "
+                 "posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar",
+                 "p01:6185")
 
 
 def por_habitacion_y_sonido(rom, t, bl):

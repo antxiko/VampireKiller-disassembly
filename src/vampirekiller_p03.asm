@@ -127,7 +127,7 @@ L_A0E7:
 	ld d,(ix+005h)		;a0ea   ; lee la x de la cosa
 L_A0ED:
 	ld c,a			;a0ed
-	ld a,(0d012h)		;a0ee
+	ld a,(0d012h)		;a0ee   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a0f1
 	add a,a			;a0f2
 	add a,a			;a0f3
@@ -284,7 +284,7 @@ L_A22E:
 	ret nz			;a23d
 	inc (ix+001h)		;a23e   ; sube el paso en que va la cosa
 	ld (ix+011h),018h		;a241
-	ld a,(0d012h)		;a245
+	ld a,(0d012h)		;a245   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a248
 	add a,a			;a249
 	add a,a			;a24a
@@ -420,7 +420,7 @@ L_A348:
 	ld a,(ix+003h)		;a352   ; lee la y de la cosa
 	and 0f8h		;a355
 	ld (ix+003h),a		;a357   ; guarda la y de la cosa
-	ld a,(0d012h)		;a35a
+	ld a,(0d012h)		;a35a   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a35d
 	add a,a			;a35e
 	sub 030h		;a35f
@@ -820,7 +820,7 @@ L_A653:
 	jp z,pon_velocidad_x		;a655   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	push hl			;a658
 	ex de,hl			;a659
-	ld a,(0d012h)		;a65a
+	ld a,(0d012h)		;a65a   ; lee la VUELTA (0, 1 o 2)
 	add a,a			;a65d
 	add a,a			;a65e
 	add a,a			;a65f

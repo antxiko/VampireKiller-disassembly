@@ -59,17 +59,17 @@ D 0x865E 0x8668 cosas_fase_18  un byte por cada una de las 10 habitaciones de la
 F 0x865E 10
 D 0x8668 0x8674 tres_listas_de_cada_bloque  6 punteros, uno por bloque de tres fases, a las tres listas que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00; lo leen p01:61A1 (12 bytes)
 F 0x8668 2
-D 0x8674 0x868E tres_listas_8674  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (26 bytes)
+D 0x8674 0x868E tres_listas_8674  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (26 bytes)
 F 0x8674 16
-D 0x868E 0x86B6 tres_listas_868E  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (40 bytes)
+D 0x868E 0x86B6 tres_listas_868E  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (40 bytes)
 F 0x868E 16
-D 0x86B6 0x8706 tres_listas_86B6  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (80 bytes)
+D 0x86B6 0x8706 tres_listas_86B6  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (80 bytes)
 F 0x86B6 16
-D 0x8706 0x873F tres_listas_8706  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (57 bytes)
+D 0x8706 0x873F tres_listas_8706  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (57 bytes)
 F 0x8706 16
-D 0x873F 0x87CE tres_listas_873F  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (143 bytes)
+D 0x873F 0x87CE tres_listas_873F  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (143 bytes)
 F 0x873F 16
-D 0x87CE 0x8824 tres_listas_87CE  tres listas seguidas para p01:6181 (0xFF acaba cada una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen p01:6185 (86 bytes)
+D 0x87CE 0x8824 tres_listas_87CE  LAS COSAS DE CADA HABITACION de las tres fases del bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00, 0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes). En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y, nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (86 bytes)
 F 0x87CE 16
 D 0x8824 0x8894 letras_8824  14 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:53EA (112 bytes)
 F 0x8824 8

@@ -353,18 +353,26 @@ DATA_tres_listas_de_cada_bloque:
 	defb 0ceh,087h	; 8672
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_8674: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (26 bytes)
+; DATOS tres_listas_8674: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (26
+;   bytes)
 ;   0x8674..0x868e  (26 bytes)
 DATA_tres_listas_8674:
 	defb 000h,000h,005h,088h,000h,085h,046h,000h,000h,000h,000h,085h,06ch,0ffh,0ffh,005h	; 8674  ......F.....l...
 	defb 087h,000h,005h,088h,085h,0abh,000h,01fh,067h,0ffh	; 8684  ........g.
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_868E: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (40 bytes)
+; DATOS tres_listas_868E: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (40
+;   bytes)
 ;   0x868e..0x86b6  (40 bytes)
 DATA_tres_listas_868E:
 	defb 006h,0ceh,006h,069h,000h,006h,0c8h,006h,064h,01fh,034h,000h,006h,0cbh,006h,064h	; 868e  ...i....d.4....d
@@ -372,9 +380,13 @@ DATA_tres_listas_868E:
 	defb 006h,0aah,0ffh,000h,000h,00ah,05ch,0ffh	; 86ae  ......\.
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_86B6: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (80 bytes)
+; DATOS tres_listas_86B6: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (80
+;   bytes)
 ;   0x86b6..0x8706  (80 bytes)
 DATA_tres_listas_86B6:
 	defb 000h,00dh,095h,00dh,09ah,000h,00bh,0b9h,000h,00bh,0cbh,000h,00bh,0cdh,00dh,08bh	; 86b6  ................
@@ -384,9 +396,13 @@ DATA_tres_listas_86B6:
 	defb 07bh,000h,00dh,075h,00dh,057h,000h,00bh,054h,000h,000h,00bh,0b3h,00dh,057h,0ffh	; 86f6  {..u.W..T.....W.
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_8706: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (57 bytes)
+; DATOS tres_listas_8706: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (57
+;   bytes)
 ;   0x8706..0x873f  (57 bytes)
 DATA_tres_listas_8706:
 	defb 000h,000h,000h,000h,000h,000h,021h,0b3h,021h,0bch,000h,021h,0b8h,000h,021h,0b3h	; 8706  ......!.!..!..!.
@@ -395,9 +411,13 @@ DATA_tres_listas_8706:
 	defb 099h,000h,000h,00eh,09ah,000h,00eh,09eh,0ffh	; 8736  .........
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_873F: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (143 bytes)
+; DATOS tres_listas_873F: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (143
+;   bytes)
 ;   0x873f..0x87ce  (143 bytes)
 DATA_tres_listas_873F:
 	defb 00bh,0bch,009h,05ch,000h,00bh,054h,00dh,07bh,000h,00dh,055h,00dh,05ah,00dh,097h	; 873f  ...\..T.{..U.Z..
@@ -411,9 +431,13 @@ DATA_tres_listas_873F:
 	defb 010h,079h,010h,0b6h,000h,000h,010h,0bah,000h,010h,0bah,000h,010h,0bah,0ffh	; 87bf  .y.............
 
 ; ----------------------------------------------------------------------
-; DATOS tres_listas_87CE: tres listas seguidas para p01:6181 (0xFF acaba cada
-;   una, 0x00 salta 16 en el destino, y si no, pares de bytes); lo leen
-;   p01:6185 (86 bytes)
+; DATOS tres_listas_87CE: LAS COSAS DE CADA HABITACION de las tres fases del
+;   bloque: tres listas seguidas, una por fase, que p01:6181 copia a 0xDB00,
+;   0xDC00 y 0xDD00 (16 bytes por habitacion, cuatro cosas de cuatro bytes).
+;   En cada lista, 0xFF acaba, 0x00 pasa a la habitacion siguiente y si no van
+;   dos bytes: el tipo (bit 7, una bandera) y la posicion (nibble alto la y,
+;   nibble bajo la x / 16); p01:61BB las crea al entrar; lo leen p01:6185 (86
+;   bytes)
 ;   0x87ce..0x8824  (86 bytes)
 DATA_tres_listas_87CE:
 	defb 000h,012h,0b8h,000h,012h,097h,000h,012h,098h,000h,012h,0bah,000h,000h,000h,012h	; 87ce  ................

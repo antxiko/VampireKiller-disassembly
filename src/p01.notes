@@ -1,5 +1,291 @@
 # Notas del banco 01: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+C 0x602C sin sprites
+C 0x602D nada que colorear
+C 0x6037 los sprites de la ficha, desde +0x20
+C 0x6039 cuantos
+C 0x603A el color va 5 mas alla
+C 0x603E el color del sprite
+C 0x6042 el siguiente sprite, 5 bytes mas alla
+C 0x6045 uno por sprite
+C 0x6048 apunta el hueco de sprite D en el sprite E de la ficha
+C 0x604C E * 5...
+C 0x6050 ... + 0x21
+C 0x6055 el hueco
+C 0x6154 LAS COSAS DE LAS HABITACIONES del bloque, con el banco 14
+C 0x6155 el banco 14
+C 0x615E las tres listas, en blanco
+C 0x6161 las del bloque de 0xD002
+C 0x6164 la de la primera fase del bloque
+C 0x616A la de la segunda
+C 0x6170 la de la tercera
+C 0x6176 vuelve el banco 2
+C 0x6181 el principio de la habitacion (0xCFF0 de temporal)
+C 0x6185 el tipo
+C 0x6187 0xFF: acabo la lista
+C 0x618A 0x00: la habitacion siguiente
+C 0x618C el tipo
+C 0x618E y la posicion
+C 0x6190 salta los otros dos bytes
+C 0x6194 la habitacion siguiente...
+C 0x6199 ... 16 bytes mas alla
+C 0x619E el bloque
+C 0x61A1 la tabla de las tres listas de cada bloque
+C 0x61A7 HL = sus listas
+C 0x61A9 las tres listas en blanco: 0xC0 cosas
+C 0x61AC numeradas desde 1
+C 0x61B0 sin tipo
+C 0x61B5 el cuarto byte, su numero
+C 0x61B6 (cada cosa lleva el suyo)
+C 0x61BB CREA LAS COSAS DE LA HABITACION: el bloque...
+C 0x61BF ... por tres
+C 0x61C5 la fase, desde 1
+C 0x61C6 el patio no tiene
+C 0x61C7 la fase dentro del bloque
+C 0x61C8 256 bytes por fase
+C 0x61CB en las listas
+C 0x61D2 16 bytes por habitacion
+C 0x61D9 cuatro cosas
+C 0x61DD el tipo
+C 0x61DF no hay
+C 0x61E3 sin la bandera
+C 0x61E5 C = el tipo
+C 0x61E7 la posicion:
+C 0x61E8 la y, el nibble alto
+C 0x61EB la x...
+C 0x61EE ... por 16
+C 0x61F2 D
+C 0x61F5 su numero
+C 0x61F6 crea la cosa
+C 0x61FB la siguiente, 4 bytes mas alla
+C 0x61FF cuatro
+C 0x6202 LA PANTALLA DEL TITULO
+C 0x6208 su paleta
+C 0x620E el borde...
+C 0x6210 ... registro 7 = 0x0F
+C 0x6215 un rectangulo...
+C 0x6218 ... de 0xA8 x 0x48 en (0x28, 0x40)...
+C 0x621B ... de color 0...
+C 0x621C ... en la pagina 1
+C 0x6224 en (0x40, 0x40)...
+C 0x6227 ... el logotipo, del guion de 0x628F
+C 0x6230 la cuenta del telon
+C 0x6236 0x31 lineas
+C 0x6239 sin acabar
+C 0x624C EL TELON DEL TITULO: la cuenta
+C 0x6250 un cuadro de cada dos
+C 0x6254 una linea menos
+C 0x6256 quedan
+C 0x6258 se acabo:
+C 0x625A el titulo, listo
+C 0x625E 0x31 menos las que quedan
+C 0x6261 C = las lineas que se ven
+C 0x6262 0xA8 de ancho
+C 0x6264 de (0x28, 0x40) de la pagina 1...
+C 0x6267 ... a (0x28, 0x40) de la 0
+C 0x626F la posicion de la fila
+C 0x6270 el dibujo
+C 0x6273 0xFF acaba
+C 0x6276 0xFE: fila nueva
+C 0x6279 vuelve al principio de la fila...
+C 0x627A ... corrida dx
+C 0x627E y 8 puntos mas abajo
+C 0x6284 el dibujo
+C 0x6285 lo pinta
+C 0x6288 la posicion siguiente
+C 0x62D0 EMPIEZA UNA VIDA: vida llena...
+C 0x62D5 ... y la barra del enemigo llena
+C 0x62DA fuera armas y cuentas
+C 0x62DD los dibujos de las armas
+C 0x62E0 y los de la fase
+C 0x62E3 y los de la pantalla
+C 0x62E9 la paleta de la fase
+C 0x62EC borra lo de Simon (0xC420-0xC46F)
+C 0x62EF Simon a la salida de la fase
+C 0x62F2 la lista de cosas de la fase
+C 0x62F5 todos los sprites fuera
+C 0x62F8 vacia las listas de la habitacion
+C 0x62FB la carga de la habitacion
+C 0x62FE los dibujos de su decorado
+C 0x6301 monta la habitacion
+C 0x6307 mira si es la habitacion especial
+C 0x630A la pinta
+C 0x630D las puertas
+C 0x6310 los bloques que se rompen
+C 0x6313 otra lista
+C 0x6316 lo que lleva, en el marcador
+C 0x6319 la especial 6...
+C 0x631E ... trae lo suyo
+C 0x6324 los plazos de las siete cosas
+C 0x6327 las cosas de las habitaciones
+C 0x632A y las de esta
+C 0x6333 a cero lo de la habitacion especial
+C 0x6346 la habitacion especial de cada fase
+C 0x634F C = la habitacion en la que se esta
+C 0x6350 el byte de la fase
+C 0x6352 la habitacion, el nibble alto
+C 0x6358 es esta?
+C 0x6359 no
+C 0x635A si: el nibble bajo...
+C 0x635D ... a 0xCE00
+C 0x6363 vale 6?
+C 0x6366 si: los dibujos grandes de 0x57DF (0xB5A1 y 0xB719)
+C 0x6385 vacia las listas de la habitacion...
+C 0x638A ... 0x290 bytes
+C 0x638F los bloques que se rompen
+C 0x639E fuera las armas
+C 0x63A1 las siete fichas de 0xC800...
+C 0x63A4 de 0x80 en 0x80
+C 0x63A9 vacias
+C 0x63AC y las ocho de 0xD700
+C 0x63B1 tipo 0: vacia
+C 0x63B3 la siguiente
+C 0x63B7 borra lo de Simon: 0xC420 a 0xC46F
+C 0x63C5 los 32 sprites de 0xD600...
+C 0x63CA ... con la y a 0xE0: fuera de la pantalla
+C 0x63CC 4 bytes cada uno
+C 0x63D3 LA PANTALLA DE UNA ESCENA:
+C 0x63D6 Simon en el centro (0x80, 0x80)
+C 0x63DE los 191 dibujos del banco 9
+C 0x63F6 el marcador
+C 0x63F9 monta la habitacion
+C 0x63FC la pinta
+C 0x6405 la salida de Simon en cada fase
+C 0x6408 dos bytes por fase
+C 0x640C la y (el bit 0 es el lado)
+C 0x6414 la x
+C 0x6419 el lado
+C 0x6445 COMPONE LOS SPRITES DE LA COSA: el tipo 0x0E...
+C 0x644B ... y el 0x17 no
+C 0x644F el banco 6 en 0xA000
+C 0x645B como se compone cada dibujo
+C 0x6461 los sprites de la ficha
+C 0x6464 +0x20
+C 0x6466 cuantos
+C 0x6467 a la y del primero (+0x22)
+C 0x6469 0x80, 0x81 y 0x82...
+C 0x6472 ... son composiciones fijas
+C 0x6476 dy
+C 0x647B la y del sprite
+C 0x647D dx
+C 0x6481 la x del sprite
+C 0x6484 el patron
+C 0x6488 al siguiente sprite (5 bytes)
+C 0x648A uno por sprite
+C 0x648D vuelve el banco 3
+C 0x6497 la 0x82: posiciones de 0x64D9
+C 0x649D la 0x81: de 0x64D5
+C 0x64A3 la 0x80: de 0x64CD
+C 0x64A9 dy fijo
+C 0x64AF la y del sprite
+C 0x64B2 dx fijo
+C 0x64B8 la x del sprite
+C 0x64BA el patron
+C 0x64BD al siguiente sprite
+C 0x64C0 uno por sprite
+C 0x64C3 vuelve el banco 3
+C 0x64E5 LOS SPRITES A LA TABLA: las ocho de 0xD700
+C 0x64EC o las siete de 0xC800
+C 0x64F3 vacia?
+C 0x64F5 sus sprites
+C 0x64FA la siguiente ficha
+C 0x6501 +0x20: cuantos
+C 0x6505 ninguno
+C 0x6507 el primero
+C 0x6509 su hueco en la tabla
+C 0x650C cuatro bytes por hueco
+C 0x650E en la copia de la tabla de atributos (0xD638)
+C 0x6515 y, x y patron
+C 0x651B el color
+C 0x651D si es 0...
+C 0x6522 ... la y a 0xE1: no se ve
+C 0x6529 los colores de linea de ese hueco:
+C 0x6530 (0x6A70 + 8 * hueco) * 2 = 0xD4E0 + 16 * hueco
+C 0x6536 el color
+C 0x6537 en las 16 lineas del sprite (modo 2)
+C 0x653E el siguiente sprite de la ficha
+C 0x6542 HL = A...
+C 0x6545 ... por dos
+C 0x6546 + la tabla
+C 0x6547 la palabra
+C 0x654B LOS SPRITES A LA VRAM, cada cuadro. Sin 0xCE0C...
+C 0x654F ... tal cual
+C 0x6552 en la habitacion especial 5...
+C 0x6557 ... tal cual
+C 0x655C y con la puerta en 5...
+C 0x655E ... tal cual
+C 0x6560 si no, el orden se rota cada cuadro...
+C 0x6564 ... 0x68 posiciones...
+C 0x6566 ... (multiplo de 8)
+C 0x6569 el puerto de datos
+C 0x656D los colores, en ese orden
+C 0x6570 la tabla de atributos de la VRAM
+C 0x6576 desde el sprite que toque
+C 0x6579 16 tandas...
+C 0x657B ... de la copia de 0xD600
+C 0x657D de dos sprites (8 bytes)
+C 0x6582 la tanda siguiente, rotando
+C 0x658A la tabla de colores de sprite de la VRAM
+C 0x6590 el mismo orden
+C 0x6593 16 tandas
+C 0x6595 de la copia de 0xD400...
+C 0x659A ... dos sprites de 16 lineas
+C 0x659E rotando
+C 0x65A4 sin rotar: la copia de 0xD400...
+C 0x65A7 ... a 0xF400 de la VRAM...
+C 0x65AA ... colores y atributos de golpe
+C 0x65CC LA ESCENA DEL FINAL: paso 0
+C 0x65D3 en (0xC0, 0xD0)...
+C 0x65D6 ... la cosa 0x11
+C 0x65DE paso 1
+C 0x65E1 espera...
+C 0x65F3 paso 2
+C 0x65FA 0x78 cuadros
+C 0x6602 paso 3: la cuenta
+C 0x660C y que no quede nadie en 0xC800
+C 0x6611 silencio
+C 0x6619 paso 4: la musica 0x88
+C 0x661E la barra del enemigo, llena
+C 0x6629 la cosa 0x17...
+C 0x662B ... en (0x49, 0x80)
+C 0x663E paso 5
+C 0x6641 espera a que 0xCE36 llegue a 2
+C 0x6655 paso 6
+C 0x665B el destello
+C 0x666D borra todas las cosas
+C 0x6677 paso 7
+C 0x667F la musica 0x8D
+C 0x6684 0xB4 cuadros
+C 0x668C paso 8: la cuenta
+C 0x6697 paso 9
+C 0x66A1 8 cuadros
+C 0x66A9 paso 10: la cuenta
+C 0x66B4 y a los textos del final
+C 0x66BA EL TEXTO DEL FINAL, por pasos (0xCE40)
+C 0x66C9 la musica 0x8E
+C 0x66CE prepara la pantalla del texto
+C 0x66D1 el paso siguiente
+C 0x66D6 los renglones
+C 0x66D9 hasta el ultimo
+C 0x66E4 0x1E cuadros
+C 0x66F1 la cuenta
+C 0x66F6 se acabo:
+C 0x6701 LA VUELTA: una mas...
+C 0x6706 ... hasta la 2
+C 0x670B y el desplazamiento vertical...
+C 0x670D ... (registro 23) a cero
+C 0x6712 la pantalla del texto
+C 0x6715 todo a cero
+C 0x6726 el color 14...
+C 0x6728 ... blanco (0xFF, 0x0F)
+C 0x672F cada cuadro: la cuenta
+C 0x6732 el renglon
+C 0x6735 y lo demas
+C 0x673B cada cuatro cuadros...
+C 0x6741 ... sube la cuenta del texto
+C 0x6743 los bancos 8 y 5, donde estan los renglones
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
 F 0x6058 16
@@ -102,15 +388,10 @@ C 0x6157 el mapper: pone en 0x8000 el banco de A
 C 0x615A guarda la copia del banco de 0x8000
 C 0x6179 el mapper: pone en 0x8000 el banco de A
 C 0x617C guarda la copia del banco de 0x8000
-C 0x6181 guarda el tipo de la cosa que se crea
-C 0x6194 lee el tipo de la cosa que se crea
-C 0x619E lee el bloque de tres fases (0-5)
 C 0x61A4 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-C 0x61BB lee el bloque de tres fases (0-5)
 C 0x61C2 lee la FASE (0 el patio, 1-18)
 C 0x61CF lee la HABITACION dentro de la fase
 C 0x61D6 hl_mas_a: HL += A
-C 0x6202 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 C 0x620B pon_paleta: lista de [color][RB][G] hasta 0xFF
 C 0x621E rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x622D enciende_la_pantalla: bit 6 del registro 1 del VDP a uno
@@ -133,7 +414,6 @@ C 0x6409 hl_mas_a: HL += A
 C 0x6411 guarda la Y de Simon
 C 0x6415 guarda la X de Simon
 C 0x641B guarda el lado al que mira Simon (0 derecha)
-C 0x6445 lee el tipo de la cosa
 C 0x6451 el mapper: pone en 0xA000 el banco de A
 C 0x6454 guarda la copia del banco de 0xA000
 C 0x6458 lee el dibujo de la cosa
