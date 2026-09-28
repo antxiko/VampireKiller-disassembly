@@ -107,7 +107,7 @@ L_805A:
 	jp p,L_8078		;806f   ; aun le queda: sigue
 L_8072:
 	call L_81AB		;8072   ; muerta: puntos
-	call L_9A3E		;8075   ; y lo que suelta
+	call se_va_la_cosa		;8075   ; y lo que suelta
 L_8078:
 	ld a,(iy+001h)		;8078   ; que arma era?
 	cp 002h		;807b   ; la 2 se gasta al dar
@@ -1066,7 +1066,7 @@ L_861C:
 	jr z,L_8642		;8625
 	call L_8264		;8627   ; la toca?
 	jr nc,L_8642		;862a
-	call L_9A1A		;862c   ; si: se la carga
+	call se_vuelve_llama		;862c   ; si: se la carga
 	ld a,00bh		;862f   ; efecto 0x0B
 	call 0509fh		;8631   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	ld hl,0c441h		;8634   ; apunta a los usos que le quedan a lo que para golpes
@@ -3164,7 +3164,7 @@ repinta_uno:
 ; ----------------------------------------------------------------------
 la_cruz_y_los_vendedores:
 	ld hl,0c5b5h		;928d
-	ld b,002h		;9290
+	ld b,002h		;9290   ; dos
 L_9292:
 	push hl			;9292
 	ld a,(hl)			;9293   ; puesta...
@@ -3590,94 +3590,98 @@ tecla_de_la_fila:
 	cpl			;954e   ; ... su bit 0, a 1 si esta pulsada
 	and 001h		;954f
 	ret			;9551
-L_9552:
+
+; ----------------------------------------------------------------------
+; EL MAPA DEL PERGAMINO (el objeto 0x0F pone el bit 7 de 0xC701 y tres usos en 0xC70F, p02:8E33). Solo en partida y fuera de las habitaciones especiales (0xCE00 = 0). Con el bit 1 de 0xC00B gasta un uso (el ultimo quita el pergamino), borra el sitio de juego y pinta el fondo del mapa (0xCF38 = 1); al cuadro siguiente pinta todas las habitaciones de la fase, a Simon y la flecha de la salida (0xCF38 = 2); con el bit 1 otra vez lo devuelve todo como estaba (0xCF38 = 0).
+; ----------------------------------------------------------------------
+el_mapa_del_pergamino:
 	ld a,(0c002h)		;9552   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
-	and 040h		;9555
+	and 040h		;9555   ; el bit 6
 	ret z			;9557
-	ld a,(0ce00h)		;9558
+	ld a,(0ce00h)		;9558   ; en una habitacion especial...
 	and a			;955b
-	ret nz			;955c
-	ld a,(0cf38h)		;955d
+	ret nz			;955c   ; ... no
+	ld a,(0cf38h)		;955d   ; 0xCF38: 1, pinta las habitaciones...
 	dec a			;9560
-	jr z,L_95A8		;9561
-	dec a			;9563
-	jr z,L_95B3		;9564
-	ld a,(0c00bh)		;9566
+	jr z,pinta_el_mapa		;9561
+	dec a			;9563   ; ... 2, esperando para quitarlo
+	jr z,quita_el_mapa		;9564
+	ld a,(0c00bh)		;9566   ; 0: el bit 1 de 0xC00B?
 	bit 1,a		;9569
 	ret z			;956b
 	ld a,(0c701h)		;956c   ; lee lo que lleva Simon (un bit por objeto)
-	add a,a			;956f
+	add a,a			;956f   ; lleva el pergamino (bit 7)?
 	ret nc			;9570
-	ld hl,0c70fh		;9571
+	ld hl,0c70fh		;9571   ; los usos que le quedan
 	ld a,(hl)			;9574
-	and a			;9575
+	and a			;9575   ; ninguno: nada
 	ret z			;9576
-	dec (hl)			;9577
-	jr nz,L_9582		;9578
+	dec (hl)			;9577   ; uno menos...
+	jr nz,L_9582		;9578   ; ... y con el ultimo...
 	ld hl,0c701h		;957a   ; apunta a lo que lleva Simon (un bit por objeto)
-	res 7,(hl)		;957d
-	call L_8EE6		;957f
+	res 7,(hl)		;957d   ; ... se va el pergamino...
+	call L_8EE6		;957f   ; ... y se repinta lo que lleva
 L_9582:
 	call 047feh		;9582
-	ld hl,00020h		;9585
-	ld bc,000b4h		;9588
-	xor a			;958b
+	ld hl,00020h		;9585   ; borra el sitio de juego: desde (0, 0x20)...
+	ld bc,000b4h		;9588   ; ... 256 x 0xB4 puntos...
+	xor a			;958b   ; ... del color 0
 	ld d,000h		;958c
 	call 0490ah		;958e   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	ld hl,01830h		;9591
-	ld bc,0d07eh		;9594
-	ld a,033h		;9597
+	ld hl,01830h		;9591   ; el fondo del mapa, desde (0x18, 0x30)...
+	ld bc,0d07eh		;9594   ; ... 0xD0 x 0x7E...
+	ld a,033h		;9597   ; ... del color 3
 	ld d,000h		;9599
 	call 0490ah		;959b   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
-	ld a,019h		;959e
+	ld a,019h		;959e   ; efecto 0x19
 	call 0509fh		;95a0   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_95A3:
-	ld hl,0cf38h		;95a3
+el_mapa_un_paso_mas:
+	ld hl,0cf38h		;95a3   ; 0xCF38 al paso siguiente
 	inc (hl)			;95a6
 	ret			;95a7
-L_95A8:
-	call L_95D0		;95a8
-	call L_9815		;95ab
-	call L_9853		;95ae
-	jr L_95A3		;95b1
-L_95B3:
-	ld a,(0c00bh)		;95b3
+pinta_el_mapa:
+	call pinta_las_habitaciones		;95a8   ; las habitaciones de la fase...
+	call simon_en_el_mapa		;95ab   ; ... Simon...
+	call la_flecha_de_la_salida		;95ae   ; ... y la flecha de la salida
+	jr el_mapa_un_paso_mas		;95b1
+quita_el_mapa:
+	ld a,(0c00bh)		;95b3   ; el bit 1 de 0xC00B otra vez?
 	bit 1,a		;95b6
 	ret z			;95b8
-	call 04f91h		;95b9
-	call las_trampas_de_cadena		;95bc
-	call puerta_de_la_fase_a_0xff		;95bf
-	call repinta_los_vendedores		;95c2
-	call L_8707		;95c5
+	call 04f91h		;95b9   ; la habitacion...
+	call las_trampas_de_cadena		;95bc   ; ... sus trampas de cadena...
+	call puerta_de_la_fase_a_0xff		;95bf   ; ... la puerta de la fase...
+	call repinta_los_vendedores		;95c2   ; ... los vendedores...
+	call L_8707		;95c5   ; ... los marcos...
 	call 04809h		;95c8
-	xor a			;95cb
+	xor a			;95cb   ; y 0xCF38 a 0
 	ld (0cf38h),a		;95cc
 	ret			;95cf
-L_95D0:
-	xor a			;95d0
+pinta_las_habitaciones:
+	xor a			;95d0   ; desde la habitacion 0
 	ld (0cffdh),a		;95d1
-L_95D4:
-	call L_9609		;95d4
-	call L_967A		;95d7
-	call L_9793		;95da
-	call L_9807		;95dd
-	ld a,(0cffdh)		;95e0
+pinta_una_habitacion:
+	call mapa_de_celdas_de_la_habitacion		;95d4   ; su mapa de celdas, con los bloques grandes...
+	call sitio_de_la_habitacion_en_el_mapa		;95d7   ; ... su sitio en el mapa...
+	call celdas_a_puntos		;95da   ; ... sus celdas a puntos...
+	call habitacion_a_la_pantalla		;95dd   ; ... y a la pantalla
+	ld a,(0cffdh)		;95e0   ; la habitacion siguiente
 	inc a			;95e3
 	ld (0cffdh),a		;95e4
 	ld c,a			;95e7
 	ld a,(0d000h)		;95e8   ; lee la FASE (0 el patio, 1-18)
-	ld hl,095f6h		;95eb
+	ld hl,095f6h		;95eb   ; hasta las que tiene la fase (0x95F6)
 	call 04061h		;95ee   ; hl_mas_a: HL += A
 	ld a,c			;95f1
 	cp (hl)			;95f2
-	jr nz,L_95D4		;95f3
+	jr nz,pinta_una_habitacion		;95f3
 	ret			;95f5
 
 ; ----------------------------------------------------------------------
-; DATOS un_tope_por_fase: 19 bytes, uno por fase, contra los que p02:95F2
-;   compara
+; DATOS habitaciones_de_cada_fase: 19 bytes, cuantas habitaciones tiene cada
+;   fase (0 el patio): hasta ahi pinta el mapa del pergamino (p02:95F2)
 ;   0x95f6..0x9609  (19 bytes)
-DATA_un_tope_por_fase:
+DATA_habitaciones_de_cada_fase:
 	defb 003h,008h,006h,006h,006h,006h,006h,009h,008h,009h,009h,006h,00ch,00ch,008h,00ah	; 95f6  ................
 	defb 00ah,00ch,00ah	; 9606
 
@@ -3686,42 +3690,46 @@ DATA_un_tope_por_fase:
 ; ======================================================================
 
 
-L_9609:
+
+; ----------------------------------------------------------------------
+; EL MAPA DE CELDAS de la habitacion 0xCFFD, montado en 0xE800 (p00:4FAF), con cada bloque grande que se rompe (tamano 3) aun puesto como pared: los de la habitacion en que esta Simon, de 0xC470; los de las otras, de sus secretos (p00:5B21 a 0xEB00).
+; ----------------------------------------------------------------------
+mapa_de_celdas_de_la_habitacion:
 	ld hl,0e800h		;9609
-	ld a,(0d000h)		;960c   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;960c   ; B = la fase...
 	ld b,a			;960f
-	ld a,(0cffdh)		;9610
+	ld a,(0cffdh)		;9610   ; ... C = la habitacion
 	ld c,a			;9613
-	call 04fafh		;9614
+	call 04fafh		;9614   ; su mapa de celdas, a 0xE800
 	ld a,(0cffdh)		;9617
-	call 05bd2h		;961a
+	call 05bd2h		;961a   ; sus secretos...
 	ld de,0eb00h		;961d
-	call 05b21h		;9620
+	call 05b21h		;9620   ; ... y sus cosas fijas a 0xEB00
 	ld ix,0eb00h		;9623
 	ld a,(0d001h)		;9627   ; lee la HABITACION dentro de la fase
 	ld hl,0cffdh		;962a
-	cp (hl)			;962d
+	cp (hl)			;962d   ; es la habitacion en que esta Simon?
 	jr nz,L_9634		;962e
-	ld ix,0c470h		;9630   ; apunta a los bloques que se rompen (ocho de 16 bytes)
+	ld ix,0c470h		;9630   ; si: sus cosas fijas de ahora
 L_9634:
-	ld b,008h		;9634
+	ld b,008h		;9634   ; ocho
 L_9636:
-	ld a,(ix+000h)		;9636
+	ld a,(ix+000h)		;9636   ; puesta?
 	and a			;9639
 	jr z,L_9644		;963a
-	ld a,(ix+004h)		;963c
+	ld a,(ix+004h)		;963c   ; tamano 3, bloque grande?
 	cp 003h		;963f
-	call z,L_964C		;9641
+	call z,bloque_grande_al_mapa		;9641   ; si: pared en el mapa
 L_9644:
-	ld de,00010h		;9644
+	ld de,00010h		;9644   ; la siguiente, 16 bytes mas
 	add ix,de		;9647
 	djnz L_9636		;9649
 	ret			;964b
-L_964C:
-	ld a,(ix+001h)		;964c
+bloque_grande_al_mapa:
+	ld a,(ix+001h)		;964c   ; la y, sin las dos filas de arriba...
 	sub 010h		;964f
-	ld h,(ix+002h)		;9651
-	rra			;9654
+	ld h,(ix+002h)		;9651   ; ... y la x
+	rra			;9654   ; la celda: y / 8 * 32 + x / 8
 	rra			;9655
 	rra			;9656
 	rra			;9657
@@ -3730,13 +3738,13 @@ L_964C:
 	rr h		;965b
 	rra			;965d
 	rr h		;965e
-	ld l,h			;9660
-	and 003h		;9661
+	ld l,h			;9660   ; L, lo bajo
+	and 003h		;9661   ; H, lo alto, desde 0xE800
 	add a,0e8h		;9663
 	ld h,a			;9665
-	ld c,004h		;9666
-L_9668:
-	ld a,001h		;9668
+	ld c,004h		;9666   ; cuatro filas...
+cuatro_celdas_de_pared:
+	ld a,001h		;9668   ; ... de cuatro celdas a 1
 	ld (hl),a			;966a
 	inc hl			;966b
 	ld (hl),a			;966c
@@ -3744,21 +3752,21 @@ L_9668:
 	ld (hl),a			;966e
 	inc hl			;966f
 	ld (hl),a			;9670
-	ld a,01dh		;9671
+	ld a,01dh		;9671   ; la fila siguiente, 32 celdas mas alla
 	call 04061h		;9673   ; hl_mas_a: HL += A
 	dec c			;9676
-	jr nz,L_9668		;9677
+	jr nz,cuatro_celdas_de_pared		;9677
 	ret			;9679
-L_967A:
-	ld a,(0d000h)		;967a   ; lee la FASE (0 el patio, 1-18)
+sitio_de_la_habitacion_en_el_mapa:
+	ld a,(0d000h)		;967a   ; la casilla de la habitacion 0xCFFD...
 	ld de,09695h		;967d
 	call 06542h		;9680   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	ld a,(0cffdh)		;9683
 	call 04066h		;9686   ; de_mas_a: DE += A
 	ld a,(de)			;9689
-	ld de,09757h		;968a
+	ld de,09757h		;968a   ; ... a su sitio en la pantalla...
 	call 06542h		;968d   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-	ld (0cff2h),de		;9690
+	ld (0cff2h),de		;9690   ; ... en 0xCFF2
 	ret			;9694
 
 ; ----------------------------------------------------------------------
@@ -3790,73 +3798,79 @@ DATA_casilla_de_cada_habitacion:
 ; ======================================================================
 
 
-L_9793:
-	ld de,0e840h		;9793
-	ld hl,0eb00h		;9796
-	ld bc,002c0h		;9799
+
+; ----------------------------------------------------------------------
+; LA HABITACION EN PUNTOS: cada celda de 0xE840 (las 22 filas que se ven, 0x2C0 celdas) se vuelve un punto del color 0x0E si es pared o 0 si no, dos puntos por byte, en 0xEB00.
+; ----------------------------------------------------------------------
+celdas_a_puntos:
+	ld de,0e840h		;9793   ; desde la fila 2 del mapa de celdas...
+	ld hl,0eb00h		;9796   ; ... a 0xEB00...
+	ld bc,002c0h		;9799   ; ... 22 filas de 32
 L_979C:
-	call L_97AE		;979c
-	call L_97FA		;979f
-	bit 0,c		;97a2
-	jr z,L_97A7		;97a4
-	inc hl			;97a6
-L_97A7:
+	call color_de_la_celda		;979c   ; el color de la celda
+	call color_al_byte		;979f   ; al byte
+	bit 0,c		;97a2   ; despues de la impar...
+	jr z,la_celda_siguiente		;97a4
+	inc hl			;97a6   ; ... el byte siguiente
+la_celda_siguiente:
 	inc de			;97a7
-	dec bc			;97a8
+	dec bc			;97a8   ; hasta la ultima
 	ld a,c			;97a9
 	or b			;97aa
 	jr nz,L_979C		;97ab
 	ret			;97ad
-L_97AE:
-	ld a,(de)			;97ae
+color_de_la_celda:
+	ld a,(de)			;97ae   ; la celda...
 	exx			;97af
-	cp 00eh		;97b0
-	jr nc,L_97D0		;97b2
-	ld hl,097ech		;97b4
+	cp 00eh		;97b0   ; 0x0E o mas: nada
+	jr nc,celda_vacia		;97b2
+	ld hl,097ech		;97b4   ; su clase, de 0x97EC
 	ld e,a			;97b7
 	ld d,000h		;97b8
 	add hl,de			;97ba
 	ld a,(hl)			;97bb
 	ld c,a			;97bc
-	dec a			;97bd
-	jp m,L_97D0		;97be
-	jr z,L_97D3		;97c1
+	dec a			;97bd   ; 0: nada
+	jp m,celda_vacia		;97be
+	jr z,celda_de_pared		;97c1   ; 1: pared
 	dec a			;97c3
-	jr z,L_97D7		;97c4
-	ld a,(0d002h)		;97c6   ; lee el bloque de tres fases (0-5)
+	jr z,L_97D7		;97c4   ; 2: pared
+	ld a,(0d002h)		;97c6   ; 3 y 4, segun el bloque de fases:
 	cp 005h		;97c9
-	jr z,L_97E2		;97cb
+	jr z,el_3_y_el_4_son_pared		;97cb   ; el ultimo, los dos son pared
 	and a			;97cd
-	jr z,L_97DB		;97ce
-L_97D0:
-	xor a			;97d0
+	jr z,el_3_es_pared		;97ce   ; el primero, solo el 3
+celda_vacia:
+	xor a			;97d0   ; A = 0
 	exx			;97d1
 	ret			;97d2
-L_97D3:
-	ld a,00eh		;97d3
+celda_de_pared:
+	ld a,00eh		;97d3   ; A = 0x0E
 	exx			;97d5
 	ret			;97d6
 L_97D7:
 	ld a,00eh		;97d7
 	exx			;97d9
 	ret			;97da
-L_97DB:
-	ld a,c			;97db
+el_3_es_pared:
+	ld a,c			;97db   ; solo la clase 3
 	cp 003h		;97dc
-	jr z,L_97D3		;97de
-	jr L_97D0		;97e0
-L_97E2:
-	ld a,c			;97e2
+	jr z,celda_de_pared		;97de
+	jr celda_vacia		;97e0
+el_3_y_el_4_son_pared:
+	ld a,c			;97e2   ; la clase 3...
 	sub 003h		;97e3
-	jr z,L_97D3		;97e5
-	dec a			;97e7
-	jr z,L_97D3		;97e8
-	jr L_97D0		;97ea
+	jr z,celda_de_pared		;97e5
+	dec a			;97e7   ; ... o la 4
+	jr z,celda_de_pared		;97e8
+	jr celda_vacia		;97ea
 
 ; ----------------------------------------------------------------------
-; DATOS catorce_valores: 14 bytes que p02:97B4 indexa con A (menor que 14)
+; DATOS clase_de_cada_celda: 14 bytes, la clase de cada valor de celda en el
+;   mapa del pergamino (p02:97B4): 0 nada, 1 y 2 pared, 3 y 4 segun el bloque
+;   de fases
 ;   0x97ec..0x97fa  (14 bytes)
-DATA_catorce_valores:
+DATA_clase_de_cada_celda:
 	defb 000h,001h,001h,002h,002h,004h,004h,004h,004h,003h,001h,001h,002h,002h	; 97ec  ..............
 
 ; ======================================================================
@@ -3864,53 +3878,53 @@ DATA_catorce_valores:
 ; ======================================================================
 
 
-L_97FA:
-	bit 0,c		;97fa
-	jr z,L_9801		;97fc
-	or (hl)			;97fe
+color_al_byte:
+	bit 0,c		;97fa   ; la celda impar...
+	jr z,color_a_la_izquierda		;97fc
+	or (hl)			;97fe   ; ... a la derecha del byte
 	ld (hl),a			;97ff
 	ret			;9800
-L_9801:
-	add a,a			;9801
+color_a_la_izquierda:
+	add a,a			;9801   ; la par, arriba del byte
 	add a,a			;9802
 	add a,a			;9803
 	add a,a			;9804
 	ld (hl),a			;9805
 	ret			;9806
-L_9807:
-	ld de,(0cff2h)		;9807
-	ld hl,0eb00h		;980b
-	ld bc,02016h		;980e
+habitacion_a_la_pantalla:
+	ld de,(0cff2h)		;9807   ; en su sitio...
+	ld hl,0eb00h		;980b   ; ... los puntos de 0xEB00...
+	ld bc,02016h		;980e   ; ... 0x20 x 0x16, por HMMC en la pagina 0
 	xor a			;9811
 	jp 0498ah		;9812   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
-L_9815:
-	ld a,(0d001h)		;9815   ; lee la HABITACION dentro de la fase
+simon_en_el_mapa:
+	ld a,(0d001h)		;9815   ; el sitio de la habitacion en que esta
 	ld (0cffdh),a		;9818
-	call L_967A		;981b
+	call sitio_de_la_habitacion_en_el_mapa		;981b
 	ld hl,(0cff2h)		;981e
 	ld a,(0c425h)		;9821   ; lee la Y de Simon
-	sub 040h		;9824
-	call c,L_9844		;9826
-	rra			;9829
+	sub 040h		;9824   ; su y, menos 0x40...
+	call c,una_fila_mas_arriba		;9826   ; (por encima, una fila de habitaciones mas arriba)
+	rra			;9829   ; ... a octavos
 	rra			;982a
 	rra			;982b
 	and 01fh		;982c
-	add a,l			;982e
+	add a,l			;982e   ; mas la y de la habitacion
 	ld e,a			;982f
-	ld a,(0c427h)		;9830   ; lee la X de Simon
+	ld a,(0c427h)		;9830   ; su x, a octavos...
 	rra			;9833
 	rra			;9834
 	rra			;9835
 	and 01fh		;9836
-	add a,h			;9838
+	add a,h			;9838   ; ... mas la x de la habitacion
 	ld d,a			;9839
-	ld bc,00404h		;983a
+	ld bc,00404h		;983a   ; un punto de 4 x 4 (0x984B)...
 	ld hl,0984bh		;983d
-	xor a			;9840
+	xor a			;9840   ; ... por HMMC
 	jp 0498ah		;9841   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
-L_9844:
+una_fila_mas_arriba:
 	ex af,af'			;9844
-	ld a,l			;9845
+	ld a,l			;9845   ; 0x20 menos en la y de la habitacion
 	sub 020h		;9846
 	ld l,a			;9848
 	ex af,af'			;9849
@@ -3928,31 +3942,35 @@ DATA_hmmc_984B:
 ; ======================================================================
 
 
-L_9853:
-	ld a,(0d000h)		;9853   ; lee la FASE (0 el patio, 1-18)
+
+; ----------------------------------------------------------------------
+; LA FLECHA DE LA SALIDA de la fase en el mapa: tres bytes por fase en 0x98AC, (y, x) y hacia donde (bit 0: 0 la flecha a la derecha de 0x9874, 1 la de la izquierda de 0x9890), 8 x 7 puntos por HMMC.
+; ----------------------------------------------------------------------
+la_flecha_de_la_salida:
+	ld a,(0d000h)		;9853   ; los tres bytes de la fase...
 	ld c,a			;9856
 	add a,a			;9857
 	add a,c			;9858
-	ld hl,098ach		;9859
+	ld hl,098ach		;9859   ; ... de 0x98AC
 	call 04061h		;985c   ; hl_mas_a: HL += A
-	ld e,(hl)			;985f
+	ld e,(hl)			;985f   ; E = la y...
 	inc hl			;9860
-	ld d,(hl)			;9861
+	ld d,(hl)			;9861   ; ... D = la x
 	inc hl			;9862
-	bit 0,(hl)		;9863
-	ld hl,09874h		;9865
+	bit 0,(hl)		;9863   ; hacia donde?
+	ld hl,09874h		;9865   ; 0: a la derecha...
 	jr z,L_986D		;9868
-	ld hl,09890h		;986a
+	ld hl,09890h		;986a   ; ... 1: a la izquierda
 L_986D:
-	ld bc,00807h		;986d
+	ld bc,00807h		;986d   ; 8 x 7 puntos por HMMC
 	xor a			;9870
 	jp 0498ah		;9871   ; hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 
 ; ----------------------------------------------------------------------
-; DATOS dibujo_de_8x7: 28 bytes, 8 x 7 puntos a 4 bits, que p02:9865 manda por
-;   HMMC (`ld bc,0x0807`) si el bit 0 esta a cero
+; DATOS flecha_a_la_derecha: 8 x 7 puntos a 4 bits, la flecha de la salida en
+;   el mapa del pergamino (p02:9865, bit 0 a cero)
 ;   0x9874..0x9890  (28 bytes)
-DATA_dibujo_de_8x7:
+DATA_flecha_a_la_derecha:
 	defb 000h,008h,000h,000h,000h,008h,080h,000h,088h,088h,088h,000h,088h,088h,088h,080h	; 9874  ................
 	defb 088h,088h,088h,000h,000h,008h,080h,000h,000h,008h,000h,000h	; 9884  ............
 
@@ -3967,10 +3985,11 @@ DATA_hmmc_9890:
 	defb 000h,000h,080h,000h	; 98a8
 
 ; ----------------------------------------------------------------------
-; DATOS tres_bytes_por_fase: 19 registros de tres bytes, uno por fase, que
-;   p02:9859 indexa con fase * 3
+; DATOS salida_de_cada_fase_en_el_mapa: 19 registros de tres bytes (y, x,
+;   hacia donde) con la flecha de la salida en el mapa del pergamino
+;   (p02:9859, fase * 3)
 ;   0x98ac..0x98e5  (57 bytes)
-DATA_tres_bytes_por_fase:
+DATA_salida_de_cada_fase_en_el_mapa:
 	defb 06ch,092h,000h,04eh,0b4h,000h,063h,094h,000h,06eh,054h,000h,04eh,045h,001h,052h	; 98ac  l..N..c..nT.NE.R
 	defb 043h,001h,052h,065h,001h,054h,094h,000h,050h,0b4h,000h,082h,0c3h,001h,058h,0d4h	; 98bc  C.Re.T..P.....X.
 	defb 000h,06dh,0d4h,000h,06dh,094h,000h,082h,063h,001h,058h,024h,001h,043h,065h,001h	; 98cc  .m..m...c.X$.Ce.
@@ -3981,59 +4000,63 @@ DATA_tres_bytes_por_fase:
 ; ======================================================================
 
 
-L_98E5:
-	ld a,(0d010h)		;98e5
+
+; ----------------------------------------------------------------------
+; LOS ENEMIGOS, cada cuadro (p00:5C68; sin el reloj, 0x5EB8 antes): las siete cosas de 0xC800, de 0x80 bytes. Con el tiempo parado (0xD010) las que se paran (byte 0x7E) no hacen nada; las demas, su manejador por el tipo (0x9942) y su velocidad; y la que se sale de la pantalla, fuera.
+; ----------------------------------------------------------------------
+mueve_los_enemigos:
+	ld a,(0d010h)		;98e5   ; sin el tiempo parado...
 	and a			;98e8
-	call z,05eb8h		;98e9
-L_98EC:
-	ld ix,0c800h		;98ec
-	ld b,007h		;98f0
+	call z,05eb8h		;98e9   ; ... lo de 0x5EB8
+los_siete_enemigos:
+	ld ix,0c800h		;98ec   ; la lista de 0xC800...
+	ld b,007h		;98f0   ; ... siete
 L_98F2:
 	ld a,(ix+000h)		;98f2   ; lee el tipo de la cosa
 	and a			;98f5
-	jr z,L_9908		;98f6
+	jr z,L_9908		;98f6   ; vacia: la siguiente
 	push bc			;98f8
-	call L_992F		;98f9
-	jr c,L_9904		;98fc
-	call L_993B		;98fe
-	call L_99B9		;9901
+	call parada_por_el_reloj		;98f9   ; parada por el reloj?
+	jr c,L_9904		;98fc   ; si: ni se mueve
+	call manejador_del_enemigo		;98fe   ; su manejador...
+	call mueve_la_cosa		;9901   ; ... y su velocidad
 L_9904:
-	call L_99E5		;9904
+	call fuera_si_se_sale		;9904   ; fuera si se sale
 	pop bc			;9907
 L_9908:
-	ld de,00080h		;9908
+	ld de,00080h		;9908   ; la siguiente, 0x80 bytes mas
 	add ix,de		;990b
 	djnz L_98F2		;990d
 	ret			;990f
-L_9910:
-	ld ix,0d700h		;9910
+sprites_de_lo_que_lanzan:
+	ld ix,0d700h		;9910   ; la lista de 0xD700, ocho
 	ld b,008h		;9914
 	jr L_991E		;9916
-L_9918:
-	ld ix,0c800h		;9918
+sprites_de_los_enemigos:
+	ld ix,0c800h		;9918   ; la lista de 0xC800, siete
 	ld b,007h		;991c
 L_991E:
 	push bc			;991e
 	ld a,(ix+000h)		;991f   ; lee el tipo de la cosa
-	and a			;9922
-	call nz,06445h		;9923
-	ld de,00080h		;9926
+	and a			;9922   ; puesta?
+	call nz,06445h		;9923   ; si: compone sus sprites
+	ld de,00080h		;9926   ; la siguiente, 0x80 bytes mas
 	add ix,de		;9929
 	pop bc			;992b
 	djnz L_991E		;992c
 	ret			;992e
-L_992F:
-	ld a,(0d010h)		;992f
+parada_por_el_reloj:
+	ld a,(0d010h)		;992f   ; el tiempo parado (0xD010)?
 	and a			;9932
-	ret z			;9933
-	ld a,(ix+07eh)		;9934
+	ret z			;9933   ; no: NC
+	ld a,(ix+07eh)		;9934   ; esta se para (byte 0x7E)?
 	and a			;9937
-	ret z			;9938
-	scf			;9939
+	ret z			;9938   ; no: NC
+	scf			;9939   ; si: carry
 	ret			;993a
-L_993B:
-	ld a,(ix+000h)		;993b   ; lee el tipo de la cosa
-	dec a			;993e
+manejador_del_enemigo:
+	ld a,(ix+000h)		;993b   ; el tipo, desde 1...
+	dec a			;993e   ; ... por la tabla de detras
 	call 0406bh		;993f   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -4096,33 +4119,33 @@ DATA_tabla_9942:
 
 L_999E:
 	ret			;999e
-L_999F:
-	ld de,00080h		;999f
-	ld hl,0c80eh		;99a2
+marca_el_bit_0:
+	ld de,00080h		;999f   ; en las dos listas, 0x80 bytes cada cosa...
+	ld hl,0c80eh		;99a2   ; ... el byte 0x0E de las siete de 0xC800...
 	ld b,007h		;99a5
-	call L_99AF		;99a7
-	ld hl,0d70eh		;99aa
+	call bit_2_al_bit_0		;99a7
+	ld hl,0d70eh		;99aa   ; ... y de las ocho de 0xD700
 	ld b,008h		;99ad
-L_99AF:
-	bit 2,(hl)		;99af
+bit_2_al_bit_0:
+	bit 2,(hl)		;99af   ; con el bit 2...
 	jr z,L_99B5		;99b1
-	set 0,(hl)		;99b3
+	set 0,(hl)		;99b3   ; ... se pone el 0
 L_99B5:
-	add hl,de			;99b5
-	djnz L_99AF		;99b6
+	add hl,de			;99b5   ; la siguiente
+	djnz bit_2_al_bit_0		;99b6
 	ret			;99b8
-L_99B9:
-	ld a,(ix+006h)		;99b9   ; lee si la cosa se mueve
+mueve_la_cosa:
+	ld a,(ix+006h)		;99b9   ; se mueve?
 	and a			;99bc
 	ret z			;99bd
-	ld e,(ix+007h)		;99be   ; lee la velocidad vertical (parte baja)
+	ld e,(ix+007h)		;99be   ; y += la velocidad vertical, con su fraccion
 	ld d,(ix+008h)		;99c1   ; lee la velocidad vertical
 	ld l,(ix+002h)		;99c4   ; lee la fraccion de la y de la cosa
 	ld h,(ix+003h)		;99c7   ; lee la y de la cosa
 	add hl,de			;99ca
 	ld (ix+002h),l		;99cb   ; guarda la fraccion de la y de la cosa
 	ld (ix+003h),h		;99ce   ; guarda la y de la cosa
-	ld e,(ix+009h)		;99d1   ; lee la velocidad horizontal (parte baja)
+	ld e,(ix+009h)		;99d1   ; x += la velocidad horizontal, con su fraccion
 	ld d,(ix+00ah)		;99d4   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	ld l,(ix+004h)		;99d7   ; lee la fraccion de la x de la cosa
 	ld h,(ix+005h)		;99da   ; lee la x de la cosa
@@ -4130,204 +4153,216 @@ L_99B9:
 	ld (ix+004h),l		;99de   ; guarda la fraccion de la x de la cosa
 	ld (ix+005h),h		;99e1   ; guarda la x de la cosa
 	ret			;99e4
-L_99E5:
-	ld a,(ix+003h)		;99e5   ; lee la y de la cosa
+fuera_si_se_sale:
+	ld a,(ix+003h)		;99e5   ; la y, de 0xE4 abajo...
 	cp 0e4h		;99e8
-	jr nc,borra_la_cosa		;99ea
-	ld a,(ix+005h)		;99ec   ; lee la x de la cosa
+	jr nc,borra_la_cosa		;99ea   ; ... fuera
+	ld a,(ix+005h)		;99ec   ; la x, de 0xF1 a la derecha...
 	cp 0f1h		;99ef
-	jr nc,borra_la_cosa		;99f1
-	cp 007h		;99f3
-	ret nc			;99f5
+	jr nc,borra_la_cosa		;99f1   ; ... fuera
+	cp 007h		;99f3   ; o por debajo de 7...
+	ret nc			;99f5   ; (dentro: nada)
+
+; ----------------------------------------------------------------------
+; BORRA LA COSA: tipo 0 y byte 0x0E a 0, y cada uno de sus sprites (la lista que empieza en el byte 0x20 de la ficha: cuantos y, de cinco en cinco bytes, su numero) se esconde con la y 0xE0 en la copia de 0xD638.
+; ----------------------------------------------------------------------
 borra_la_cosa:
-	xor a			;99f6
+	xor a			;99f6   ; tipo a 0...
 	ld (ix+000h),a		;99f7   ; guarda el tipo de la cosa
-	ld (ix+00eh),a		;99fa
-	push ix		;99fd
+	ld (ix+00eh),a		;99fa   ; ... y el byte 0x0E
+	push ix		;99fd   ; HL = la ficha...
 	pop hl			;99ff
-	set 5,l		;9a00
+	set 5,l		;9a00   ; ... su byte 0x20: cuantos sprites
 	ld c,(hl)			;9a02
 	ld a,c			;9a03
-	and a			;9a04
+	and a			;9a04   ; ninguno: listo
 	ret z			;9a05
-	inc l			;9a06
+	inc l			;9a06   ; el primero
 L_9A07:
-	ld a,(hl)			;9a07
-	ld de,0d638h		;9a08
-	add a,a			;9a0b
+	ld a,(hl)			;9a07   ; su numero...
+	ld de,0d638h		;9a08   ; ... en la copia de los atributos...
+	add a,a			;9a0b   ; ... cuatro bytes cada uno
 	add a,a			;9a0c
 	add a,e			;9a0d
 	ld e,a			;9a0e
-	ld a,0e0h		;9a0f
+	ld a,0e0h		;9a0f   ; la y 0xE0: escondido
 	ld (de),a			;9a11
-	ld a,l			;9a12
+	ld a,l			;9a12   ; el siguiente, cinco bytes mas
 	add a,005h		;9a13
 	ld l,a			;9a15
 	dec c			;9a16
 	jr nz,L_9A07		;9a17
 	ret			;9a19
-L_9A1A:
-	call borra_la_cosa		;9a1a   ; borra_la_cosa: tipo a cero y sus sprites libres
-	ld c,(ix+003h)		;9a1d   ; lee la y de la cosa
-	ld b,(ix+005h)		;9a20   ; lee la x de la cosa
-	ld hl,00000h		;9a23
+se_vuelve_llama:
+	call borra_la_cosa		;9a1a   ; la borra...
+	ld c,(ix+003h)		;9a1d   ; ... y en su y...
+	ld b,(ix+005h)		;9a20   ; ... y su x...
+	ld hl,00000h		;9a23   ; ... sin velocidad...
 	ld e,l			;9a26
 	ld d,h			;9a27
-	ld a,0ffh		;9a28
+	ld a,0ffh		;9a28   ; ... y deja una llama en 0xD700 (A = 0xFF: el tipo 0x0C)
 	push ix		;9a2a
 	call crea_con_parametros		;9a2c   ; crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
-	ld (ix+01fh),000h		;9a2f
-	ld (ix+07eh),000h		;9a33
+	ld (ix+01fh),000h		;9a2f   ; sin nada que soltar...
+	ld (ix+07eh),000h		;9a33   ; ... y no se para con el reloj
 	pop ix		;9a37
 	ret			;9a39
-L_9A3A:
-	ld a,001h		;9a3a
+
+; ----------------------------------------------------------------------
+; CUANDO UNA COSA SE VA: 0x9A3A (0xCFFF = 1) cuando la cruz las borra todas (p01:7813), sin soltar nada; 0x9A3E (0xCFFF = 0) cuando la matan o Simon la coge (p01:7DFC, 7E9C). Las que se cogen dan lo suyo; las demas dejan la llama (el tipo 0x1E) y a veces algo.
+; ----------------------------------------------------------------------
+se_va_por_la_cruz:
+	ld a,001h		;9a3a   ; 0xCFFF = 1
 	jr L_9A3F		;9a3c
-L_9A3E:
-	xor a			;9a3e
+se_va_la_cosa:
+	xor a			;9a3e   ; 0xCFFF = 0
 L_9A3F:
 	ld (0cfffh),a		;9a3f
 	push ix		;9a42
-	call L_9A4A		;9a44
+	call se_va		;9a44
 	pop ix		;9a47
 	ret			;9a49
-L_9A4A:
-	call L_9A6B		;9a4a
-	ret c			;9a4d
-	call borra_la_cosa		;9a4e   ; borra_la_cosa: tipo a cero y sus sprites libres
-	call L_9ABE		;9a51
+se_va:
+	call las_que_no_son_un_enemigo		;9a4a   ; las que no son un enemigo...
+	ret c			;9a4d   ; ... acaban ahi
+	call borra_la_cosa		;9a4e   ; se borra
+	call lo_que_suelta		;9a51   ; suelta algo?
 	ret c			;9a54
-	call L_9B22		;9a55
-L_9A58:
-	ld c,01eh		;9a58
+	call sitio_de_lo_que_suelta		;9a55   ; la llama, en su sitio
+crea_la_llama:
+	ld c,01eh		;9a58   ; el tipo 0x1E...
 	push ix		;9a5a
 	push bc			;9a5c
 	call 05f1dh		;9a5d   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop bc			;9a60
-	ld (ix+01fh),b		;9a61
+	ld (ix+01fh),b		;9a61   ; ... con B en su byte 0x1F
 	pop ix		;9a64
-	ld hl,0ce08h		;9a66
+	ld hl,0ce08h		;9a66   ; un muerto mas (0xCE08)
 	inc (hl)			;9a69
 	ret			;9a6a
-L_9A6B:
-	ld a,(ix+000h)		;9a6b   ; lee el tipo de la cosa
+las_que_no_son_un_enemigo:
+	ld a,(ix+000h)		;9a6b   ; el tipo, a 0xCFF0
 	ld (0cff0h),a		;9a6e   ; guarda el tipo de la cosa que se crea
-	cp 022h		;9a71
-	jp z,L_9A8D		;9a73
-	cp 024h		;9a76
-	jr z,L_9A97		;9a78
-	cp 026h		;9a7a
-	jr z,L_9A92		;9a7c
-	cp 011h		;9a7e
-	jp z,L_9AA3		;9a80
-	cp 009h		;9a83
-	jr z,L_9AA9		;9a85
-	cp 018h		;9a87
-	jr z,L_9AB3		;9a89
-	xor a			;9a8b
+	cp 022h		;9a71   ; 0x22, la bola del jefe...
+	jp z,la_bola_se_va		;9a73
+	cp 024h		;9a76   ; 0x24...
+	jr z,da_un_corazon		;9a78
+	cp 026h		;9a7a   ; 0x26, lo que suelta un enemigo...
+	jr z,da_lo_que_suelta		;9a7c
+	cp 011h		;9a7e   ; 0x11, Dracula...
+	jp z,dracula_cae		;9a80
+	cp 009h		;9a83   ; 9, el esqueleto que se hunde...
+	jr z,el_esqueleto_se_hunde		;9a85
+	cp 018h		;9a87   ; 0x18...
+	jr z,el_tipo_0x18		;9a89
+	xor a			;9a8b   ; los demas: NC
 	ret			;9a8c
-L_9A8D:
-	call borra_la_cosa		;9a8d   ; borra_la_cosa: tipo a cero y sus sprites libres
+la_bola_se_va:
+	call borra_la_cosa		;9a8d   ; se borra, sin mas
 	scf			;9a90
 	ret			;9a91
-L_9A92:
-	ld a,(ix+01fh)		;9a92
+da_lo_que_suelta:
+	ld a,(ix+01fh)		;9a92   ; lo que lleva (byte 0x1F)
 	jr L_9A99		;9a95
-L_9A97:
-	ld a,001h		;9a97
+da_un_corazon:
+	ld a,001h		;9a97   ; 0x24: el objeto 1, un corazon
 L_9A99:
 	push af			;9a99
-	call borra_la_cosa		;9a9a   ; borra_la_cosa: tipo a cero y sus sprites libres
+	call borra_la_cosa		;9a9a   ; se borra...
 	pop af			;9a9d
-	call L_8D2C		;9a9e
+	call L_8D2C		;9a9e   ; ... y Simon lo coge
 	scf			;9aa1
 	ret			;9aa2
-L_9AA3:
-	ld (ix+001h),008h		;9aa3   ; el paso en que va la cosa = 0x08
+dracula_cae:
+	ld (ix+001h),008h		;9aa3   ; Dracula: al paso 8
 	scf			;9aa7
 	ret			;9aa8
-L_9AA9:
-	ld a,(0cfffh)		;9aa9
+el_esqueleto_se_hunde:
+	ld a,(0cfffh)		;9aa9   ; con la cruz...
 	and a			;9aac
-	ret nz			;9aad
-	call 0b048h		;9aae
+	ret nz			;9aad   ; ... nada
+	call 0b048h		;9aae   ; si no, se hunde (no muere)
 	scf			;9ab1
 	ret			;9ab2
-L_9AB3:
-	ld a,(0ce0bh)		;9ab3
+el_tipo_0x18:
+	ld a,(0ce0bh)		;9ab3   ; con el jefe caido (0xCE0B)...
 	and a			;9ab6
-	ret nz			;9ab7
-	ld (ix+010h),008h		;9ab8
+	ret nz			;9ab7   ; ... nada
+	ld (ix+010h),008h		;9ab8   ; si no, el byte 0x10 a 8
 	scf			;9abc
 	ret			;9abd
-L_9ABE:
+
+; ----------------------------------------------------------------------
+; LO QUE SUELTA UN ENEMIGO al morir. En las habitaciones especiales y con la cruz, nada; el dragon de huesos (0x0E) deja cuatro llamas en fila; el que lleva algo (byte 0x1F) lo suelta; si no, de cada 32 muertos (0xCF40) uno suelta el 0x13 (5.000 puntos) y, por sorteo con R, uno de 64 el corazon grande (2). Lo que suelta es una cosa del tipo 0x26 que sale un poco por encima (0x9B34). Devuelve B para la llama: 1 en uno de cada cuatro de los demas.
+; ----------------------------------------------------------------------
+lo_que_suelta:
 	ld b,000h		;9abe
-	ld a,(0ce00h)		;9ac0
+	ld a,(0ce00h)		;9ac0   ; en una habitacion especial...
 	and a			;9ac3
-	ret nz			;9ac4
-	ld a,(0cff0h)		;9ac5   ; lee el tipo de la cosa que se crea
+	ret nz			;9ac4   ; ... nada
+	ld a,(0cff0h)		;9ac5   ; el dragon de huesos?
 	cp 00eh		;9ac8
-	jr z,L_9AF3		;9aca
-	ld a,(0cfffh)		;9acc
+	jr z,cuatro_llamas		;9aca
+	ld a,(0cfffh)		;9acc   ; con la cruz...
 	and a			;9acf
-	ret nz			;9ad0
-	ld a,(ix+01fh)		;9ad1
+	ret nz			;9ad0   ; ... nada
+	ld a,(ix+01fh)		;9ad1   ; lleva algo?
 	ld c,a			;9ad4
 	and a			;9ad5
-	jp nz,L_9B13		;9ad6
-	ld hl,0cf40h		;9ad9
+	jp nz,suelta_c		;9ad6   ; si: eso
+	ld hl,0cf40h		;9ad9   ; un muerto mas en 0xCF40...
 	inc (hl)			;9adc
 	ld a,(hl)			;9add
-	and 01fh		;9ade
-	ld c,013h		;9ae0
-	jp z,L_9B13		;9ae2
-	ld a,r		;9ae5
+	and 01fh		;9ade   ; ... y cada 32...
+	ld c,013h		;9ae0   ; ... el 0x13 (5.000 puntos)
+	jp z,suelta_c		;9ae2
+	ld a,r		;9ae5   ; uno de 64, por R...
 	and 03fh		;9ae7
-	ld c,002h		;9ae9
-	jr z,L_9B13		;9aeb
-	and 003h		;9aed
-	ret nz			;9aef
-	ld b,001h		;9af0
+	ld c,002h		;9ae9   ; ... el corazon grande
+	jr z,suelta_c		;9aeb
+	and 003h		;9aed   ; de los demas, uno de cada cuatro...
+	ret nz			;9aef   ; (los otros tres, nada)
+	ld b,001h		;9af0   ; ... B = 1 para la llama
 	ret			;9af2
-L_9AF3:
-	ld e,(ix+003h)		;9af3   ; lee la y de la cosa
-	ld d,(ix+005h)		;9af6   ; lee la x de la cosa
-	ld b,004h		;9af9
-L_9AFB:
+cuatro_llamas:
+	ld e,(ix+003h)		;9af3   ; E = la y...
+	ld d,(ix+005h)		;9af6   ; ... D = la x
+	ld b,004h		;9af9   ; cuatro
+una_llama_del_dragon:
 	push bc			;9afb
 	push de			;9afc
-	ld b,001h		;9afd
-	ld a,(0cfffh)		;9aff
+	ld b,001h		;9afd   ; B = 1...
+	ld a,(0cfffh)		;9aff   ; ... o 0 con la cruz
 	and a			;9b02
-	jr z,L_9B06		;9b03
+	jr z,crea_una_llama		;9b03
 	dec b			;9b05
-L_9B06:
-	call L_9A58		;9b06
+crea_una_llama:
+	call crea_la_llama		;9b06   ; la llama
 	pop de			;9b09
 	pop bc			;9b0a
-	ld a,d			;9b0b
+	ld a,d			;9b0b   ; 0x10 mas a la derecha
 	add a,010h		;9b0c
 	ld d,a			;9b0e
-	djnz L_9AFB		;9b0f
-	scf			;9b11
+	djnz una_llama_del_dragon		;9b0f
+	scf			;9b11   ; carry: listo
 	ret			;9b12
-L_9B13:
+suelta_c:
 	push bc			;9b13
-	call L_9B22		;9b14
-	ld c,026h		;9b17
+	call sitio_de_lo_que_suelta		;9b14   ; un poco por encima
+	ld c,026h		;9b17   ; una cosa 0x26...
 	call 05f1dh		;9b19   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 	pop bc			;9b1c
-	ld (ix+01fh),c		;9b1d
-	scf			;9b20
+	ld (ix+01fh),c		;9b1d   ; ... que lleva C
+	scf			;9b20   ; carry: listo
 	ret			;9b21
-L_9B22:
-	ld a,(0cff0h)		;9b22   ; lee el tipo de la cosa que se crea
+sitio_de_lo_que_suelta:
+	ld a,(0cff0h)		;9b22   ; la altura del tipo, de 0x9B34...
 	ld hl,l9b33h		;9b25
 	call 04061h		;9b28   ; hl_mas_a: HL += A
-	ld a,(ix+003h)		;9b2b   ; lee la y de la cosa
+	ld a,(ix+003h)		;9b2b   ; ... restada a su y: E
 	sub (hl)			;9b2e
 	ld e,a			;9b2f
-	ld d,(ix+005h)		;9b30   ; lee la x de la cosa
+	ld d,(ix+005h)		;9b30   ; D = su x
 L_9B33:
 	ret			;9b33
 
@@ -4347,109 +4382,109 @@ DATA_altura_de_lo_que_suelta:
 ; ======================================================================
 
 
-L_9B60:
-	ld (ix+00bh),085h		;9b60   ; el dibujo de la cosa = 0x85
-	ld (ix+00ch),010h		;9b64   ; la cuenta de cuadros del paso = 0x10
+nace_la_llama:
+	ld (ix+00bh),085h		;9b60   ; LA LLAMA (tipo 0x1E, al nacer; p00:5FC9): el dibujo 0x85...
+	ld (ix+00ch),010h		;9b64   ; ... 0x10 cuadros...
 	ld (ix+00eh),000h		;9b68
-	ld (ix+07eh),000h		;9b6c
+	ld (ix+07eh),000h		;9b6c   ; ... y no se para con el reloj
 	ret			;9b70
-L_9B71:
-	ld a,(ix+000h)		;9b71   ; lee el tipo de la cosa
+la_llama:
+	ld a,(ix+000h)		;9b71   ; LA LLAMA, cada cuadro: su tipo a 0xCFF0
 	ld (0cff0h),a		;9b74   ; guarda el tipo de la cosa que se crea
-	ld a,(ix+00ch)		;9b77   ; lee la cuenta de cuadros del paso
+	ld a,(ix+00ch)		;9b77   ; cada cuatro cuadros...
 	and 004h		;9b7a
-	ld c,085h		;9b7c
+	ld c,085h		;9b7c   ; ... el dibujo 0x85 o el 0x86
 	jr z,L_9B81		;9b7e
 	inc c			;9b80
 L_9B81:
 	ld (ix+00bh),c		;9b81   ; guarda el dibujo de la cosa
-	dec (ix+00ch)		;9b84   ; baja la cuenta de cuadros del paso
+	dec (ix+00ch)		;9b84   ; al acabar la cuenta...
 	ret nz			;9b87
-	call borra_la_cosa		;9b88   ; borra_la_cosa: tipo a cero y sus sprites libres
-	ld a,(ix+01fh)		;9b8b
+	call borra_la_cosa		;9b88   ; ... se borra...
+	ld a,(ix+01fh)		;9b8b   ; ... y si lleva algo (byte 0x1F)...
 	and a			;9b8e
 	ret z			;9b8f
-	ld c,024h		;9b90
+	ld c,024h		;9b90   ; ... deja un corazon que cae (tipo 0x24) en su sitio
 	ld e,(ix+003h)		;9b92   ; lee la y de la cosa
 	ld d,(ix+005h)		;9b95   ; lee la x de la cosa
 	jp 05f1dh		;9b98   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_9B9B:
-	ld (ix+00eh),002h		;9b9b
+nace_el_corazon:
+	ld (ix+00eh),002h		;9b9b   ; EL CORAZON QUE CAE (tipo 0x24, al nacer)
 	ld (ix+00ch),001h		;9b9f   ; la cuenta de cuadros del paso = 0x01
 	ld (ix+006h),001h		;9ba3   ; la cosa se mueve
-	ld de,00080h		;9ba7
+	ld de,00080h		;9ba7   ; baja a 0x80...
 	call 0a55dh		;9baa   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld de,00200h		;9bad
+	ld de,00200h		;9bad   ; ... y va a 0x200 de lado...
 	call 0a56ch		;9bb0   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld (ix+011h),0ffh		;9bb3
+	ld (ix+011h),0ffh		;9bb3   ; ... con un empuje de -0x20 (bytes 0x10 y 0x11)
 	ld (ix+010h),0e0h		;9bb7
 	ld (ix+00bh),000h		;9bbb   ; el dibujo de la cosa = 0x00
 	ld (ix+07eh),000h		;9bbf
 	ret			;9bc3
-L_9BC4:
-	ld (ix+00ch),014h		;9bc4   ; la cuenta de cuadros del paso = 0x14
+nace_lo_que_suelta:
+	ld (ix+00ch),014h		;9bc4   ; LO QUE SUELTA UN ENEMIGO (tipo 0x26, al nacer): 0x14 cuadros quieto...
 	ld (ix+006h),000h		;9bc8   ; la cosa se queda quieta
 	ld (ix+00eh),002h		;9bcc
-	ld (ix+00bh),001h		;9bd0   ; el dibujo de la cosa = 0x01
+	ld (ix+00bh),001h		;9bd0   ; ... con el dibujo 1
 	ld (ix+07eh),000h		;9bd4
 	ret			;9bd8
-L_9BD9:
-	call L_9C5D		;9bd9
-	jr c,L_9C03		;9bdc
-	inc (ix+00ch)		;9bde   ; sube la cuenta de cuadros del paso
-	ld e,(ix+010h)		;9be1
+el_corazon_cae:
+	call toca_el_decorado		;9bd9   ; EL CORAZON, cada cuadro: toca el decorado?
+	jr c,queda_en_el_suelo		;9bdc
+	inc (ix+00ch)		;9bde   ; si no, la cuenta sube...
+	ld e,(ix+010h)		;9be1   ; ... y su empuje (bytes 0x10 y 0x11)...
 	ld d,(ix+011h)		;9be4
-	call 0a564h		;9be7
-	ld a,(ix+00ch)		;9bea   ; lee la cuenta de cuadros del paso
+	call 0a564h		;9be7   ; ... va a la velocidad horizontal
+	ld a,(ix+00ch)		;9bea   ; cada 0x20 cuadros...
 	sub 020h		;9bed
 	ret nz			;9bef
 	ld (ix+00ch),a		;9bf0   ; guarda la cuenta de cuadros del paso
-	ld e,(ix+010h)		;9bf3
+	ld e,(ix+010h)		;9bf3   ; ... el empuje cambia de signo: se mece
 	ld d,(ix+011h)		;9bf6
 	call 0a17ch		;9bf9   ; niega_de: DE = -DE
 	ld (ix+010h),e		;9bfc
 	ld (ix+011h),d		;9bff
 	ret			;9c02
-L_9C03:
-	call borra_la_cosa		;9c03   ; borra_la_cosa: tipo a cero y sus sprites libres
-	ld b,001h		;9c06
-	ld hl,00410h		;9c08
-L_9C0B:
-	ld a,(ix+003h)		;9c0b   ; lee la y de la cosa
+queda_en_el_suelo:
+	call borra_la_cosa		;9c03   ; se borra...
+	ld b,001h		;9c06   ; ... y deja el objeto 1 (un corazon)...
+	ld hl,00410h		;9c08   ; ... 0x10 mas arriba y 4 a la izquierda
+deja_el_objeto_b:
+	ld a,(ix+003h)		;9c0b   ; la y menos L...
 	sub l			;9c0e
-	and 0f8h		;9c0f
+	and 0f8h		;9c0f   ; ... a la rejilla de 8
 	ld e,a			;9c11
-	ld a,(ix+005h)		;9c12   ; lee la x de la cosa
+	ld a,(ix+005h)		;9c12   ; la x menos H, mas 4...
 	sub h			;9c15
 	add a,004h		;9c16
-	and 0f8h		;9c18
+	and 0f8h		;9c18   ; ... a la rejilla de 8
 	ld d,a			;9c1a
-	jp L_89E3		;9c1b
-L_9C1E:
-	ld hl,09c59h		;9c1e
-	ld a,(0c003h)		;9c21   ; lee el contador de cuadros
+	jp L_89E3		;9c1b   ; y sale como un objeto a la vista
+lo_que_suelta_cae:
+	ld hl,09c59h		;9c1e   ; LO QUE SUELTA UN ENEMIGO, cada cuadro: su color, uno de 0x9C59...
+	ld a,(0c003h)		;9c21   ; ... por los dos bits bajos del contador de cuadros
 	and 003h		;9c24
 	call 04061h		;9c26   ; hl_mas_a: HL += A
 	ld a,(hl)			;9c29
 	ld (ix+025h),a		;9c2a
-	ld a,(ix+001h)		;9c2d   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;9c2d   ; paso 0: quieto
 	and a			;9c30
-	jr nz,L_9C46		;9c31
-	dec (ix+00ch)		;9c33   ; baja la cuenta de cuadros del paso
+	jr nz,lo_que_suelta_llega		;9c31
+	dec (ix+00ch)		;9c33   ; al acabar la cuenta...
 	ret nz			;9c36
-	inc (ix+001h)		;9c37   ; sube el paso en que va la cosa
-	ld de,00000h		;9c3a
+	inc (ix+001h)		;9c37   ; ... al paso 1...
+	ld de,00000h		;9c3a   ; ... sin moverse de lado...
 	call 0a56ch		;9c3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld de,00800h		;9c40
+	ld de,00800h		;9c40   ; ... cayendo a 0x800
 	jp 0a55dh		;9c43   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_9C46:
-	ld (ix+006h),001h		;9c46   ; la cosa se mueve
-	call L_9C5D		;9c4a
+lo_que_suelta_llega:
+	ld (ix+006h),001h		;9c46   ; paso 1: se mueve
+	call toca_el_decorado		;9c4a   ; toca el decorado?
 	ret nc			;9c4d
-	call borra_la_cosa		;9c4e   ; borra_la_cosa: tipo a cero y sus sprites libres
-	ld b,(ix+01fh)		;9c51
-	ld hl,00810h		;9c54
-	jr L_9C0B		;9c57
+	call borra_la_cosa		;9c4e   ; si: se borra...
+	ld b,(ix+01fh)		;9c51   ; ... y deja lo que lleva...
+	ld hl,00810h		;9c54   ; ... 0x10 mas arriba y 8 a la izquierda
+	jr deja_el_objeto_b		;9c57
 
 ; ----------------------------------------------------------------------
 ; DATOS cuatro_valores_por_cuadro_2: cuatro bytes que p02:9C1E elige con los
@@ -4463,49 +4498,53 @@ DATA_cuatro_valores_por_cuadro_2:
 ; ======================================================================
 
 
-L_9C5D:
-	ld e,(ix+003h)		;9c5d   ; lee la y de la cosa
-	ld d,(ix+005h)		;9c60   ; lee la x de la cosa
+toca_el_decorado:
+	ld e,(ix+003h)		;9c5d   ; E = la y...
+	ld d,(ix+005h)		;9c60   ; ... D = la x
 	jp 07b98h		;9c63   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-L_9C66:
-	ld (ix+00eh),000h		;9c66
+nace_un_cascote:
+	ld (ix+00eh),000h		;9c66   ; LOS CASCOTES (tipo 0x20, al nacer): el dibujo 0x0E...
 	ld c,00eh		;9c6a
-	ld a,(0d000h)		;9c6c   ; lee la FASE (0 el patio, 1-18)
+	ld a,(0d000h)		;9c6c   ; ... o, en la fase 10...
 	cp 00ah		;9c6f
 	jr nz,L_9C79		;9c71
-	ld c,015h		;9c73
+	ld c,015h		;9c73   ; ... el 0x15 con el color 0x0B
 	ld (ix+025h),00bh		;9c75
 L_9C79:
 	ld (ix+00bh),c		;9c79   ; guarda el dibujo de la cosa
-	ld (ix+00ch),01eh		;9c7c   ; la cuenta de cuadros del paso = 0x1E
-	ld (ix+006h),001h		;9c80   ; la cosa se mueve
-	ld (ix+07eh),000h		;9c84
-	ld hl,0cf30h		;9c88
+	ld (ix+00ch),01eh		;9c7c   ; 0x1E cuadros...
+	ld (ix+006h),001h		;9c80   ; ... moviendose...
+	ld (ix+07eh),000h		;9c84   ; ... y no se para con el reloj
+	ld hl,0cf30h		;9c88   ; uno a cada lado (0xCF30):
 	inc (hl)			;9c8b
 	ld a,(hl)			;9c8c
-	ld hl,0fb00h		;9c8d
-	ld de,00100h		;9c90
+	ld hl,0fb00h		;9c8d   ; -0x500 hacia arriba...
+	ld de,00100h		;9c90   ; ... y 0x100 a la derecha...
 	rra			;9c93
-	jr c,L_9C9C		;9c94
-	ld de,0ff00h		;9c96
-	ld hl,0fa00h		;9c99
+	jr c,L_9C9C		;9c94   ; ... o...
+	ld de,0ff00h		;9c96   ; ... 0x100 a la izquierda...
+	ld hl,0fa00h		;9c99   ; ... y -0x600 hacia arriba
 L_9C9C:
 	call 0a56ch		;9c9c   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;9c9f
 	jp 0a55dh		;9ca0   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_9CA3:
-	ld de,00080h		;9ca3
+el_cascote_cae:
+	ld de,00080h		;9ca3   ; LOS CASCOTES, cada cuadro: la gravedad, 0x80
 	jp 0a549h		;9ca6   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_9CA9:
+
+; ----------------------------------------------------------------------
+; LO QUE SALE EN CADA HABITACION. Cada habitacion tiene un byte en la tabla del banco 14 de 0x85A6 (p00:5ED8) con un bit por generador; p00:5EF6 llama a los de sus bits cada cuadro (sin el tiempo parado ni la puerta de la fase abriendose). Cada generador lleva dos bytes en 0xCF00 (plazo y cuantos van) y ocho plazos en su tabla. Bit 0 (0x9CE6): el tipo 1; bits 1 y 2 (0x9D4B, 0x9D52): los tipos 2 y 3, los hombres pez; bit 3 (0x9D97): el tipo 4; bits 4 y 5 (0x9DC3, 0x9DD5): los tipos 7 y 8; bit 6 (0x9DE7): el aguila, el 0x0F.
+; ----------------------------------------------------------------------
+los_plazos_de_la_habitacion:
 	ld hl,0cf00h		;9ca9   ; apunta a los plazos de las siete cosas de la habitacion
-	ld de,09cbbh		;9cac
-	ld b,007h		;9caf
+	ld de,09cbbh		;9cac   ; los primeros, de 0x9CBB
+	ld b,007h		;9caf   ; siete generadores
 L_9CB1:
-	ld a,(de)			;9cb1
+	ld a,(de)			;9cb1   ; el primer plazo...
 	ld (hl),a			;9cb2
 	inc de			;9cb3
 	inc l			;9cb4
-	ld (hl),000h		;9cb5
+	ld (hl),000h		;9cb5   ; ... y ninguno salido
 	inc l			;9cb7
 	djnz L_9CB1		;9cb8
 	ret			;9cba
@@ -4523,92 +4562,96 @@ DATA_cuentas_iniciales:
 ; ======================================================================
 
 
-L_9CC3:
+
+; ----------------------------------------------------------------------
+; EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por VUELTA (y como poco 1), y devuelve Z: toca sacar uno.
+; ----------------------------------------------------------------------
+el_plazo_de_un_generador:
 	exx			;9cc3
-	ld hl,0cf10h		;9cc4   ; apunta a el reloj de los plazos
-	dec (hl)			;9cc7
+	ld hl,0cf10h		;9cc4   ; el reloj comun...
+	dec (hl)			;9cc7   ; ... baja...
 	ld a,(hl)			;9cc8
 	exx			;9cc9
-	and 003h		;9cca
+	and 003h		;9cca   ; ... y cuenta una de cada cuatro
 	ret nz			;9ccc
-	dec (hl)			;9ccd
-	ret nz			;9cce
-	inc l			;9ccf
+	dec (hl)			;9ccd   ; el plazo, uno menos
+	ret nz			;9cce   ; aun no: NZ
+	inc l			;9ccf   ; uno salido mas
 	ld a,(hl)			;9cd0
 	inc (hl)			;9cd1
 	dec l			;9cd2
-	and 007h		;9cd3
+	and 007h		;9cd3   ; el plazo siguiente, de los ocho...
 	call 04066h		;9cd5   ; de_mas_a: DE += A
-	ld a,(0d012h)		;9cd8   ; lee la VUELTA (0, 1 o 2)
+	ld a,(0d012h)		;9cd8   ; ... menos dos por VUELTA
 	add a,a			;9cdb
 	ld c,a			;9cdc
 	ld a,(de)			;9cdd
 	sub c			;9cde
 	jr nc,L_9CE2		;9cdf
-	xor a			;9ce1
+	xor a			;9ce1   ; (no menos de 0)
 L_9CE2:
-	inc a			;9ce2
+	inc a			;9ce2   ; mas uno
 	ld (hl),a			;9ce3
-	xor a			;9ce4
+	xor a			;9ce4   ; Z: toca
 	ret			;9ce5
-L_9CE6:
-	ld hl,0cf00h		;9ce6   ; apunta a los plazos de las siete cosas de la habitacion
+genera_el_tipo_1:
+	ld hl,0cf00h		;9ce6   ; BIT 0: el tipo 1, con los plazos de 0x9D43
 	ld de,09d43h		;9ce9
-	call L_9CC3		;9cec
+	call el_plazo_de_un_generador		;9cec
 	ret nz			;9cef
-	call L_9CFC		;9cf0
-	call L_9E16		;9cf3
-	ret c			;9cf6
-	ld c,001h		;9cf7
+	call sitio_del_tipo_1		;9cf0   ; su sitio, segun la fase
+	call no_delante_de_simon		;9cf3   ; no delante de Simon, si esta en un borde
+	ret c			;9cf6   ; (carry: no sale)
+	ld c,001h		;9cf7   ; el tipo 1
 	jp 05f1dh		;9cf9   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-L_9CFC:
-	ld a,(0c425h)		;9cfc   ; lee la Y de Simon
+sitio_del_tipo_1:
+	ld a,(0c425h)		;9cfc   ; C = la y de Simon
 	ld c,a			;9cff
 	ld hl,(0d000h)		;9d00   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-	ld a,l			;9d03
+	ld a,l			;9d03   ; fase 1...
 	dec a			;9d04
-	jr z,L_9D28		;9d05
-	dec a			;9d07
-	jr z,L_9D1B		;9d08
-	dec a			;9d0a
-	jr z,L_9D17		;9d0b
-	cp 008h		;9d0d
-	jr z,L_9D13		;9d0f
-	jr L_9D2C		;9d11
-L_9D13:
-	ld e,0b0h		;9d13
-	jr L_9D1D		;9d15
-L_9D17:
-	ld e,0c0h		;9d17
-	jr L_9D1D		;9d19
-L_9D1B:
-	ld e,0a0h		;9d1b
-L_9D1D:
-	ld d,0f0h		;9d1d
-	ld a,(0cf01h)		;9d1f
+	jr z,en_la_fase_1		;9d05
+	dec a			;9d07   ; ... 2...
+	jr z,en_la_fase_2		;9d08
+	dec a			;9d0a   ; ... 3...
+	jr z,en_la_fase_3		;9d0b
+	cp 008h		;9d0d   ; ... u 11
+	jr z,en_la_fase_11		;9d0f
+	jr y_0xc0		;9d11   ; las demas
+en_la_fase_11:
+	ld e,0b0h		;9d13   ; y = 0xB0
+	jr por_un_lado_y_por_otro		;9d15
+en_la_fase_3:
+	ld e,0c0h		;9d17   ; y = 0xC0
+	jr por_un_lado_y_por_otro		;9d19
+en_la_fase_2:
+	ld e,0a0h		;9d1b   ; y = 0xA0
+por_un_lado_y_por_otro:
+	ld d,0f0h		;9d1d   ; x = 0xF0, por la derecha...
+	ld a,(0cf01h)		;9d1f   ; ... o, dos de cada cuatro (bit 1 de 0xCF01)...
 	bit 1,a		;9d22
 	ret z			;9d24
-	ld d,010h		;9d25
+	ld d,010h		;9d25   ; ... 0x10, por la izquierda
 	ret			;9d27
-L_9D28:
-	ld a,h			;9d28
+en_la_fase_1:
+	ld a,h			;9d28   ; la habitacion 1?
 	dec a			;9d29
-	jr z,L_9D38		;9d2a
-L_9D2C:
-	ld e,0c0h		;9d2c
-L_9D2E:
-	ld d,0f0h		;9d2e
-	ld a,(0c42ch)		;9d30   ; lee el lado al que mira Simon (0 derecha)
+	jr z,en_la_habitacion_1		;9d2a
+y_0xc0:
+	ld e,0c0h		;9d2c   ; y = 0xC0
+por_delante_de_simon:
+	ld d,0f0h		;9d2e   ; x = 0xF0...
+	ld a,(0c42ch)		;9d30   ; ... si Simon mira a la derecha...
 	and a			;9d33
 	ret z			;9d34
-	ld d,010h		;9d35
+	ld d,010h		;9d35   ; ... y 0x10 si a la izquierda
 	ret			;9d37
-L_9D38:
-	ld e,0c0h		;9d38
-	ld a,c			;9d3a
+en_la_habitacion_1:
+	ld e,0c0h		;9d38   ; y = 0xC0...
+	ld a,c			;9d3a   ; ... con Simon abajo (y 0x88 o mas)...
 	cp 088h		;9d3b
-	jr nc,L_9D2E		;9d3d
-	ld de,0f060h		;9d3f
+	jr nc,por_delante_de_simon		;9d3d
+	ld de,0f060h		;9d3f   ; ... y si esta arriba, en (0xF0, 0x60)
 	ret			;9d42
 
 ; ----------------------------------------------------------------------
@@ -4624,35 +4667,35 @@ DATA_plazos_de_la_cosa_1:
 ; ======================================================================
 
 
-L_9D4B:
-	ld hl,0cf02h		;9d4b
+genera_el_tipo_2:
+	ld hl,0cf02h		;9d4b   ; BIT 1: el tipo 2, el hombre pez
 	ld c,002h		;9d4e
 	jr L_9D57		;9d50
-L_9D52:
-	ld hl,0cf02h		;9d52
+genera_el_tipo_3:
+	ld hl,0cf02h		;9d52   ; BIT 2: el tipo 3, el hombre pez (con los mismos plazos de 0xCF02)
 	ld c,003h		;9d55
 L_9D57:
-	ld de,09d8fh		;9d57
+	ld de,09d8fh		;9d57   ; los plazos de 0x9D8F
 	push bc			;9d5a
-	call L_9CC3		;9d5b
+	call el_plazo_de_un_generador		;9d5b
 	pop bc			;9d5e
 	ret nz			;9d5f
-	ld e,0c8h		;9d60
-	ld a,(0cf03h)		;9d62
+	ld e,0c8h		;9d60   ; sale del agua, y = 0xC8...
+	ld a,(0cf03h)		;9d62   ; ... en una de las ocho x de 0x9D87, por turno
 	and 007h		;9d65
 	ld hl,09d87h		;9d67
 	call 04061h		;9d6a   ; hl_mas_a: HL += A
 	ld d,(hl)			;9d6d
-	ld a,(0c427h)		;9d6e   ; lee la X de Simon
+	ld a,(0c427h)		;9d6e   ; lejos de Simon (0x18 o mas)...
 	sub d			;9d71
 	add a,018h		;9d72
 	cp 030h		;9d74
-	jp nc,05f1dh		;9d76   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-	ld a,d			;9d79
+	jp nc,05f1dh		;9d76   ; ... ahi
+	ld a,d			;9d79   ; si no, 0x20 mas alla...
 	ld d,020h		;9d7a
-	cp 080h		;9d7c
+	cp 080h		;9d7c   ; ... a la derecha en la mitad izquierda...
 	jr c,L_9D82		;9d7e
-	ld d,0e0h		;9d80
+	ld d,0e0h		;9d80   ; ... y a la izquierda en la derecha
 L_9D82:
 	add a,d			;9d82
 	ld d,a			;9d83
@@ -4670,24 +4713,24 @@ DATA_plazos_de_la_cosa_3:
 ; ======================================================================
 
 
-L_9D97:
-	ld hl,0cf06h		;9d97
+genera_el_tipo_4:
+	ld hl,0cf06h		;9d97   ; BIT 3: el tipo 4, con los plazos de 0x9DBB
 	ld de,09dbbh		;9d9a
 	ld c,004h		;9d9d
-L_9D9F:
-	push bc			;9d9f
-	call L_9CC3		;9da0
+genera_por_un_lado:
+	push bc			;9d9f   ; toca?
+	call el_plazo_de_un_generador		;9da0
 	pop bc			;9da3
-	ret nz			;9da4
-	inc hl			;9da5
+	ret nz			;9da4   ; no: nada
+	inc hl			;9da5   ; cuantos van...
 	ld a,(hl)			;9da6
-	rr a		;9da7
-	ld d,0f0h		;9da9
+	rr a		;9da7   ; ... impar...
+	ld d,0f0h		;9da9   ; ... por la derecha, x = 0xF0...
 	jr c,L_9DAF		;9dab
-	ld d,010h		;9dad
+	ld d,010h		;9dad   ; ... par, por la izquierda
 L_9DAF:
-	call L_9E16		;9daf
-	ld a,(0c425h)		;9db2   ; lee la Y de Simon
+	call no_delante_de_simon		;9daf   ; no delante de Simon, si esta en un borde
+	ld a,(0c425h)		;9db2   ; a la altura de Simon, 8 mas arriba
 	sub 008h		;9db5
 	ld e,a			;9db7
 	jp 05f1dh		;9db8   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
@@ -4703,8 +4746,8 @@ DATA_plazos_de_la_cosa_4:
 ; ======================================================================
 
 
-L_9DC3:
-	ld hl,0cf08h		;9dc3
+genera_el_tipo_7:
+	ld hl,0cf08h		;9dc3   ; BIT 4: el tipo 7, con los plazos de 0x9DCD
 	ld de,09dcdh		;9dc6
 	ld c,007h		;9dc9
 	jr $-44		;9dcb
@@ -4720,8 +4763,8 @@ DATA_plazos_de_la_cosa_5:
 ; ======================================================================
 
 
-L_9DD5:
-	ld hl,0cf0ah		;9dd5
+genera_el_tipo_8:
+	ld hl,0cf0ah		;9dd5   ; BIT 5: el tipo 8, con los plazos de 0x9DDF
 	ld de,09ddfh		;9dd8
 	ld c,008h		;9ddb
 	jr $-62		;9ddd
@@ -4737,25 +4780,25 @@ DATA_plazos_de_la_cosa_6:
 ; ======================================================================
 
 
-L_9DE7:
-	ld hl,0cf0ch		;9de7
+genera_el_aguila:
+	ld hl,0cf0ch		;9de7   ; BIT 6: el aguila (0x0F), con los plazos de 0x9E0E
 	ld de,09e0eh		;9dea
-	call L_9CC3		;9ded
+	call el_plazo_de_un_generador		;9ded
 	ret nz			;9df0
-	ld a,(0c427h)		;9df1   ; lee la X de Simon
+	ld a,(0c427h)		;9df1   ; Simon a la derecha del todo (0xC0 o mas)?
 	cp 0c0h		;9df4
-	jr c,L_9DFE		;9df6
-	ld a,001h		;9df8
+	jr c,sitio_del_aguila		;9df6
+	ld a,001h		;9df8   ; si: no sale, y se prueba al cuadro siguiente
 	ld (0cf0ch),a		;9dfa
 	ret			;9dfd
-L_9DFE:
-	ld de,0e030h		;9dfe
-	ld a,(0cf0dh)		;9e01
+sitio_del_aguila:
+	ld de,0e030h		;9dfe   ; x = 0xE0, y = 0x30...
+	ld a,(0cf0dh)		;9e01   ; ... o, una de cada dos...
 	rra			;9e04
 	jr c,L_9E09		;9e05
-	ld e,040h		;9e07
+	ld e,040h		;9e07   ; ... y = 0x40
 L_9E09:
-	ld c,00fh		;9e09
+	ld c,00fh		;9e09   ; el tipo 0x0F
 	jp 05f1dh		;9e0b   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 
 ; ----------------------------------------------------------------------
@@ -4769,50 +4812,58 @@ DATA_plazos_de_la_cosa_7:
 ; ======================================================================
 
 
-L_9E16:
-	ld a,(0c427h)		;9e16   ; lee la X de Simon
+
+; ----------------------------------------------------------------------
+; NO DELANTE DE SIMON: con Simon a menos de 0x40 de un borde, lo que iba a salir por ese borde sale por el otro.
+; ----------------------------------------------------------------------
+no_delante_de_simon:
+	ld a,(0c427h)		;9e16   ; Simon a la derecha (0xC0 o mas)?
 	cp 0c0h		;9e19
-	jr nc,L_9E29		;9e1b
-	cp 040h		;9e1d
-	jr c,L_9E22		;9e1f
+	jr nc,simon_a_la_derecha		;9e1b
+	cp 040h		;9e1d   ; a la izquierda (menos de 0x40)?
+	jr c,simon_a_la_izquierda		;9e1f
 	ret			;9e21
-L_9E22:
-	ld a,d			;9e22
+simon_a_la_izquierda:
+	ld a,d			;9e22   ; salia por la izquierda?
 	cp 040h		;9e23
 	ret nc			;9e25
-	ld d,0f0h		;9e26
+	ld d,0f0h		;9e26   ; si: por la derecha
 	ret			;9e28
-L_9E29:
-	ld a,d			;9e29
+simon_a_la_derecha:
+	ld a,d			;9e29   ; salia por la derecha?
 	cp 0c0h		;9e2a
-	ccf			;9e2c
+	ccf			;9e2c   ; (NC: no)
 	ret nc			;9e2d
-	ld d,010h		;9e2e
+	ld d,010h		;9e2e   ; si: por la izquierda
 	ret			;9e30
-L_9E31:
+
+; ----------------------------------------------------------------------
+; LO QUE LANZAN, cada cuadro (p00:5C6B): las ocho cosas de 0xD700, de 0x80 bytes: si el reloj no las para, su manejador (0x9E5F, por su tipo) y su velocidad; sus sprites; y fuera si se salen.
+; ----------------------------------------------------------------------
+mueve_lo_que_lanzan:
 	ld ix,0d700h		;9e31
-	ld b,008h		;9e35
+	ld b,008h		;9e35   ; ocho
 L_9E37:
 	ld a,(ix+000h)		;9e37   ; lee el tipo de la cosa
 	and a			;9e3a
-	jr z,L_9E50		;9e3b
+	jr z,L_9E50		;9e3b   ; vacia: la siguiente
 	push bc			;9e3d
-	call L_992F		;9e3e
+	call parada_por_el_reloj		;9e3e   ; parada por el reloj?
 	jr c,L_9E49		;9e41
-	call L_9E58		;9e43
-	call L_99B9		;9e46
+	call manejador_de_lo_que_lanza		;9e43   ; su manejador...
+	call mueve_la_cosa		;9e46   ; ... y su velocidad
 L_9E49:
-	call 06445h		;9e49
-	call L_99E5		;9e4c
+	call 06445h		;9e49   ; sus sprites
+	call fuera_si_se_sale		;9e4c   ; fuera si se sale
 	pop bc			;9e4f
 L_9E50:
-	ld de,00080h		;9e50
+	ld de,00080h		;9e50   ; la siguiente, 0x80 bytes mas
 	add ix,de		;9e53
 	djnz L_9E37		;9e55
 	ret			;9e57
-L_9E58:
-	ld a,(ix+000h)		;9e58   ; lee el tipo de la cosa
-	dec a			;9e5b
+manejador_de_lo_que_lanza:
+	ld a,(ix+000h)		;9e58   ; el tipo, desde 1...
+	dec a			;9e5b   ; ... por la tabla de detras
 	call 0406bh		;9e5c   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -4839,199 +4890,203 @@ DATA_tabla_9E5F:
 ; ======================================================================
 
 
-L_9E77:
-	ret			;9e77
-L_9E78:
-	inc (ix+00ch)		;9e78   ; sube la cuenta de cuadros del paso
+sin_nada_que_hacer:
+	ret			;9e77   ; los tipos 1, 2, 3, 5 y 0x0A: solo su velocidad
+lanzado_tipo_6:
+	inc (ix+00ch)		;9e78   ; TIPO 6: cada dos cuadros...
 	bit 1,(ix+00ch)		;9e7b   ; mira el bit 1 de la cuenta de cuadros del paso
-	ld a,027h		;9e7f
+	ld a,027h		;9e7f   ; ... el dibujo 0x27 o 0x28...
 	jr z,L_9E84		;9e81
 	inc a			;9e83
 L_9E84:
-	bit 7,(ix+00ah)		;9e84   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
+	bit 7,(ix+00ah)		;9e84   ; ... y, hacia la derecha...
 	jr nz,L_9E8C		;9e88
-	add a,002h		;9e8a
+	add a,002h		;9e8a   ; ... dos mas
 L_9E8C:
 	ld (ix+00bh),a		;9e8c   ; guarda el dibujo de la cosa
 	ret			;9e8f
-L_9E90:
-	ld e,(ix+012h)		;9e90
+lanzado_tipo_7:
+	ld e,(ix+012h)		;9e90   ; TIPO 7: los bytes 0x12-0x13 se suman...
 	ld d,(ix+013h)		;9e93
-	ld l,(ix+010h)		;9e96
+	ld l,(ix+010h)		;9e96   ; ... a los 0x10-0x11
 	ld h,(ix+011h)		;9e99
 	add hl,de			;9e9c
 	ld (ix+010h),l		;9e9d
 	ld (ix+011h),h		;9ea0
-	ld a,(ix+00ch)		;9ea3   ; lee la cuenta de cuadros del paso
+	ld a,(ix+00ch)		;9ea3   ; cada cuatro cuadros...
 	inc (ix+00ch)		;9ea6   ; sube la cuenta de cuadros del paso
 	and 004h		;9ea9
-	ld c,039h		;9eab
+	ld c,039h		;9eab   ; ... el dibujo 0x39 o 0x3A
 	jr z,L_9EB0		;9ead
 	inc c			;9eaf
 L_9EB0:
 	ld (ix+00bh),c		;9eb0   ; guarda el dibujo de la cosa
-	ld de,00030h		;9eb3
+	ld de,00030h		;9eb3   ; por encima de la altura del byte 0x11...
 	ld a,(ix+003h)		;9eb6   ; lee la y de la cosa
 	cp (ix+011h)		;9eb9
 	jr c,L_9EC1		;9ebc
-	ld de,0ffd0h		;9ebe
+	ld de,0ffd0h		;9ebe   ; ... tira hacia abajo (0x30) y, por debajo, hacia arriba (-0x30)
 L_9EC1:
 	jp 0a549h		;9ec1   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_9EC4:
-	ret			;9ec4
-L_9EC5:
-	inc (ix+00ch)		;9ec5   ; sube la cuenta de cuadros del paso
+lanzado_tipo_11:
+	ret			;9ec4   ; TIPO 0x0B: nada
+lanzado_tipo_9:
+	inc (ix+00ch)		;9ec5   ; TIPO 9: cada cuatro cuadros...
 	ld a,(ix+00ch)		;9ec8   ; lee la cuenta de cuadros del paso
 	rra			;9ecb
 	rra			;9ecc
 	and 003h		;9ecd
-	add a,063h		;9ecf
+	add a,063h		;9ecf   ; ... el dibujo 0x63 a 0x66
 	ld (ix+00bh),a		;9ed1   ; guarda el dibujo de la cosa
-	bit 7,(ix+010h)		;9ed4
-	ld de,00018h		;9ed8
-	jr nz,L_9EE0		;9edb
-	ld de,0ffe8h		;9edd
-L_9EE0:
-	call 0a564h		;9ee0
-	ld a,(ix+013h)		;9ee3
+	bit 7,(ix+010h)		;9ed4   ; hacia donde va (bit 7 del byte 0x10)...
+	ld de,00018h		;9ed8   ; ... tira 0x18 hacia la derecha...
+	jr nz,vuelve_a_quien_lo_lanzo		;9edb
+	ld de,0ffe8h		;9edd   ; ... o hacia la izquierda: vuelve
+vuelve_a_quien_lo_lanzo:
+	call 0a564h		;9ee0   ; a la velocidad horizontal
+	ld a,(ix+013h)		;9ee3   ; aun sin mirar (byte 0x13)?
 	and a			;9ee6
-	jr z,L_9EED		;9ee7
-	dec (ix+013h)		;9ee9
+	jr z,lo_recoge_quien_lo_lanzo		;9ee7
+	dec (ix+013h)		;9ee9   ; un cuadro menos
 	ret			;9eec
-L_9EED:
-	ld l,(ix+011h)		;9eed
+lo_recoge_quien_lo_lanzo:
+	ld l,(ix+011h)		;9eed   ; quien lo lanzo (bytes 0x11-0x12)...
 	ld h,(ix+012h)		;9ef0
-	ld a,(hl)			;9ef3
+	ld a,(hl)			;9ef3   ; ... sigue siendo el tipo 0x10?
 	cp 010h		;9ef4
 	ret nz			;9ef6
-	ld a,005h		;9ef7
+	ld a,005h		;9ef7   ; su x (byte 5)...
 	add a,l			;9ef9
 	ld l,a			;9efa
 	ld a,(hl)			;9efb
-	sub (ix+005h)		;9efc   ; le resta la x de la cosa
+	sub (ix+005h)		;9efc   ; ... a menos de 0x10?
 	add a,010h		;9eff
 	cp 020h		;9f01
 	ret nc			;9f03
-	jp borra_la_cosa		;9f04   ; borra_la_cosa: tipo a cero y sus sprites libres
-L_9F07:
-	ld a,(ix+00ch)		;9f07   ; lee la cuenta de cuadros del paso
+	jp borra_la_cosa		;9f04   ; si: lo recoge
+lanzado_tipo_4:
+	ld a,(ix+00ch)		;9f07   ; TIPO 4: la cuenta, de 0 a 0x0B...
 	inc a			;9f0a
 	cp 00ch		;9f0b
 	jr c,L_9F10		;9f0d
 	xor a			;9f0f
 L_9F10:
 	ld (ix+00ch),a		;9f10   ; guarda la cuenta de cuadros del paso
-	rra			;9f13
+	rra			;9f13   ; ... cada cuatro cuadros el dibujo 0x4B a 0x4D...
 	rra			;9f14
 	and 003h		;9f15
 	add a,04bh		;9f17
 	ld (ix+00bh),a		;9f19   ; guarda el dibujo de la cosa
-	ld de,00050h		;9f1c
+	ld de,00050h		;9f1c   ; ... y cae con la gravedad 0x50
 	jp 0a549h		;9f1f   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_9F22:
-	ld a,(ix+00ch)		;9f22   ; lee la cuenta de cuadros del paso
+lanzado_tipo_8:
+	ld a,(ix+00ch)		;9f22   ; TIPO 8: cada cuatro cuadros, el dibujo 0x7D a 0x80
 	rra			;9f25
 	rra			;9f26
 	and 003h		;9f27
 	add a,07dh		;9f29
 	ld (ix+00bh),a		;9f2b   ; guarda el dibujo de la cosa
-	ld a,(ix+001h)		;9f2e   ; lee el paso en que va la cosa
+	ld a,(ix+001h)		;9f2e   ; paso 1?
 	dec a			;9f31
-	jr z,L_9F4C		;9f32
-	dec (ix+00ch)		;9f34   ; baja la cuenta de cuadros del paso
+	jr z,lanzado_tipo_8_quieto		;9f32
+	dec (ix+00ch)		;9f34   ; paso 0: al acabar la cuenta...
 	ret nz			;9f37
-	ld a,040h		;9f38
+	ld a,040h		;9f38   ; ... va hacia Simon a 0x40...
 	call 0a0e7h		;9f3a
 	call 0a56ch		;9f3d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ex de,hl			;9f40
 	call 0a55dh		;9f41   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld (ix+00ch),01eh		;9f44   ; la cuenta de cuadros del paso = 0x1E
-	inc (ix+001h)		;9f48   ; sube el paso en que va la cosa
+	ld (ix+00ch),01eh		;9f44   ; ... 0x1E cuadros...
+	inc (ix+001h)		;9f48   ; ... en el paso 1
 	ret			;9f4b
-L_9F4C:
-	dec (ix+00ch)		;9f4c   ; baja la cuenta de cuadros del paso
+lanzado_tipo_8_quieto:
+	dec (ix+00ch)		;9f4c   ; paso 1: al acabar la cuenta...
 	ret nz			;9f4f
-	ld de,00000h		;9f50
+	ld de,00000h		;9f50   ; ... se para...
 	call 0a56ch		;9f53   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	call 0a55dh		;9f56   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld (ix+00ch),03ch		;9f59   ; la cuenta de cuadros del paso = 0x3C
-	ld (ix+001h),e		;9f5d   ; guarda el paso en que va la cosa
+	ld (ix+00ch),03ch		;9f59   ; ... 0x3C cuadros...
+	ld (ix+001h),e		;9f5d   ; ... en el paso 0
 	ret			;9f60
-L_9F61:
-	ld a,(ix+003h)		;9f61   ; lee la y de la cosa
+lanza_su_tipo:
+	ld a,(ix+003h)		;9f61   ; desde la cosa, 0x10 mas arriba: C = y...
 	sub 010h		;9f64
 	ld c,a			;9f66
-	ld b,(ix+005h)		;9f67   ; lee la x de la cosa
-	ld a,(ix+000h)		;9f6a   ; lee el tipo de la cosa
+	ld b,(ix+005h)		;9f67   ; ... B = x...
+	ld a,(ix+000h)		;9f6a   ; ... y A = su tipo
 crea_con_parametros:
-	ld (0cff9h),a		;9f6d
-	ld (0cff1h),bc		;9f70   ; guarda la posicion de la cosa que se crea
-	ld (0cff5h),hl		;9f74
+	ld (0cff9h),a		;9f6d   ; guarda el tipo pedido...
+	ld (0cff1h),bc		;9f70   ; ... la posicion...
+	ld (0cff5h),hl		;9f74   ; ... HL y DE (las velocidades)...
 	ld (0cff7h),de		;9f77
 	push ix		;9f7b
-	call L_9F83		;9f7d
+	call L_9F83		;9f7d   ; ... y la crea
 	pop ix		;9f80
 	ret			;9f82
+
+; ----------------------------------------------------------------------
+; CREA UNA COSA EN LA LISTA DE 0xD700: el tipo pedido 0xCFF9 da el suyo en 0xA08E (0xFF da el 0x0C); busca una ficha libre de las ocho y dos sprites libres (con y = 0xE0) desde el 0x11 hacia abajo (entre dos solo, con 0xCE03), y la rellena con la posicion y las velocidades de 0xCFF1-0xCFF8.
+; ----------------------------------------------------------------------
 L_9F83:
-	ld a,(0cff9h)		;9f83
+	ld a,(0cff9h)		;9f83   ; el tipo pedido...
 	cp 0ffh		;9f86
-	ld c,00ch		;9f88
+	ld c,00ch		;9f88   ; ... 0xFF: el 0x0C...
 	jr z,L_9F93		;9f8a
-	ld hl,0a08eh		;9f8c
+	ld hl,0a08eh		;9f8c   ; ... si no, el de 0xA08E
 	call 04061h		;9f8f   ; hl_mas_a: HL += A
 	ld c,(hl)			;9f92
 L_9F93:
 	ld a,c			;9f93
 	ld (0cff0h),a		;9f94   ; guarda el tipo de la cosa que se crea
-	ld hl,0d700h		;9f97
+	ld hl,0d700h		;9f97   ; una ficha libre de las ocho de 0xD700
 	ld b,008h		;9f9a
 	xor a			;9f9c
 	ld de,00080h		;9f9d
 L_9FA0:
-	cp (hl)			;9fa0
-	jr z,L_9FA7		;9fa1
-	add hl,de			;9fa3
+	cp (hl)			;9fa0   ; libre?
+	jr z,ficha_libre		;9fa1
+	add hl,de			;9fa3   ; no: la siguiente
 	djnz L_9FA0		;9fa4
-	ret			;9fa6
-L_9FA7:
-	push hl			;9fa7
+	ret			;9fa6   ; (ninguna: no se crea)
+ficha_libre:
+	push hl			;9fa7   ; IX = la ficha
 	pop ix		;9fa8
 	ld (0cff3h),hl		;9faa   ; guarda la ficha de la cosa que se crea
-	ld c,002h		;9fad
+	ld c,002h		;9fad   ; dos sprites
 	ld (ix+020h),c		;9faf   ; guarda cuantos sprites lleva la cosa
-	ld (ix+07fh),001h		;9fb2
-	ld (ix+07eh),001h		;9fb6
-	ld de,01100h		;9fba
-	ld hl,0d67ch		;9fbd
-	ld b,008h		;9fc0
-	ld a,(0ce03h)		;9fc2
+	ld (ix+07fh),001h		;9fb2   ; (byte 0x7F)
+	ld (ix+07eh),001h		;9fb6   ; se para con el reloj
+	ld de,01100h		;9fba   ; desde el sprite 0x11...
+	ld hl,0d67ch		;9fbd   ; ... en la copia de los atributos, hacia abajo...
+	ld b,008h		;9fc0   ; ... ocho...
+	ld a,(0ce03h)		;9fc2   ; ... o dos con 0xCE03
 	and a			;9fc5
-	jr z,L_9FCA		;9fc6
+	jr z,busca_sprites_libres		;9fc6
 	ld b,002h		;9fc8
-L_9FCA:
-	ld a,(hl)			;9fca
+busca_sprites_libres:
+	ld a,(hl)			;9fca   ; libre (y = 0xE0)?
 	cp 0e0h		;9fcb
-	jr nz,L_9FD8		;9fcd
-	ld (hl),0e1h		;9fcf
-	call 06048h		;9fd1
-	inc e			;9fd4
-	dec c			;9fd5
-	jr z,L_9FE0		;9fd6
-L_9FD8:
-	dec d			;9fd8
-	dec l			;9fd9
+	jr nz,el_sprite_anterior		;9fcd
+	ld (hl),0e1h		;9fcf   ; si: ocupado (0xE1)...
+	call 06048h		;9fd1   ; ... y apuntado en la ficha
+	inc e			;9fd4   ; el siguiente de la ficha
+	dec c			;9fd5   ; todos?
+	jr z,rellena_la_ficha		;9fd6
+el_sprite_anterior:
+	dec d			;9fd8   ; el numero anterior...
+	dec l			;9fd9   ; ... cuatro bytes antes
 	dec l			;9fda
 	dec l			;9fdb
 	dec l			;9fdc
-	djnz L_9FCA		;9fdd
+	djnz busca_sprites_libres		;9fdd
 	ret			;9fdf
-L_9FE0:
-	ld hl,(0cff3h)		;9fe0   ; lee la ficha de la cosa que se crea
-	ld a,(0cff0h)		;9fe3   ; lee el tipo de la cosa que se crea
+rellena_la_ficha:
+	ld hl,(0cff3h)		;9fe0   ; la ficha...
+	ld a,(0cff0h)		;9fe3   ; ... el tipo...
 	ld (hl),a			;9fe6
 	inc l			;9fe7
-	ld (hl),000h		;9fe8
-	ld de,(0cff1h)		;9fea   ; lee la posicion de la cosa que se crea
+	ld (hl),000h		;9fe8   ; ... el paso 0
+	ld de,(0cff1h)		;9fea   ; la posicion: y...
 	inc l			;9fee
 	ld (hl),000h		;9fef
 	inc l			;9ff1
@@ -5039,8 +5094,8 @@ L_9FE0:
 	inc l			;9ff3
 	ld (hl),000h		;9ff4
 	inc l			;9ff6
-	ld (hl),d			;9ff7
+	ld (hl),d			;9ff7   ; ... y x...
 	inc l			;9ff8
-	ld (hl),001h		;9ff9
+	ld (hl),001h		;9ff9   ; ... y se mueve
 	inc l			;9ffb
 	ld de,(0cff5h)		;9ffc

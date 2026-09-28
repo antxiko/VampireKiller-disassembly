@@ -1098,7 +1098,7 @@ C 0x9286 E = la y, D = la x
 C 0x928A y la puerta
 B 0x928D LA CRUZ (p02:8DC2) se lleva a los vendedores pintados: pone 0xFF en sus golpes, y 0x91F2 les da el desenlace 6.
 L 0x928D la_cruz_y_los_vendedores
-C 0x928F dos
+C 0x9290 dos
 C 0x9293 puesta...
 C 0x9297 ... y pintada (bit 7)?
 C 0x929A si: los golpes...
@@ -1269,6 +1269,563 @@ L 0x954B tecla_de_la_fila
 C 0x954B la fila A...
 C 0x954E ... su bit 0, a 1 si esta pulsada
 
+B 0x9552 EL MAPA DEL PERGAMINO (el objeto 0x0F pone el bit 7 de 0xC701 y tres usos en 0xC70F, p02:8E33). Solo en partida y fuera de las habitaciones especiales (0xCE00 = 0). Con el bit 1 de 0xC00B gasta un uso (el ultimo quita el pergamino), borra el sitio de juego y pinta el fondo del mapa (0xCF38 = 1); al cuadro siguiente pinta todas las habitaciones de la fase, a Simon y la flecha de la salida (0xCF38 = 2); con el bit 1 otra vez lo devuelve todo como estaba (0xCF38 = 0).
+L 0x9552 el_mapa_del_pergamino
+C 0x9555 el bit 6
+C 0x9558 en una habitacion especial...
+C 0x955C ... no
+C 0x955D 0xCF38: 1, pinta las habitaciones...
+C 0x9563 ... 2, esperando para quitarlo
+C 0x9566 0: el bit 1 de 0xC00B?
+C 0x956F lleva el pergamino (bit 7)?
+C 0x9571 los usos que le quedan
+C 0x9575 ninguno: nada
+C 0x9577 uno menos...
+C 0x9578 ... y con el ultimo...
+C 0x957D ... se va el pergamino...
+C 0x957F ... y se repinta lo que lleva
+C 0x9585 borra el sitio de juego: desde (0, 0x20)...
+C 0x9588 ... 256 x 0xB4 puntos...
+C 0x958B ... del color 0
+C 0x9591 el fondo del mapa, desde (0x18, 0x30)...
+C 0x9594 ... 0xD0 x 0x7E...
+C 0x9597 ... del color 3
+C 0x959E efecto 0x19
+L 0x95A3 el_mapa_un_paso_mas
+C 0x95A3 0xCF38 al paso siguiente
+L 0x95A8 pinta_el_mapa
+C 0x95A8 las habitaciones de la fase...
+C 0x95AB ... Simon...
+C 0x95AE ... y la flecha de la salida
+L 0x95B3 quita_el_mapa
+C 0x95B3 el bit 1 de 0xC00B otra vez?
+C 0x95B9 la habitacion...
+C 0x95BC ... sus trampas de cadena...
+C 0x95BF ... la puerta de la fase...
+C 0x95C2 ... los vendedores...
+C 0x95C5 ... los marcos...
+C 0x95CB y 0xCF38 a 0
+L 0x95D0 pinta_las_habitaciones
+C 0x95D0 desde la habitacion 0
+L 0x95D4 pinta_una_habitacion
+C 0x95D4 su mapa de celdas, con los bloques grandes...
+C 0x95D7 ... su sitio en el mapa...
+C 0x95DA ... sus celdas a puntos...
+C 0x95DD ... y a la pantalla
+C 0x95E0 la habitacion siguiente
+C 0x95EB hasta las que tiene la fase (0x95F6)
+B 0x9609 EL MAPA DE CELDAS de la habitacion 0xCFFD, montado en 0xE800 (p00:4FAF), con cada bloque grande que se rompe (tamano 3) aun puesto como pared: los de la habitacion en que esta Simon, de 0xC470; los de las otras, de sus secretos (p00:5B21 a 0xEB00).
+L 0x9609 mapa_de_celdas_de_la_habitacion
+C 0x960C B = la fase...
+C 0x9610 ... C = la habitacion
+C 0x9614 su mapa de celdas, a 0xE800
+C 0x961A sus secretos...
+C 0x9620 ... y sus cosas fijas a 0xEB00
+C 0x962D es la habitacion en que esta Simon?
+C 0x9630 si: sus cosas fijas de ahora
+C 0x9634 ocho
+C 0x9636 puesta?
+C 0x963C tamano 3, bloque grande?
+C 0x9641 si: pared en el mapa
+C 0x9644 la siguiente, 16 bytes mas
+L 0x964C bloque_grande_al_mapa
+C 0x964C la y, sin las dos filas de arriba...
+C 0x9651 ... y la x
+C 0x9654 la celda: y / 8 * 32 + x / 8
+C 0x9660 L, lo bajo
+C 0x9661 H, lo alto, desde 0xE800
+C 0x9666 cuatro filas...
+L 0x9668 cuatro_celdas_de_pared
+C 0x9668 ... de cuatro celdas a 1
+C 0x9671 la fila siguiente, 32 celdas mas alla
+L 0x967A sitio_de_la_habitacion_en_el_mapa
+C 0x967A la casilla de la habitacion 0xCFFD...
+C 0x968A ... a su sitio en la pantalla...
+C 0x9690 ... en 0xCFF2
+B 0x9793 LA HABITACION EN PUNTOS: cada celda de 0xE840 (las 22 filas que se ven, 0x2C0 celdas) se vuelve un punto del color 0x0E si es pared o 0 si no, dos puntos por byte, en 0xEB00.
+L 0x9793 celdas_a_puntos
+C 0x9793 desde la fila 2 del mapa de celdas...
+C 0x9796 ... a 0xEB00...
+C 0x9799 ... 22 filas de 32
+C 0x979C el color de la celda
+C 0x979F al byte
+C 0x97A2 despues de la impar...
+C 0x97A6 ... el byte siguiente
+L 0x97A7 la_celda_siguiente
+C 0x97A8 hasta la ultima
+L 0x97AE color_de_la_celda
+C 0x97AE la celda...
+C 0x97B0 0x0E o mas: nada
+C 0x97B4 su clase, de 0x97EC
+C 0x97BD 0: nada
+C 0x97C1 1: pared
+C 0x97C4 2: pared
+C 0x97C6 3 y 4, segun el bloque de fases:
+C 0x97CB el ultimo, los dos son pared
+C 0x97CE el primero, solo el 3
+L 0x97D0 celda_vacia
+C 0x97D0 A = 0
+L 0x97D3 celda_de_pared
+C 0x97D3 A = 0x0E
+L 0x97DB el_3_es_pared
+C 0x97DB solo la clase 3
+L 0x97E2 el_3_y_el_4_son_pared
+C 0x97E2 la clase 3...
+C 0x97E7 ... o la 4
+L 0x97FA color_al_byte
+C 0x97FA la celda impar...
+C 0x97FE ... a la derecha del byte
+L 0x9801 color_a_la_izquierda
+C 0x9801 la par, arriba del byte
+L 0x9807 habitacion_a_la_pantalla
+C 0x9807 en su sitio...
+C 0x980B ... los puntos de 0xEB00...
+C 0x980E ... 0x20 x 0x16, por HMMC en la pagina 0
+L 0x9815 simon_en_el_mapa
+C 0x9815 el sitio de la habitacion en que esta
+C 0x9824 su y, menos 0x40...
+C 0x9826 (por encima, una fila de habitaciones mas arriba)
+C 0x9829 ... a octavos
+C 0x982E mas la y de la habitacion
+C 0x9830 su x, a octavos...
+C 0x9838 ... mas la x de la habitacion
+C 0x983A un punto de 4 x 4 (0x984B)...
+C 0x9840 ... por HMMC
+L 0x9844 una_fila_mas_arriba
+C 0x9845 0x20 menos en la y de la habitacion
+B 0x9853 LA FLECHA DE LA SALIDA de la fase en el mapa: tres bytes por fase en 0x98AC, (y, x) y hacia donde (bit 0: 0 la flecha a la derecha de 0x9874, 1 la de la izquierda de 0x9890), 8 x 7 puntos por HMMC.
+L 0x9853 la_flecha_de_la_salida
+C 0x9853 los tres bytes de la fase...
+C 0x9859 ... de 0x98AC
+C 0x985F E = la y...
+C 0x9861 ... D = la x
+C 0x9863 hacia donde?
+C 0x9865 0: a la derecha...
+C 0x986A ... 1: a la izquierda
+C 0x986D 8 x 7 puntos por HMMC
+
+B 0x98E5 LOS ENEMIGOS, cada cuadro (p00:5C68; sin el reloj, 0x5EB8 antes): las siete cosas de 0xC800, de 0x80 bytes. Con el tiempo parado (0xD010) las que se paran (byte 0x7E) no hacen nada; las demas, su manejador por el tipo (0x9942) y su velocidad; y la que se sale de la pantalla, fuera.
+L 0x98E5 mueve_los_enemigos
+C 0x98E5 sin el tiempo parado...
+C 0x98E9 ... lo de 0x5EB8
+L 0x98EC los_siete_enemigos
+C 0x98EC la lista de 0xC800...
+C 0x98F0 ... siete
+C 0x98F6 vacia: la siguiente
+C 0x98F9 parada por el reloj?
+C 0x98FC si: ni se mueve
+C 0x98FE su manejador...
+C 0x9901 ... y su velocidad
+C 0x9904 fuera si se sale
+C 0x9908 la siguiente, 0x80 bytes mas
+L 0x9910 sprites_de_lo_que_lanzan
+C 0x9910 la lista de 0xD700, ocho
+L 0x9918 sprites_de_los_enemigos
+C 0x9918 la lista de 0xC800, siete
+C 0x9922 puesta?
+C 0x9923 si: compone sus sprites
+C 0x9926 la siguiente, 0x80 bytes mas
+L 0x992F parada_por_el_reloj
+C 0x992F el tiempo parado (0xD010)?
+C 0x9933 no: NC
+C 0x9934 esta se para (byte 0x7E)?
+C 0x9938 no: NC
+C 0x9939 si: carry
+L 0x993B manejador_del_enemigo
+C 0x993B el tipo, desde 1...
+C 0x993E ... por la tabla de detras
+L 0x999F marca_el_bit_0
+C 0x999F en las dos listas, 0x80 bytes cada cosa...
+C 0x99A2 ... el byte 0x0E de las siete de 0xC800...
+C 0x99AA ... y de las ocho de 0xD700
+L 0x99AF bit_2_al_bit_0
+C 0x99AF con el bit 2...
+C 0x99B3 ... se pone el 0
+C 0x99B5 la siguiente
+L 0x99B9 mueve_la_cosa
+C 0x99B9 se mueve?
+C 0x99BE y += la velocidad vertical, con su fraccion
+C 0x99D1 x += la velocidad horizontal, con su fraccion
+L 0x99E5 fuera_si_se_sale
+C 0x99E5 la y, de 0xE4 abajo...
+C 0x99EA ... fuera
+C 0x99EC la x, de 0xF1 a la derecha...
+C 0x99F1 ... fuera
+C 0x99F3 o por debajo de 7...
+C 0x99F5 (dentro: nada)
+B 0x99F6 BORRA LA COSA: tipo 0 y byte 0x0E a 0, y cada uno de sus sprites (la lista que empieza en el byte 0x20 de la ficha: cuantos y, de cinco en cinco bytes, su numero) se esconde con la y 0xE0 en la copia de 0xD638.
+C 0x99F6 tipo a 0...
+C 0x99FA ... y el byte 0x0E
+C 0x99FD HL = la ficha...
+C 0x9A00 ... su byte 0x20: cuantos sprites
+C 0x9A04 ninguno: listo
+C 0x9A06 el primero
+C 0x9A07 su numero...
+C 0x9A08 ... en la copia de los atributos...
+C 0x9A0B ... cuatro bytes cada uno
+C 0x9A0F la y 0xE0: escondido
+C 0x9A12 el siguiente, cinco bytes mas
+L 0x9A1A se_vuelve_llama
+C 0x9A1A la borra...
+C 0x9A1D ... y en su y...
+C 0x9A20 ... y su x...
+C 0x9A23 ... sin velocidad...
+C 0x9A28 ... y deja una llama en 0xD700 (A = 0xFF: el tipo 0x0C)
+C 0x9A2F sin nada que soltar...
+C 0x9A33 ... y no se para con el reloj
+B 0x9A3A CUANDO UNA COSA SE VA: 0x9A3A (0xCFFF = 1) cuando la cruz las borra todas (p01:7813), sin soltar nada; 0x9A3E (0xCFFF = 0) cuando la matan o Simon la coge (p01:7DFC, 7E9C). Las que se cogen dan lo suyo; las demas dejan la llama (el tipo 0x1E) y a veces algo.
+L 0x9A3A se_va_por_la_cruz
+C 0x9A3A 0xCFFF = 1
+L 0x9A3E se_va_la_cosa
+C 0x9A3E 0xCFFF = 0
+L 0x9A4A se_va
+C 0x9A4A las que no son un enemigo...
+C 0x9A4D ... acaban ahi
+C 0x9A4E se borra
+C 0x9A51 suelta algo?
+C 0x9A55 la llama, en su sitio
+L 0x9A58 crea_la_llama
+C 0x9A58 el tipo 0x1E...
+C 0x9A61 ... con B en su byte 0x1F
+C 0x9A66 un muerto mas (0xCE08)
+L 0x9A6B las_que_no_son_un_enemigo
+C 0x9A6B el tipo, a 0xCFF0
+C 0x9A71 0x22, la bola del jefe...
+C 0x9A76 0x24...
+C 0x9A7A 0x26, lo que suelta un enemigo...
+C 0x9A7E 0x11, Dracula...
+C 0x9A83 9, el esqueleto que se hunde...
+C 0x9A87 0x18...
+C 0x9A8B los demas: NC
+L 0x9A8D la_bola_se_va
+C 0x9A8D se borra, sin mas
+L 0x9A92 da_lo_que_suelta
+C 0x9A92 lo que lleva (byte 0x1F)
+L 0x9A97 da_un_corazon
+C 0x9A97 0x24: el objeto 1, un corazon
+C 0x9A9A se borra...
+C 0x9A9E ... y Simon lo coge
+L 0x9AA3 dracula_cae
+C 0x9AA3 Dracula: al paso 8
+L 0x9AA9 el_esqueleto_se_hunde
+C 0x9AA9 con la cruz...
+C 0x9AAD ... nada
+C 0x9AAE si no, se hunde (no muere)
+L 0x9AB3 el_tipo_0x18
+C 0x9AB3 con el jefe caido (0xCE0B)...
+C 0x9AB7 ... nada
+C 0x9AB8 si no, el byte 0x10 a 8
+B 0x9ABE LO QUE SUELTA UN ENEMIGO al morir. En las habitaciones especiales y con la cruz, nada; el dragon de huesos (0x0E) deja cuatro llamas en fila; el que lleva algo (byte 0x1F) lo suelta; si no, de cada 32 muertos (0xCF40) uno suelta el 0x13 (5.000 puntos) y, por sorteo con R, uno de 64 el corazon grande (2). Lo que suelta es una cosa del tipo 0x26 que sale un poco por encima (0x9B34). Devuelve B para la llama: 1 en uno de cada cuatro de los demas.
+L 0x9ABE lo_que_suelta
+C 0x9AC0 en una habitacion especial...
+C 0x9AC4 ... nada
+C 0x9AC5 el dragon de huesos?
+C 0x9ACC con la cruz...
+C 0x9AD0 ... nada
+C 0x9AD1 lleva algo?
+C 0x9AD6 si: eso
+C 0x9AD9 un muerto mas en 0xCF40...
+C 0x9ADE ... y cada 32...
+C 0x9AE0 ... el 0x13 (5.000 puntos)
+C 0x9AE5 uno de 64, por R...
+C 0x9AE9 ... el corazon grande
+C 0x9AED de los demas, uno de cada cuatro...
+C 0x9AEF (los otros tres, nada)
+C 0x9AF0 ... B = 1 para la llama
+L 0x9AF3 cuatro_llamas
+C 0x9AF3 E = la y...
+C 0x9AF6 ... D = la x
+C 0x9AF9 cuatro
+L 0x9AFB una_llama_del_dragon
+C 0x9AFD B = 1...
+C 0x9AFF ... o 0 con la cruz
+L 0x9B06 crea_una_llama
+C 0x9B06 la llama
+C 0x9B0B 0x10 mas a la derecha
+C 0x9B11 carry: listo
+L 0x9B13 suelta_c
+C 0x9B14 un poco por encima
+C 0x9B17 una cosa 0x26...
+C 0x9B1D ... que lleva C
+C 0x9B20 carry: listo
+L 0x9B22 sitio_de_lo_que_suelta
+C 0x9B22 la altura del tipo, de 0x9B34...
+C 0x9B2B ... restada a su y: E
+C 0x9B30 D = su x
+
+L 0x9B60 nace_la_llama
+C 0x9B60 LA LLAMA (tipo 0x1E, al nacer; p00:5FC9): el dibujo 0x85...
+C 0x9B64 ... 0x10 cuadros...
+C 0x9B6C ... y no se para con el reloj
+L 0x9B71 la_llama
+C 0x9B71 LA LLAMA, cada cuadro: su tipo a 0xCFF0
+C 0x9B77 cada cuatro cuadros...
+C 0x9B7C ... el dibujo 0x85 o el 0x86
+C 0x9B84 al acabar la cuenta...
+C 0x9B88 ... se borra...
+C 0x9B8B ... y si lleva algo (byte 0x1F)...
+C 0x9B90 ... deja un corazon que cae (tipo 0x24) en su sitio
+L 0x9B9B nace_el_corazon
+C 0x9B9B EL CORAZON QUE CAE (tipo 0x24, al nacer)
+C 0x9BA7 baja a 0x80...
+C 0x9BAD ... y va a 0x200 de lado...
+C 0x9BB3 ... con un empuje de -0x20 (bytes 0x10 y 0x11)
+L 0x9BC4 nace_lo_que_suelta
+C 0x9BC4 LO QUE SUELTA UN ENEMIGO (tipo 0x26, al nacer): 0x14 cuadros quieto...
+C 0x9BD0 ... con el dibujo 1
+L 0x9BD9 el_corazon_cae
+C 0x9BD9 EL CORAZON, cada cuadro: toca el decorado?
+C 0x9BDE si no, la cuenta sube...
+C 0x9BE1 ... y su empuje (bytes 0x10 y 0x11)...
+C 0x9BE7 ... va a la velocidad horizontal
+C 0x9BEA cada 0x20 cuadros...
+C 0x9BF3 ... el empuje cambia de signo: se mece
+L 0x9C03 queda_en_el_suelo
+C 0x9C03 se borra...
+C 0x9C06 ... y deja el objeto 1 (un corazon)...
+C 0x9C08 ... 0x10 mas arriba y 4 a la izquierda
+L 0x9C0B deja_el_objeto_b
+C 0x9C0B la y menos L...
+C 0x9C0F ... a la rejilla de 8
+C 0x9C12 la x menos H, mas 4...
+C 0x9C18 ... a la rejilla de 8
+C 0x9C1B y sale como un objeto a la vista
+L 0x9C1E lo_que_suelta_cae
+C 0x9C1E LO QUE SUELTA UN ENEMIGO, cada cuadro: su color, uno de 0x9C59...
+C 0x9C21 ... por los dos bits bajos del contador de cuadros
+C 0x9C2D paso 0: quieto
+C 0x9C33 al acabar la cuenta...
+C 0x9C37 ... al paso 1...
+C 0x9C3A ... sin moverse de lado...
+C 0x9C40 ... cayendo a 0x800
+L 0x9C46 lo_que_suelta_llega
+C 0x9C46 paso 1: se mueve
+C 0x9C4A toca el decorado?
+C 0x9C4E si: se borra...
+C 0x9C51 ... y deja lo que lleva...
+C 0x9C54 ... 0x10 mas arriba y 8 a la izquierda
+L 0x9C5D toca_el_decorado
+C 0x9C5D E = la y...
+C 0x9C60 ... D = la x
+L 0x9C66 nace_un_cascote
+C 0x9C66 LOS CASCOTES (tipo 0x20, al nacer): el dibujo 0x0E...
+C 0x9C6C ... o, en la fase 10...
+C 0x9C73 ... el 0x15 con el color 0x0B
+C 0x9C7C 0x1E cuadros...
+C 0x9C80 ... moviendose...
+C 0x9C84 ... y no se para con el reloj
+C 0x9C88 uno a cada lado (0xCF30):
+C 0x9C8D -0x500 hacia arriba...
+C 0x9C90 ... y 0x100 a la derecha...
+C 0x9C94 ... o...
+C 0x9C96 ... 0x100 a la izquierda...
+C 0x9C99 ... y -0x600 hacia arriba
+L 0x9CA3 el_cascote_cae
+C 0x9CA3 LOS CASCOTES, cada cuadro: la gravedad, 0x80
+B 0x9CA9 LO QUE SALE EN CADA HABITACION. Cada habitacion tiene un byte en la tabla del banco 14 de 0x85A6 (p00:5ED8) con un bit por generador; p00:5EF6 llama a los de sus bits cada cuadro (sin el tiempo parado ni la puerta de la fase abriendose). Cada generador lleva dos bytes en 0xCF00 (plazo y cuantos van) y ocho plazos en su tabla. Bit 0 (0x9CE6): el tipo 1; bits 1 y 2 (0x9D4B, 0x9D52): los tipos 2 y 3, los hombres pez; bit 3 (0x9D97): el tipo 4; bits 4 y 5 (0x9DC3, 0x9DD5): los tipos 7 y 8; bit 6 (0x9DE7): el aguila, el 0x0F.
+L 0x9CA9 los_plazos_de_la_habitacion
+C 0x9CAC los primeros, de 0x9CBB
+C 0x9CAF siete generadores
+C 0x9CB1 el primer plazo...
+C 0x9CB5 ... y ninguno salido
+B 0x9CC3 EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por VUELTA (y como poco 1), y devuelve Z: toca sacar uno.
+L 0x9CC3 el_plazo_de_un_generador
+C 0x9CC4 el reloj comun...
+C 0x9CC7 ... baja...
+C 0x9CCA ... y cuenta una de cada cuatro
+C 0x9CCD el plazo, uno menos
+C 0x9CCE aun no: NZ
+C 0x9CCF uno salido mas
+C 0x9CD3 el plazo siguiente, de los ocho...
+C 0x9CD8 ... menos dos por VUELTA
+C 0x9CE1 (no menos de 0)
+C 0x9CE2 mas uno
+C 0x9CE4 Z: toca
+L 0x9CE6 genera_el_tipo_1
+C 0x9CE6 BIT 0: el tipo 1, con los plazos de 0x9D43
+C 0x9CF0 su sitio, segun la fase
+C 0x9CF3 no delante de Simon, si esta en un borde
+C 0x9CF6 (carry: no sale)
+C 0x9CF7 el tipo 1
+L 0x9CFC sitio_del_tipo_1
+C 0x9CFC C = la y de Simon
+C 0x9D03 fase 1...
+C 0x9D07 ... 2...
+C 0x9D0A ... 3...
+C 0x9D0D ... u 11
+C 0x9D11 las demas
+L 0x9D13 en_la_fase_11
+C 0x9D13 y = 0xB0
+L 0x9D17 en_la_fase_3
+C 0x9D17 y = 0xC0
+L 0x9D1B en_la_fase_2
+C 0x9D1B y = 0xA0
+L 0x9D1D por_un_lado_y_por_otro
+C 0x9D1D x = 0xF0, por la derecha...
+C 0x9D1F ... o, dos de cada cuatro (bit 1 de 0xCF01)...
+C 0x9D25 ... 0x10, por la izquierda
+L 0x9D28 en_la_fase_1
+C 0x9D28 la habitacion 1?
+L 0x9D2C y_0xc0
+C 0x9D2C y = 0xC0
+L 0x9D2E por_delante_de_simon
+C 0x9D2E x = 0xF0...
+C 0x9D30 ... si Simon mira a la derecha...
+C 0x9D35 ... y 0x10 si a la izquierda
+L 0x9D38 en_la_habitacion_1
+C 0x9D38 y = 0xC0...
+C 0x9D3A ... con Simon abajo (y 0x88 o mas)...
+C 0x9D3F ... y si esta arriba, en (0xF0, 0x60)
+L 0x9D4B genera_el_tipo_2
+C 0x9D4B BIT 1: el tipo 2, el hombre pez
+L 0x9D52 genera_el_tipo_3
+C 0x9D52 BIT 2: el tipo 3, el hombre pez (con los mismos plazos de 0xCF02)
+C 0x9D57 los plazos de 0x9D8F
+C 0x9D60 sale del agua, y = 0xC8...
+C 0x9D62 ... en una de las ocho x de 0x9D87, por turno
+C 0x9D6E lejos de Simon (0x18 o mas)...
+C 0x9D76 ... ahi
+C 0x9D79 si no, 0x20 mas alla...
+C 0x9D7C ... a la derecha en la mitad izquierda...
+C 0x9D80 ... y a la izquierda en la derecha
+L 0x9D97 genera_el_tipo_4
+C 0x9D97 BIT 3: el tipo 4, con los plazos de 0x9DBB
+L 0x9D9F genera_por_un_lado
+C 0x9D9F toca?
+C 0x9DA4 no: nada
+C 0x9DA5 cuantos van...
+C 0x9DA7 ... impar...
+C 0x9DA9 ... por la derecha, x = 0xF0...
+C 0x9DAD ... par, por la izquierda
+C 0x9DAF no delante de Simon, si esta en un borde
+C 0x9DB2 a la altura de Simon, 8 mas arriba
+L 0x9DC3 genera_el_tipo_7
+C 0x9DC3 BIT 4: el tipo 7, con los plazos de 0x9DCD
+L 0x9DD5 genera_el_tipo_8
+C 0x9DD5 BIT 5: el tipo 8, con los plazos de 0x9DDF
+L 0x9DE7 genera_el_aguila
+C 0x9DE7 BIT 6: el aguila (0x0F), con los plazos de 0x9E0E
+C 0x9DF1 Simon a la derecha del todo (0xC0 o mas)?
+C 0x9DF8 si: no sale, y se prueba al cuadro siguiente
+L 0x9DFE sitio_del_aguila
+C 0x9DFE x = 0xE0, y = 0x30...
+C 0x9E01 ... o, una de cada dos...
+C 0x9E07 ... y = 0x40
+C 0x9E09 el tipo 0x0F
+B 0x9E16 NO DELANTE DE SIMON: con Simon a menos de 0x40 de un borde, lo que iba a salir por ese borde sale por el otro.
+L 0x9E16 no_delante_de_simon
+C 0x9E16 Simon a la derecha (0xC0 o mas)?
+C 0x9E1D a la izquierda (menos de 0x40)?
+L 0x9E22 simon_a_la_izquierda
+C 0x9E22 salia por la izquierda?
+C 0x9E26 si: por la derecha
+L 0x9E29 simon_a_la_derecha
+C 0x9E29 salia por la derecha?
+C 0x9E2C (NC: no)
+C 0x9E2E si: por la izquierda
+B 0x9E31 LO QUE LANZAN, cada cuadro (p00:5C6B): las ocho cosas de 0xD700, de 0x80 bytes: si el reloj no las para, su manejador (0x9E5F, por su tipo) y su velocidad; sus sprites; y fuera si se salen.
+L 0x9E31 mueve_lo_que_lanzan
+C 0x9E35 ocho
+C 0x9E3B vacia: la siguiente
+C 0x9E3E parada por el reloj?
+C 0x9E43 su manejador...
+C 0x9E46 ... y su velocidad
+C 0x9E49 sus sprites
+C 0x9E4C fuera si se sale
+C 0x9E50 la siguiente, 0x80 bytes mas
+L 0x9E58 manejador_de_lo_que_lanza
+C 0x9E58 el tipo, desde 1...
+C 0x9E5B ... por la tabla de detras
+L 0x9E77 sin_nada_que_hacer
+C 0x9E77 los tipos 1, 2, 3, 5 y 0x0A: solo su velocidad
+L 0x9E78 lanzado_tipo_6
+C 0x9E78 TIPO 6: cada dos cuadros...
+C 0x9E7F ... el dibujo 0x27 o 0x28...
+C 0x9E84 ... y, hacia la derecha...
+C 0x9E8A ... dos mas
+L 0x9E90 lanzado_tipo_7
+C 0x9E90 TIPO 7: los bytes 0x12-0x13 se suman...
+C 0x9E96 ... a los 0x10-0x11
+C 0x9EA3 cada cuatro cuadros...
+C 0x9EAB ... el dibujo 0x39 o 0x3A
+C 0x9EB3 por encima de la altura del byte 0x11...
+C 0x9EBE ... tira hacia abajo (0x30) y, por debajo, hacia arriba (-0x30)
+L 0x9EC4 lanzado_tipo_11
+C 0x9EC4 TIPO 0x0B: nada
+L 0x9EC5 lanzado_tipo_9
+C 0x9EC5 TIPO 9: cada cuatro cuadros...
+C 0x9ECF ... el dibujo 0x63 a 0x66
+C 0x9ED4 hacia donde va (bit 7 del byte 0x10)...
+C 0x9ED8 ... tira 0x18 hacia la derecha...
+C 0x9EDD ... o hacia la izquierda: vuelve
+L 0x9EE0 vuelve_a_quien_lo_lanzo
+C 0x9EE0 a la velocidad horizontal
+C 0x9EE3 aun sin mirar (byte 0x13)?
+C 0x9EE9 un cuadro menos
+L 0x9EED lo_recoge_quien_lo_lanzo
+C 0x9EED quien lo lanzo (bytes 0x11-0x12)...
+C 0x9EF3 ... sigue siendo el tipo 0x10?
+C 0x9EF7 su x (byte 5)...
+C 0x9EFC ... a menos de 0x10?
+C 0x9F04 si: lo recoge
+L 0x9F07 lanzado_tipo_4
+C 0x9F07 TIPO 4: la cuenta, de 0 a 0x0B...
+C 0x9F13 ... cada cuatro cuadros el dibujo 0x4B a 0x4D...
+C 0x9F1C ... y cae con la gravedad 0x50
+L 0x9F22 lanzado_tipo_8
+C 0x9F22 TIPO 8: cada cuatro cuadros, el dibujo 0x7D a 0x80
+C 0x9F2E paso 1?
+C 0x9F34 paso 0: al acabar la cuenta...
+C 0x9F38 ... va hacia Simon a 0x40...
+C 0x9F44 ... 0x1E cuadros...
+C 0x9F48 ... en el paso 1
+L 0x9F4C lanzado_tipo_8_quieto
+C 0x9F4C paso 1: al acabar la cuenta...
+C 0x9F50 ... se para...
+C 0x9F59 ... 0x3C cuadros...
+C 0x9F5D ... en el paso 0
+L 0x9F61 lanza_su_tipo
+C 0x9F61 desde la cosa, 0x10 mas arriba: C = y...
+C 0x9F67 ... B = x...
+C 0x9F6A ... y A = su tipo
+C 0x9F6D guarda el tipo pedido...
+C 0x9F70 ... la posicion...
+C 0x9F74 ... HL y DE (las velocidades)...
+C 0x9F7D ... y la crea
+B 0x9F83 CREA UNA COSA EN LA LISTA DE 0xD700: el tipo pedido 0xCFF9 da el suyo en 0xA08E (0xFF da el 0x0C); busca una ficha libre de las ocho y dos sprites libres (con y = 0xE0) desde el 0x11 hacia abajo (entre dos solo, con 0xCE03), y la rellena con la posicion y las velocidades de 0xCFF1-0xCFF8.
+C 0x9F83 el tipo pedido...
+C 0x9F88 ... 0xFF: el 0x0C...
+C 0x9F8C ... si no, el de 0xA08E
+C 0x9F97 una ficha libre de las ocho de 0xD700
+C 0x9FA0 libre?
+C 0x9FA3 no: la siguiente
+C 0x9FA6 (ninguna: no se crea)
+L 0x9FA7 ficha_libre
+C 0x9FA7 IX = la ficha
+C 0x9FAD dos sprites
+C 0x9FB2 (byte 0x7F)
+C 0x9FB6 se para con el reloj
+C 0x9FBA desde el sprite 0x11...
+C 0x9FBD ... en la copia de los atributos, hacia abajo...
+C 0x9FC0 ... ocho...
+C 0x9FC2 ... o dos con 0xCE03
+L 0x9FCA busca_sprites_libres
+C 0x9FCA libre (y = 0xE0)?
+C 0x9FCF si: ocupado (0xE1)...
+C 0x9FD1 ... y apuntado en la ficha
+C 0x9FD4 el siguiente de la ficha
+C 0x9FD5 todos?
+L 0x9FD8 el_sprite_anterior
+C 0x9FD8 el numero anterior...
+C 0x9FD9 ... cuatro bytes antes
+L 0x9FE0 rellena_la_ficha
+C 0x9FE0 la ficha...
+C 0x9FE3 ... el tipo...
+C 0x9FE8 ... el paso 0
+C 0x9FEA la posicion: y...
+C 0x9FF7 ... y x...
+C 0x9FF9 ... y se mueve
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
 F 0x8000 16
@@ -1300,15 +1857,15 @@ D 0x9428 0x944C lo_que_venden  los nueve de la tienda (p02:9409): lo que vende y
 F 0x9428 16
 D 0x9473 0x9491 columna_y_dos_rotulos  18 bytes, uno por fase (1-18): su columna del bloque en 0xDE00 (0x00, 0x40 o 0x80; p02:945A); detras, los dos rotulos de la tienda (0x9485 y 0x948A, p02:93DF y 93E8)
 F 0x9473 16
-D 0x95F6 0x9609 un_tope_por_fase  19 bytes, uno por fase, contra los que p02:95F2 compara
+D 0x95F6 0x9609 habitaciones_de_cada_fase  19 bytes, cuantas habitaciones tiene cada fase (0 el patio): hasta ahi pinta el mapa del pergamino (p02:95F2)
 F 0x95F6 16
 D 0x9695 0x9793 casilla_de_cada_habitacion  19 punteros, uno por fase, a un byte por habitacion: su casilla en una rejilla de 6 x 5; p02:968A la convierte con la tabla de 30 palabras de 0x9757 en una posicion (x de 0x20 a 0xC0, y de 0x38 a 0x8C) y la deja en 0xCFF2
 F 0x9695 16
-D 0x97EC 0x97FA catorce_valores  14 bytes que p02:97B4 indexa con A (menor que 14)
+D 0x97EC 0x97FA clase_de_cada_celda  14 bytes, la clase de cada valor de celda en el mapa del pergamino (p02:97B4): 0 nada, 1 y 2 pared, 3 y 4 segun el bloque de fases
 F 0x97EC 16
-D 0x9874 0x9890 dibujo_de_8x7  28 bytes, 8 x 7 puntos a 4 bits, que p02:9865 manda por HMMC (`ld bc,0x0807`) si el bit 0 esta a cero
+D 0x9874 0x9890 flecha_a_la_derecha  8 x 7 puntos a 4 bits, la flecha de la salida en el mapa del pergamino (p02:9865, bit 0 a cero)
 F 0x9874 16
-D 0x98AC 0x98E5 tres_bytes_por_fase  19 registros de tres bytes, uno por fase, que p02:9859 indexa con fase * 3
+D 0x98AC 0x98E5 salida_de_cada_fase_en_el_mapa  19 registros de tres bytes (y, x, hacia donde) con la flecha de la salida en el mapa del pergamino (p02:9859, fase * 3)
 F 0x98AC 16
 D 0x9B34 0x9B60 altura_de_lo_que_suelta  un byte por tipo de cosa (1-44): cuanto mas arriba de ella sale lo que suelta al morir; p02:9B25 lee desde 0x9B33 + el tipo de 0xCFF0 y p02:9B2E se lo resta a su y antes de crear la cosa 0x26. El listado escribe la base como `l9b33h` porque 0x9B33 es un `ret`
 F 0x9B34 16
@@ -1538,70 +2095,37 @@ C 0x959B rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#
 C 0x95A0 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x95E8 lee la FASE (0 el patio, 1-18)
 C 0x95EE hl_mas_a: HL += A
-C 0x960C lee la FASE (0 el patio, 1-18)
 C 0x9627 lee la HABITACION dentro de la fase
-C 0x9630 apunta a los bloques que se rompen (ocho de 16 bytes)
 C 0x9673 hl_mas_a: HL += A
-C 0x967A lee la FASE (0 el patio, 1-18)
 C 0x9680 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x9686 de_mas_a: DE += A
 C 0x968D palabra_de_la_tabla: DE = la palabra A de la tabla de DE
-C 0x97C6 lee el bloque de tres fases (0-5)
 C 0x9812 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
-C 0x9815 lee la HABITACION dentro de la fase
 C 0x9821 lee la Y de Simon
-C 0x9830 lee la X de Simon
 C 0x9841 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
-C 0x9853 lee la FASE (0 el patio, 1-18)
 C 0x985C hl_mas_a: HL += A
 C 0x9871 hmmc: orden HMMC del V9938: puntos de HL a la VRAM
 C 0x98F2 lee el tipo de la cosa
 C 0x991F lee el tipo de la cosa
-C 0x993B lee el tipo de la cosa
 C 0x993F despacha: salta a la entrada A de la tabla que va detras del call
-C 0x99B9 lee si la cosa se mueve
-C 0x99BE lee la velocidad vertical (parte baja)
 C 0x99C1 lee la velocidad vertical
 C 0x99C4 lee la fraccion de la y de la cosa
 C 0x99C7 lee la y de la cosa
 C 0x99CB guarda la fraccion de la y de la cosa
 C 0x99CE guarda la y de la cosa
-C 0x99D1 lee la velocidad horizontal (parte baja)
 C 0x99D4 lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0x99D7 lee la fraccion de la x de la cosa
 C 0x99DA lee la x de la cosa
 C 0x99DE guarda la fraccion de la x de la cosa
 C 0x99E1 guarda la x de la cosa
-C 0x99E5 lee la y de la cosa
-C 0x99EC lee la x de la cosa
 C 0x99F7 guarda el tipo de la cosa
-C 0x9A1A borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9A1D lee la y de la cosa
-C 0x9A20 lee la x de la cosa
 C 0x9A2C crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
-C 0x9A4E borra_la_cosa: tipo a cero y sus sprites libres
 C 0x9A5D crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9A6B lee el tipo de la cosa
 C 0x9A6E guarda el tipo de la cosa que se crea
-C 0x9A8D borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9A9A borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9AA3 el paso en que va la cosa = 0x08
-C 0x9AC5 lee el tipo de la cosa que se crea
-C 0x9AF3 lee la y de la cosa
-C 0x9AF6 lee la x de la cosa
 C 0x9B19 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9B22 lee el tipo de la cosa que se crea
 C 0x9B28 hl_mas_a: HL += A
-C 0x9B2B lee la y de la cosa
-C 0x9B30 lee la x de la cosa
-C 0x9B60 el dibujo de la cosa = 0x85
-C 0x9B64 la cuenta de cuadros del paso = 0x10
-C 0x9B71 lee el tipo de la cosa
 C 0x9B74 guarda el tipo de la cosa que se crea
-C 0x9B77 lee la cuenta de cuadros del paso
 C 0x9B81 guarda el dibujo de la cosa
-C 0x9B84 baja la cuenta de cuadros del paso
-C 0x9B88 borra_la_cosa: tipo a cero y sus sprites libres
 C 0x9B92 lee la y de la cosa
 C 0x9B95 lee la x de la cosa
 C 0x9B98 crea_una_cosa: crea una cosa del tipo C en la posicion DE
@@ -1610,96 +2134,45 @@ C 0x9BA3 la cosa se mueve
 C 0x9BAA pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x9BB0 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9BBB el dibujo de la cosa = 0x00
-C 0x9BC4 la cuenta de cuadros del paso = 0x14
 C 0x9BC8 la cosa se queda quieta
-C 0x9BD0 el dibujo de la cosa = 0x01
-C 0x9BDE sube la cuenta de cuadros del paso
-C 0x9BEA lee la cuenta de cuadros del paso
 C 0x9BF0 guarda la cuenta de cuadros del paso
 C 0x9BF9 niega_de: DE = -DE
-C 0x9C03 borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9C0B lee la y de la cosa
-C 0x9C12 lee la x de la cosa
-C 0x9C21 lee el contador de cuadros
 C 0x9C26 hl_mas_a: HL += A
-C 0x9C2D lee el paso en que va la cosa
-C 0x9C33 baja la cuenta de cuadros del paso
-C 0x9C37 sube el paso en que va la cosa
 C 0x9C3D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9C43 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0x9C46 la cosa se mueve
-C 0x9C4E borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9C5D lee la y de la cosa
-C 0x9C60 lee la x de la cosa
 C 0x9C63 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0x9C6C lee la FASE (0 el patio, 1-18)
 C 0x9C79 guarda el dibujo de la cosa
-C 0x9C7C la cuenta de cuadros del paso = 0x1E
-C 0x9C80 la cosa se mueve
 C 0x9C9C pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9CA0 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0x9CA6 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 C 0x9CA9 apunta a los plazos de las siete cosas de la habitacion
-C 0x9CC4 apunta a el reloj de los plazos
 C 0x9CD5 de_mas_a: DE += A
-C 0x9CD8 lee la VUELTA (0, 1 o 2)
-C 0x9CE6 apunta a los plazos de las siete cosas de la habitacion
 C 0x9CF9 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9CFC lee la Y de Simon
 C 0x9D00 lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-C 0x9D30 lee el lado al que mira Simon (0 derecha)
 C 0x9D6A hl_mas_a: HL += A
-C 0x9D6E lee la X de Simon
-C 0x9D76 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x9D84 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9DB2 lee la Y de Simon
 C 0x9DB8 crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9DF1 lee la X de Simon
 C 0x9E0B crea_una_cosa: crea una cosa del tipo C en la posicion DE
-C 0x9E16 lee la X de Simon
 C 0x9E37 lee el tipo de la cosa
-C 0x9E58 lee el tipo de la cosa
 C 0x9E5C despacha: salta a la entrada A de la tabla que va detras del call
-C 0x9E78 sube la cuenta de cuadros del paso
 C 0x9E7B mira el bit 1 de la cuenta de cuadros del paso
-C 0x9E84 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0x9E8C guarda el dibujo de la cosa
-C 0x9EA3 lee la cuenta de cuadros del paso
 C 0x9EA6 sube la cuenta de cuadros del paso
 C 0x9EB0 guarda el dibujo de la cosa
 C 0x9EB6 lee la y de la cosa
 C 0x9EC1 suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-C 0x9EC5 sube la cuenta de cuadros del paso
 C 0x9EC8 lee la cuenta de cuadros del paso
 C 0x9ED1 guarda el dibujo de la cosa
-C 0x9EFC le resta la x de la cosa
-C 0x9F04 borra_la_cosa: tipo a cero y sus sprites libres
-C 0x9F07 lee la cuenta de cuadros del paso
 C 0x9F10 guarda la cuenta de cuadros del paso
 C 0x9F19 guarda el dibujo de la cosa
 C 0x9F1F suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-C 0x9F22 lee la cuenta de cuadros del paso
 C 0x9F2B guarda el dibujo de la cosa
-C 0x9F2E lee el paso en que va la cosa
-C 0x9F34 baja la cuenta de cuadros del paso
 C 0x9F3D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9F41 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0x9F44 la cuenta de cuadros del paso = 0x1E
-C 0x9F48 sube el paso en que va la cosa
-C 0x9F4C baja la cuenta de cuadros del paso
 C 0x9F53 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0x9F56 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0x9F59 la cuenta de cuadros del paso = 0x3C
-C 0x9F5D guarda el paso en que va la cosa
-C 0x9F61 lee la y de la cosa
-C 0x9F67 lee la x de la cosa
-C 0x9F6A lee el tipo de la cosa
-C 0x9F70 guarda la posicion de la cosa que se crea
 C 0x9F8F hl_mas_a: HL += A
 C 0x9F94 guarda el tipo de la cosa que se crea
 C 0x9FAA guarda la ficha de la cosa que se crea
 C 0x9FAF guarda cuantos sprites lleva la cosa
-C 0x9FE0 lee la ficha de la cosa que se crea
-C 0x9FE3 lee el tipo de la cosa que se crea
-C 0x9FEA lee la posicion de la cosa que se crea
 # --- fin de las anotaciones de anota.py ---
