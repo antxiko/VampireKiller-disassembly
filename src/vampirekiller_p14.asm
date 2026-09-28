@@ -506,99 +506,99 @@ DATA_letras_8894:
 
 reproductor:
 	ld a,(0c097h)		;8964   ; lee la copia del registro 7 del PSG (el mezclador)
-	ld e,a			;8967
-	ld a,007h		;8968
+	ld e,a			;8967   ; el mezclador, cada cuadro
+	ld a,007h		;8968   ; al registro 7
 	call 00093h		;896a   ; BIOS WRTPSG - Writes data to PSG-register
 	ld a,(0c098h)		;896d   ; lee las banderas del sonido (bit 0 pausa, bit 1 ...)
-	bit 0,a		;8970
-	jp nz,L_89F2		;8972
-	bit 1,a		;8975
-	jp nz,L_89F6		;8977
+	bit 0,a		;8970   ; en pausa?
+	jp nz,L_89F2		;8972   ; solo suena la musica de la pausa
+	bit 1,a		;8975   ; el segundo efecto?
+	jp nz,L_89F6		;8977   ; solo ese
 	ld a,(0c0a5h)		;897a   ; lee la cuenta del fundido de la musica
-	dec a			;897d
+	dec a			;897d   ; sin fundido: a tocar
 	jp m,L_89A5		;897e
-	jp nz,L_89A2		;8981
+	jp nz,L_89A2		;8981   ; aun no toca bajar
 	ld a,(0c0a6h)		;8984   ; lee el volumen que se le resta a la musica
-	dec a			;8987
+	dec a			;8987   ; un punto menos de volumen
 	ld (0c0a6h),a		;8988   ; guarda el volumen que se le resta a la musica
-	cp 0f0h		;898b
-	jp nz,L_89A0		;898d
-	ld hl,canal_en_reposo		;8990
+	cp 0f0h		;898b   ; llego a -16?
+	jp nz,L_89A0		;898d   ; no: otra espera
+	ld hl,canal_en_reposo		;8990   ; si: los tres canales, callados
 	ld (0c010h),hl		;8993   ; guarda el manejador del canal A del sonido
 	ld (0c012h),hl		;8996   ; guarda el manejador del canal B
 	ld (0c014h),hl		;8999   ; guarda el manejador del canal C
 	xor a			;899c
 	jp L_89A2		;899d
 L_89A0:
-	ld a,03ah		;89a0
+	ld a,03ah		;89a0   ; 0x3A cuadros hasta el siguiente punto
 L_89A2:
 	ld (0c0a5h),a		;89a2   ; guarda la cuenta del fundido de la musica
 L_89A5:
-	xor a			;89a5
+	xor a			;89a5   ; canal 0 (A)
 	ld b,a			;89a6
 	ld hl,(0c010h)		;89a7   ; lee el manejador del canal A del sonido
-	call L_89C6		;89aa
-	ld a,001h		;89ad
+	call L_89C6		;89aa   ; a su manejador
+	ld a,001h		;89ad   ; canal 1 (B)
 	ld b,a			;89af
 	ld hl,(0c012h)		;89b0   ; lee el manejador del canal B
 	call L_89C6		;89b3
-	ld a,002h		;89b6
+	ld a,002h		;89b6   ; canal 2 (C)
 	ld b,a			;89b8
 	ld hl,(0c014h)		;89b9   ; lee el manejador del canal C
 L_89BC:
 	call L_89C6		;89bc
-	ld a,002h		;89bf
+	ld a,002h		;89bf   ; y el efecto, por el canal C (numero 3)
 	ld b,003h		;89c1
 	ld hl,(0c016h)		;89c3   ; lee el manejador del efecto de sonido
 L_89C6:
 	ld (0c094h),a		;89c6   ; guarda el canal del PSG que se esta tocando
 	ld a,b			;89c9
 	ld (0c095h),a		;89ca   ; guarda el numero de canal
-	jp (hl)			;89cd
+	jp (hl)			;89cd   ; al manejador
 canal_en_reposo:
 	ld a,(0c095h)		;89ce   ; lee el numero de canal
-	cp 003h		;89d1
+	cp 003h		;89d1   ; el del efecto?
 	jp nz,L_89DD		;89d3
-	xor a			;89d6
+	xor a			;89d6   ; sin efecto: ninguna prioridad
 	ld (0c096h),a		;89d7   ; guarda la prioridad del efecto que suena
 	ld a,(0c095h)		;89da   ; lee el numero de canal
 L_89DD:
-	rlca			;89dd
+	rlca			;89dd   ; dos bytes por canal
 	ld hl,0c010h		;89de   ; apunta a el manejador del canal A del sonido
-	add a,l			;89e1
+	add a,l			;89e1   ; su manejador...
 	ld l,a			;89e2
 	jr nc,L_89E6		;89e3
 	inc h			;89e5
 L_89E6:
-	ld de,L_89F1		;89e6
+	ld de,L_89F1		;89e6   ; ... pasa a ser un `ret`
 	ld (hl),e			;89e9
 	inc hl			;89ea
 	ld (hl),d			;89eb
-	ld e,000h		;89ec
+	ld e,000h		;89ec   ; y su volumen a cero
 	jp volumen_del_canal		;89ee   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_89F1:
-	ret			;89f1
+	ret			;89f1   ; (el manejador de un canal que ya no suena)
 L_89F2:
 	ld hl,(0c01ah)		;89f2   ; lee el manejador de la musica de la pausa
-	jp (hl)			;89f5
+	jp (hl)			;89f5   ; la musica de la pausa
 L_89F6:
-	xor a			;89f6
-	ld b,004h		;89f7
+	xor a			;89f6   ; el segundo efecto: canal 0 (A)...
+	ld b,004h		;89f7   ; ... numero 4
 	ld hl,(0c018h)		;89f9   ; lee el manejador del segundo efecto
 	jp L_89BC		;89fc
 L_89FF:
-	ld a,(0c094h)		;89ff   ; lee el canal del PSG que se esta tocando
+	ld a,(0c094h)		;89ff   ; escribe el periodo DE en el canal: registro 2 * canal
 	rlca			;8a02
 	call 00093h		;8a03   ; BIOS WRTPSG - Writes data to PSG-register
-	inc a			;8a06
-	ld e,d			;8a07
+	inc a			;8a06   ; el siguiente registro
+	ld e,d			;8a07   ; la parte alta
 	jp 00093h		;8a08   ; BIOS WRTPSG - Writes data to PSG-register
 volumen_del_canal:
 	ld a,(0c094h)		;8a0b   ; lee el canal del PSG que se esta tocando
-	add a,008h		;8a0e
+	add a,008h		;8a0e   ; registro 8 + canal
 	jp 00093h		;8a10   ; BIOS WRTPSG - Writes data to PSG-register
 L_8A13:
-	push hl			;8a13
+	push hl			;8a13   ; abre y cierra tono y ruido del canal: cuatro formas
 	ld hl,08a57h		;8a14
 	jp L_8A2C		;8a17
 L_8A1A:
@@ -614,19 +614,19 @@ L_8A28:
 	ld hl,08a45h		;8a29
 L_8A2C:
 	ld a,(0c094h)		;8a2c   ; lee el canal del PSG que se esta tocando
-	rlca			;8a2f
+	rlca			;8a2f   ; dos bytes por canal
 	add a,l			;8a30
 	ld l,a			;8a31
 	jr nc,L_8A35		;8a32
 	inc h			;8a34
 L_8A35:
 	ld a,(0c097h)		;8a35   ; lee la copia del registro 7 del PSG (el mezclador)
-	and (hl)			;8a38
+	and (hl)			;8a38   ; AND
 	inc hl			;8a39
-	or (hl)			;8a3a
+	or (hl)			;8a3a   ; OR
 	ld (0c097h),a		;8a3b   ; guarda la copia del registro 7 del PSG (el mezclador)
 	pop hl			;8a3e
-	ld e,a			;8a3f
+	ld e,a			;8a3f   ; al registro 7
 	ld a,007h		;8a40
 	jp 00093h		;8a42   ; BIOS WRTPSG - Writes data to PSG-register
 
@@ -647,131 +647,135 @@ DATA_mascaras_del_mezclador:
 
 
 L_8A5D:
-	ld ix,0c080h		;8a5d
+	ld ix,0c080h		;8a5d   ; la ficha de la musica de la pausa
 	jp L_8A76		;8a61
+
+; ----------------------------------------------------------------------
+; CADA CANAL DE MUSICA (IX = su ficha: 0xC01C, 0xC030, 0xC044, y 0xC080 la de la pausa). +0/+1 la partitura, +2 las banderas (bit 0: con tono; bit 2: la otra tabla de golpes; bit 5: tapado por un efecto; bit 6: un pelo mas grave; bit 7: el golpe acabo), +3 el tempo, +4 el volumen base, +5/+6 la envolvente, +7 la octava, +9 lo que le queda a la nota, +10 el volumen, +11 cuando empieza a caer, +12/+13 el guion del golpe de percusion, +14/+15 sus cuentas, +16/+17 los bucles y +18/+19 la vuelta de una llamada.
+; ----------------------------------------------------------------------
 L_8A64:
-	ld ix,0c01ch		;8a64
+	ld ix,0c01ch		;8a64   ; la del canal A
 	jp L_8A76		;8a68
 L_8A6B:
-	ld ix,0c030h		;8a6b
+	ld ix,0c030h		;8a6b   ; la del B
 	jp L_8A76		;8a6f
 L_8A72:
-	ld ix,0c044h		;8a72
+	ld ix,0c044h		;8a72   ; la del C
 L_8A76:
 	ld a,(0c095h)		;8a76   ; lee el numero de canal
-	cp 002h		;8a79
+	cp 002h		;8a79   ; el canal C...
 	jp nz,L_8A89		;8a7b
 	ld a,(0c096h)		;8a7e   ; lee la prioridad del efecto que suena
-	or a			;8a81
+	or a			;8a81   ; ... con efecto sonando...
 	jp z,L_8A89		;8a82
-	set 5,(ix+002h)		;8a85
+	set 5,(ix+002h)		;8a85   ; ... queda tapado
 L_8A89:
-	dec (ix+009h)		;8a89
-	jp z,L_8ACA		;8a8c
-	bit 0,(ix+002h)		;8a8f
-	jp z,L_8AB3		;8a93
-	ld a,(ix+009h)		;8a96
-	cp (ix+00bh)		;8a99
+	dec (ix+009h)		;8a89   ; le queda nota?
+	jp z,L_8ACA		;8a8c   ; se acabo: la siguiente
+	bit 0,(ix+002h)		;8a8f   ; con tono?
+	jp z,L_8AB3		;8a93   ; no: percusion
+	ld a,(ix+009h)		;8a96   ; lo que le queda
+	cp (ix+00bh)		;8a99   ; ya toca caer?
 	jp nc,L_8AA3		;8a9c
-	cp (ix+006h)		;8a9f
+	cp (ix+006h)		;8a9f   ; o ya se paso?
 	ret nc			;8aa2
 L_8AA3:
-	ld e,(ix+00ah)		;8aa3
-	dec e			;8aa6
-	ret m			;8aa7
+	ld e,(ix+00ah)		;8aa3   ; el volumen...
+	dec e			;8aa6   ; ... un punto menos
+	ret m			;8aa7   ; a cero ya
 	ld (ix+00ah),e		;8aa8
-	bit 5,(ix+002h)		;8aab
+	bit 5,(ix+002h)		;8aab   ; tapado: no se escribe
 	ret nz			;8aaf
 	jp volumen_del_canal		;8ab0   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8AB3:
-	bit 5,(ix+002h)		;8ab3
+	bit 5,(ix+002h)		;8ab3   ; percusion tapada: nada
 	ret nz			;8ab7
-	bit 7,(ix+002h)		;8ab8
+	bit 7,(ix+002h)		;8ab8   ; el golpe acabo?
 	ret nz			;8abc
-	call L_8CA7		;8abd
-	ret nc			;8ac0
-	set 7,(ix+002h)		;8ac1
-	ld e,000h		;8ac5
+	call L_8CA7		;8abd   ; un paso del golpe
+	ret nc			;8ac0   ; sigue
+	set 7,(ix+002h)		;8ac1   ; acabo
+	ld e,000h		;8ac5   ; volumen a cero
 	jp volumen_del_canal		;8ac7   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 L_8ACA:
-	ld l,(ix+000h)		;8aca
+	ld l,(ix+000h)		;8aca   ; LEE LA PARTITURA
 	ld h,(ix+001h)		;8acd
 L_8AD0:
-	ld a,(hl)			;8ad0
+	ld a,(hl)			;8ad0   ; el byte
 	inc hl			;8ad1
 	ld c,a			;8ad2
-	cp 0d0h		;8ad3
+	cp 0d0h		;8ad3   ; 0xD0 en adelante: ordenes
 	jp nc,L_8BB4		;8ad5
 	ld (ix+000h),l		;8ad8
 	ld (ix+001h),h		;8adb
-	cp 0c0h		;8ade
+	cp 0c0h		;8ade   ; 0xC0-0xCF: silencio
 	jp nc,L_8B99		;8ae0
-	and 00fh		;8ae3
+	and 00fh		;8ae3   ; una NOTA: la duracion, el nibble bajo + 1...
 	inc a			;8ae5
 	ld b,a			;8ae6
-	ld e,(ix+003h)		;8ae7
+	ld e,(ix+003h)		;8ae7   ; ... por el tempo
 	xor a			;8aea
 L_8AEB:
 	add a,e			;8aeb
 	djnz L_8AEB		;8aec
-	ld (ix+009h),a		;8aee
+	ld (ix+009h),a		;8aee   ; lo que dura
 	ld a,(0c095h)		;8af1   ; lee el numero de canal
-	cp 002h		;8af4
+	cp 002h		;8af4   ; el canal C...
 	jp nz,L_8B04		;8af6
 	ld a,(0c096h)		;8af9   ; lee la prioridad del efecto que suena
-	or a			;8afc
+	or a			;8afc   ; ... sin efecto...
 	jp nz,L_8B04		;8afd
-	res 5,(ix+002h)		;8b00
+	res 5,(ix+002h)		;8b00   ; ... ya no esta tapado
 L_8B04:
-	bit 0,(ix+002h)		;8b04
-	jp z,L_8B53		;8b08
-	ld a,(ix+009h)		;8b0b
-	sub (ix+005h)		;8b0e
-	ld (ix+00bh),a		;8b11
-	bit 5,(ix+002h)		;8b14
+	bit 0,(ix+002h)		;8b04   ; con tono?
+	jp z,L_8B53		;8b08   ; no: un golpe
+	ld a,(ix+009h)		;8b0b   ; lo que dura...
+	sub (ix+005h)		;8b0e   ; ... menos la envolvente
+	ld (ix+00bh),a		;8b11   ; cuando empieza a caer
+	bit 5,(ix+002h)		;8b14   ; tapado: nada
 	ret nz			;8b18
-	ld a,c			;8b19
+	ld a,c			;8b19   ; la nota, el nibble alto...
 	and 0f0h		;8b1a
-	rrca			;8b1c
+	rrca			;8b1c   ; ... por dos
 	rrca			;8b1d
 	rrca			;8b1e
-	ld hl,08b81h		;8b1f
+	ld hl,08b81h		;8b1f   ; la tabla de periodos
 	add a,l			;8b22
 	ld l,a			;8b23
 	jr nc,L_8B27		;8b24
 	inc h			;8b26
 L_8B27:
-	ld e,(hl)			;8b27
+	ld e,(hl)			;8b27   ; el periodo de la nota
 	inc hl			;8b28
 	ld d,(hl)			;8b29
-	ld b,(ix+007h)		;8b2a
+	ld b,(ix+007h)		;8b2a   ; la octava:
 L_8B2D:
-	srl d		;8b2d
+	srl d		;8b2d   ; cada octava, la mitad
 	rr e		;8b2f
 	djnz L_8B2D		;8b31
-	bit 6,(ix+002h)		;8b33
+	bit 6,(ix+002h)		;8b33   ; el bit 6...
 	jp z,L_8B3C		;8b37
-	inc de			;8b3a
+	inc de			;8b3a   ; ... un pelo mas grave
 	inc de			;8b3b
 L_8B3C:
-	call L_89FF		;8b3c
+	call L_89FF		;8b3c   ; al PSG
 	ld a,(0c0a6h)		;8b3f   ; lee el volumen que se le resta a la musica
-	add a,(ix+004h)		;8b42
+	add a,(ix+004h)		;8b42   ; mas el volumen base
 	jp p,L_8B49		;8b45
-	xor a			;8b48
+	xor a			;8b48   ; no baja de cero
 L_8B49:
-	ld (ix+00ah),a		;8b49
+	ld (ix+00ah),a		;8b49   ; el volumen
 	ld e,a			;8b4c
 	call volumen_del_canal		;8b4d   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
-	jp L_8A28		;8b50
+	jp L_8A28		;8b50   ; y el mezclador: tono abierto
 L_8B53:
-	bit 2,(ix+002h)		;8b53
+	bit 2,(ix+002h)		;8b53   ; UN GOLPE de percusion: que tabla?
 	jp nz,L_8B7B		;8b57
-	ld hl,0aad9h		;8b5a
+	ld hl,0aad9h		;8b5a   ; la de 0xAAD9
 L_8B5D:
-	ld a,c			;8b5d
+	ld a,c			;8b5d   ; la nota elige el golpe
 	and 0f0h		;8b5e
-	rrca			;8b60
+	rrca			;8b60   ; por dos
 	rrca			;8b61
 	rrca			;8b62
 	add a,l			;8b63
@@ -779,17 +783,17 @@ L_8B5D:
 	jr nc,L_8B68		;8b65
 	inc h			;8b67
 L_8B68:
-	ld a,(hl)			;8b68
+	ld a,(hl)			;8b68   ; el guion del golpe
 	ld (ix+00ch),a		;8b69
 	inc hl			;8b6c
 	ld a,(hl)			;8b6d
 	ld (ix+00dh),a		;8b6e
-	res 7,(ix+002h)		;8b71
-	ld a,001h		;8b75
+	res 7,(ix+002h)		;8b71   ; empieza
+	ld a,001h		;8b75   ; ya en el primer cuadro
 	ld (ix+00eh),a		;8b77
 	ret			;8b7a
 L_8B7B:
-	ld hl,0aaf1h		;8b7b
+	ld hl,0aaf1h		;8b7b   ; la otra tabla, 0xAAF1
 	jp L_8B5D		;8b7e
 
 ; ----------------------------------------------------------------------
@@ -817,90 +821,94 @@ DATA_periodos_de_las_notas:
 
 
 L_8B99:
-	and 00fh		;8b99
-	inc a			;8b9b
+	and 00fh		;8b99   ; SILENCIO: la duracion...
+	inc a			;8b9b   ; ... + 1...
 	ld b,a			;8b9c
-	ld e,(ix+003h)		;8b9d
+	ld e,(ix+003h)		;8b9d   ; ... por el tempo
 	xor a			;8ba0
 L_8BA1:
 	add a,e			;8ba1
 	djnz L_8BA1		;8ba2
-	ld (ix+009h),a		;8ba4
-	bit 5,(ix+002h)		;8ba7
+	ld (ix+009h),a		;8ba4   ; lo que dura
+	bit 5,(ix+002h)		;8ba7   ; tapado: nada
 	ret nz			;8bab
-	ld e,000h		;8bac
-	ld (ix+00ah),e		;8bae
+	ld e,000h		;8bac   ; volumen...
+	ld (ix+00ah),e		;8bae   ; ... a cero
 	jp volumen_del_canal		;8bb1   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
+
+; ----------------------------------------------------------------------
+; LAS ORDENES DE LA PARTITURA (0xD0 en adelante): 0xDx pone el tempo; 0xE0-0xE5 la octava; 0xE6 y 0xEB ponen y quitan 0xC0A8; 0xE7 el bit 6 (un pelo mas grave); 0xEA salta a otra direccion; 0xED llama a un trozo y 0xEE vuelve; 0xE8, 0xE9, 0xEC y 0xEF cambian las banderas; 0xFE es un bucle [veces][direccion]; 0xFF acaba el canal; y las demas 0xFx ponen la envolvente con un byte mas.
+; ----------------------------------------------------------------------
 L_8BB4:
-	and 0f0h		;8bb4
-	cp 0d0h		;8bb6
+	and 0f0h		;8bb4   ; que orden?
+	cp 0d0h		;8bb6   ; 0xDx: el tempo
 	jp z,L_8C06		;8bb8
-	cp 0e0h		;8bbb
+	cp 0e0h		;8bbb   ; 0xEx
 	jp z,L_8C0F		;8bbd
-	ld a,c			;8bc0
+	ld a,c			;8bc0   ; 0xFx:
 	and 00fh		;8bc1
-	cp 00fh		;8bc3
+	cp 00fh		;8bc3   ; 0xFF: acaba el canal
 	jp z,L_8C80		;8bc5
-	cp 00eh		;8bc8
+	cp 00eh		;8bc8   ; 0xFE: el bucle
 	jp nz,L_8BED		;8bca
-	ld a,(ix+010h)		;8bcd
-	dec a			;8bd0
+	ld a,(ix+010h)		;8bcd   ; la cuenta del bucle
+	dec a			;8bd0   ; era la ultima vuelta?
 	jp z,L_8BE4		;8bd1
-	jp p,L_8BD9		;8bd4
-	ld a,(hl)			;8bd7
-	dec a			;8bd8
+	jp p,L_8BD9		;8bd4   ; ya contando: sigue
+	ld a,(hl)			;8bd7   ; empieza: las veces...
+	dec a			;8bd8   ; ... menos esta
 L_8BD9:
 	inc hl			;8bd9
-	ld (ix+010h),a		;8bda
-	ld a,(hl)			;8bdd
+	ld (ix+010h),a		;8bda   ; la cuenta
+	ld a,(hl)			;8bdd   ; y vuelve atras
 	inc hl			;8bde
 	ld h,(hl)			;8bdf
 	ld l,a			;8be0
 	jp L_8AD0		;8be1
 L_8BE4:
-	ld (ix+010h),a		;8be4
-	inc hl			;8be7
+	ld (ix+010h),a		;8be4   ; se acabo el bucle
+	inc hl			;8be7   ; salta el resto de la orden
 	inc hl			;8be8
 	inc hl			;8be9
 	jp L_8AD0		;8bea
 L_8BED:
-	inc a			;8bed
+	inc a			;8bed   ; la ENVOLVENTE: el volumen base
 	ld (ix+004h),a		;8bee
-	ld a,(hl)			;8bf1
+	ld a,(hl)			;8bf1   ; el nibble alto...
 	rrca			;8bf2
 	rrca			;8bf3
 	rrca			;8bf4
 	rrca			;8bf5
 	and 00fh		;8bf6
-	dec a			;8bf8
+	dec a			;8bf8   ; ... - 1: lo que tarda en caer
 	ld (ix+005h),a		;8bf9
-	ld a,(hl)			;8bfc
+	ld a,(hl)			;8bfc   ; el nibble bajo:
 	inc hl			;8bfd
 	and 00fh		;8bfe
-	ld (ix+006h),a		;8c00
+	ld (ix+006h),a		;8c00   ; hasta donde cae
 	jp L_8AD0		;8c03
 L_8C06:
-	ld a,c			;8c06
+	ld a,c			;8c06   ; 0xDx:
 	and 00fh		;8c07
-	ld (ix+003h),a		;8c09
+	ld (ix+003h),a		;8c09   ; el tempo
 	jp L_8AD0		;8c0c
 L_8C0F:
-	ld a,c			;8c0f
+	ld a,c			;8c0f   ; 0xEx:
 	and 00fh		;8c10
-	cp 006h		;8c12
+	cp 006h		;8c12   ; 0xE0-0xE5: la octava
 	jp c,L_8C42		;8c14
-	jp z,L_8C4C		;8c17
+	jp z,L_8C4C		;8c17   ; 0xE6
 	cp 007h		;8c1a
-	jp z,L_8C5B		;8c1c
+	jp z,L_8C5B		;8c1c   ; 0xE7
 	cp 00ah		;8c1f
-	jp z,L_8C62		;8c21
+	jp z,L_8C62		;8c21   ; 0xEA: salto
 	cp 00bh		;8c24
-	jp z,L_8C54		;8c26
+	jp z,L_8C54		;8c26   ; 0xEB
 	cp 00dh		;8c29
-	jp z,L_8C69		;8c2b
+	jp z,L_8C69		;8c2b   ; 0xED: llamada
 	cp 00eh		;8c2e
-	jp z,L_8C77		;8c30
-	and 007h		;8c33
+	jp z,L_8C77		;8c30   ; 0xEE: vuelta
+	and 007h		;8c33   ; las demas: tres bits de banderas
 	ld b,a			;8c35
 	ld a,(ix+002h)		;8c36
 	and 0f8h		;8c39
@@ -908,192 +916,196 @@ L_8C0F:
 	ld (ix+002h),a		;8c3c
 	jp L_8AD0		;8c3f
 L_8C42:
-	neg		;8c42
+	neg		;8c42   ; la octava: 6 - n
 	add a,006h		;8c44
 	ld (ix+007h),a		;8c46
 	jp L_8AD0		;8c49
 L_8C4C:
-	ld a,001h		;8c4c
+	ld a,001h		;8c4c   ; 0xE6: 0xC0A8 a 1 (no deja sonar efectos)
 	ld (0c0a8h),a		;8c4e
 	jp L_8AD0		;8c51
 L_8C54:
-	xor a			;8c54
+	xor a			;8c54   ; 0xEB: 0xC0A8 a cero
 	ld (0c0a8h),a		;8c55
 	jp L_8AD0		;8c58
 L_8C5B:
-	set 6,(ix+002h)		;8c5b
+	set 6,(ix+002h)		;8c5b   ; 0xE7: un pelo mas grave
 	jp L_8AD0		;8c5f
 L_8C62:
-	ld a,(hl)			;8c62
+	ld a,(hl)			;8c62   ; 0xEA: la direccion...
 	inc hl			;8c63
 	ld h,(hl)			;8c64
-	ld l,a			;8c65
+	ld l,a			;8c65   ; ... y alli sigue
 	jp L_8AD0		;8c66
 L_8C69:
-	ld e,(hl)			;8c69
+	ld e,(hl)			;8c69   ; 0xED: la direccion del trozo
 	inc hl			;8c6a
 	ld d,(hl)			;8c6b
 	inc hl			;8c6c
-	ld (ix+012h),l		;8c6d
+	ld (ix+012h),l		;8c6d   ; guarda la vuelta
 	ld (ix+013h),h		;8c70
-	ex de,hl			;8c73
+	ex de,hl			;8c73   ; y al trozo
 	jp L_8AD0		;8c74
 L_8C77:
-	ld l,(ix+012h)		;8c77
+	ld l,(ix+012h)		;8c77   ; 0xEE: de vuelta
 	ld h,(ix+013h)		;8c7a
 	jp L_8AD0		;8c7d
 L_8C80:
-	ld a,(0c095h)		;8c80   ; lee el numero de canal
-	inc a			;8c83
+	ld a,(0c095h)		;8c80   ; 0xFF: el canal acaba:
+	inc a			;8c83   ; su numero...
 	ld b,a			;8c84
-	ld a,07fh		;8c85
+	ld a,07fh		;8c85   ; ... su bit...
 L_8C87:
 	rlca			;8c87
 	djnz L_8C87		;8c88
 	ld b,a			;8c8a
-	ld a,(0c0a7h)		;8c8b
+	ld a,(0c0a7h)		;8c8b   ; ... fuera de la cuenta de 0xC0A7
 	and b			;8c8e
 	ld (0c0a7h),a		;8c8f
-	jp canal_en_reposo		;8c92   ; canal_en_reposo: el canal que no suena
+	jp canal_en_reposo		;8c92   ; y el canal, en reposo
 L_8C95:
-	ld ix,0c06ch		;8c95
+	ld ix,0c06ch		;8c95   ; el segundo efecto: su ficha
 	jp L_8CA0		;8c99
 L_8C9C:
-	ld ix,0c058h		;8c9c
+	ld ix,0c058h		;8c9c   ; el efecto: su ficha
 L_8CA0:
-	call L_8CA7		;8ca0
-	ret nc			;8ca3
-	jp canal_en_reposo		;8ca4   ; canal_en_reposo: el canal que no suena
+	call L_8CA7		;8ca0   ; un paso
+	ret nc			;8ca3   ; sigue
+	jp canal_en_reposo		;8ca4   ; acabo: en reposo
+
+; ----------------------------------------------------------------------
+; UN PASO DE UN EFECTO (o de un golpe de percusion): cada tantos cuadros, un byte del guion. 0xFF acaba; 0xFE es un bucle; 0x2x abre y cierra tono y ruido y da la duracion (y desde 0x28 el periodo de la envolvente del PSG); 0x1x pone el ruido y luego volumen y periodo; y lo demas es volumen (nibble alto) y periodo (nibble bajo y un byte mas).
+; ----------------------------------------------------------------------
 L_8CA7:
-	dec (ix+00eh)		;8ca7
-	jp nz,L_8D8B		;8caa
-	ld a,(ix+00fh)		;8cad
-	ld (ix+00eh),a		;8cb0
-	ld l,(ix+00ch)		;8cb3
+	dec (ix+00eh)		;8ca7   ; la cuenta del paso
+	jp nz,L_8D8B		;8caa   ; aun no toca
+	ld a,(ix+00fh)		;8cad   ; otra vez...
+	ld (ix+00eh),a		;8cb0   ; ... la cuenta entera
+	ld l,(ix+00ch)		;8cb3   ; el guion
 	ld h,(ix+00dh)		;8cb6
 L_8CB9:
-	ld a,(hl)			;8cb9
-	cp 0ffh		;8cba
-	jp z,L_8D8D		;8cbc
+	ld a,(hl)			;8cb9   ; el byte
+	cp 0ffh		;8cba   ; 0xFF?
+	jp z,L_8D8D		;8cbc   ; acabo (carry)
 	inc hl			;8cbf
 	ld c,a			;8cc0
-	cp 0feh		;8cc1
-	jp z,L_8D18		;8cc3
-	and 0f0h		;8cc6
+	cp 0feh		;8cc1   ; 0xFE?
+	jp z,L_8D18		;8cc3   ; el bucle
+	and 0f0h		;8cc6   ; 0x2x?
 	cp 020h		;8cc8
-	jp z,L_8D38		;8cca
-	cp 010h		;8ccd
-	jp nz,L_8CE1		;8ccf
-	ld a,c			;8cd2
+	jp z,L_8D38		;8cca   ; el mezclador
+	cp 010h		;8ccd   ; 0x1x?
+	jp nz,L_8CE1		;8ccf   ; no: volumen y periodo
+	ld a,c			;8cd2   ; el ruido...
 	and 00fh		;8cd3
-	rlca			;8cd5
+	rlca			;8cd5   ; ... por dos
 	ld e,a			;8cd6
-	ld a,006h		;8cd7
+	ld a,006h		;8cd7   ; al registro 6
 	call 00093h		;8cd9   ; BIOS WRTPSG - Writes data to PSG-register
-	ld a,(hl)			;8cdc
+	ld a,(hl)			;8cdc   ; el byte siguiente
 	inc hl			;8cdd
 	ld c,a			;8cde
-	and 0f0h		;8cdf
+	and 0f0h		;8cdf   ; el volumen, el nibble alto
 L_8CE1:
 	rrca			;8ce1
 	rrca			;8ce2
 	rrca			;8ce3
 	rrca			;8ce4
 	ld e,a			;8ce5
-	bit 4,(ix+00ah)		;8ce6
-	jp z,L_8CF5		;8cea
-	ld a,00dh		;8ced
+	bit 4,(ix+00ah)		;8ce6   ; con envolvente (bit 4)?
+	jp z,L_8CF5		;8cea   ; no
+	ld a,00dh		;8ced   ; si: la forma de la envolvente, registro 13
 	call 00093h		;8cef   ; BIOS WRTPSG - Writes data to PSG-register
 	jp L_8D09		;8cf2
 L_8CF5:
-	ld a,(0c095h)		;8cf5   ; lee el numero de canal
+	ld a,(0c095h)		;8cf5   ; en los canales de musica...
 	cp 003h		;8cf8
 	jp nc,L_8D06		;8cfa
-	ld a,(0c0a6h)		;8cfd   ; lee el volumen que se le resta a la musica
+	ld a,(0c0a6h)		;8cfd   ; ... se le resta el fundido
 	add a,e			;8d00
-	jp p,L_8D05		;8d01
+	jp p,L_8D05		;8d01   ; no baja de cero
 	xor a			;8d04
 L_8D05:
 	ld e,a			;8d05
 L_8D06:
-	call volumen_del_canal		;8d06   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
+	call volumen_del_canal		;8d06   ; el volumen
 L_8D09:
-	ld a,c			;8d09
+	ld a,c			;8d09   ; el periodo: nibble bajo...
 	and 00fh		;8d0a
 	ld d,a			;8d0c
-	ld e,(hl)			;8d0d
+	ld e,(hl)			;8d0d   ; ... y el byte siguiente
 	inc hl			;8d0e
-	ld (ix+00ch),l		;8d0f
+	ld (ix+00ch),l		;8d0f   ; donde sigue el guion
 	ld (ix+00dh),h		;8d12
-	jp L_89FF		;8d15
+	jp L_89FF		;8d15   ; y el periodo, al PSG
 L_8D18:
-	ld a,(ix+011h)		;8d18
-	dec a			;8d1b
+	ld a,(ix+011h)		;8d18   ; el BUCLE del efecto: la cuenta
+	dec a			;8d1b   ; era la ultima?
 	jp z,L_8D2F		;8d1c
-	jp p,L_8D24		;8d1f
-	ld a,(hl)			;8d22
-	dec a			;8d23
+	jp p,L_8D24		;8d1f   ; ya contando
+	ld a,(hl)			;8d22   ; empieza: las veces
+	dec a			;8d23   ; menos esta
 L_8D24:
 	inc hl			;8d24
-	ld (ix+011h),a		;8d25
-	ld a,(hl)			;8d28
+	ld (ix+011h),a		;8d25   ; la cuenta
+	ld a,(hl)			;8d28   ; y vuelve atras
 	inc hl			;8d29
 	ld h,(hl)			;8d2a
 	ld l,a			;8d2b
 	jp L_8CB9		;8d2c
 L_8D2F:
-	ld (ix+011h),a		;8d2f
-	inc hl			;8d32
+	ld (ix+011h),a		;8d2f   ; se acabo
+	inc hl			;8d32   ; salta el resto
 	inc hl			;8d33
 	inc hl			;8d34
 	jp L_8CB9		;8d35
 L_8D38:
-	bit 0,c		;8d38
+	bit 0,c		;8d38   ; el MEZCLADOR: los bits 0 y 1 eligen la forma
 	jp nz,L_8D4E		;8d3a
 	bit 1,c		;8d3d
 	jp nz,L_8D48		;8d3f
-	call L_8A13		;8d42
+	call L_8A13		;8d42   ; tono
 	jp L_8D5C		;8d45
 L_8D48:
-	call L_8A28		;8d48
+	call L_8A28		;8d48   ; tono y ruido
 	jp L_8D5C		;8d4b
 L_8D4E:
 	bit 1,c		;8d4e
 	jp nz,L_8D59		;8d50
-	call L_8A21		;8d53
+	call L_8A21		;8d53   ; ruido
 	jp L_8D5C		;8d56
 L_8D59:
-	call L_8A1A		;8d59
+	call L_8A1A		;8d59   ; nada
 L_8D5C:
-	ld a,c			;8d5c
+	ld a,c			;8d5c   ; el bit 3 pasa a ser el 4: con envolvente
 	rlca			;8d5d
 	and 010h		;8d5e
 	ld (ix+00ah),a		;8d60
-	ld e,a			;8d63
+	ld e,a			;8d63   ; y el volumen
 	call volumen_del_canal		;8d64   ; volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
-	ld a,(hl)			;8d67
+	ld a,(hl)			;8d67   ; la duracion
 	inc hl			;8d68
-	ld (ix+00eh),a		;8d69
-	ld (ix+00fh),a		;8d6c
-	ld a,c			;8d6f
+	ld (ix+00eh),a		;8d69   ; la cuenta...
+	ld (ix+00fh),a		;8d6c   ; ... y la cuenta entera
+	ld a,c			;8d6f   ; 0x20: sin mas
 	cp 020h		;8d70
 	jp z,L_8D8B		;8d72
-	cp 028h		;8d75
+	cp 028h		;8d75   ; 0x21-0x27: sigue el guion
 	jp c,L_8CB9		;8d77
-	ld e,(hl)			;8d7a
+	ld e,(hl)			;8d7a   ; 0x28 en adelante: el periodo de la envolvente...
 	inc hl			;8d7b
-	ld a,00ch		;8d7c
+	ld a,00ch		;8d7c   ; ... registro 12
 	call 00093h		;8d7e   ; BIOS WRTPSG - Writes data to PSG-register
 	ld e,(hl)			;8d81
 	inc hl			;8d82
-	ld a,00bh		;8d83
+	ld a,00bh		;8d83   ; ... y 11
 	call 00093h		;8d85   ; BIOS WRTPSG - Writes data to PSG-register
-	jp L_8CB9		;8d88
+	jp L_8CB9		;8d88   ; y sigue
 L_8D8B:
-	or a			;8d8b
+	or a			;8d8b   ; sigue (sin carry)
 	ret			;8d8c
 L_8D8D:
-	scf			;8d8d
+	scf			;8d8d   ; acabo (con carry)
 	ret			;8d8e
 
 ; ----------------------------------------------------------------------

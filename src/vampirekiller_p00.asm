@@ -284,7 +284,7 @@ L_41A0:
 L_41AB:
 	djnz L_41C1		;41ab
 	call L_4E20		;41ad
-	ld a,(0c413h)		;41b0
+	ld a,(0c413h)		;41b0   ; lee la DEMOSTRACION en marcha
 	or a			;41b3
 	ret nz			;41b4
 L_41B5:
@@ -359,7 +359,7 @@ L_422C:
 	call apaga_la_pantalla		;4234   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
 	call L_4513		;4237
 	call 062e6h		;423a
-	ld hl,0c413h		;423d
+	ld hl,0c413h		;423d   ; apunta a la DEMOSTRACION en marcha
 	ld (hl),001h		;4240
 	call 0794fh		;4242
 	xor a			;4245
@@ -395,7 +395,7 @@ L_4257:
 	and a			;427f
 	ld a,008h		;4280
 	jp nz,cambia_de_estado		;4282   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	ld a,(0c413h)		;4285
+	ld a,(0c413h)		;4285   ; lee la DEMOSTRACION en marcha
 	or a			;4288
 	ret nz			;4289
 	jr L_4249		;428a
@@ -2237,77 +2237,87 @@ DATA_codigo_sin_llamar_4DD7:
 
 
 L_4DDB:
-	ld d,000h		;4ddb
-	ld hl,00000h		;4ddd
-	ld bc,00000h		;4de0
-	xor a			;4de3
+	ld d,000h		;4ddb   ; pagina 0
+	ld hl,00000h		;4ddd   ; desde (0, 0)
+	ld bc,00000h		;4de0   ; 256 x 256: toda
+	xor a			;4de3   ; color 0
 	jp rellena_rectangulo		;4de4   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
+
+; ----------------------------------------------------------------------
+; EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con 0xC413 puesto (lo que dice que es la demostracion) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
+; ----------------------------------------------------------------------
 L_4DE7:
-	ld hl,0c420h		;4de7
+	ld hl,0c420h		;4de7   ; borra de 0xC420...
 	ld de,0c421h		;4dea
-	ld bc,01bdfh		;4ded
+	ld bc,01bdfh		;4ded   ; ... 0x1BE0 bytes
 	xor a			;4df0
 	ld (hl),a			;4df1
 	ldir		;4df2
-	ld (0c007h),a		;4df4
+	ld (0c007h),a		;4df4   ; sin teclas
 	ld (0cf3dh),a		;4df7
 	ld (0d001h),a		;4dfa   ; guarda la HABITACION dentro de la fase
 	ld (0d002h),a		;4dfd   ; guarda el bloque de tres fases (0-5)
 	inc a			;4e00
-	ld (0c413h),a		;4e01
+	ld (0c413h),a		;4e01   ; 0xC413 = 1: es la demostracion
 	ld (0c411h),a		;4e04   ; guarda la fase en BCD, la del marcador
 	ld (0d000h),a		;4e07   ; guarda la FASE (0 el patio, 1-18)
-	ld (0cf3ah),a		;4e0a
-	ld a,020h		;4e0d
+	ld (0cf3ah),a		;4e0a   ; el primer par, ya
+	ld a,020h		;4e0d   ; vida llena
 	ld (0c415h),a		;4e0f   ; guarda la vida de Simon
-	ld a,080h		;4e12
+	ld a,080h		;4e12   ; y la del enemigo
 	ld (0c418h),a		;4e14   ; guarda la vida del enemigo (barra ENEMY)
-	call 062d0h		;4e17
-	call 062e6h		;4e1a
-	jp L_4513		;4e1d
+	call 062d0h		;4e17   ; empieza una vida
+	call 062e6h		;4e1a   ; monta la fase
+	jp L_4513		;4e1d   ; y el marcador
 L_4E20:
 	call L_5C25		;4e20
 	ld a,(0c41bh)		;4e23   ; lee el lado por el que se sale de la habitacion
-	and a			;4e26
-	ret z			;4e27
-	call L_5A2E		;4e28
-	jp 062f5h		;4e2b
+	and a			;4e26   ; se sale de la habitacion?
+	ret z			;4e27   ; no
+	call L_5A2E		;4e28   ; si: a cual
+	jp 062f5h		;4e2b   ; y se monta
+
+; ----------------------------------------------------------------------
+; UN CUADRO DE LA DEMOSTRACION: se entregan las teclas del par que toca hasta que se acaba su cuenta, y se pasa al siguiente. Unas teclas 0xFF la terminan.
+; ----------------------------------------------------------------------
 L_4E2E:
-	ld hl,0cf3ah		;4e2e
+	ld hl,0cf3ah		;4e2e   ; la cuenta del par
 	dec (hl)			;4e31
-	jr z,L_4E46		;4e32
+	jr z,L_4E46		;4e32   ; se acabo: el siguiente
 L_4E34:
-	ld a,(0cf3bh)		;4e34
-	cp 0ffh		;4e37
-	jr z,L_4E41		;4e39
-	ld hl,0c007h		;4e3b
+	ld a,(0cf3bh)		;4e34   ; las teclas del par
+	cp 0ffh		;4e37   ; 0xFF...
+	jr z,L_4E41		;4e39   ; ... acaba la demostracion
+	ld hl,0c007h		;4e3b   ; se entregan como mandos
 	jp L_4BB1		;4e3e
 L_4E41:
-	xor a			;4e41
-	ld (0c413h),a		;4e42
+	xor a			;4e41   ; fin de la demostracion
+	ld (0c413h),a		;4e42   ; guarda la DEMOSTRACION en marcha
 	ret			;4e45
 L_4E46:
-	inc hl			;4e46
+	inc hl			;4e46   ; el numero de par
 	inc hl			;4e47
 	ld c,(hl)			;4e48
-	inc (hl)			;4e49
-	ld de,04e5dh		;4e4a
+	inc (hl)			;4e49   ; el siguiente
+	ld de,04e5dh		;4e4a   ; la tabla de pulsaciones
 	ld l,c			;4e4d
 	ld h,000h		;4e4e
-	add hl,hl			;4e50
+	add hl,hl			;4e50   ; dos bytes por par
 	add hl,de			;4e51
-	ld a,(hl)			;4e52
-	ld (0cf3ah),a		;4e53
+	ld a,(hl)			;4e52   ; cuantos cuadros
+	ld (0cf3ah),a		;4e53   ; guarda la cuenta de la pulsacion de la demostracion
 	inc hl			;4e56
-	ld a,(hl)			;4e57
-	ld (0cf3bh),a		;4e58
+	ld a,(hl)			;4e57   ; las teclas
+	ld (0cf3bh),a		;4e58   ; guarda las teclas de la demostracion
 	jr L_4E34		;4e5b
 
 ; ----------------------------------------------------------------------
-; DATOS pares_para_CF3A: 27 pares que p00:4E48 va dejando en 0xCF3A y 0xCF3B,
-;   uno cada vez (el indice lo sube el `inc (hl)` de p00:4E49)
+; DATOS teclas_de_la_demostracion: LAS PULSACIONES DE LA DEMOSTRACION: 27
+;   pares [cuantos cuadros][teclas] que p00:4E48 va sacando por orden (0xCF3A
+;   la cuenta, 0xCF3B las teclas) y p00:4E3E entrega como si fueran los mandos
+;   (0xC007); unas teclas 0xFF acaban la demostracion (p00:4E41)
 ;   0x4e5d..0x4e93  (54 bytes)
-DATA_pares_para_CF3A:
+DATA_teclas_de_la_demostracion:
 	defb 016h,000h,02bh,008h,007h,018h,017h,008h,008h,018h,055h,008h,004h,000h,010h,004h	; 4e5d  ..+.......U.....
 	defb 009h,000h,041h,021h,022h,029h,007h,039h,025h,029h,02ah,008h,004h,029h,04dh,008h	; 4e6d  ..A!").9%)*..)M.
 	defb 00fh,000h,01ah,004h,009h,014h,00fh,004h,007h,000h,05eh,008h,00eh,000h,014h,004h	; 4e7d  ..........^.....
@@ -2466,123 +2476,127 @@ L_4F9C:
 L_4FAF:
 	ld (0c5d5h),hl		;4faf   ; guarda el destino del montaje de la habitacion
 	ld (0c5d7h),bc		;4fb2   ; guarda la habitacion que se monta
+
+; ----------------------------------------------------------------------
+; MONTA LA HABITACION en el bufer de DE (0xC5D5): la habitacion son 8 x 6 bloques de 32 x 32 puntos, y cada bloque, 4 x 4 celdas de dibujo. El bufer tiene 32 celdas por fila: tras cada fila de ocho bloques se saltan 0x60 (tres filas de celdas mas). Con 0xC41A puesto la habitacion es la de 0x614B y los bloques los de 0xA041.
+; ----------------------------------------------------------------------
 monta_la_habitacion:
-	di			;4fb6
+	di			;4fb6   ; los bancos del mapa, 11-12-13, con su copia
 	ld hl,0f0f1h		;4fb7   ; apunta a la copia del banco de 0x6000
-	ld a,00bh		;4fba
+	ld a,00bh		;4fba   ; el 11
 	ld (06000h),a		;4fbc   ; el mapper: pone en 0x6000 el banco de A
 	ld (hl),a			;4fbf
 	inc l			;4fc0
-	inc a			;4fc1
+	inc a			;4fc1   ; el 12
 	ld (08000h),a		;4fc2   ; el mapper: pone en 0x8000 el banco de A
 	ld (hl),a			;4fc5
 	inc l			;4fc6
-	inc a			;4fc7
+	inc a			;4fc7   ; el 13
 	ld (0a000h),a		;4fc8   ; el mapper: pone en 0xA000 el banco de A
 	ld (hl),a			;4fcb
 	ei			;4fcc
 	ld a,(0c41ah)		;4fcd   ; lee la habitacion especial
-	ld hl,0614bh		;4fd0
-	and a			;4fd3
-	jr nz,L_4FF0		;4fd4
+	ld hl,0614bh		;4fd0   ; la habitacion especial
+	and a			;4fd3   ; puesta?
+	jr nz,L_4FF0		;4fd4   ; si: esa
 	ld a,(0c5d8h)		;4fd6   ; lee la fase de la habitacion que se monta
-	ld hl,06000h		;4fd9
+	ld hl,06000h		;4fd9   ; la primera habitacion de cada fase
 	call hl_mas_a		;4fdc   ; hl_mas_a: HL += A
-	ld l,(hl)			;4fdf
+	ld l,(hl)			;4fdf   ; la de esta fase
 	ld a,(0c5d7h)		;4fe0   ; lee la habitacion que se monta
-	add a,l			;4fe3
+	add a,l			;4fe3   ; + la habitacion
 	ld h,000h		;4fe4
-	ld l,a			;4fe6
-	add hl,hl			;4fe7
-	ld de,06013h		;4fe8
+	ld l,a			;4fe6   ; su numero en el castillo
+	add hl,hl			;4fe7   ; dos bytes por habitacion
+	ld de,06013h		;4fe8   ; la tabla de habitaciones
 	add hl,de			;4feb
-	ld e,(hl)			;4fec
+	ld e,(hl)			;4fec   ; sus 8 x 6 bloques
 	inc hl			;4fed
 	ld d,(hl)			;4fee
 	ex de,hl			;4fef
 L_4FF0:
 	ld de,(0c5d5h)		;4ff0   ; lee el destino del montaje de la habitacion
-	ld a,006h		;4ff4
+	ld a,006h		;4ff4   ; seis filas de bloques
 L_4FF6:
 	ex af,af'			;4ff6
-	ld b,008h		;4ff7
+	ld b,008h		;4ff7   ; ocho bloques por fila
 L_4FF9:
-	ld a,(hl)			;4ff9
+	ld a,(hl)			;4ff9   ; el bloque
 	push de			;4ffa
-	exx			;4ffb
-	push af			;4ffc
+	exx			;4ffb   ; (los registros de la habitacion, a un lado)
+	push af			;4ffc   ; el numero de bloque, a guardar
 	ld a,(0c41ah)		;4ffd   ; lee la habitacion especial
-	and a			;5000
-	ld bc,0a041h		;5001
+	and a			;5000   ; habitacion especial?
+	ld bc,0a041h		;5001   ; sus bloques
 	jr nz,L_5013		;5004
 	ld a,(0c5d8h)		;5006   ; lee la fase de la habitacion que se monta
-	add a,a			;5009
-	ld hl,07ebbh		;500a
+	add a,a			;5009   ; los de la fase:
+	ld hl,07ebbh		;500a   ; el juego de bloques de cada fase
 	call hl_mas_a		;500d   ; hl_mas_a: HL += A
 	ld c,(hl)			;5010
 	inc hl			;5011
 	ld b,(hl)			;5012
 L_5013:
-	pop af			;5013
+	pop af			;5013   ; el numero de bloque
 	ld h,000h		;5014
 	ld l,a			;5016
-	add hl,hl			;5017
+	add hl,hl			;5017   ; 16 bytes por bloque
 	add hl,hl			;5018
 	add hl,hl			;5019
 	add hl,hl			;501a
-	add hl,bc			;501b
-	ld bc,01cffh		;501c
+	add hl,bc			;501b   ; HL = el bloque
+	ld bc,01cffh		;501c   ; B = 0x1C: de una fila a la siguiente del bufer (32 - 4)
 	pop de			;501f
-	ldi		;5020
+	ldi		;5020   ; la primera fila del bloque, cuatro celdas
 	ldi		;5022
 	ldi		;5024
 	ldi		;5026
-	ld a,b			;5028
+	ld a,b			;5028   ; la fila siguiente del bufer
 	add a,e			;5029
 	ld e,a			;502a
-	ldi		;502b
+	ldi		;502b   ; la segunda
 	ldi		;502d
 	ldi		;502f
 	ldi		;5031
 	ld a,b			;5033
 	add a,e			;5034
 	ld e,a			;5035
-	ldi		;5036
+	ldi		;5036   ; la tercera
 	ldi		;5038
 	ldi		;503a
 	ldi		;503c
 	ld a,b			;503e
 	add a,e			;503f
 	ld e,a			;5040
-	ldi		;5041
+	ldi		;5041   ; la cuarta
 	ldi		;5043
 	ldi		;5045
 	ldi		;5047
-	exx			;5049
-	inc hl			;504a
-	inc e			;504b
+	exx			;5049   ; (los registros de la habitacion)
+	inc hl			;504a   ; el bloque siguiente
+	inc e			;504b   ; cuatro celdas a la derecha en el bufer
 	inc e			;504c
 	inc e			;504d
 	inc de			;504e
-	djnz L_4FF9		;504f
+	djnz L_4FF9		;504f   ; ocho bloques
 	ex de,hl			;5051
-	ld bc,00060h		;5052
+	ld bc,00060h		;5052   ; la fila de bloques siguiente: 0x60 mas (tres filas de celdas)
 	add hl,bc			;5055
 	ex de,hl			;5056
 	ex af,af'			;5057
-	dec a			;5058
+	dec a			;5058   ; seis filas de bloques
 	jp nz,L_4FF6		;5059
-	di			;505c
+	di			;505c   ; y vuelven los bancos 1, 2 y 3
 	push hl			;505d
 	ld hl,0f0f1h		;505e   ; apunta a la copia del banco de 0x6000
-	ld a,001h		;5061
+	ld a,001h		;5061   ; el 1
 	ld (06000h),a		;5063   ; el mapper: pone en 0x6000 el banco de A
 	ld (hl),a			;5066
-	inc a			;5067
+	inc a			;5067   ; el 2
 	ld (08000h),a		;5068   ; el mapper: pone en 0x8000 el banco de A
 	inc hl			;506b
 	ld (hl),a			;506c
-	inc a			;506d
+	inc a			;506d   ; el 3
 	ld (0a000h),a		;506e   ; el mapper: pone en 0xA000 el banco de A
 	inc hl			;5071
 	ld (hl),a			;5072

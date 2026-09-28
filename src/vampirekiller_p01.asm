@@ -1021,17 +1021,17 @@ L_6743:
 	jr z,L_6781		;676c
 	ld d,a			;676e
 	ld a,(0ce33h)		;676f   ; lee la cuenta del texto del final
-	add a,0d8h		;6772
+	add a,0d8h		;6772   ; la columna
 	ld e,a			;6774
-	ld c,0ffh		;6775
-	call 04ad5h		;6777
+	ld c,0ffh		;6775   ; se pinta
+	call 04ad5h		;6777   ; el texto del renglon
 	ld hl,0ce31h		;677a   ; apunta a el renglon del final que toca
-	inc (hl)			;677d
+	inc (hl)			;677d   ; el siguiente
 	jp 05336h		;677e   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 L_6781:
-	ld a,001h		;6781
+	ld a,001h		;6781   ; el ultimo: se acabo el texto
 	ld (0ce32h),a		;6783
-	ld a,0ffh		;6786
+	ld a,0ffh		;6786   ; la musica se funde
 	call 0509fh		;6788   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	jp 05336h		;678b   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 
@@ -1091,18 +1091,18 @@ DATA_renglones_del_final:
 
 L_67E4:
 	ld hl,0ce39h		;67e4   ; apunta a la cuenta del destello
-	ld a,(hl)			;67e7
+	ld a,(hl)			;67e7   ; la cuenta...
 	inc a			;67e8
-	cp 013h		;67e9
+	cp 013h		;67e9   ; ... de 0 a 18
 	jr c,L_67EE		;67eb
 	xor a			;67ed
 L_67EE:
 	ld (hl),a			;67ee
-	ld hl,067fdh		;67ef
+	ld hl,067fdh		;67ef   ; el color del destello
 	call 04061h		;67f2   ; hl_mas_a: HL += A
-	ld d,(hl)			;67f5
-	ld e,005h		;67f6
-	ld a,006h		;67f8
+	ld d,(hl)			;67f5   ; rojo y azul
+	ld e,005h		;67f6   ; verde 5
+	ld a,006h		;67f8   ; al color 6
 	jp 04814h		;67fa   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 
 ; ----------------------------------------------------------------------
@@ -1120,62 +1120,62 @@ DATA_destello:
 
 
 L_6810:
-	ld de,00000h		;6810
+	ld de,00000h		;6810   ; el color 6 a negro
 	ld a,006h		;6813
 	jp 04814h		;6815   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 L_6818:
-	ld hl,0ce38h		;6818
+	ld hl,0ce38h		;6818   ; otra cuenta de la escena
 	inc (hl)			;681b
 	ld a,(hl)			;681c
-	and 01fh		;681d
-	cp 01ch		;681f
-	jp z,L_69A0		;6821
-	cp 01fh		;6824
+	and 01fh		;681d   ; cada 32:
+	cp 01ch		;681f   ; en la 28...
+	jp z,L_69A0		;6821   ; ... un dibujo
+	cp 01fh		;6824   ; en la 31...
 	ret nz			;6826
-	jp L_6984		;6827
+	jp L_6984		;6827   ; ... el otro
 L_682A:
-	ld a,(0ce33h)		;682a   ; lee la cuenta del texto del final
+	ld a,(0ce33h)		;682a   ; EL TEXTO SUBE: la linea que se va por arriba...
 	sub 002h		;682d
-	ld h,a			;682f
+	ld h,a			;682f   ; ... por 128 bytes
 	ld l,000h		;6830
 	srl h		;6832
 	rr l		;6834
-	ld de,00000h		;6836
+	ld de,00000h		;6836   ; en la pagina 0
 	add hl,de			;6839
-	ld bc,00080h		;683a
-	xor a			;683d
+	ld bc,00080h		;683a   ; una linea
+	xor a			;683d   ; se borra
 	jp 00056h		;683e   ; BIOS FILVRM - Fills VRAM with value
 L_6841:
-	ld a,(0ce34h)		;6841
+	ld a,(0ce34h)		;6841   ; hay desplazamiento?
 	and a			;6844
-	ret z			;6845
+	ret z			;6845   ; no
 	ld a,(0ce33h)		;6846   ; lee la cuenta del texto del final
-	ld b,a			;6849
-	ld c,017h		;684a
+	ld b,a			;6849   ; la cuenta del texto...
+	ld c,017h		;684a   ; ... al registro 23: la pantalla sube
 	jp 00047h		;684c   ; BIOS WRTVDP - Writes data in the VDP-register
 L_684F:
-	ld b,006h		;684f
+	ld b,006h		;684f   ; seis cosas...
 L_6851:
 	push bc			;6851
-	ld c,02eh		;6852
-	ld a,r		;6854
+	ld c,02eh		;6852   ; ... de tipo 0x2E
+	ld a,r		;6854   ; una x al azar, +-8...
 	and 00fh		;6856
 	sub 008h		;6858
 	ld d,a			;685a
-	ld a,(0ce0fh)		;685b
+	ld a,(0ce0fh)		;685b   ; ... de 0xCE0F
 	add a,d			;685e
 	ld d,a			;685f
-	ld a,r		;6860
+	ld a,r		;6860   ; una y al azar, de 0x98 a 0xA7
 	and 00fh		;6862
 	add a,098h		;6864
 	ld e,a			;6866
-	call 05f1dh		;6867   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
+	call 05f1dh		;6867   ; la crea
 	pop bc			;686a
-	djnz L_6851		;686b
+	djnz L_6851		;686b   ; seis
 L_686D:
 	ret			;686d
 L_686E:
-	ld a,(0ce35h)		;686e
+	ld a,(0ce35h)		;686e   ; una animacion por pasos (0xCE35)
 	call 0406bh		;6871   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -1194,11 +1194,11 @@ DATA_tabla_6874:
 
 
 L_687C:
-	ld hl,0ce37h		;687c
+	ld hl,0ce37h		;687c   ; la cuenta
 	dec (hl)			;687f
 	ret nz			;6880
 L_6881:
-	ld hl,0ce35h		;6881
+	ld hl,0ce35h		;6881   ; el paso siguiente
 	inc (hl)			;6884
 	ret			;6885
 L_6886:
@@ -1206,73 +1206,73 @@ L_6886:
 	ld a,(0ce36h)		;6889
 	and a			;688c
 	ret nz			;688d
-	ld a,040h		;688e
+	ld a,040h		;688e   ; 0x40 cuadros
 	ld (0ce37h),a		;6890
 	jr L_6881		;6893
 L_6895:
 	call L_68C4		;6895
-	ld a,(0ce36h)		;6898
+	ld a,(0ce36h)		;6898   ; hasta que 0xCE36 sea 2
 	cp 002h		;689b
 	ret nz			;689d
-	xor a			;689e
+	xor a			;689e   ; vuelve al paso 0
 	ld (0ce35h),a		;689f
-	ld a,0c0h		;68a2
+	ld a,0c0h		;68a2   ; 0xC0 cuadros
 	ld (0ce37h),a		;68a4
 	ret			;68a7
 L_68A8:
-	ld hl,0ce37h		;68a8
+	ld hl,0ce37h		;68a8   ; la cuenta
 	inc (hl)			;68ab
-	cp 010h		;68ac
+	cp 010h		;68ac   ; a los 16...
 	jr z,L_68B9		;68ae
-	ld a,(hl)			;68b0
+	ld a,(hl)			;68b0   ; ... a los 32:
 	sub 010h		;68b1
 	ret nz			;68b3
 	ld (0ce36h),a		;68b4
-	jr L_6914		;68b7
+	jr L_6914		;68b7   ; el primer cuadro
 L_68B9:
 	ld hl,0ce36h		;68b9
 	ld a,(hl)			;68bc
 	ld (hl),001h		;68bd
 	cp 002h		;68bf
 	ret nz			;68c1
-	jr L_68DC		;68c2
+	jr L_68DC		;68c2   ; el segundo cuadro
 L_68C4:
-	ld hl,0ce37h		;68c4
+	ld hl,0ce37h		;68c4   ; la cuenta
 	inc (hl)			;68c7
 	ld a,(hl)			;68c8
-	cp 010h		;68c9
+	cp 010h		;68c9   ; a los 16...
 	jr z,L_68D7		;68cb
-	cp 020h		;68cd
+	cp 020h		;68cd   ; ... a los 32:
 	ret nz			;68cf
 	ld a,002h		;68d0
 	ld (0ce36h),a		;68d2
-	jr L_694C		;68d5
+	jr L_694C		;68d5   ; el tercer cuadro
 L_68D7:
 	ld a,001h		;68d7
 	ld (0ce36h),a		;68d9
 L_68DC:
-	ld hl,060a0h		;68dc
-	ld de,07080h		;68df
+	ld hl,060a0h		;68dc   ; un cuadro de la animacion: cuatro trozos de 16 x 16 de la fila 0xA0 de la pagina 1...
+	ld de,07080h		;68df   ; ... a (0x70, 0x80)
 	ld bc,01010h		;68e2
 	ld a,001h		;68e5
 	call 04946h		;68e7   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	ld hl,0a0a0h		;68ea
-	ld de,08080h		;68ed
+	ld de,08080h		;68ed   ; a (0x80, 0x80)
 	ld bc,01010h		;68f0
 	ld a,001h		;68f3
 	call 04946h		;68f5   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	ld hl,050a0h		;68f8
-	ld de,07090h		;68fb
+	ld de,07090h		;68fb   ; a (0x70, 0x90)
 	ld bc,01010h		;68fe
 	ld a,001h		;6901
 	call 04946h		;6903   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	ld hl,090a0h		;6906
-	ld de,08090h		;6909
+	ld de,08090h		;6909   ; a (0x80, 0x90)
 	ld bc,01010h		;690c
 	ld a,001h		;690f
 	jp 04946h		;6911   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_6914:
-	ld hl,040a0h		;6914
+	ld hl,040a0h		;6914   ; otro cuadro
 	ld de,07080h		;6917
 	ld bc,01010h		;691a
 	ld a,001h		;691d
@@ -1293,7 +1293,7 @@ L_6914:
 	ld a,001h		;6947
 	jp 04946h		;6949   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_694C:
-	ld hl,060a0h		;694c
+	ld hl,060a0h		;694c   ; otro cuadro
 	ld de,07080h		;694f
 	ld bc,01010h		;6952
 	ld a,001h		;6955
@@ -1314,18 +1314,18 @@ L_694C:
 	ld a,001h		;697f
 	jp 04946h		;6981   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_6984:
-	ld hl,000a0h		;6984
-	ld de,06858h		;6987
+	ld hl,000a0h		;6984   ; dos trozos de 16 x 16...
+	ld de,06858h		;6987   ; ... a (0x68, 0x58)...
 	ld bc,01010h		;698a
 	ld a,001h		;698d
 	call 04946h		;698f   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	ld hl,010a0h		;6992
-	ld de,08858h		;6995
+	ld de,08858h		;6995   ; ... y (0x88, 0x58)
 	ld bc,01010h		;6998
 	ld a,001h		;699b
 	jp 04946h		;699d   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_69A0:
-	ld hl,020a0h		;69a0
+	ld hl,020a0h		;69a0   ; los otros dos
 	ld de,06858h		;69a3
 	ld bc,01010h		;69a6
 	ld a,001h		;69a9
@@ -1336,19 +1336,19 @@ L_69A0:
 	ld a,001h		;69b7
 	jp 04946h		;69b9   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 L_69BC:
-	xor a			;69bc
+	xor a			;69bc   ; las cosas que saltan en la escena:
 	ld (ix+07eh),a		;69bd
 	ld (ix+00eh),a		;69c0
 	ld (ix+006h),001h		;69c3   ; la cosa se mueve
 	ld (ix+00bh),05ah		;69c7   ; el dibujo de la cosa = 0x5A
-	ld hl,0ce12h		;69cb
+	ld hl,0ce12h		;69cb   ; la cuenta de 0xCE12...
 	ld a,(hl)			;69ce
 	inc (hl)			;69cf
-	add a,a			;69d0
-	ld de,069e4h		;69d1
+	add a,a			;69d0   ; dos palabras por cosa
+	ld de,069e4h		;69d1   ; de la tabla de 0x69E4
 	call palabra_de_la_tabla		;69d4   ; palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 	call 0a55dh		;69d7   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	inc hl			;69da
+	inc hl			;69da   ; la segunda
 	ld e,(hl)			;69db
 	inc hl			;69dc
 	ld d,(hl)			;69dd
@@ -1369,48 +1369,48 @@ DATA_seis_pares_de_velocidades:
 
 
 L_69FC:
-	ld hl,0f680h		;69fc
-	ld de,0ce60h		;69ff
-	ld bc,00020h		;6a02
+	ld hl,0f680h		;69fc   ; LA PALETA SE APAGA: la copia de la VRAM (0xF680)...
+	ld de,0ce60h		;69ff   ; ... a 0xCE60
+	ld bc,00020h		;6a02   ; los 16 colores
 	call 0465ah		;6a05
-	ld a,080h		;6a08
+	ld a,080h		;6a08   ; 0x80 cuadros
 	ld (0ce13h),a		;6a0a
 	ret			;6a0d
 L_6A0E:
-	ld hl,0ce13h		;6a0e
+	ld hl,0ce13h		;6a0e   ; un paso: la cuenta
 	dec (hl)			;6a11
 	ld a,(hl)			;6a12
-	and 00fh		;6a13
+	and 00fh		;6a13   ; el color que toca (uno por cuadro)
 	ld c,a			;6a15
-	add a,a			;6a16
+	add a,a			;6a16   ; dos bytes por color
 	ld hl,0ce60h		;6a17
 	call 04061h		;6a1a   ; hl_mas_a: HL += A
-	ld a,(hl)			;6a1d
+	ld a,(hl)			;6a1d   ; el rojo...
 	and 0f0h		;6a1e
-	jr z,L_6A24		;6a20
-	sub 010h		;6a22
+	jr z,L_6A24		;6a20   ; ... a cero ya?
+	sub 010h		;6a22   ; ... baja uno
 L_6A24:
 	ld d,a			;6a24
-	ld a,(hl)			;6a25
+	ld a,(hl)			;6a25   ; el azul...
 	and 00fh		;6a26
 	jr z,L_6A2B		;6a28
-	dec a			;6a2a
+	dec a			;6a2a   ; ... baja uno
 L_6A2B:
 	or d			;6a2b
 	ld (hl),a			;6a2c
 	ld d,a			;6a2d
 	inc hl			;6a2e
-	ld a,(hl)			;6a2f
+	ld a,(hl)			;6a2f   ; el verde...
 	and a			;6a30
 	jr z,L_6A34		;6a31
-	dec a			;6a33
+	dec a			;6a33   ; ... baja uno
 L_6A34:
 	ld (hl),a			;6a34
 	inc hl			;6a35
 	ld e,a			;6a36
-	ld a,c			;6a37
+	ld a,c			;6a37   ; y el color, al VDP
 	call 04814h		;6a38   ; pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-	ld a,(0ce13h)		;6a3b
+	ld a,(0ce13h)		;6a3b   ; hasta que la cuenta acabe
 	and a			;6a3e
 	ret			;6a3f
 L_6A40:
@@ -1419,14 +1419,14 @@ L_6A40:
 L_6A48:
 	ret			;6a48
 L_6A49:
-	ld a,(0ce36h)		;6a49
+	ld a,(0ce36h)		;6a49   ; con 0xCE36 a 2...
 	cp 002h		;6a4c
 	ret nz			;6a4e
-	ld a,(0c003h)		;6a4f   ; lee el contador de cuadros
+	ld a,(0c003h)		;6a4f   ; ... cada ocho cuadros...
 	and 007h		;6a52
 	ret nz			;6a54
-	ld c,02ch		;6a55
-	ld de,08098h		;6a57
+	ld c,02ch		;6a55   ; ... una cosa 0x2C...
+	ld de,08098h		;6a57   ; ... en (0x98, 0x80)
 	jp 05f1dh		;6a5a   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
 L_6A5D:
 	ld (ix+006h),001h		;6a5d   ; la cosa se mueve
@@ -2363,7 +2363,7 @@ L_70BF:
 	ld (0c440h),a		;70d0
 	ld (0d010h),a		;70d3
 	ld (0d001h),a		;70d6   ; guarda la HABITACION dentro de la fase
-	ld (0c413h),a		;70d9
+	ld (0c413h),a		;70d9   ; guarda la DEMOSTRACION en marcha
 L_70DC:
 	ld a,(0c701h)		;70dc   ; lee lo que lleva Simon (un bit por objeto)
 	and 080h		;70df

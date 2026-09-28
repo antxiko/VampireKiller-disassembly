@@ -1,5 +1,79 @@
 # Notas del banco 13: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+B 0xB963 A QUE HABITACION SE SALE. 0xC41B dice por que lado se sale (1-4; 0xFF es que se va por un paso, a la habitacion de 0xC5B4). Las salidas de cada habitacion son dos bytes, cuatro nibbles: el lado 1 es el nibble alto del primero, el 2 el bajo, el 3 el alto del segundo y el 4 el bajo. 0xF es que por ahi no se sale. Devuelve carry y la habitacion nueva en 0xD001.
+C 0xB966 0xFF?
+C 0xB967 si: por un paso
+C 0xB969 HL = las salidas de esta habitacion
+C 0xB96F el lado
+C 0xB971 ya se ha usado:
+C 0xB972 a cero
+C 0xB973 desde 0
+C 0xB974 los lados 3 y 4...
+C 0xB978 ... estan en el segundo byte
+C 0xB979 los lados pares...
+C 0xB97B el byte
+C 0xB97C ... son el nibble bajo
+C 0xB97E los impares, el alto
+C 0xB982 la habitacion vecina
+C 0xB984 0xF: por ahi no hay salida
+C 0xB986 sin carry
+C 0xB987 la habitacion nueva
+C 0xB98A con carry
+C 0xB98C por un paso:
+C 0xB990 la habitacion del paso
+C 0xB995 HL += A
+C 0xB99A COPIA LAS CUATRO SALIDAS de la habitacion a 0xC41C-0xC41F: HL = las suyas
+C 0xB99D el destino
+C 0xB9A0 cuatro nibbles
+C 0xB9A2 el byte
+C 0xB9A3 los pares...
+C 0xB9A5 ... el nibble bajo
+C 0xB9A7 los impares, el alto
+C 0xB9AD 0xF...
+C 0xB9B1 ... pasa a 0xFF
+C 0xB9B3 a su sitio
+C 0xB9B5 tras un par...
+C 0xB9B9 ... el byte siguiente
+C 0xB9BA cuatro
+C 0xB9BD HL = LAS SALIDAS DE ESTA HABITACION: la fase
+C 0xB9C0 la tabla de salidas de cada fase
+C 0xB9C3 dos bytes por fase
+C 0xB9C7 la tabla de la fase
+C 0xB9CB la habitacion
+C 0xB9CE dos bytes por habitacion
+C 0xBB31 LA PUERTA Y EL PASO de la habitacion
+C 0xBB37 la fase...
+C 0xBB3A ... en la tabla de la puerta de cada fase
+C 0xBB3E tres bytes por fase
+C 0xBB43 el primer byte
+C 0xBB45 la habitacion de la puerta
+C 0xBB48 es esta?
+C 0xBB4C no
+C 0xBB4D si: donde esta
+C 0xBB52 a 0xC5AD
+C 0xBB55 el bit 7...
+C 0xBB57 ... puesto: 0xFF
+C 0xBB5B ... si no, 4
+C 0xBB5D el estado de la puerta
+C 0xBB9A fase y habitacion
+C 0xBB9E los pasos entre habitaciones
+C 0xBBA1 la fase + 1...
+C 0xBBA2 ... 0xFF acaba
+C 0xBBA6 es esta fase?
+C 0xBBA7 no: el siguiente
+C 0xBBA9 habitaciones:
+C 0xBBAB la de salida, el nibble bajo
+C 0xBBAD es esta?
+C 0xBBAE si
+C 0xBBB0 el registro siguiente
+C 0xBBB6 donde esta el paso
+C 0xBBBA a 0xC5B2
+C 0xBBBD hay paso
+C 0xBBC2 la habitacion a la que lleva...
+C 0xBBC3 ... el nibble alto
+C 0xBBC9 a 0xC5B4
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
 D 0xA000 0xA041 bloques_9AC1_cola  88 bloques de 32x32 (16 bytes cada uno: 4 x 4 dibujos de 8x8); tantos como el indice mas alto que usan sus habitaciones (sigue del banco anterior, 0x9AC1); lo leen p00:5010 (65 bytes)
 F 0xA000 16
@@ -230,16 +304,5 @@ L 0xB963 sale_de_la_habitacion
 L 0xB99A salidas_de_la_habitacion
 C 0xB963 lee el lado por el que se sale de la habitacion
 C 0xB96C apunta a el lado por el que se sale de la habitacion
-C 0xB987 guarda la HABITACION dentro de la fase
 C 0xB98D guarda el lado por el que se sale de la habitacion
-C 0xB990 lee la habitacion a la que lleva el paso
-C 0xB9BD lee la FASE (0 el patio, 1-18)
-C 0xB9CB lee la HABITACION dentro de la fase
-C 0xBB37 lee la FASE (0 el patio, 1-18)
-C 0xBB48 lee la HABITACION dentro de la fase
-C 0xBB52 guarda donde esta la puerta de la fase
-C 0xBB5D guarda el estado de la puerta de la fase
-C 0xBB9A lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-C 0xBBBA guarda el paso a otra habitacion
-C 0xBBC9 guarda la habitacion a la que lleva el paso
 # --- fin de las anotaciones de anota.py ---

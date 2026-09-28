@@ -1,5 +1,224 @@
 # Notas del banco 14: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+B 0x8A64 CADA CANAL DE MUSICA (IX = su ficha: 0xC01C, 0xC030, 0xC044, y 0xC080 la de la pausa). +0/+1 la partitura, +2 las banderas (bit 0: con tono; bit 2: la otra tabla de golpes; bit 5: tapado por un efecto; bit 6: un pelo mas grave; bit 7: el golpe acabo), +3 el tempo, +4 el volumen base, +5/+6 la envolvente, +7 la octava, +9 lo que le queda a la nota, +10 el volumen, +11 cuando empieza a caer, +12/+13 el guion del golpe de percusion, +14/+15 sus cuentas, +16/+17 los bucles y +18/+19 la vuelta de una llamada.
+C 0x8967 el mezclador, cada cuadro
+C 0x8968 al registro 7
+C 0x8970 en pausa?
+C 0x8972 solo suena la musica de la pausa
+C 0x8975 el segundo efecto?
+C 0x8977 solo ese
+C 0x897D sin fundido: a tocar
+C 0x8981 aun no toca bajar
+C 0x8987 un punto menos de volumen
+C 0x898B llego a -16?
+C 0x898D no: otra espera
+C 0x8990 si: los tres canales, callados
+C 0x89A0 0x3A cuadros hasta el siguiente punto
+C 0x89A5 canal 0 (A)
+C 0x89AA a su manejador
+C 0x89AD canal 1 (B)
+C 0x89B6 canal 2 (C)
+C 0x89BF y el efecto, por el canal C (numero 3)
+C 0x89CD al manejador
+C 0x89D1 el del efecto?
+C 0x89D6 sin efecto: ninguna prioridad
+C 0x89DD dos bytes por canal
+C 0x89E1 su manejador...
+C 0x89E6 ... pasa a ser un `ret`
+C 0x89EC y su volumen a cero
+C 0x89F1 (el manejador de un canal que ya no suena)
+C 0x89F5 la musica de la pausa
+C 0x89F6 el segundo efecto: canal 0 (A)...
+C 0x89F7 ... numero 4
+C 0x89FF escribe el periodo DE en el canal: registro 2 * canal
+C 0x8A06 el siguiente registro
+C 0x8A07 la parte alta
+C 0x8A0E registro 8 + canal
+C 0x8A13 abre y cierra tono y ruido del canal: cuatro formas
+C 0x8A2F dos bytes por canal
+C 0x8A38 AND
+C 0x8A3A OR
+C 0x8A3F al registro 7
+C 0x8A5D la ficha de la musica de la pausa
+C 0x8A64 la del canal A
+C 0x8A6B la del B
+C 0x8A72 la del C
+C 0x8A79 el canal C...
+C 0x8A81 ... con efecto sonando...
+C 0x8A85 ... queda tapado
+C 0x8A89 le queda nota?
+C 0x8A8C se acabo: la siguiente
+C 0x8A8F con tono?
+C 0x8A93 no: percusion
+C 0x8A96 lo que le queda
+C 0x8A99 ya toca caer?
+C 0x8A9F o ya se paso?
+C 0x8AA3 el volumen...
+C 0x8AA6 ... un punto menos
+C 0x8AA7 a cero ya
+C 0x8AAB tapado: no se escribe
+C 0x8AB3 percusion tapada: nada
+C 0x8AB8 el golpe acabo?
+C 0x8ABD un paso del golpe
+C 0x8AC0 sigue
+C 0x8AC1 acabo
+C 0x8AC5 volumen a cero
+C 0x8ACA LEE LA PARTITURA
+C 0x8AD0 el byte
+C 0x8AD3 0xD0 en adelante: ordenes
+C 0x8ADE 0xC0-0xCF: silencio
+C 0x8AE3 una NOTA: la duracion, el nibble bajo + 1...
+C 0x8AE7 ... por el tempo
+C 0x8AEE lo que dura
+C 0x8AF4 el canal C...
+C 0x8AFC ... sin efecto...
+C 0x8B00 ... ya no esta tapado
+C 0x8B04 con tono?
+C 0x8B08 no: un golpe
+C 0x8B0B lo que dura...
+C 0x8B0E ... menos la envolvente
+C 0x8B11 cuando empieza a caer
+C 0x8B14 tapado: nada
+C 0x8B19 la nota, el nibble alto...
+C 0x8B1C ... por dos
+C 0x8B1F la tabla de periodos
+C 0x8B27 el periodo de la nota
+C 0x8B2A la octava:
+C 0x8B2D cada octava, la mitad
+C 0x8B33 el bit 6...
+C 0x8B3A ... un pelo mas grave
+C 0x8B3C al PSG
+C 0x8B42 mas el volumen base
+C 0x8B48 no baja de cero
+C 0x8B49 el volumen
+C 0x8B50 y el mezclador: tono abierto
+C 0x8B53 UN GOLPE de percusion: que tabla?
+C 0x8B5A la de 0xAAD9
+C 0x8B5D la nota elige el golpe
+C 0x8B60 por dos
+C 0x8B68 el guion del golpe
+C 0x8B71 empieza
+C 0x8B75 ya en el primer cuadro
+C 0x8B7B la otra tabla, 0xAAF1
+B 0x8BB4 LAS ORDENES DE LA PARTITURA (0xD0 en adelante): 0xDx pone el tempo; 0xE0-0xE5 la octava; 0xE6 y 0xEB ponen y quitan 0xC0A8; 0xE7 el bit 6 (un pelo mas grave); 0xEA salta a otra direccion; 0xED llama a un trozo y 0xEE vuelve; 0xE8, 0xE9, 0xEC y 0xEF cambian las banderas; 0xFE es un bucle [veces][direccion]; 0xFF acaba el canal; y las demas 0xFx ponen la envolvente con un byte mas.
+B 0x8CA7 UN PASO DE UN EFECTO (o de un golpe de percusion): cada tantos cuadros, un byte del guion. 0xFF acaba; 0xFE es un bucle; 0x2x abre y cierra tono y ruido y da la duracion (y desde 0x28 el periodo de la envolvente del PSG); 0x1x pone el ruido y luego volumen y periodo; y lo demas es volumen (nibble alto) y periodo (nibble bajo y un byte mas).
+C 0x8B99 SILENCIO: la duracion...
+C 0x8B9B ... + 1...
+C 0x8B9D ... por el tempo
+C 0x8BA4 lo que dura
+C 0x8BA7 tapado: nada
+C 0x8BAC volumen...
+C 0x8BAE ... a cero
+C 0x8BB4 que orden?
+C 0x8BB6 0xDx: el tempo
+C 0x8BBB 0xEx
+C 0x8BC0 0xFx:
+C 0x8BC3 0xFF: acaba el canal
+C 0x8BC8 0xFE: el bucle
+C 0x8BCD la cuenta del bucle
+C 0x8BD0 era la ultima vuelta?
+C 0x8BD4 ya contando: sigue
+C 0x8BD7 empieza: las veces...
+C 0x8BD8 ... menos esta
+C 0x8BDA la cuenta
+C 0x8BDD y vuelve atras
+C 0x8BE4 se acabo el bucle
+C 0x8BE7 salta el resto de la orden
+C 0x8BED la ENVOLVENTE: el volumen base
+C 0x8BF1 el nibble alto...
+C 0x8BF8 ... - 1: lo que tarda en caer
+C 0x8BFC el nibble bajo:
+C 0x8C00 hasta donde cae
+C 0x8C06 0xDx:
+C 0x8C09 el tempo
+C 0x8C0F 0xEx:
+C 0x8C12 0xE0-0xE5: la octava
+C 0x8C17 0xE6
+C 0x8C1C 0xE7
+C 0x8C21 0xEA: salto
+C 0x8C26 0xEB
+C 0x8C2B 0xED: llamada
+C 0x8C30 0xEE: vuelta
+C 0x8C33 las demas: tres bits de banderas
+C 0x8C42 la octava: 6 - n
+C 0x8C4C 0xE6: 0xC0A8 a 1 (no deja sonar efectos)
+C 0x8C54 0xEB: 0xC0A8 a cero
+C 0x8C5B 0xE7: un pelo mas grave
+C 0x8C62 0xEA: la direccion...
+C 0x8C65 ... y alli sigue
+C 0x8C69 0xED: la direccion del trozo
+C 0x8C6D guarda la vuelta
+C 0x8C73 y al trozo
+C 0x8C77 0xEE: de vuelta
+C 0x8C80 0xFF: el canal acaba:
+C 0x8C83 su numero...
+C 0x8C85 ... su bit...
+C 0x8C8B ... fuera de la cuenta de 0xC0A7
+C 0x8C92 y el canal, en reposo
+C 0x8C95 el segundo efecto: su ficha
+C 0x8C9C el efecto: su ficha
+C 0x8CA0 un paso
+C 0x8CA3 sigue
+C 0x8CA4 acabo: en reposo
+C 0x8CA7 la cuenta del paso
+C 0x8CAA aun no toca
+C 0x8CAD otra vez...
+C 0x8CB0 ... la cuenta entera
+C 0x8CB3 el guion
+C 0x8CB9 el byte
+C 0x8CBA 0xFF?
+C 0x8CBC acabo (carry)
+C 0x8CC1 0xFE?
+C 0x8CC3 el bucle
+C 0x8CC6 0x2x?
+C 0x8CCA el mezclador
+C 0x8CCD 0x1x?
+C 0x8CCF no: volumen y periodo
+C 0x8CD2 el ruido...
+C 0x8CD5 ... por dos
+C 0x8CD7 al registro 6
+C 0x8CDC el byte siguiente
+C 0x8CDF el volumen, el nibble alto
+C 0x8CE6 con envolvente (bit 4)?
+C 0x8CEA no
+C 0x8CED si: la forma de la envolvente, registro 13
+C 0x8CF5 en los canales de musica...
+C 0x8CFD ... se le resta el fundido
+C 0x8D01 no baja de cero
+C 0x8D06 el volumen
+C 0x8D09 el periodo: nibble bajo...
+C 0x8D0D ... y el byte siguiente
+C 0x8D0F donde sigue el guion
+C 0x8D15 y el periodo, al PSG
+C 0x8D18 el BUCLE del efecto: la cuenta
+C 0x8D1B era la ultima?
+C 0x8D1F ya contando
+C 0x8D22 empieza: las veces
+C 0x8D23 menos esta
+C 0x8D25 la cuenta
+C 0x8D28 y vuelve atras
+C 0x8D2F se acabo
+C 0x8D32 salta el resto
+C 0x8D38 el MEZCLADOR: los bits 0 y 1 eligen la forma
+C 0x8D42 tono
+C 0x8D48 tono y ruido
+C 0x8D53 ruido
+C 0x8D59 nada
+C 0x8D5C el bit 3 pasa a ser el 4: con envolvente
+C 0x8D63 y el volumen
+C 0x8D67 la duracion
+C 0x8D69 la cuenta...
+C 0x8D6C ... y la cuenta entera
+C 0x8D6F 0x20: sin mas
+C 0x8D75 0x21-0x27: sigue el guion
+C 0x8D7A 0x28 en adelante: el periodo de la envolvente...
+C 0x8D7C ... registro 12
+C 0x8D83 ... y 11
+C 0x8D88 y sigue
+C 0x8D8B sigue (sin carry)
+C 0x8D8D acabo (con carry)
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
 D 0x8000 0x800C listas_de_cada_bloque  6 punteros, uno por bloque de tres fases (0xD002), a la lista que p00:5A67 copia a 0xE000; lo leen p00:5AA3 (12 bytes)
 F 0x8000 2
@@ -205,7 +424,6 @@ C 0x89DE apunta a el manejador del canal A del sonido
 C 0x89EE volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 C 0x89F2 lee el manejador de la musica de la pausa
 C 0x89F9 lee el manejador del segundo efecto
-C 0x89FF lee el canal del PSG que se esta tocando
 C 0x8A0B lee el canal del PSG que se esta tocando
 C 0x8A2C lee el canal del PSG que se esta tocando
 C 0x8A35 lee la copia del registro 7 del PSG (el mezclador)
@@ -219,11 +437,5 @@ C 0x8AF9 lee la prioridad del efecto que suena
 C 0x8B3F lee el volumen que se le resta a la musica
 C 0x8B4D volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 C 0x8BB1 volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
-C 0x8C80 lee el numero de canal
-C 0x8C92 canal_en_reposo: el canal que no suena
-C 0x8CA4 canal_en_reposo: el canal que no suena
-C 0x8CF5 lee el numero de canal
-C 0x8CFD lee el volumen que se le resta a la musica
-C 0x8D06 volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 C 0x8D64 volumen_del_canal: escribe el volumen E en el registro 8+canal del PSG
 # --- fin de las anotaciones de anota.py ---

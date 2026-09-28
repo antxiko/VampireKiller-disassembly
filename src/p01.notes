@@ -285,6 +285,93 @@ C 0x6735 y lo demas
 C 0x673B cada cuatro cuadros...
 C 0x6741 ... sube la cuenta del texto
 C 0x6743 los bancos 8 y 5, donde estan los renglones
+C 0x6772 la columna
+C 0x6775 se pinta
+C 0x6777 el texto del renglon
+C 0x677D el siguiente
+C 0x6781 el ultimo: se acabo el texto
+C 0x6786 la musica se funde
+C 0x67E7 la cuenta...
+C 0x67E9 ... de 0 a 18
+C 0x67EF el color del destello
+C 0x67F5 rojo y azul
+C 0x67F6 verde 5
+C 0x67F8 al color 6
+C 0x6810 el color 6 a negro
+C 0x6818 otra cuenta de la escena
+C 0x681D cada 32:
+C 0x681F en la 28...
+C 0x6821 ... un dibujo
+C 0x6824 en la 31...
+C 0x6827 ... el otro
+C 0x682A EL TEXTO SUBE: la linea que se va por arriba...
+C 0x682F ... por 128 bytes
+C 0x6836 en la pagina 0
+C 0x683A una linea
+C 0x683D se borra
+C 0x6841 hay desplazamiento?
+C 0x6845 no
+C 0x6849 la cuenta del texto...
+C 0x684A ... al registro 23: la pantalla sube
+C 0x684F seis cosas...
+C 0x6852 ... de tipo 0x2E
+C 0x6854 una x al azar, +-8...
+C 0x685B ... de 0xCE0F
+C 0x6860 una y al azar, de 0x98 a 0xA7
+C 0x6867 la crea
+C 0x686B seis
+C 0x686E una animacion por pasos (0xCE35)
+C 0x687C la cuenta
+C 0x6881 el paso siguiente
+C 0x688E 0x40 cuadros
+C 0x6898 hasta que 0xCE36 sea 2
+C 0x689E vuelve al paso 0
+C 0x68A2 0xC0 cuadros
+C 0x68A8 la cuenta
+C 0x68AC a los 16...
+C 0x68B0 ... a los 32:
+C 0x68B7 el primer cuadro
+C 0x68C2 el segundo cuadro
+C 0x68C4 la cuenta
+C 0x68C9 a los 16...
+C 0x68CD ... a los 32:
+C 0x68D5 el tercer cuadro
+C 0x68DC un cuadro de la animacion: cuatro trozos de 16 x 16 de la fila 0xA0 de la pagina 1...
+C 0x68DF ... a (0x70, 0x80)
+C 0x68ED a (0x80, 0x80)
+C 0x68FB a (0x70, 0x90)
+C 0x6909 a (0x80, 0x90)
+C 0x6914 otro cuadro
+C 0x694C otro cuadro
+C 0x6984 dos trozos de 16 x 16...
+C 0x6987 ... a (0x68, 0x58)...
+C 0x6995 ... y (0x88, 0x58)
+C 0x69A0 los otros dos
+C 0x69BC las cosas que saltan en la escena:
+C 0x69CB la cuenta de 0xCE12...
+C 0x69D0 dos palabras por cosa
+C 0x69D1 de la tabla de 0x69E4
+C 0x69DA la segunda
+C 0x69FC LA PALETA SE APAGA: la copia de la VRAM (0xF680)...
+C 0x69FF ... a 0xCE60
+C 0x6A02 los 16 colores
+C 0x6A08 0x80 cuadros
+C 0x6A0E un paso: la cuenta
+C 0x6A13 el color que toca (uno por cuadro)
+C 0x6A16 dos bytes por color
+C 0x6A1D el rojo...
+C 0x6A20 ... a cero ya?
+C 0x6A22 ... baja uno
+C 0x6A25 el azul...
+C 0x6A2A ... baja uno
+C 0x6A2F el verde...
+C 0x6A33 ... baja uno
+C 0x6A37 y el color, al VDP
+C 0x6A3B hasta que la cuenta acabe
+C 0x6A49 con 0xCE36 a 2...
+C 0x6A4F ... cada ocho cuadros...
+C 0x6A55 ... una cosa 0x2C...
+C 0x6A57 ... en (0x98, 0x80)
 
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
@@ -474,9 +561,7 @@ C 0x67E4 apunta a la cuenta del destello
 C 0x67F2 hl_mas_a: HL += A
 C 0x67FA pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x6815 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
-C 0x682A lee la cuenta del texto del final
 C 0x6846 lee la cuenta del texto del final
-C 0x6867 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x6871 despacha: salta a la entrada A de la tabla que va detras del call
 C 0x68E7 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x68F5 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
@@ -503,7 +588,6 @@ C 0x69E1 palabra_de_la_tabla: DE = la palabra A de la tabla de DE
 C 0x6A1A hl_mas_a: HL += A
 C 0x6A38 pon_un_color: color A de la paleta = DE (y su copia en la VRAM, en 0xF680)
 C 0x6A44 la cosa se queda quieta
-C 0x6A4F lee el contador de cuadros
 C 0x6A5A crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0x6A5D la cosa se mueve
 C 0x6A61 la cuenta de cuadros del paso = 0x08
@@ -647,6 +731,7 @@ C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70B4 apunta a los corazones, en BCD
 C 0x70CA guarda la cuenta de la INVENCIBILIDAD
 C 0x70D6 guarda la HABITACION dentro de la fase
+C 0x70D9 guarda la DEMOSTRACION en marcha
 C 0x70DC lee lo que lleva Simon (un bit por objeto)
 C 0x70E1 guarda lo que lleva Simon (un bit por objeto)
 C 0x70E5 guarda el arma que lleva Simon (0, ninguna)

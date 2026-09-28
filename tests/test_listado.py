@@ -32,6 +32,19 @@ class Listado(unittest.TestCase):
         self.assertNotIn("pisa", r.stdout)
         self.assertNotIn("avisos", r.stdout)
 
+    def test_la_densidad_no_baja_del_30(self):
+        """Comentarios de linea sobre instrucciones, en los seis bancos con codigo."""
+        import re
+        ti = tc = 0
+        for p in ("00", "01", "02", "03", "13", "14"):
+            r = subprocess.run([sys.executable, os.path.join(TOOLS, "densidad.py"),
+                                os.path.join(RAIZ, "src", "vampirekiller_p%s.asm" % p)],
+                               capture_output=True, text=True)
+            m = re.search(r"en total: (\d+) instrucciones, (\d+) comentarios", r.stdout)
+            ti += int(m.group(1))
+            tc += int(m.group(2))
+        self.assertGreaterEqual(100.0 * tc / ti, 30.0)
+
     def test_el_makefile_y_paginas_py_dicen_lo_mismo(self):
         sys.path.insert(0, TOOLS)
         from paginas import ORG

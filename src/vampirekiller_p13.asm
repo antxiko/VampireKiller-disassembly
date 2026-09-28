@@ -1033,84 +1033,88 @@ DATA_rle_B895:
 ; ======================================================================
 
 
+
+; ----------------------------------------------------------------------
+; A QUE HABITACION SE SALE. 0xC41B dice por que lado se sale (1-4; 0xFF es que se va por un paso, a la habitacion de 0xC5B4). Las salidas de cada habitacion son dos bytes, cuatro nibbles: el lado 1 es el nibble alto del primero, el 2 el bajo, el 3 el alto del segundo y el 4 el bajo. 0xF es que por ahi no se sale. Devuelve carry y la habitacion nueva en 0xD001.
+; ----------------------------------------------------------------------
 sale_de_la_habitacion:
 	ld a,(0c41bh)		;b963   ; lee el lado por el que se sale de la habitacion
-	inc a			;b966
-	jr z,L_B98C		;b967
-	call L_B9BD		;b969
+	inc a			;b966   ; 0xFF?
+	jr z,L_B98C		;b967   ; si: por un paso
+	call L_B9BD		;b969   ; HL = las salidas de esta habitacion
 	ld de,0c41bh		;b96c   ; apunta a el lado por el que se sale de la habitacion
-	ld a,(de)			;b96f
+	ld a,(de)			;b96f   ; el lado
 	ld b,a			;b970
-	xor a			;b971
-	ld (de),a			;b972
-	dec b			;b973
-	bit 1,b		;b974
+	xor a			;b971   ; ya se ha usado:
+	ld (de),a			;b972   ; a cero
+	dec b			;b973   ; desde 0
+	bit 1,b		;b974   ; los lados 3 y 4...
 	jr z,L_B979		;b976
-	inc hl			;b978
+	inc hl			;b978   ; ... estan en el segundo byte
 L_B979:
-	bit 0,b		;b979
-	ld a,(hl)			;b97b
-	jr nz,L_B982		;b97c
-	rrca			;b97e
+	bit 0,b		;b979   ; los lados pares...
+	ld a,(hl)			;b97b   ; el byte
+	jr nz,L_B982		;b97c   ; ... son el nibble bajo
+	rrca			;b97e   ; los impares, el alto
 	rrca			;b97f
 	rrca			;b980
 	rrca			;b981
 L_B982:
-	and 00fh		;b982
-	cp 00fh		;b984
-	ret z			;b986
+	and 00fh		;b982   ; la habitacion vecina
+	cp 00fh		;b984   ; 0xF: por ahi no hay salida
+	ret z			;b986   ; sin carry
 L_B987:
-	ld (0d001h),a		;b987   ; guarda la HABITACION dentro de la fase
-	scf			;b98a
+	ld (0d001h),a		;b987   ; la habitacion nueva
+	scf			;b98a   ; con carry
 	ret			;b98b
 L_B98C:
-	xor a			;b98c
+	xor a			;b98c   ; por un paso:
 	ld (0c41bh),a		;b98d   ; guarda el lado por el que se sale de la habitacion
-	ld a,(0c5b4h)		;b990   ; lee la habitacion a la que lleva el paso
+	ld a,(0c5b4h)		;b990   ; la habitacion del paso
 	jr L_B987		;b993
 L_B995:
-	add a,l			;b995
+	add a,l			;b995   ; HL += A
 	ld l,a			;b996
 	ret nc			;b997
 	inc h			;b998
 	ret			;b999
 salidas_de_la_habitacion:
-	call L_B9BD		;b99a
-	ld de,0c41ch		;b99d
-	ld b,004h		;b9a0
+	call L_B9BD		;b99a   ; COPIA LAS CUATRO SALIDAS de la habitacion a 0xC41C-0xC41F: HL = las suyas
+	ld de,0c41ch		;b99d   ; el destino
+	ld b,004h		;b9a0   ; cuatro nibbles
 L_B9A2:
-	ld a,(hl)			;b9a2
-	bit 0,b		;b9a3
-	jr nz,L_B9AB		;b9a5
-	rrca			;b9a7
+	ld a,(hl)			;b9a2   ; el byte
+	bit 0,b		;b9a3   ; los pares...
+	jr nz,L_B9AB		;b9a5   ; ... el nibble bajo
+	rrca			;b9a7   ; los impares, el alto
 	rrca			;b9a8
 	rrca			;b9a9
 	rrca			;b9aa
 L_B9AB:
 	and 00fh		;b9ab
-	cp 00fh		;b9ad
+	cp 00fh		;b9ad   ; 0xF...
 	jr nz,L_B9B3		;b9af
-	ld a,0ffh		;b9b1
+	ld a,0ffh		;b9b1   ; ... pasa a 0xFF
 L_B9B3:
-	ld (de),a			;b9b3
+	ld (de),a			;b9b3   ; a su sitio
 	inc de			;b9b4
-	bit 0,b		;b9b5
+	bit 0,b		;b9b5   ; tras un par...
 	jr z,L_B9BA		;b9b7
-	inc hl			;b9b9
+	inc hl			;b9b9   ; ... el byte siguiente
 L_B9BA:
-	djnz L_B9A2		;b9ba
+	djnz L_B9A2		;b9ba   ; cuatro
 	ret			;b9bc
 L_B9BD:
-	ld a,(0d000h)		;b9bd   ; lee la FASE (0 el patio, 1-18)
-	ld hl,0b9d3h		;b9c0
-	add a,a			;b9c3
+	ld a,(0d000h)		;b9bd   ; HL = LAS SALIDAS DE ESTA HABITACION: la fase
+	ld hl,0b9d3h		;b9c0   ; la tabla de salidas de cada fase
+	add a,a			;b9c3   ; dos bytes por fase
 	call L_B995		;b9c4
-	ld a,(hl)			;b9c7
+	ld a,(hl)			;b9c7   ; la tabla de la fase
 	inc hl			;b9c8
 	ld h,(hl)			;b9c9
 	ld l,a			;b9ca
-	ld a,(0d001h)		;b9cb   ; lee la HABITACION dentro de la fase
-	add a,a			;b9ce
+	ld a,(0d001h)		;b9cb   ; la habitacion
+	add a,a			;b9ce   ; dos bytes por habitacion
 	call L_B995		;b9cf
 	ret			;b9d2
 
@@ -1434,35 +1438,35 @@ DATA_salidas_fase_18:
 
 
 L_BB31:
-	call L_BB37		;bb31
+	call L_BB37		;bb31   ; LA PUERTA Y EL PASO de la habitacion
 	jp L_BB9A		;bb34
 L_BB37:
-	ld a,(0d000h)		;bb37   ; lee la FASE (0 el patio, 1-18)
-	ld hl,0bb61h		;bb3a
+	ld a,(0d000h)		;bb37   ; la fase...
+	ld hl,0bb61h		;bb3a   ; ... en la tabla de la puerta de cada fase
 	ld b,a			;bb3d
-	add a,a			;bb3e
+	add a,a			;bb3e   ; tres bytes por fase
 	add a,b			;bb3f
 	call L_B995		;bb40
-	ld a,(hl)			;bb43
+	ld a,(hl)			;bb43   ; el primer byte
 	ld b,a			;bb44
-	and 00fh		;bb45
+	and 00fh		;bb45   ; la habitacion de la puerta
 	ld c,a			;bb47
-	ld a,(0d001h)		;bb48   ; lee la HABITACION dentro de la fase
+	ld a,(0d001h)		;bb48   ; es esta?
 	cp c			;bb4b
-	ret nz			;bb4c
-	inc hl			;bb4d
+	ret nz			;bb4c   ; no
+	inc hl			;bb4d   ; si: donde esta
 	ld a,(hl)			;bb4e
 	inc hl			;bb4f
 	ld h,(hl)			;bb50
 	ld l,a			;bb51
-	ld (0c5adh),hl		;bb52   ; guarda donde esta la puerta de la fase
-	ld a,b			;bb55
+	ld (0c5adh),hl		;bb52   ; a 0xC5AD
+	ld a,b			;bb55   ; el bit 7...
 	add a,a			;bb56
-	ld a,0ffh		;bb57
+	ld a,0ffh		;bb57   ; ... puesto: 0xFF
 	jr c,L_BB5D		;bb59
-	ld a,004h		;bb5b
+	ld a,004h		;bb5b   ; ... si no, 4
 L_BB5D:
-	ld (0c5ach),a		;bb5d   ; guarda el estado de la puerta de la fase
+	ld (0c5ach),a		;bb5d   ; el estado de la puerta
 	ret			;bb60
 
 ; ----------------------------------------------------------------------
@@ -1497,42 +1501,42 @@ DATA_puerta_de_cada_fase:
 
 
 L_BB9A:
-	ld de,(0d000h)		;bb9a   ; lee la fase (0xD000) y la habitacion (0xD001) de un tiron
-	ld hl,0bbcdh		;bb9e
+	ld de,(0d000h)		;bb9a   ; fase y habitacion
+	ld hl,0bbcdh		;bb9e   ; los pasos entre habitaciones
 L_BBA1:
-	ld a,(hl)			;bba1
-	inc a			;bba2
+	ld a,(hl)			;bba1   ; la fase + 1...
+	inc a			;bba2   ; ... 0xFF acaba
 	ret z			;bba3
 	inc hl			;bba4
 	dec a			;bba5
-	cp e			;bba6
-	jr nz,L_BBB0		;bba7
-	ld a,(hl)			;bba9
+	cp e			;bba6   ; es esta fase?
+	jr nz,L_BBB0		;bba7   ; no: el siguiente
+	ld a,(hl)			;bba9   ; habitaciones:
 	ld c,a			;bbaa
-	and 00fh		;bbab
-	cp d			;bbad
-	jr z,L_BBB5		;bbae
+	and 00fh		;bbab   ; la de salida, el nibble bajo
+	cp d			;bbad   ; es esta?
+	jr z,L_BBB5		;bbae   ; si
 L_BBB0:
-	inc hl			;bbb0
+	inc hl			;bbb0   ; el registro siguiente
 	inc hl			;bbb1
 	inc hl			;bbb2
 	jr L_BBA1		;bbb3
 L_BBB5:
 	inc hl			;bbb5
-	ld a,(hl)			;bbb6
+	ld a,(hl)			;bbb6   ; donde esta el paso
 	inc hl			;bbb7
 	ld h,(hl)			;bbb8
 	ld l,a			;bbb9
-	ld (0c5b2h),hl		;bbba   ; guarda el paso a otra habitacion
-	ld a,001h		;bbbd
+	ld (0c5b2h),hl		;bbba   ; a 0xC5B2
+	ld a,001h		;bbbd   ; hay paso
 	ld (0c5b1h),a		;bbbf
-	ld a,c			;bbc2
-	rrca			;bbc3
+	ld a,c			;bbc2   ; la habitacion a la que lleva...
+	rrca			;bbc3   ; ... el nibble alto
 	rrca			;bbc4
 	rrca			;bbc5
 	rrca			;bbc6
 	and 00fh		;bbc7
-	ld (0c5b4h),a		;bbc9   ; guarda la habitacion a la que lleva el paso
+	ld (0c5b4h),a		;bbc9   ; a 0xC5B4
 	ret			;bbcc
 
 ; ----------------------------------------------------------------------
