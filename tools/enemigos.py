@@ -23,8 +23,12 @@ tablas como las monta el cartucho.
   geometria tiene que ser la de 0xB473 (clasifica_muestras; coteja.py
   enemigos). El tipo 0x0E, un dragon de huesos, se monta aparte (tramos).
 
+  Lo que lanzan (bolas, hachas...) va en otra lista, la de 0xD700, con sus
+  propios tipos (p02:9E5C; crea_con_parametros los saca de 0xA08F): va en
+  otra hoja.
+
 Uso:  enemigos.py lista [fase]    las cosas de cada habitacion
-      enemigos.py                 docs/imagenes/enemigos.png
+      enemigos.py                 docs/imagenes/enemigos.png y lo_que_lanzan.png
 """
 import os
 import sys
@@ -111,15 +115,23 @@ def compone(cart, tipo, dibujo, x, y, n=None):
 
 
 # ------------------------------------------------------------ lo visto
-def muestras():
-    """De cada .cosas: (fase, hab, cuadro, tipo, dibujo, y, x, [(y, x, patron,
-    color)])."""
+LISTAS = ("cosas", "lanzado")          # 0xC800 y 0xD700
+
+
+def muestras(lista="cosas"):
+    """De cada .cosas, las fichas de una lista: "cosas" (0xC800, los enemigos,
+    p02:993F) o "lanzado" (0xD700, lo que lanzan, p02:9E5C), que numeran sus
+    tipos cada una a su manera; un "|" las separa en cada linea. Da (fase,
+    hab, cuadro, tipo, dibujo, y, x, [(y, x, patron, color)])."""
     for ruta in sorted(glob.glob(os.path.join(COSAS, "hab_f*_h*.cosas"))):
         base = os.path.basename(ruta)
         fase, hab = int(base[5:7]), int(base[9:11])
         with open(ruta) as f:
             for cuadro, linea in enumerate(f):
-                for trozo in linea.split():
+                partes = linea.split("|")
+                if len(partes) != 2:
+                    raise ValueError("%s: sin el | que separa las dos listas" % ruta)
+                for trozo in partes[LISTAS.index(lista)].split():
                     b = bytes.fromhex(trozo)
                     tipo, dibujo, y, x, n = b[:5]
                     spr = [tuple(b[6 + 5 * k:10 + 5 * k]) for k in range(n)]
@@ -203,14 +215,14 @@ def clasifica_muestras(cart):
         return any(_relativo(geometria(tipo, d, n)[j:j + len(trozo)]) == r for d in range(256))
 
     clases, raras = Counter(), []
-    for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras():
-        if tipo == TRAMOS and spr:
+    for lista, (fase, hab, cuadro, tipo, dibujo, y, x, spr) in ((l, m) for l in LISTAS for m in muestras(l)):
+        if lista == "cosas" and tipo == TRAMOS and spr:
             c = "tramos: " + clasifica_los_tramos(cart, fase, hab, spr)
             clases[c] += 1
             if c.endswith("sin explicar"):
                 raras.append((fase, hab, cuadro, tipo, dibujo, [a[:3] for a in spr]))
             continue
-        if tipo in SIN_COMPONER or not spr:
+        if (lista == "cosas" and tipo in SIN_COMPONER) or not spr:
             continue
         n, s3 = len(spr), [a[:3] for a in spr]
         plano = [b for a in s3 for b in a]
@@ -251,30 +263,32 @@ def hoja_de_los_tramos(cart, fase=12, hab=0):
     return fila
 
 
-def vistos(cart):
+def vistos(cart, lista="cosas"):
     """{tipo: [(dibujo, colores, fase, hab)]}: cada cuadro distinto que se vio
-    con la geometria de su tabla."""
+    en esa lista con la geometria de su tabla."""
     fuera = {}
-    for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras():
-        if tipo in SIN_COMPONER or not spr:
+    for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras(lista):
+        if (lista == "cosas" and tipo in SIN_COMPONER) or not spr:
             continue
         if _relativo(compone(cart, tipo, dibujo, 0, 0, len(spr))) != _relativo(spr):
             continue
         colores = tuple(a[3] for a in spr)
         if not any(colores):
             continue                          # escondida: todo a color 0
-        if tipo == DRACULA and dibujo in DE_PIE and not all(colores):
+        if lista == "cosas" and tipo == DRACULA and dibujo in DE_PIE and not all(colores):
             continue                          # p03:AD61: el parpadeo al aparecer
-        lista = fuera.setdefault(tipo, [])
-        if all((d, c) != (dibujo, colores) for d, c, _, _ in lista):
-            lista.append((dibujo, colores, fase, hab))
+        vista = fuera.setdefault(tipo, [])
+        if all((d, c) != (dibujo, colores) for d, c, _, _ in vista):
+            vista.append((dibujo, colores, fase, hab))
+    if lista != "cosas":
+        return fuera
     # Dracula de pie en sus cuatro dibujos, los que no salieran en las
     # muestras: cotejados aparte (coteja.py dracula)
     from dracula import colores_de_pie, FASE, SALA
-    lista = fuera.setdefault(DRACULA, [])
+    vista = fuera.setdefault(DRACULA, [])
     for dibujo in DE_PIE:
-        if all(d != dibujo for d, _, _, _ in lista):
-            lista.append((dibujo, tuple(colores_de_pie(cart)), FASE, SALA))
+        if all(d != dibujo for d, _, _, _ in vista):
+            vista.append((dibujo, tuple(colores_de_pie(cart)), FASE, SALA))
     return fuera
 
 
@@ -298,12 +312,12 @@ def pinta_el_cuerpo_en(cart, v, img, dibujo, dy, dx):
                     img[y0 + j - dy][0x70 + i - dx] = rgb(v.paleta, c)
 
 
-def hoja(cart, por_tipo, tope=12):
+def hoja(cart, por_tipo, tope=12, con_tramos=True):
     """Una fila por tipo con sus cuadros (hasta `tope`), cada uno con los
     patrones y la paleta de la habitacion donde se vio."""
     salas = {}
     filas = []
-    for tipo in sorted(set(por_tipo) | {TRAMOS}):
+    for tipo in sorted(set(por_tipo) | ({TRAMOS} if con_tramos else set())):
         if tipo == TRAMOS:
             filas.append(hoja_de_los_tramos(cart))
             continue
@@ -326,7 +340,7 @@ def hoja(cart, por_tipo, tope=12):
             v.v[:] = salas[(fase, hab)].v
             v.paleta = salas[(fase, hab)].paleta
             spr = compone(cart, tipo, dibujo, 0x80, 0x80, len(colores))
-            if tipo == DRACULA and dibujo in DE_PIE:
+            if con_tramos and tipo == DRACULA and dibujo in DE_PIE:
                 pinta_el_cuerpo_en(cart, v, fila, dibujo, 0x80 + y0 - 4, 0x80 + caja[2] - 4 - k * ancho)
             for s, (yy, xx, patron, _) in enumerate(spr):
                 color = colores[s]
@@ -357,6 +371,9 @@ def main():
     por_tipo = vistos(cart)
     print("tipos vistos:", sorted(por_tipo))
     print(guarda_png(hoja(cart, por_tipo), os.path.join(IMAGENES, "enemigos.png"), 2))
+    lanzado = vistos(cart, "lanzado")
+    print("tipos lanzados vistos:", sorted(lanzado))
+    print(guarda_png(hoja(cart, lanzado, con_tramos=False), os.path.join(IMAGENES, "lo_que_lanzan.png"), 2))
 
 
 if __name__ == "__main__":

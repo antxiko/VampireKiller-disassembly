@@ -288,9 +288,20 @@ def carga_las_puertas(cart, vram):
 
 
 # ------------------------------------------------------------ la fase
+def carga_los_sprites_de_siempre(cart, vram):
+    """p00:5768, al empezar cada vida (p01:62E0): dos RLE del banco 9/10 a los
+    patrones de sprites, 0xA185 a 0xFF00 (los patrones 0xE0-0xFF: entre
+    ellos la bola, 0xF0, de lo que lanzan) y 0xA147 a 0xF9C0."""
+    rle_a_la_vram(cart, B910, 0xFF00, 0xA185, vram)
+    rle_a_la_vram(cart, B910, 0xF9C0, 0xA147, vram)
+
+
 def carga_la_fase(cart, fase, vram=None):
-    """p00:564C y p00:570D: los dibujos del decorado y la paleta de la fase."""
-    vram = vram or carga_los_dibujos_de_los_objetos(cart)
+    """p00:564C y p00:570D: los dibujos del decorado y la paleta de la fase,
+    sobre lo que se carga al empezar la vida."""
+    if vram is None:
+        vram = carga_los_dibujos_de_los_objetos(cart)
+        carga_los_sprites_de_siempre(cart, vram)
     b = bancos_de_los_dibujos(fase)
     hl = cart.palabra(DIBUJOS_DE_CADA_FASE + 2 * fase, b)
     sube_dibujos(cart, b, hl, PRIMER_DIBUJO, N_DIBUJOS, vram)

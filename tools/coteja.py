@@ -19,7 +19,8 @@ p01:6321 encienda la pantalla).
   dracula       Dracula de pie, cuerpo y sprites, contra work/dracula
                 (tools/lanza_dracula.sh).
 
-  enemigos      las cosas grabadas en work/cosas, cada muestra explicada por
+  enemigos      las cosas grabadas en work/cosas -las dos listas: 0xC800, los
+                enemigos, y 0xD700, lo que lanzan-, cada muestra explicada por
                 su composicion (tools/enemigos.py).
 
 Uso:  coteja.py [habitaciones] [mapa] [titulo] [simon] [dracula] [enemigos] [-v]

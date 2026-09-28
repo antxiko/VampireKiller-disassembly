@@ -1,5 +1,6 @@
 #!/bin/sh
-# lanza_cosas.sh [fases]: cada habitacion, 250 cuadros de las fichas de las cosas con
+# lanza_cosas.sh [fases]: cada habitacion, 250 cuadros de las fichas de las cosas (las dos
+# listas, separadas por "|") con
 # tools/omsx_habitacion.tcl (VK_MUESTRAS) en work/cosas, UN openMSX cada vez. Las que
 # ya tienen sus .cosas se saltan. Las cuentas de habitaciones por fase son las de
 # 0x6000 del banco 11 (graficos.cuantas_habitaciones): 156 en total.

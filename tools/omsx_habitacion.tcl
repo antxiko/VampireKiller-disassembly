@@ -91,12 +91,15 @@ proc encendida {} {
 
 # Con VK_MUESTRAS=<n> apunta en <nombre>.cosas, durante n cuadros, las quince
 # fichas de 0xC800 y 0xD700 (tipo, dibujo, y, x y sus sprites de +0x20) con
-# Simon invencible (0xC43A), y luego vuelca como siempre.
+# Simon invencible (0xC43A), y luego vuelca como siempre. Un "|" separa las de
+# 0xC800 (las cosas) de las de 0xD700 (lo que lanzan): cada lista numera sus
+# tipos a su manera (p02:993F y p02:9E5C).
 proc muestra {} {
     pon 0xC43A 0xFF
     set linea {}
-    foreach base {0xC800 0xC880 0xC900 0xC980 0xCA00 0xCA80 0xCB00
+    foreach base {0xC800 0xC880 0xC900 0xC980 0xCA00 0xCA80 0xCB00 |
                   0xD700 0xD780 0xD800 0xD880 0xD900 0xD980 0xDA00 0xDA80} {
+        if {$base eq "|"} { lappend linea "|" ; continue }
         if {[lee $base] == 0} continue
         set b {}
         foreach off {0 0x0B 3 5} { lappend b [format %02X [lee [expr {$base + $off}]]] }
