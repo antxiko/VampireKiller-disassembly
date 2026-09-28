@@ -900,6 +900,192 @@ L 0xAD93 pinta_el_cuerpo_de_dracula
 L 0xADC6 devuelve_el_fondo_de_dracula
 L 0xADD2 cuerpo_del_dibujo
 
+C 0xAD93 0xCE0E: el cuerpo que toca (1-5)...
+C 0xAD97 ... 0: nada
+C 0xAD99 se gasta
+C 0xAD9B el origen, de 0xADBC
+C 0xADA2 x - 16...
+C 0xADA8 ... y 0x91
+C 0xADAA 32 x 32 puntos
+C 0xADAD con el 5 (H = 0x80)...
+C 0xADB2 ... si no, LMMM con TIMP de la pagina 1 a la 0
+L 0xADB7 copia_el_fondo_guardado
+C 0xADB7 el fondo guardado, por HMMM de la pagina 1 a la 0
+C 0xAAE2 las cuatro x de los tramos, de 0xAB1E...
+C 0xAAE5 ... cuatro
+C 0xAAE7 la x de la cosa mas la del tramo...
+C 0xAAEB ... dos veces, desde el byte 0x10
+C 0xAAEF el tramo siguiente
+C 0xAAF2 los sprites, desde el byte 0x22...
+C 0xAAF6 ... ocho...
+C 0xAAF9 ... con patron y color de 0xAB0E
+C 0xAAFC la y...
+C 0xAB01 ... y la x de la cosa...
+C 0xAB06 ... su patron...
+C 0xAB08 ... y su color
+C 0xAB0A (el numero del sprite siguiente no se toca)
+C 0xA17C DE = -DE: complemento...
+C 0xA182 ... mas uno
+B 0xB87C LAS MOMIAS (el tipo 0x14, las dos del jefe de la fase 9; por su dibujo). Esperan (byte 0x10); van hacia Simon a 0x230, andando con tres dibujos de ida y vuelta (0xBA20 a la izquierda, 0xBA23 a la derecha) y rebotando en x = 0x20 y 0xE0; al acabar cada tramo (su largo, al azar de 0xB9C7) se vuelve hacia Simon, se para 0x30 cuadros parpadeando y le lanza el tipo 0x14 de 0xA08E (efecto 0x0A); solo si iba a la izquierda en un tramo impar y Simon queda detras, da la vuelta y sigue andando.
+C 0xB87C al nacer: el dibujo 0x36...
+C 0xB880 ... 0x20 cuadros de espera...
+C 0xB884 ... quieta
+L 0xB893 las_momias
+C 0xB893 por su paso
+L 0xB8A1 momia_espera
+C 0xB8A1 paso 0: al acabar la espera...
+C 0xB8A5 ... al paso 1, moviendose
+L 0xB8AD momia_arranca
+C 0xB8AD paso 1: a la izquierda...
+C 0xB8B4 ... si Simon esta a la izquierda...
+C 0xB8BC ... y si no, a la derecha
+C 0xB8C6 al paso 2
+C 0xB8C9 el dibujo, ya
+C 0xB8CD y un tramo al azar
+L 0xB8D0 momia_anda
+C 0xB8D0 paso 2: anda
+C 0xB8D3 al acabar el tramo...
+C 0xB8D8 ... otro al azar
+C 0xB8DF en los tramos impares...
+C 0xB8E8 ... si iba a la izquierda, a la derecha
+L 0xB8F0 momia_encara
+C 0xB8F0 el otro, hacia Simon
+L 0xB8F8 momia_a_la_izquierda
+C 0xB8F8 a la izquierda
+C 0xB902 Simon delante, a la izquierda?
+L 0xB90D momia_a_la_derecha
+C 0xB90D a la derecha
+C 0xB917 Simon delante, a la derecha?
+L 0xB922 momia_se_para
+C 0xB922 al paso 3...
+C 0xB925 ... quieta...
+C 0xB929 ... 0x30 cuadros
+L 0xB930 momia_en_el_borde
+C 0xB930 x menos de 0x20...
+C 0xB937 ... o mas de 0xE0?
+C 0xB93A si: rebota
+C 0xB948 (en 0x20, a la derecha)
+C 0xB954 (en 0xE0, a la izquierda)
+L 0xB960 momia_lanza
+C 0xB960 paso 3: un cuadro menos
+C 0xB965 parpadea: el color 8...
+C 0xB96D ... o el 0x4C
+L 0xB96F colores_de_la_momia
+C 0xB96F los seis sprites, uno si y otro no: 2 y A
+L 0xB985 momia_tira
+C 0xB985 desde 0x38 por encima...
+C 0xB98E ... a 0x40 hacia Simon...
+C 0xB993 ... pero hacia donde mira
+C 0xB99B desde 0x18 por encima...
+C 0xB9A4 ... el tipo 0x14 de 0xA08E
+C 0xB9A9 efecto 0x0A
+C 0xB9AE vuelve al paso 2, andando
+L 0xB9B6 tramo_al_azar
+C 0xB9B6 uno de los ocho de 0xB9C7, por R...
+C 0xB9C3 ... al byte 0x10
+L 0xB9CF paso_de_la_momia
+C 0xB9CF la de la derecha...
+C 0xB9D2 ... o, mirando a la izquierda (byte 0x12)...
+C 0xB9D8 ... la de la izquierda
+L 0xB9DB cada_ocho_cuadros
+C 0xB9DB un cuadro mas...
+C 0xB9E1 ... y cada ocho...
+C 0xB9E5 ... el dibujo siguiente
+C 0xB9E9 hacia arriba o hacia abajo (byte 0x15)?
+C 0xB9EF arriba: uno mas...
+C 0xB9F5 ... y en el 3...
+C 0xB9F9 ... vuelve al 1, bajando
+L 0xBA03 dibujo_anterior
+C 0xBA03 abajo: uno menos...
+C 0xBA09 ... y en el -1...
+C 0xBA0D ... vuelve al 1, subiendo
+L 0xBA15 pon_el_dibujo
+C 0xBA15 el dibujo del byte 0x14
+B 0xBAF6 EL TIPO 0x18 (sale con el jefe de la fase 12). Paso 0: espera (byte 0x10) y va de lado a la velocidad de 0xCE09 con el dibujo 0x67; con 0xCE07 salta (-0x600). Paso 1: en el aire, dibujo 0x67 y luego 0x68, con la gravedad 0x60, rebotando en los bordes (x 0x14 y 0xE8) y disparando cada tanto (byte 0x12) hacia Simon; al tocar el decorado, el dibujo 0x69 en la rejilla de 8 y 0x10 cuadros quieto. Paso 2: salta otra vez, -0x780 abajo o -0x580 arriba, mas algo al azar.
+L 0xBAF6 el_tipo_0x18
+C 0xBAF6 por su paso
+C 0xBB00 esperando?
+C 0xBB04 0xCE07: salta
+C 0xBB0E -0x600
+L 0xBB18 va_de_lado
+C 0xBB18 el dibujo 0x67...
+C 0xBB1C ... a la velocidad de 0xCE09
+L 0xBB23 en_el_aire
+C 0xBB23 esperando?
+C 0xBB27 los cuadros en el aire...
+C 0xBB2D ... el dibujo 0x67...
+C 0xBB33 ... y desde el cuarto, el 0x68
+C 0xBB37 dispara cada tanto
+C 0xBB3A la gravedad, 0x60
+C 0xBB43 en el borde derecho...
+C 0xBB4C ... a la izquierda
+C 0xBB50 en el izquierdo...
+C 0xBB52 ... a la derecha
+C 0xBB55 subiendo: nada mas
+C 0xBB60 toca el decorado?
+C 0xBB64 si: el dibujo 0x69...
+C 0xBB69 ... quieto...
+C 0xBB6D ... en la rejilla de 8...
+C 0xBB75 ... 0x10 cuadros
+L 0xBB7D al_borde_derecho
+C 0xBB7D ya va a la izquierda?
+C 0xBB80 no: la vuelta
+L 0xBB86 al_borde_izquierdo
+C 0xBB86 ya va a la derecha?
+C 0xBB89 no: la vuelta
+L 0xBB8F en_el_suelo
+C 0xBB8F esperando?
+C 0xBB92 quieto
+C 0xBB97 al acabar la cuenta, salta:
+C 0xBB9E abajo, -0x780...
+C 0xBBA5 ... arriba, -0x580
+L 0xBBA8 el_salto
+C 0xBBA8 mas 2 * (R | 0x80)
+C 0xBBB4 se mueve...
+C 0xBBB8 ... desde el paso 0
+L 0xBBC0 espera_del_tipo_0x18
+C 0xBBC0 quedan cuadros de espera (byte 0x10)?
+C 0xBBC6 uno menos, quieto...
+C 0xBBCD ... y carry
+L 0xBBCF se_mueve
+C 0xBBCF sin espera: se mueve
+L 0xBBD4 dispara_cada_tanto
+C 0xBBD4 al acabar la cuenta del byte 0x12...
+C 0xBBDB ... hacia Simon...
+C 0xBBDE ... su tipo
+L 0xBBFD empieza_el_jefe_de_la_fase_15
+C 0xBBFD FASE 15: el tipo 0x16 en (0xA0, 0x90)...
+C 0xBC05 ... y cuatro del 0x16 de 0xA08E
+C 0xBC11 cuenta a 0
+L 0xBC18 el_jefe_de_la_fase_15
+C 0xBC18 caido (0xCE15)?
+C 0xBC1C si: a rematar
+C 0xBC1F cada 0x80 cuadros...
+C 0xBC26 ... otro
+L 0xBC29 saca_uno_del_0x16
+C 0xBC29 el sitio siguiente (0xCF20)...
+C 0xBC2E ... de los ocho de 0xBC44
+C 0xBC37 C = y...
+C 0xBC39 ... B = x
+C 0xBC3A quieto...
+C 0xBC3F ... el tipo 0x16 de 0xA08E
+L 0xBEA2 al_paso_2
+C 0xBEA2 paso 2
+B 0xBEA6 EL JEFE DE LA FASE 3 (tipo 0x12) APUNTA: a un punto 0x30 por encima de Simon (como poco la y 0x30) y 0x48 a un lado u otro (bit 0 del byte 0x14); para apuntar, pone ese punto en el sitio de Simon, llama a apunta_a_simon y lo devuelve.
+L 0xBEA6 apunta_junto_a_simon
+C 0xBEA6 la y de Simon, menos 0x30...
+C 0xBEAD (como poco 0x30)
+L 0xBEB0 la_x_del_punto
+C 0xBEB0 la y, al byte 0x11
+C 0xBEB3 a un lado...
+C 0xBEB8 ... 0x48...
+C 0xBEBC ... o al otro
+C 0xBEBF mas la x de Simon...
+C 0xBEC4 ... al byte 0x12
+C 0xBEC7 guarda el sitio de Simon...
+C 0xBED0 ... y pone el punto
+C 0xBED8 apunta
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0xA08F 0xA0E5 tablas_por_tipo  tres tablas seguidas: 0xA08F, un byte por tipo de cosa que p02:9F8C lee con 0xA08E + tipo; 0xA0BF, punteros por tipo (p03:A011 con DE = 0xA0BD, via 0x6542) a las cuatro listas cortas de 0xA0D7-0xA0E4, que se copian a los sprites de la cosa (p03:A017); los mismos bytes usan p01:68EA y p03:BBFD como coordenadas de VRAM
 F 0xA08F 16
@@ -1624,40 +1810,22 @@ C 0xB85A despacha: salta a la entrada A de la tabla que va detras del call
 C 0xB866 crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0xB86E crea_una_cosa: crea una cosa del tipo C en la posicion DE
 C 0xB871 siguiente_paso: sube el paso de la escena (0xCE01)
-C 0xB87C el dibujo de la cosa = 0x36
 C 0xB887 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xB893 lee el paso en que va la cosa
 C 0xB896 despacha: salta a la entrada A de la tabla que va detras del call
-C 0xB8A5 sube el paso en que va la cosa
 C 0xB8A8 la cosa se mueve
-C 0xB8B4 lee la X de Simon
 C 0xB8B7 compara con la x de la cosa
 C 0xB8C3 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB8C6 sube el paso en que va la cosa
-C 0xB8E8 va hacia la izquierda? (bit 7 de la velocidad horizontal)
-C 0xB8F0 lee la X de Simon
 C 0xB8F3 compara con la x de la cosa
 C 0xB8FB pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB902 lee la X de Simon
 C 0xB905 compara con la x de la cosa
 C 0xB910 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB917 lee la X de Simon
 C 0xB91A compara con la x de la cosa
-C 0xB922 sube el paso en que va la cosa
-C 0xB925 la cosa se queda quieta
-C 0xB930 lee la x de la cosa
-C 0xB93A va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xB941 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB948 la x de la cosa = 0x20
 C 0xB951 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xB954 la x de la cosa = 0xE0
-C 0xB985 lee la y de la cosa
 C 0xB98B lee la x de la cosa
 C 0xB998 niega_de: DE = -DE
-C 0xB99B lee la y de la cosa
 C 0xB9A1 lee la x de la cosa
 C 0xB9A6 crea_con_parametros: guarda el tipo (A) y los parametros en 0xCFF1-0xCFF9 y crea la cosa
-C 0xB9AE baja el paso en que va la cosa
 C 0xB9B1 la cosa se mueve
 C 0xB9BF hl_mas_a: HL += A
 C 0xBA18 hl_mas_a: HL += A
@@ -1686,36 +1854,23 @@ C 0xBACB guarda el dibujo de la cosa
 C 0xBADD la cosa se mueve
 C 0xBAE8 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xBAEB pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xBAF6 lee el paso en que va la cosa
 C 0xBB11 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xBB14 sube el paso en que va la cosa
-C 0xBB18 el dibujo de la cosa = 0x67
 C 0xBB20 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xBB3D suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 C 0xBB40 lee la x de la cosa
 C 0xBB45 lee la velocidad horizontal (parte baja)
 C 0xBB48 lee la velocidad horizontal (el bit 7, hacia la izquierda)
-C 0xBB55 mira el bit 7 de la velocidad vertical
 C 0xBB5A lee la y de la cosa
 C 0xBB5D lee la x de la cosa
-C 0xBB60 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0xBB69 la cosa se queda quieta
-C 0xBB6D lee la y de la cosa
 C 0xBB72 guarda la y de la cosa
-C 0xBB75 la cuenta de cuadros del paso = 0x10
 C 0xBB79 sube el paso en que va la cosa
-C 0xBB80 niega_de: DE = -DE
 C 0xBB83 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xBB89 niega_de: DE = -DE
 C 0xBB8C pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-C 0xBB92 la cosa se queda quieta
-C 0xBB97 baja la cuenta de cuadros del paso
 C 0xBB9B lee la y de la cosa
 C 0xBBB1 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-C 0xBBB4 la cosa se mueve
 C 0xBBBC guarda el paso en que va la cosa
 C 0xBBC9 la cosa se queda quieta
-C 0xBBCF la cosa se mueve
 C 0xBBE6 va hacia la izquierda? (bit 7 de la velocidad horizontal)
 C 0xBBEF guarda el dibujo de la cosa
 C 0xBBF3 lee el paso de la escena
@@ -1812,10 +1967,6 @@ C 0xBE83 lee el paso en que va la cosa
 C 0xBE86 despacha: salta a la entrada A de la tabla que va detras del call
 C 0xBE99 la cosa se mueve
 C 0xBE9D el paso en que va la cosa = 0x01
-C 0xBEA2 el paso en que va la cosa = 0x02
-C 0xBEA6 lee la Y de Simon
-C 0xBEBF lee la X de Simon
-C 0xBEC7 lee la X de Simon
 C 0xBECB lee la Y de Simon
 C 0xBED1 guarda la X de Simon
 C 0xBED5 guarda la Y de Simon
