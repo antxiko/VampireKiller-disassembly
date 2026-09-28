@@ -1,1 +1,6 @@
 # Notas del banco 06: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA000 0xB653 dibujos_95B3_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x95B3); se solapan 2 bloques (0xA000-0xAD93, 0xA000-0xB653); lo leen fase 10, fase 11, fase 12, fase 4, fase 5, fase 6 (5715 bytes)
+F 0xA000 32
+# --- fin de los bloques de bloques.py ---

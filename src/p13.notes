@@ -1,1 +1,158 @@
 # Notas del banco 13: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA281 0xA2D1 tabla_A281  40 punteros a rle que lee p00:56F4; lo leen p00:56F4 (80 bytes)
+F 0xA281 2
+D 0xA2D1 0xA319 tabla_A2D1  36 punteros a rle que lee p00:5707; lo leen p00:5707 (72 bytes)
+F 0xA2D1 2
+D 0xA319 0xA351 rle_A319  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:5681 (56 bytes)
+F 0xA319 16
+D 0xA351 0xA38C rle_A351  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:568A (59 bytes)
+F 0xA351 16
+D 0xA38C 0xA3CA rle_A38C  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5693, p00:5707 (62 bytes)
+F 0xA38C 16
+D 0xA3CA 0xA40B rle_A3CA  rle a la VRAM, de la tabla de 0xA281; lo leen p00:569C, p00:56F4 (65 bytes)
+F 0xA3CA 16
+D 0xA40B 0xA447 rle_A40B  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:56A5, p00:5707 (60 bytes)
+F 0xA40B 16
+D 0xA447 0xA480 rle_A447  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56AE, p00:56F4 (57 bytes)
+F 0xA447 16
+D 0xA480 0xA4BC rle_A480  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:56B7, p00:5707 (60 bytes)
+F 0xA480 16
+D 0xA4BC 0xA4FE rle_A4BC  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56C0, p00:56F4 (66 bytes)
+F 0xA4BC 16
+D 0xA4FE 0xA53C rle_A4FE  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (62 bytes)
+F 0xA4FE 16
+D 0xA53C 0xA579 rle_A53C  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (61 bytes)
+F 0xA53C 16
+D 0xA579 0xA5B5 rle_A579  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (60 bytes)
+F 0xA579 16
+D 0xA5B5 0xA5F6 rle_A5B5  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (65 bytes)
+F 0xA5B5 16
+D 0xA5F6 0xA62F rle_A5F6  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xA5F6 16
+D 0xA62F 0xA671 rle_A62F  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (66 bytes)
+F 0xA62F 16
+D 0xA6AD 0xA6E4 rle_A6AD  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
+F 0xA6AD 16
+D 0xA720 0xA759 rle_A720  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xA720 16
+D 0xA795 0xA7C7 rle_A795  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (50 bytes)
+F 0xA795 16
+D 0xA7C7 0xA7FE rle_A7C7  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
+F 0xA7C7 16
+D 0xA7FE 0xA837 rle_A7FE  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xA7FE 16
+D 0xA837 0xA869 rle_A837  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (50 bytes)
+F 0xA837 16
+D 0xA869 0xA895 rle_A869  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (44 bytes)
+F 0xA869 16
+D 0xA895 0xA8C1 rle_A895  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (44 bytes)
+F 0xA895 16
+D 0xA8C1 0xA8F4 rle_A8C1  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (51 bytes)
+F 0xA8C1 16
+D 0xA8F4 0xA92B rle_A8F4  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
+F 0xA8F4 16
+D 0xA92B 0xA941 rle_A92B  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (22 bytes)
+F 0xA92B 16
+D 0xA941 0xA980 rle_A941  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (63 bytes)
+F 0xA941 16
+D 0xA980 0xA9B1 rle_A980  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (49 bytes)
+F 0xA980 16
+D 0xA9B1 0xA9E2 rle_A9B1  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (49 bytes)
+F 0xA9B1 16
+D 0xA9E2 0xAA3F rle_A9E2  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (93 bytes)
+F 0xA9E2 16
+D 0xAA3F 0xAA87 rle_AA3F  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (72 bytes)
+F 0xAA3F 16
+D 0xAA87 0xAAEE rle_AA87  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (103 bytes)
+F 0xAA87 16
+D 0xAAEE 0xAB60 rle_AAEE  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (114 bytes)
+F 0xAAEE 16
+D 0xAB60 0xABB4 rle_AB60  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (84 bytes)
+F 0xAB60 16
+D 0xABB4 0xAC21 rle_ABB4  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (109 bytes)
+F 0xABB4 16
+D 0xAC21 0xAC4C rle_AC21  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (43 bytes)
+F 0xAC21 16
+D 0xAC4C 0xAC93 rle_AC4C  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (71 bytes)
+F 0xAC4C 16
+D 0xAC93 0xACD1 rle_AC93  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (62 bytes)
+F 0xAC93 16
+D 0xACD1 0xAD12 rle_ACD1  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (65 bytes)
+F 0xACD1 16
+D 0xAD12 0xAD4E rle_AD12  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (60 bytes)
+F 0xAD12 16
+D 0xAD4E 0xAD87 rle_AD4E  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xAD4E 16
+D 0xAD87 0xADC3 rle_AD87  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (60 bytes)
+F 0xAD87 16
+D 0xADC3 0xAE05 rle_ADC3  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (66 bytes)
+F 0xADC3 16
+D 0xAE05 0xAE43 rle_AE05  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (62 bytes)
+F 0xAE05 16
+D 0xAE43 0xAE80 rle_AE43  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (61 bytes)
+F 0xAE43 16
+D 0xAE80 0xAEBC rle_AE80  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (60 bytes)
+F 0xAE80 16
+D 0xAEBC 0xAEFD rle_AEBC  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (65 bytes)
+F 0xAEBC 16
+D 0xAEFD 0xAF36 rle_AEFD  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xAEFD 16
+D 0xAF36 0xAF78 rle_AF36  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (66 bytes)
+F 0xAF36 16
+D 0xAFB4 0xAFEA rle_AFB4  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (54 bytes)
+F 0xAFB4 16
+D 0xB026 0xB05F rle_B026  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xB026 16
+D 0xB09B 0xB0CE rle_B09B  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (51 bytes)
+F 0xB09B 16
+D 0xB0CE 0xB105 rle_B0CE  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (55 bytes)
+F 0xB0CE 16
+D 0xB105 0xB13E rle_B105  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (57 bytes)
+F 0xB105 16
+D 0xB13E 0xB171 rle_B13E  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (51 bytes)
+F 0xB13E 16
+D 0xB171 0xB19E rle_B171  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (45 bytes)
+F 0xB171 16
+D 0xB19E 0xB1CC rle_B19E  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (46 bytes)
+F 0xB19E 16
+D 0xB1CC 0xB1FF rle_B1CC  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (51 bytes)
+F 0xB1CC 16
+D 0xB1FF 0xB235 rle_B1FF  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (54 bytes)
+F 0xB1FF 16
+D 0xB235 0xB24B rle_B235  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (22 bytes)
+F 0xB235 16
+D 0xB24B 0xB28A rle_B24B  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (63 bytes)
+F 0xB24B 16
+D 0xB28A 0xB2BC rle_B28A  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (50 bytes)
+F 0xB28A 16
+D 0xB2BC 0xB2ED rle_B2BC  rle a la VRAM, de la tabla de 0xA281; lo leen p00:56F4 (49 bytes)
+F 0xB2BC 16
+D 0xB2ED 0xB34A rle_B2ED  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (93 bytes)
+F 0xB2ED 16
+D 0xB34A 0xB392 rle_B34A  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (72 bytes)
+F 0xB34A 16
+D 0xB392 0xB3FB rle_B392  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (105 bytes)
+F 0xB392 16
+D 0xB3FB 0xB46B rle_B3FB  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (112 bytes)
+F 0xB3FB 16
+D 0xB46B 0xB4BE rle_B46B  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (83 bytes)
+F 0xB46B 16
+D 0xB4BE 0xB52D rle_B4BE  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (111 bytes)
+F 0xB4BE 16
+D 0xB52D 0xB556 rle_B52D  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (41 bytes)
+F 0xB52D 16
+D 0xB556 0xB5A1 rle_B556  rle a la VRAM, de la tabla de 0xA2D1; lo leen p00:5707 (75 bytes)
+F 0xB556 16
+D 0xB895 0xB963 rle_B895  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:56C9 (206 bytes)
+F 0xB895 16
+D 0xBBF6 0xBE58 rle_BBF6  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene), con el destino delante; lo leen p00:5A1E (610 bytes)
+F 0xBBF6 16
+D 0xBE59 0xBEC1 letras_BE59  13 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:531B (104 bytes)
+F 0xBE59 8
+D 0xBEC1 0xBF29 letras_BEC1  13 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:5327 (104 bytes)
+F 0xBEC1 8
+D 0xBF29 0xBFF9 letras_BF29  26 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:5333 (208 bytes)
+F 0xBF29 8
+# --- fin de los bloques de bloques.py ---

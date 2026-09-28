@@ -3083,10 +3083,18 @@ L_55D4:
 	jp L_5336		;55d4
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x55d7..0x55ec  (21 bytes)
-DATA_55D7:
-	defb 04eh,0a2h,0c9h,0a4h,072h,0a2h,0c0h,0f8h,002h,080h,0f9h,000h,0f9h,002h,040h,0f9h	; 55d7  N...r.........@.
-	defb 0c0h,0f8h,002h,000h,0f9h	; 55e7
+; DATOS tabla_55D7: 3 punteros a rle que lee p00:55AE; lo leen p00:55AE (6
+;   bytes)
+;   0x55d7..0x55dd  (6 bytes)
+DATA_tabla_55D7:
+	defb 04eh,0a2h	; 55d7
+	defb 0c9h,0a4h	; 55d9
+	defb 072h,0a2h	; 55db
+
+; ----------------------------------------------------------------------
+; DATOS sin identificar  0x55dd..0x55ec  (15 bytes)
+DATA_55DD:
+	defb 0c0h,0f8h,002h,080h,0f9h,000h,0f9h,002h,040h,0f9h,0c0h,0f8h,002h,000h,0f9h	; 55dd  ........@......
 
 ; ======================================================================
 ; CODIGO 0x55ec..0x56cf  (227 bytes)
@@ -3261,8 +3269,11 @@ L_5733:
 	jp L_5336		;573f
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5742..0x5768  (38 bytes)
-DATA_5742:
+; DATOS dibujos_de_cada_fase: 19 punteros, uno por fase (0 el patio, 1-18): de
+;   donde salen los 191 dibujos de 8x8 de su decorado; los lee p00:565B con la
+;   fase de 0xD000; lo leen p00:565B (38 bytes)
+;   0x5742..0x5768  (38 bytes)
+DATA_dibujos_de_cada_fase:
 	defb 000h,060h,020h,072h,020h,072h,020h,072h,0b3h,095h,0b3h,095h,0b3h,095h,093h,084h	; 5742  .` r r r........
 	defb 093h,084h,093h,084h,073h,09eh,073h,09eh,073h,09eh,000h,080h,000h,080h,000h,080h	; 5752  ....s.s.s.......
 	defb 040h,096h,040h,096h,0c0h,0a4h	; 5762

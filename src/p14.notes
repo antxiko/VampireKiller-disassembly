@@ -1,1 +1,8 @@
 # Notas del banco 14: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8824 0x8894 letras_8824  14 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:53EA (112 bytes)
+F 0x8824 8
+D 0x8894 0x8964 letras_8894  26 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; lo leen p00:53F6 (208 bytes)
+F 0x8894 8
+# --- fin de los bloques de bloques.py ---

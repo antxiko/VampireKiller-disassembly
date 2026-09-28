@@ -1,1 +1,96 @@
 # Notas del banco 10: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA000 0xA005 paleta_9FFE_cola  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion (sigue del banco anterior, 0x9FFE); lo leen p00:57AE (5 bytes)
+F 0xA000 3
+D 0xA005 0xA00C paleta_A005  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA005 3
+D 0xA00C 0xA013 paleta_A00C  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA00C 3
+D 0xA013 0xA01A paleta_A013  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA013 3
+D 0xA028 0xA02F paleta_A028  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA028 3
+D 0xA02F 0xA036 paleta_A02F  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA02F 3
+D 0xA036 0xA03D paleta_A036  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA036 3
+D 0xA052 0xA059 paleta_A052  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
+F 0xA052 3
+D 0xA059 0xA066 paleta_A059  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (13 bytes)
+F 0xA059 3
+D 0xA066 0xA0A8 rle_A066  rle a la VRAM 0xFE80, mandado por el guion de 0x9DE0; lo leen guion 0x9DE0 (66 bytes)
+F 0xA066 16
+D 0xA0A8 0xA0EA rle_A0A8  rle a la VRAM 0xFE80, mandado por el guion de 0x9DB5; lo leen guion 0x9DB5, guion 0x9EBA (66 bytes)
+F 0xA0A8 16
+D 0xA0EA 0xA147 rle_A0EA  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:55F5 (93 bytes)
+F 0xA0EA 16
+D 0xA147 0xA185 rle_A147  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:577A (62 bytes)
+F 0xA147 16
+D 0xA185 0xA23B rle_A185  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:5771 (182 bytes)
+F 0xA185 16
+D 0xA23B 0xA24E rle_A23B  rle a la VRAM 0xFC80, mandado por el guion de 0x9D8A; lo leen guion 0x9D8A, guion 0x9EBA, guion 0x9FD2 (19 bytes)
+F 0xA23B 16
+D 0xA24E 0xA272 rle_A24E  rle a la VRAM, de la tabla de 0x55D7; lo leen p00:55AE (36 bytes)
+F 0xA24E 16
+D 0xA272 0xA2E5 rle_A272  rle a la VRAM, de la tabla de 0x55D7; lo leen p00:55AE (115 bytes)
+F 0xA272 16
+D 0xA2E5 0xA367 rle_A2E5  rle a la VRAM 0xFE00, mandado por el guion de 0x9D64; lo leen guion 0x9D64, guion 0x9DE0, guion 0x9E83, guion 0x9EDB (130 bytes)
+F 0xA2E5 16
+D 0xA367 0xA3DE rle_A367  rle a la VRAM 0xFD00, mandado por el guion de 0x9D64; lo leen guion 0x9D64 (119 bytes)
+F 0xA367 16
+D 0xA3DE 0xA4C9 rle_A3DE  rle a la VRAM 0xFB80, mandado por el guion de 0x9F91; lo leen guion 0x9F91 (235 bytes)
+F 0xA3DE 16
+D 0xA4C9 0xA54A rle_A4C9  rle a la VRAM, de la tabla de 0x55D7; lo leen guion 0x9F5F, p00:55AE (129 bytes)
+F 0xA4C9 16
+D 0xA54A 0xA646 rle_A54A  rle a la VRAM 0xFA00, mandado por el guion de 0x9E62; lo leen guion 0x9E62, guion 0x9EDB, guion 0x9FB2 (252 bytes)
+F 0xA54A 16
+D 0xA646 0xA827 rle_A646  rle a la VRAM 0xFA00, mandado por el guion de 0x9EA4; lo leen guion 0x9EA4 (481 bytes)
+F 0xA646 16
+D 0xA827 0xA896 rle_A827  rle a la VRAM 0xFC80, mandado por el guion de 0x9E62; lo leen guion 0x9E62, guion 0x9EDB, guion 0x9FB2 (111 bytes)
+F 0xA827 16
+D 0xA896 0xA951 rle_A896  rle a la VRAM 0xFB80, mandado por el guion de 0x9F1E; lo leen guion 0x9F1E (187 bytes)
+F 0xA896 16
+D 0xA951 0xAA05 rle_A951  rle a la VRAM 0xFD40, mandado por el guion de 0x9E62; lo leen guion 0x9E62, guion 0x9F01, guion 0x9F1E, guion 0x9F44 (180 bytes)
+F 0xA951 16
+D 0xAA05 0xABAF rle_AA05  rle a la VRAM 0xFA00, mandado por el guion de 0x9F44; lo leen guion 0x9F44 (426 bytes)
+F 0xAA05 16
+D 0xABAF 0xACE3 rle_ABAF  rle a la VRAM 0xFA00, mandado por el guion de 0x9F01; lo leen guion 0x9F01 (308 bytes)
+F 0xABAF 16
+D 0xACE3 0xADE5 rle_ACE3  rle a la VRAM 0xFA00, mandado por el guion de 0x9F5F; lo leen guion 0x9F5F (258 bytes)
+F 0xACE3 16
+D 0xADE5 0xAEE0 rle_ADE5  rle a la VRAM 0xFC00, mandado por el guion de 0x9DB5; lo leen guion 0x9DB5, guion 0x9DE0 (251 bytes)
+F 0xADE5 16
+D 0xAEE0 0xAF96 rle_AEE0  rle a la VRAM 0xFA40, mandado por el guion de 0x9FED; lo leen guion 0x9FED (182 bytes)
+F 0xAEE0 16
+D 0xAF96 0xB051 rle_AF96  rle a la VRAM 0xFBC0, mandado por el guion de 0x9FED; lo leen guion 0x9FED (187 bytes)
+F 0xAF96 16
+D 0xB051 0xB07A rle_B051  rle a la VRAM 0xFE80, mandado por el guion de 0x9D38; lo leen guion 0x9D38, guion 0x9D4E, guion 0x9D64, guion 0x9D8A, guion 0x9DA5, guion 0x9DB5, guion 0x9DE0, guion 0x9E0B y 8 mas (41 bytes)
+F 0xB051 16
+D 0xB07A 0xB0AA rle_B07A  rle a la VRAM 0xFEC0, mandado por el guion de 0x9D38; lo leen guion 0x9D38, guion 0x9D4E, guion 0x9D64, guion 0x9D8A, guion 0x9DA5, guion 0x9DB5, guion 0x9DE0, guion 0x9E0B y 8 mas (48 bytes)
+F 0xB07A 16
+D 0xB0AA 0xB120 rle_B0AA  rle a la VRAM (0x00 acaba, 0x80 otro destino, 1nnnnnnn van tal cual, 0nnnnnnn repite el que viene); lo leen p00:57C9 (118 bytes)
+F 0xB0AA 16
+D 0xB120 0xB198 rle_B120  rle a la VRAM 0xFA00, mandado por el guion de 0x9DE0; lo leen guion 0x9DE0, guion 0x9EDB, guion 0x9F5F (120 bytes)
+F 0xB120 16
+D 0xB198 0xB1EA rle_B198  rle a la VRAM 0xFC00, mandado por el guion de 0x9E0B; lo leen guion 0x9E0B (82 bytes)
+F 0xB198 16
+D 0xB1EA 0xB3E8 rle_B1EA  rle a la VRAM 0xFA00, mandado por el guion de 0x9E0B; lo leen guion 0x9E0B (510 bytes)
+F 0xB1EA 16
+D 0xB3E8 0xB4A3 rle_B3E8  rle a la VRAM 0xFA00, mandado por el guion de 0x9D38; lo leen guion 0x9D38, guion 0x9F1E (187 bytes)
+F 0xB3E8 16
+D 0xB4A3 0xB50B rle_B4A3  rle a la VRAM 0xFC00, mandado por el guion de 0x9E62; lo leen guion 0x9E62, guion 0x9EDB, guion 0x9FB2 (104 bytes)
+F 0xB4A3 16
+D 0xB54B 0xB62D rle_B54B  rle a la VRAM 0xFA00, mandado por el guion de 0x9D64; lo leen guion 0x9D64, guion 0x9DB5, guion 0x9EBA (226 bytes)
+F 0xB54B 16
+D 0xB62D 0xB6D8 rle_B62D  rle a la VRAM 0xFA00, mandado por el guion de 0x9E83; lo leen guion 0x9E83 (171 bytes)
+F 0xB62D 16
+D 0xB6D8 0xB836 rle_B6D8  rle a la VRAM 0xFA00, mandado por el guion de 0x9DA5; lo leen guion 0x9DA5 (350 bytes)
+F 0xB6D8 16
+D 0xB97D 0xBAB9 rle_B97D  rle a la VRAM 0xFA00, mandado por el guion de 0x9D8A; lo leen guion 0x9D8A, guion 0x9EBA, guion 0x9FD2 (316 bytes)
+F 0xB97D 16
+D 0xBAB9 0xBC5A rle_BAB9  rle a la VRAM 0xFA00, mandado por el guion de 0x9D4E; lo leen guion 0x9D4E (417 bytes)
+F 0xBAB9 16
+D 0xBC5A 0xBDA7 rle_BC5A  rle a la VRAM 0xFA00, mandado por el guion de 0x9F91; lo leen guion 0x9F91 (333 bytes)
+F 0xBC5A 16
+# --- fin de los bloques de bloques.py ---

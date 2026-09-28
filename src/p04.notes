@@ -1,1 +1,6 @@
 # Notas del banco 04: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x6000 0x8000 dibujos_6000  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado; se solapan 2 bloques (0x6000-0x77E0, 0x7220-0x8000); lo leen fase 0, fase 1, fase 2, fase 3 (8192 bytes)
+F 0x6000 32
+# --- fin de los bloques de bloques.py ---

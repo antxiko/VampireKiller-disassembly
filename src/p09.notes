@@ -1,1 +1,84 @@
 # Notas del banco 09: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x9AB0 0x9AD4 habitaciones_de_cada_fase  18 punteros, uno por fase (1-18), a su tabla de habitaciones; los lee p00:5790; lo leen p00:5786 (36 bytes)
+F 0x9AB0 16
+D 0x9AD4 0x9AF4 habitaciones_fase_1  las 8 habitaciones de la fase 1: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32 bytes)
+F 0x9AD4 4
+D 0x9AF4 0x9B0C habitaciones_fase_2  las 6 habitaciones de la fase 2: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9AF4 4
+D 0x9B0C 0x9B24 habitaciones_fase_3  las 6 habitaciones de la fase 3: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9B0C 4
+D 0x9B24 0x9B3C habitaciones_fase_4  las 6 habitaciones de la fase 4: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9B24 4
+D 0x9B3C 0x9B54 habitaciones_fase_5  las 6 habitaciones de la fase 5: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9B3C 4
+D 0x9B54 0x9B6C habitaciones_fase_6  las 6 habitaciones de la fase 6: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9B54 4
+D 0x9B6C 0x9B90 habitaciones_fase_7  las 9 habitaciones de la fase 7: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36 bytes)
+F 0x9B6C 4
+D 0x9B90 0x9BB0 habitaciones_fase_8  las 8 habitaciones de la fase 8: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32 bytes)
+F 0x9B90 4
+D 0x9BB0 0x9BD4 habitaciones_fase_9  las 9 habitaciones de la fase 9: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36 bytes)
+F 0x9BB0 4
+D 0x9BD4 0x9BF8 habitaciones_fase_10  las 9 habitaciones de la fase 10: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36 bytes)
+F 0x9BD4 4
+D 0x9BF8 0x9C10 habitaciones_fase_11  las 6 habitaciones de la fase 11: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24 bytes)
+F 0x9BF8 4
+D 0x9C10 0x9C40 habitaciones_fase_12  las 12 habitaciones de la fase 12: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48 bytes)
+F 0x9C10 4
+D 0x9C40 0x9C70 habitaciones_fase_13  las 12 habitaciones de la fase 13: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48 bytes)
+F 0x9C40 4
+D 0x9C70 0x9C90 habitaciones_fase_14  las 8 habitaciones de la fase 14: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32 bytes)
+F 0x9C70 4
+D 0x9C90 0x9CB8 habitaciones_fase_15  las 10 habitaciones de la fase 15: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (40 bytes)
+F 0x9C90 4
+D 0x9CB8 0x9CE0 habitaciones_fase_16  las 10 habitaciones de la fase 16: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (40 bytes)
+F 0x9CB8 4
+D 0x9CE0 0x9D10 habitaciones_fase_17  las 12 habitaciones de la fase 17: [guion de 0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48 bytes)
+F 0x9CE0 4
+D 0x9D38 0x9D4E guion_9D38  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+F 0x9D38 16
+D 0x9D4E 0x9D64 guion_9D4E  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+F 0x9D4E 16
+D 0x9D64 0x9D8A guion_9D64  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+F 0x9D64 16
+D 0x9D8A 0x9DA5 guion_9D8A  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+F 0x9D8A 16
+D 0x9DA5 0x9DB5 guion_9DA5  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (16 bytes)
+F 0x9DA5 16
+D 0x9DB5 0x9DE0 guion_9DB5  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (43 bytes)
+F 0x9DB5 16
+D 0x9DE0 0x9E0B guion_9DE0  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (43 bytes)
+F 0x9DE0 16
+D 0x9E0B 0x9E26 guion_9E0B  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+F 0x9E0B 16
+D 0x9E62 0x9E83 guion_9E62  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+F 0x9E62 16
+D 0x9E83 0x9EA4 guion_9E83  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+F 0x9E83 16
+D 0x9EA4 0x9EBA guion_9EA4  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+F 0x9EA4 16
+D 0x9EBA 0x9EDB guion_9EBA  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+F 0x9EBA 16
+D 0x9EDB 0x9F01 guion_9EDB  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+F 0x9EDB 16
+D 0x9F01 0x9F1E guion_9F01  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (29 bytes)
+F 0x9F01 16
+D 0x9F1E 0x9F44 guion_9F1E  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+F 0x9F1E 16
+D 0x9F44 0x9F5F guion_9F44  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+F 0x9F44 16
+D 0x9F5F 0x9F91 guion_9F5F  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (50 bytes)
+F 0x9F5F 16
+D 0x9F91 0x9FA6 guion_9F91  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (21 bytes)
+F 0x9F91 16
+D 0x9FB2 0x9FD2 guion_9FB2  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (32 bytes)
+F 0x9FB2 16
+D 0x9FD2 0x9FED guion_9FD2  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+F 0x9FD2 16
+D 0x9FED 0x9FFE guion_9FED  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57BA (17 bytes)
+F 0x9FED 16
+D 0x9FFE 0xA000 paleta_9FFE  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (2 bytes)
+F 0x9FFE 3
+# --- fin de los bloques de bloques.py ---

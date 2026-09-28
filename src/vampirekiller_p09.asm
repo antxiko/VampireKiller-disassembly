@@ -10,7 +10,7 @@
 
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x8000..0xa000  (8192 bytes)
+; DATOS sin identificar  0x8000..0x9ab0  (6832 bytes)
 DATA_8000:
 	defb 0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah	; 8000  ................
 	defb 0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah,0aah	; 8010  ................
@@ -439,88 +439,478 @@ DATA_8000:
 	defb 000h,046h,066h,060h,000h,06ch,000h,000h,006h,040h,044h,000h,000h,046h,064h,000h	; 9a80  .Ff`.l...@D..Fd.
 	defb 066h,066h,066h,060h,066h,006h,066h,004h,044h,044h,044h,04bh,000h,000h,000h,000h	; 9a90  fff`f.f.DDDK....
 	defb 006h,066h,00bh,000h,000h,0c6h,040h,000h,000h,066h,0b0h,000h,000h,00ch,000h,000h	; 9aa0  .f....@..f......
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_de_cada_fase: 18 punteros, uno por fase (1-18), a su
+;   tabla de habitaciones; los lee p00:5790; lo leen p00:5786 (36 bytes)
+;   0x9ab0..0x9ad4  (36 bytes)
+DATA_habitaciones_de_cada_fase:
 	defb 0d4h,09ah,0f4h,09ah,00ch,09bh,024h,09bh,03ch,09bh,054h,09bh,06ch,09bh,090h,09bh	; 9ab0  ......$.<.T.l...
 	defb 0b0h,09bh,0d4h,09bh,0f8h,09bh,010h,09ch,040h,09ch,070h,09ch,090h,09ch,0b8h,09ch	; 9ac0  ........@.p.....
-	defb 0e0h,09ch,010h,09dh,038h,09dh,0feh,09fh,038h,09dh,0feh,09fh,04eh,09dh,005h,0a0h	; 9ad0  ....8...8...N...
-	defb 04eh,09dh,005h,0a0h,064h,09dh,00ch,0a0h,038h,09dh,0feh,09fh,038h,09dh,0feh,09fh	; 9ae0  N...d...8...8...
-	defb 04eh,09dh,005h,0a0h,064h,09dh,00ch,0a0h,064h,09dh,00ch,0a0h,038h,09dh,0feh,09fh	; 9af0  N...d...d...8...
-	defb 064h,09dh,00ch,0a0h,08ah,09dh,013h,0a0h,08ah,09dh,013h,0a0h,04eh,09dh,005h,0a0h	; 9b00  d...........N...
-	defb 04eh,09dh,005h,0a0h,064h,09dh,00ch,0a0h,038h,09dh,0feh,09fh,064h,09dh,00ch,0a0h	; 9b10  N...d...8...d...
-	defb 0a5h,09dh,00ch,0a0h,0e0h,09dh,028h,0a0h,0b5h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h	; 9b20  ......(...(...(.
-	defb 0b5h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h	; 9b30  ..(...(...(...(.
-	defb 0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h	; 9b40  ..(...(...(...(.
-	defb 0e0h,09dh,028h,0a0h,064h,09dh,028h,0a0h,064h,09dh,028h,0a0h,064h,09dh,028h,0a0h	; 9b50  ..(.d.(.d.(.d.(.
-	defb 0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,00bh,09eh,02fh,0a0h,044h,09fh,036h,0a0h	; 9b60  ..(...(.../.D.6.
-	defb 044h,09fh,036h,0a0h,0b2h,09fh,036h,0a0h,0b2h,09fh,036h,0a0h,062h,09eh,036h,0a0h	; 9b70  D.6...6...6.b.6.
-	defb 0b2h,09fh,036h,0a0h,0b2h,09fh,036h,0a0h,083h,09eh,036h,0a0h,083h,09eh,036h,0a0h	; 9b80  ..6...6...6...6.
-	defb 0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0dbh,09eh,028h,0a0h,0b2h,09fh,028h,0a0h	; 9b90  ..(...(...(...(.
-	defb 0b2h,09fh,028h,0a0h,083h,09eh,036h,0a0h,083h,09eh,036h,0a0h,0b2h,09fh,036h,0a0h	; 9ba0  ..(...6...6...6.
-	defb 0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h,0e0h,09dh,028h,0a0h	; 9bb0  ..(...(...(...(.
-	defb 0dbh,09eh,028h,0a0h,044h,09fh,036h,0a0h,0b2h,09fh,036h,0a0h,0a4h,09eh,028h,0a0h	; 9bc0  ..(.D.6...6...(.
-	defb 062h,09eh,036h,0a0h,0b5h,09dh,059h,0a0h,0bah,09eh,059h,0a0h,0bah,09eh,059h,0a0h	; 9bd0  b.6...Y...Y...Y.
-	defb 0bah,09eh,059h,0a0h,0bah,09eh,059h,0a0h,0bah,09eh,059h,0a0h,0d2h,09fh,059h,0a0h	; 9be0  ..Y...Y...Y...Y.
-	defb 0d2h,09fh,059h,0a0h,0d2h,09fh,059h,0a0h,038h,09dh,0feh,09fh,044h,09fh,036h,0a0h	; 9bf0  ..Y...Y.8...D.6.
-	defb 001h,09fh,036h,0a0h,001h,09fh,036h,0a0h,001h,09fh,036h,0a0h,01eh,09fh,036h,0a0h	; 9c00  ..6...6...6...6.
-	defb 01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h	; 9c10  ..6...6...6...6.
-	defb 01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h,044h,09fh,036h,0a0h,01eh,09fh,036h,0a0h	; 9c20  ..6...6.D.6...6.
-	defb 01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h,01eh,09fh,036h,0a0h	; 9c30  ..6...6...6...6.
-	defb 0b2h,09fh,052h,0a0h,062h,09eh,036h,0a0h,01eh,09fh,036h,0a0h,062h,09eh,036h,0a0h	; 9c40  ..R.b.6...6.b.6.
-	defb 062h,09eh,052h,0a0h,062h,09eh,036h,0a0h,01eh,09fh,036h,0a0h,0b2h,09fh,052h,0a0h	; 9c50  b.R.b.6...6...R.
-	defb 0b2h,09fh,052h,0a0h,0b2h,09fh,052h,0a0h,0b2h,09fh,052h,0a0h,01eh,09fh,036h,0a0h	; 9c60  ..R...R...R...6.
-	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,0b2h,09fh,052h,0a0h	; 9c70  _.(._.(._.(...R.
-	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h	; 9c80  _.(._.(._.(._.(.
-	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h	; 9c90  _.(._.(._.(._.(.
-	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h	; 9ca0  _.(._.(._.(._.(.
-	defb 05fh,09fh,028h,0a0h,091h,09fh,028h,0a0h,0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h	; 9cb0  _.(...(...6...6.
-	defb 0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h	; 9cc0  ..6...6...6...6.
-	defb 0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h,0a5h,09dh,036h,0a0h	; 9cd0  ..6...6...6...6.
-	defb 0b2h,09fh,036h,0a0h,0b2h,09fh,036h,0a0h,044h,09fh,036h,0a0h,05fh,09fh,028h,0a0h	; 9ce0  ..6...6.D.6._.(.
-	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,044h,09fh,036h,0a0h,001h,09fh,036h,0a0h	; 9cf0  _.(._.(.D.6...6.
-	defb 044h,09fh,036h,0a0h,044h,09fh,036h,0a0h,001h,09fh,036h,0a0h,044h,09fh,036h,0a0h	; 9d00  D.6.D.6...6.D.6.
+	defb 0e0h,09ch,010h,09dh	; 9ad0
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_1: las 8 habitaciones de la fase 1: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32
+;   bytes)
+;   0x9ad4..0x9af4  (32 bytes)
+DATA_habitaciones_fase_1:
+	defb 038h,09dh,0feh,09fh	; 9ad4
+	defb 038h,09dh,0feh,09fh	; 9ad8
+	defb 04eh,09dh,005h,0a0h	; 9adc
+	defb 04eh,09dh,005h,0a0h	; 9ae0
+	defb 064h,09dh,00ch,0a0h	; 9ae4
+	defb 038h,09dh,0feh,09fh	; 9ae8
+	defb 038h,09dh,0feh,09fh	; 9aec
+	defb 04eh,09dh,005h,0a0h	; 9af0
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_2: las 6 habitaciones de la fase 2: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9af4..0x9b0c  (24 bytes)
+DATA_habitaciones_fase_2:
+	defb 064h,09dh,00ch,0a0h	; 9af4
+	defb 064h,09dh,00ch,0a0h	; 9af8
+	defb 038h,09dh,0feh,09fh	; 9afc
+	defb 064h,09dh,00ch,0a0h	; 9b00
+	defb 08ah,09dh,013h,0a0h	; 9b04
+	defb 08ah,09dh,013h,0a0h	; 9b08
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_3: las 6 habitaciones de la fase 3: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9b0c..0x9b24  (24 bytes)
+DATA_habitaciones_fase_3:
+	defb 04eh,09dh,005h,0a0h	; 9b0c
+	defb 04eh,09dh,005h,0a0h	; 9b10
+	defb 064h,09dh,00ch,0a0h	; 9b14
+	defb 038h,09dh,0feh,09fh	; 9b18
+	defb 064h,09dh,00ch,0a0h	; 9b1c
+	defb 0a5h,09dh,00ch,0a0h	; 9b20
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_4: las 6 habitaciones de la fase 4: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9b24..0x9b3c  (24 bytes)
+DATA_habitaciones_fase_4:
+	defb 0e0h,09dh,028h,0a0h	; 9b24
+	defb 0b5h,09dh,028h,0a0h	; 9b28
+	defb 0e0h,09dh,028h,0a0h	; 9b2c
+	defb 0b5h,09dh,028h,0a0h	; 9b30
+	defb 0e0h,09dh,028h,0a0h	; 9b34
+	defb 0e0h,09dh,028h,0a0h	; 9b38
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_5: las 6 habitaciones de la fase 5: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9b3c..0x9b54  (24 bytes)
+DATA_habitaciones_fase_5:
+	defb 0e0h,09dh,028h,0a0h	; 9b3c
+	defb 0e0h,09dh,028h,0a0h	; 9b40
+	defb 0e0h,09dh,028h,0a0h	; 9b44
+	defb 0e0h,09dh,028h,0a0h	; 9b48
+	defb 0e0h,09dh,028h,0a0h	; 9b4c
+	defb 0e0h,09dh,028h,0a0h	; 9b50
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_6: las 6 habitaciones de la fase 6: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9b54..0x9b6c  (24 bytes)
+DATA_habitaciones_fase_6:
+	defb 064h,09dh,028h,0a0h	; 9b54
+	defb 064h,09dh,028h,0a0h	; 9b58
+	defb 064h,09dh,028h,0a0h	; 9b5c
+	defb 0e0h,09dh,028h,0a0h	; 9b60
+	defb 0e0h,09dh,028h,0a0h	; 9b64
+	defb 00bh,09eh,02fh,0a0h	; 9b68
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_7: las 9 habitaciones de la fase 7: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36
+;   bytes)
+;   0x9b6c..0x9b90  (36 bytes)
+DATA_habitaciones_fase_7:
+	defb 044h,09fh,036h,0a0h	; 9b6c
+	defb 044h,09fh,036h,0a0h	; 9b70
+	defb 0b2h,09fh,036h,0a0h	; 9b74
+	defb 0b2h,09fh,036h,0a0h	; 9b78
+	defb 062h,09eh,036h,0a0h	; 9b7c
+	defb 0b2h,09fh,036h,0a0h	; 9b80
+	defb 0b2h,09fh,036h,0a0h	; 9b84
+	defb 083h,09eh,036h,0a0h	; 9b88
+	defb 083h,09eh,036h,0a0h	; 9b8c
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_8: las 8 habitaciones de la fase 8: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32
+;   bytes)
+;   0x9b90..0x9bb0  (32 bytes)
+DATA_habitaciones_fase_8:
+	defb 0e0h,09dh,028h,0a0h	; 9b90
+	defb 0e0h,09dh,028h,0a0h	; 9b94
+	defb 0dbh,09eh,028h,0a0h	; 9b98
+	defb 0b2h,09fh,028h,0a0h	; 9b9c
+	defb 0b2h,09fh,028h,0a0h	; 9ba0
+	defb 083h,09eh,036h,0a0h	; 9ba4
+	defb 083h,09eh,036h,0a0h	; 9ba8
+	defb 0b2h,09fh,036h,0a0h	; 9bac
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_9: las 9 habitaciones de la fase 9: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36
+;   bytes)
+;   0x9bb0..0x9bd4  (36 bytes)
+DATA_habitaciones_fase_9:
+	defb 0e0h,09dh,028h,0a0h	; 9bb0
+	defb 0e0h,09dh,028h,0a0h	; 9bb4
+	defb 0e0h,09dh,028h,0a0h	; 9bb8
+	defb 0e0h,09dh,028h,0a0h	; 9bbc
+	defb 0dbh,09eh,028h,0a0h	; 9bc0
+	defb 044h,09fh,036h,0a0h	; 9bc4
+	defb 0b2h,09fh,036h,0a0h	; 9bc8
+	defb 0a4h,09eh,028h,0a0h	; 9bcc
+	defb 062h,09eh,036h,0a0h	; 9bd0
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_10: las 9 habitaciones de la fase 10: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (36
+;   bytes)
+;   0x9bd4..0x9bf8  (36 bytes)
+DATA_habitaciones_fase_10:
+	defb 0b5h,09dh,059h,0a0h	; 9bd4
+	defb 0bah,09eh,059h,0a0h	; 9bd8
+	defb 0bah,09eh,059h,0a0h	; 9bdc
+	defb 0bah,09eh,059h,0a0h	; 9be0
+	defb 0bah,09eh,059h,0a0h	; 9be4
+	defb 0bah,09eh,059h,0a0h	; 9be8
+	defb 0d2h,09fh,059h,0a0h	; 9bec
+	defb 0d2h,09fh,059h,0a0h	; 9bf0
+	defb 0d2h,09fh,059h,0a0h	; 9bf4
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_11: las 6 habitaciones de la fase 11: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (24
+;   bytes)
+;   0x9bf8..0x9c10  (24 bytes)
+DATA_habitaciones_fase_11:
+	defb 038h,09dh,0feh,09fh	; 9bf8
+	defb 044h,09fh,036h,0a0h	; 9bfc
+	defb 001h,09fh,036h,0a0h	; 9c00
+	defb 001h,09fh,036h,0a0h	; 9c04
+	defb 001h,09fh,036h,0a0h	; 9c08
+	defb 01eh,09fh,036h,0a0h	; 9c0c
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_12: las 12 habitaciones de la fase 12: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48
+;   bytes)
+;   0x9c10..0x9c40  (48 bytes)
+DATA_habitaciones_fase_12:
+	defb 01eh,09fh,036h,0a0h	; 9c10
+	defb 01eh,09fh,036h,0a0h	; 9c14
+	defb 01eh,09fh,036h,0a0h	; 9c18
+	defb 01eh,09fh,036h,0a0h	; 9c1c
+	defb 01eh,09fh,036h,0a0h	; 9c20
+	defb 01eh,09fh,036h,0a0h	; 9c24
+	defb 044h,09fh,036h,0a0h	; 9c28
+	defb 01eh,09fh,036h,0a0h	; 9c2c
+	defb 01eh,09fh,036h,0a0h	; 9c30
+	defb 01eh,09fh,036h,0a0h	; 9c34
+	defb 01eh,09fh,036h,0a0h	; 9c38
+	defb 01eh,09fh,036h,0a0h	; 9c3c
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_13: las 12 habitaciones de la fase 13: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48
+;   bytes)
+;   0x9c40..0x9c70  (48 bytes)
+DATA_habitaciones_fase_13:
+	defb 0b2h,09fh,052h,0a0h	; 9c40
+	defb 062h,09eh,036h,0a0h	; 9c44
+	defb 01eh,09fh,036h,0a0h	; 9c48
+	defb 062h,09eh,036h,0a0h	; 9c4c
+	defb 062h,09eh,052h,0a0h	; 9c50
+	defb 062h,09eh,036h,0a0h	; 9c54
+	defb 01eh,09fh,036h,0a0h	; 9c58
+	defb 0b2h,09fh,052h,0a0h	; 9c5c
+	defb 0b2h,09fh,052h,0a0h	; 9c60
+	defb 0b2h,09fh,052h,0a0h	; 9c64
+	defb 0b2h,09fh,052h,0a0h	; 9c68
+	defb 01eh,09fh,036h,0a0h	; 9c6c
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_14: las 8 habitaciones de la fase 14: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (32
+;   bytes)
+;   0x9c70..0x9c90  (32 bytes)
+DATA_habitaciones_fase_14:
+	defb 05fh,09fh,028h,0a0h	; 9c70
+	defb 05fh,09fh,028h,0a0h	; 9c74
+	defb 05fh,09fh,028h,0a0h	; 9c78
+	defb 0b2h,09fh,052h,0a0h	; 9c7c
+	defb 05fh,09fh,028h,0a0h	; 9c80
+	defb 05fh,09fh,028h,0a0h	; 9c84
+	defb 05fh,09fh,028h,0a0h	; 9c88
+	defb 05fh,09fh,028h,0a0h	; 9c8c
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_15: las 10 habitaciones de la fase 15: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (40
+;   bytes)
+;   0x9c90..0x9cb8  (40 bytes)
+DATA_habitaciones_fase_15:
+	defb 05fh,09fh,028h,0a0h	; 9c90
+	defb 05fh,09fh,028h,0a0h	; 9c94
+	defb 05fh,09fh,028h,0a0h	; 9c98
+	defb 05fh,09fh,028h,0a0h	; 9c9c
+	defb 05fh,09fh,028h,0a0h	; 9ca0
+	defb 05fh,09fh,028h,0a0h	; 9ca4
+	defb 05fh,09fh,028h,0a0h	; 9ca8
+	defb 05fh,09fh,028h,0a0h	; 9cac
+	defb 05fh,09fh,028h,0a0h	; 9cb0
+	defb 091h,09fh,028h,0a0h	; 9cb4
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_16: las 10 habitaciones de la fase 16: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (40
+;   bytes)
+;   0x9cb8..0x9ce0  (40 bytes)
+DATA_habitaciones_fase_16:
+	defb 0a5h,09dh,036h,0a0h	; 9cb8
+	defb 0a5h,09dh,036h,0a0h	; 9cbc
+	defb 0a5h,09dh,036h,0a0h	; 9cc0
+	defb 0a5h,09dh,036h,0a0h	; 9cc4
+	defb 0a5h,09dh,036h,0a0h	; 9cc8
+	defb 0a5h,09dh,036h,0a0h	; 9ccc
+	defb 0a5h,09dh,036h,0a0h	; 9cd0
+	defb 0a5h,09dh,036h,0a0h	; 9cd4
+	defb 0a5h,09dh,036h,0a0h	; 9cd8
+	defb 0a5h,09dh,036h,0a0h	; 9cdc
+
+; ----------------------------------------------------------------------
+; DATOS habitaciones_fase_17: las 12 habitaciones de la fase 17: [guion de
+;   0x4714][paleta de 0x483E] por habitacion (0xD001); lo leen p00:5794 (48
+;   bytes)
+;   0x9ce0..0x9d10  (48 bytes)
+DATA_habitaciones_fase_17:
+	defb 0b2h,09fh,036h,0a0h	; 9ce0
+	defb 0b2h,09fh,036h,0a0h	; 9ce4
+	defb 044h,09fh,036h,0a0h	; 9ce8
+	defb 05fh,09fh,028h,0a0h	; 9cec
+	defb 05fh,09fh,028h,0a0h	; 9cf0
+	defb 05fh,09fh,028h,0a0h	; 9cf4
+	defb 044h,09fh,036h,0a0h	; 9cf8
+	defb 001h,09fh,036h,0a0h	; 9cfc
+	defb 044h,09fh,036h,0a0h	; 9d00
+	defb 044h,09fh,036h,0a0h	; 9d04
+	defb 001h,09fh,036h,0a0h	; 9d08
+	defb 044h,09fh,036h,0a0h	; 9d0c
+
+; ----------------------------------------------------------------------
+; DATOS sin identificar  0x9d10..0x9d38  (40 bytes)
+DATA_9D10:
 	defb 05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,05fh,09fh,028h,0a0h,044h,09fh,036h,0a0h	; 9d10  _.(._.(._.(.D.6.
 	defb 044h,09fh,036h,0a0h,044h,09fh,036h,0a0h,044h,09fh,036h,0a0h,044h,09fh,036h,0a0h	; 9d20  D.6.D.6.D.6.D.6.
-	defb 05fh,09fh,028h,0a0h,0a6h,09fh,04ah,0a0h,000h,0e8h,0b3h,000h,0fah,000h,051h,0b0h	; 9d30  _.(...J.......Q.
-	defb 080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,006h,0c0h,0fah,0ffh,000h,0b9h	; 9d40  ...z............
-	defb 0bah,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah	; 9d50  ....Q....z......
-	defb 010h,000h,0fch,0ffh,000h,04bh,0b5h,000h,0fah,000h,067h,0a3h,000h,0fdh,000h,0e5h	; 9d60  .....K....g.....
-	defb 0a2h,000h,0feh,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,040h,0fah	; 9d70  ....Q....z....@.
-	defb 006h,000h,0fbh,001h,000h,0fdh,004h,080h,0fdh,0ffh,000h,07dh,0b9h,000h,0fah,000h	; 9d80  ...........}....
-	defb 03bh,0a2h,080h,0fch,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h	; 9d90  ;....Q....z.....
-	defb 0fah,00ah,040h,0fbh,0ffh,000h,0d8h,0b6h,000h,0fah,000h,051h,0b0h,080h,0feh,000h	; 9da0  ..@........Q....
-	defb 07ah,0b0h,0c0h,0feh,0ffh,000h,04bh,0b5h,000h,0fah,000h,0e5h,0adh,000h,0fch,000h	; 9db0  z.....K.........
-	defb 051h,0b0h,000h,0feh,000h,07ah,0b0h,040h,0feh,000h,0a8h,0a0h,080h,0feh,000h,0a8h	; 9dc0  Q....z.@........
-	defb 0a0h,0c0h,0feh,001h,040h,0fah,006h,000h,0fbh,001h,000h,0fch,008h,000h,0fdh,0ffh	; 9dd0  ....@...........
+	defb 05fh,09fh,028h,0a0h,0a6h,09fh,04ah,0a0h	; 9d30  _.(...J.
+
+; ----------------------------------------------------------------------
+; DATOS guion_9D38: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+;   0x9d38..0x9d4e  (22 bytes)
+DATA_guion_9D38:
+	defb 000h,0e8h,0b3h,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h	; 9d38  ......Q....z....
+	defb 000h,0fah,006h,0c0h,0fah,0ffh	; 9d48
+
+; ----------------------------------------------------------------------
+; DATOS guion_9D4E: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+;   0x9d4e..0x9d64  (22 bytes)
+DATA_guion_9D4E:
+	defb 000h,0b9h,0bah,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h	; 9d4e  ......Q....z....
+	defb 000h,0fah,010h,000h,0fch,0ffh	; 9d5e
+
+; ----------------------------------------------------------------------
+; DATOS guion_9D64: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+;   0x9d64..0x9d8a  (38 bytes)
+DATA_guion_9D64:
+	defb 000h,04bh,0b5h,000h,0fah,000h,067h,0a3h,000h,0fdh,000h,0e5h,0a2h,000h,0feh,000h	; 9d64  .K....g.........
+	defb 051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,040h,0fah,006h,000h,0fbh,001h	; 9d74  Q....z....@.....
+	defb 000h,0fdh,004h,080h,0fdh,0ffh	; 9d84
+
+; ----------------------------------------------------------------------
+; DATOS guion_9D8A: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+;   0x9d8a..0x9da5  (27 bytes)
+DATA_guion_9D8A:
+	defb 000h,07dh,0b9h,000h,0fah,000h,03bh,0a2h,080h,0fch,000h,051h,0b0h,080h,0feh,000h	; 9d8a  .}....;....Q....
+	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fah,00ah,040h,0fbh,0ffh	; 9d9a  z.......@..
+
+; ----------------------------------------------------------------------
+; DATOS guion_9DA5: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (16 bytes)
+;   0x9da5..0x9db5  (16 bytes)
+DATA_guion_9DA5:
+	defb 000h,0d8h,0b6h,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,0ffh	; 9da5  ......Q....z....
+
+; ----------------------------------------------------------------------
+; DATOS guion_9DB5: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (43 bytes)
+;   0x9db5..0x9de0  (43 bytes)
+DATA_guion_9DB5:
+	defb 000h,04bh,0b5h,000h,0fah,000h,0e5h,0adh,000h,0fch,000h,051h,0b0h,000h,0feh,000h	; 9db5  .K.........Q....
+	defb 07ah,0b0h,040h,0feh,000h,0a8h,0a0h,080h,0feh,000h,0a8h,0a0h,0c0h,0feh,001h,040h	; 9dc5  z.@............@
+	defb 0fah,006h,000h,0fbh,001h,000h,0fch,008h,000h,0fdh,0ffh	; 9dd5  ...........
+
+; ----------------------------------------------------------------------
+; DATOS guion_9DE0: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (43 bytes)
+;   0x9de0..0x9e0b  (43 bytes)
+DATA_guion_9DE0:
 	defb 000h,020h,0b1h,000h,0fah,000h,0e5h,0adh,000h,0fch,000h,0e5h,0a2h,000h,0feh,000h	; 9de0  . ..............
 	defb 066h,0a0h,080h,0feh,000h,051h,0b0h,080h,0fbh,000h,07ah,0b0h,0c0h,0fbh,001h,000h	; 9df0  f....Q....z.....
-	defb 0fah,004h,080h,0fah,001h,000h,0fch,008h,000h,0fdh,0ffh,000h,0eah,0b1h,000h,0fah	; 9e00  ................
-	defb 000h,098h,0b1h,000h,0fch,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h	; 9e10  ......Q....z....
-	defb 000h,0fch,004h,080h,0fch,0ffh,000h,067h,0a3h,000h,0fdh,000h,0e5h,0a2h,000h,0feh	; 9e20  .......g........
-	defb 000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fdh,004h,080h,0fdh	; 9e30  .Q....z.........
-	defb 0ffh,000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch	; 9e40  ..J.........'...
-	defb 000h,02dh,0b6h,040h,0fdh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h,000h	; 9e50  .-.@........@...
-	defb 0feh,0ffh,000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h	; 9e60  ...J.........'..
-	defb 0fch,000h,051h,0a9h,040h,0fdh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h	; 9e70  ..Q.@........@..
-	defb 000h,0feh,0ffh,000h,02dh,0b6h,000h,0fah,000h,0e5h,0a2h,000h,0feh,000h,051h,0b0h	; 9e80  ....-.........Q.
-	defb 080h,0fbh,000h,07ah,0b0h,0c0h,0fbh,001h,000h,0fah,006h,0c0h,0fah,001h,000h,0feh	; 9e90  ...z............
-	defb 002h,040h,0feh,0ffh,000h,046h,0a6h,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah	; 9ea0  .@...F....Q....z
-	defb 0b0h,0c0h,0feh,001h,000h,0fah,010h,080h,0fch,0ffh,000h,04bh,0b5h,000h,0fah,000h	; 9eb0  ...........K....
-	defb 07dh,0b9h,000h,0fch,000h,03bh,0a2h,080h,0feh,000h,0a8h,0a0h,0c0h,0feh,001h,040h	; 9ec0  }....;.........@
-	defb 0fah,006h,000h,0fbh,001h,000h,0fch,00ah,040h,0fdh,0ffh,000h,04ah,0a5h,000h,0fah	; 9ed0  ........@...J...
-	defb 000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h,020h,0b1h,040h,0fdh,000h	; 9ee0  ......'.... .@..
-	defb 0e5h,0a2h,040h,0feh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,004h,0c0h,0fdh	; 9ef0  ..@........@....
-	defb 0ffh,000h,0afh,0abh,000h,0fah,000h,051h,0a9h,040h,0fdh,001h,000h,0fah,00ch,0c0h	; 9f00  .......Q.@......
-	defb 0fbh,001h,040h,0fdh,006h,000h,0feh,001h,080h,0fbh,002h,0c0h,0feh,0ffh,000h,0e8h	; 9f10  ..@.............
-	defb 0b3h,000h,0fah,000h,096h,0a8h,080h,0fbh,000h,051h,0a9h,040h,0fdh,000h,051h,0b0h	; 9f20  .........Q.@..Q.
-	defb 000h,0fdh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,006h,0c0h,0fah,001h,040h,0fdh	; 9f30  ...z..........@.
-	defb 006h,000h,0feh,0ffh,000h,005h,0aah,000h,0fah,000h,051h,0a9h,040h,0fdh,000h,051h	; 9f40  ..........Q.@..Q
-	defb 0b0h,000h,0fdh,000h,07ah,0b0h,0c0h,0feh,001h,040h,0fdh,006h,000h,0feh,0ffh,000h	; 9f50  ....z....@......
-	defb 0e3h,0ach,000h,0fah,000h,0c9h,0a4h,000h,0fch,001h,000h,0fch,002h,0c0h,0fch,001h	; 9f60  ................
-	defb 040h,0fch,002h,080h,0fch,000h,020h,0b1h,040h,0fdh,000h,051h,0b0h,000h,0fdh,000h	; 9f70  @..... .@..Q....
-	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h,0c0h,0fdh	; 9f80  z..........@....
-	defb 0ffh,000h,05ah,0bch,000h,0fah,000h,0deh,0a3h,080h,0fbh,000h,051h,0b0h,080h,0feh	; 9f90  ..Z.........Q...
-	defb 000h,07ah,0b0h,0c0h,0feh,0ffh,000h,036h,0b8h,000h,0fah,001h,000h,0fah,00ah,080h	; 9fa0  .z.....6........
-	defb 0fbh,0ffh,000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h	; 9fb0  ...J.........'..
-	defb 0fch,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,008h,000h	; 9fc0  ..Q....z........
-	defb 0fbh,0ffh,000h,07dh,0b9h,000h,0fch,000h,03bh,0a2h,080h,0feh,000h,051h,0b0h,080h	; 9fd0  ...}....;....Q..
-	defb 0fbh,000h,07ah,0b0h,0c0h,0fbh,001h,000h,0fch,00ah,040h,0fdh,0ffh,000h,0e0h,0aeh	; 9fe0  ..z.......@.....
-	defb 040h,0fah,000h,096h,0afh,0c0h,0fbh,001h,040h,0fah,006h,000h,0fbh,0ffh,004h,076h	; 9ff0  @.......@......v
+	defb 0fah,004h,080h,0fah,001h,000h,0fch,008h,000h,0fdh,0ffh	; 9e00  ...........
+
+; ----------------------------------------------------------------------
+; DATOS guion_9E0B: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+;   0x9e0b..0x9e26  (27 bytes)
+DATA_guion_9E0B:
+	defb 000h,0eah,0b1h,000h,0fah,000h,098h,0b1h,000h,0fch,000h,051h,0b0h,080h,0feh,000h	; 9e0b  ...........Q....
+	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fch,004h,080h,0fch,0ffh	; 9e1b  z..........
+
+; ----------------------------------------------------------------------
+; DATOS sin identificar  0x9e26..0x9e62  (60 bytes)
+DATA_9E26:
+	defb 000h,067h,0a3h,000h,0fdh,000h,0e5h,0a2h,000h,0feh,000h,051h,0b0h,080h,0feh,000h	; 9e26  .g.........Q....
+	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fdh,004h,080h,0fdh,0ffh,000h,04ah,0a5h,000h,0fah	; 9e36  z...........J...
+	defb 000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h,02dh,0b6h,040h,0fdh,001h	; 9e46  ......'....-.@..
+	defb 000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h,000h,0feh,0ffh	; 9e56  ......@.....
+
+; ----------------------------------------------------------------------
+; DATOS guion_9E62: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+;   0x9e62..0x9e83  (33 bytes)
+DATA_guion_9E62:
+	defb 000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h	; 9e62  .J.........'....
+	defb 051h,0a9h,040h,0fdh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h,000h,0feh	; 9e72  Q.@........@....
+	defb 0ffh	; 9e82
+
+; ----------------------------------------------------------------------
+; DATOS guion_9E83: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+;   0x9e83..0x9ea4  (33 bytes)
+DATA_guion_9E83:
+	defb 000h,02dh,0b6h,000h,0fah,000h,0e5h,0a2h,000h,0feh,000h,051h,0b0h,080h,0fbh,000h	; 9e83  .-.........Q....
+	defb 07ah,0b0h,0c0h,0fbh,001h,000h,0fah,006h,0c0h,0fah,001h,000h,0feh,002h,040h,0feh	; 9e93  z.............@.
+	defb 0ffh	; 9ea3
+
+; ----------------------------------------------------------------------
+; DATOS guion_9EA4: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (22 bytes)
+;   0x9ea4..0x9eba  (22 bytes)
+DATA_guion_9EA4:
+	defb 000h,046h,0a6h,000h,0fah,000h,051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h	; 9ea4  .F....Q....z....
+	defb 000h,0fah,010h,080h,0fch,0ffh	; 9eb4
+
+; ----------------------------------------------------------------------
+; DATOS guion_9EBA: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (33 bytes)
+;   0x9eba..0x9edb  (33 bytes)
+DATA_guion_9EBA:
+	defb 000h,04bh,0b5h,000h,0fah,000h,07dh,0b9h,000h,0fch,000h,03bh,0a2h,080h,0feh,000h	; 9eba  .K....}....;....
+	defb 0a8h,0a0h,0c0h,0feh,001h,040h,0fah,006h,000h,0fbh,001h,000h,0fch,00ah,040h,0fdh	; 9eca  .....@........@.
+	defb 0ffh	; 9eda
+
+; ----------------------------------------------------------------------
+; DATOS guion_9EDB: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+;   0x9edb..0x9f01  (38 bytes)
+DATA_guion_9EDB:
+	defb 000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h	; 9edb  .J.........'....
+	defb 020h,0b1h,040h,0fdh,000h,0e5h,0a2h,040h,0feh,001h,000h,0fah,008h,000h,0fbh,001h	; 9eeb   .@....@........
+	defb 040h,0fdh,004h,0c0h,0fdh,0ffh	; 9efb
+
+; ----------------------------------------------------------------------
+; DATOS guion_9F01: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (29 bytes)
+;   0x9f01..0x9f1e  (29 bytes)
+DATA_guion_9F01:
+	defb 000h,0afh,0abh,000h,0fah,000h,051h,0a9h,040h,0fdh,001h,000h,0fah,00ch,0c0h,0fbh	; 9f01  ......Q.@.......
+	defb 001h,040h,0fdh,006h,000h,0feh,001h,080h,0fbh,002h,0c0h,0feh,0ffh	; 9f11  .@...........
+
+; ----------------------------------------------------------------------
+; DATOS guion_9F1E: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (38 bytes)
+;   0x9f1e..0x9f44  (38 bytes)
+DATA_guion_9F1E:
+	defb 000h,0e8h,0b3h,000h,0fah,000h,096h,0a8h,080h,0fbh,000h,051h,0a9h,040h,0fdh,000h	; 9f1e  ...........Q.@..
+	defb 051h,0b0h,000h,0fdh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,006h,0c0h,0fah,001h	; 9f2e  Q....z..........
+	defb 040h,0fdh,006h,000h,0feh,0ffh	; 9f3e
+
+; ----------------------------------------------------------------------
+; DATOS guion_9F44: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+;   0x9f44..0x9f5f  (27 bytes)
+DATA_guion_9F44:
+	defb 000h,005h,0aah,000h,0fah,000h,051h,0a9h,040h,0fdh,000h,051h,0b0h,000h,0fdh,000h	; 9f44  ......Q.@..Q....
+	defb 07ah,0b0h,0c0h,0feh,001h,040h,0fdh,006h,000h,0feh,0ffh	; 9f54  z....@.....
+
+; ----------------------------------------------------------------------
+; DATOS guion_9F5F: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (50 bytes)
+;   0x9f5f..0x9f91  (50 bytes)
+DATA_guion_9F5F:
+	defb 000h,0e3h,0ach,000h,0fah,000h,0c9h,0a4h,000h,0fch,001h,000h,0fch,002h,0c0h,0fch	; 9f5f  ................
+	defb 001h,040h,0fch,002h,080h,0fch,000h,020h,0b1h,040h,0fdh,000h,051h,0b0h,000h,0fdh	; 9f6f  .@..... .@..Q...
+	defb 000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,008h,000h,0fbh,001h,040h,0fdh,006h,0c0h	; 9f7f  .z..........@...
+	defb 0fdh,0ffh	; 9f8f
+
+; ----------------------------------------------------------------------
+; DATOS guion_9F91: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (21 bytes)
+;   0x9f91..0x9fa6  (21 bytes)
+DATA_guion_9F91:
+	defb 000h,05ah,0bch,000h,0fah,000h,0deh,0a3h,080h,0fbh,000h,051h,0b0h,080h,0feh,000h	; 9f91  .Z.........Q....
+	defb 07ah,0b0h,0c0h,0feh,0ffh	; 9fa1
+
+; ----------------------------------------------------------------------
+; DATOS sin identificar  0x9fa6..0x9fb2  (12 bytes)
+DATA_9FA6:
+	defb 000h,036h,0b8h,000h,0fah,001h,000h,0fah,00ah,080h,0fbh,0ffh	; 9fa6  .6..........
+
+; ----------------------------------------------------------------------
+; DATOS guion_9FB2: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (32 bytes)
+;   0x9fb2..0x9fd2  (32 bytes)
+DATA_guion_9FB2:
+	defb 000h,04ah,0a5h,000h,0fah,000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h	; 9fb2  .J.........'....
+	defb 051h,0b0h,080h,0feh,000h,07ah,0b0h,0c0h,0feh,001h,000h,0fah,008h,000h,0fbh,0ffh	; 9fc2  Q....z..........
+
+; ----------------------------------------------------------------------
+; DATOS guion_9FD2: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57A5 (habitacion) (27 bytes)
+;   0x9fd2..0x9fed  (27 bytes)
+DATA_guion_9FD2:
+	defb 000h,07dh,0b9h,000h,0fch,000h,03bh,0a2h,080h,0feh,000h,051h,0b0h,080h,0fbh,000h	; 9fd2  .}....;....Q....
+	defb 07ah,0b0h,0c0h,0fbh,001h,000h,0fch,00ah,040h,0fdh,0ffh	; 9fe2  z.......@..
+
+; ----------------------------------------------------------------------
+; DATOS guion_9FED: guion de carga de la VRAM que interpreta 0x4714 (0xFF
+;   acaba); lo leen p00:57BA (17 bytes)
+;   0x9fed..0x9ffe  (17 bytes)
+DATA_guion_9FED:
+	defb 000h,0e0h,0aeh,040h,0fah,000h,096h,0afh,0c0h,0fbh,001h,040h,0fah,006h,000h,0fbh	; 9fed  ...@.......@....
+	defb 0ffh	; 9ffd
+
+; ----------------------------------------------------------------------
+; DATOS paleta_9FFE: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
+;   0x483E al entrar en la habitacion; lo leen p00:57AE (2 bytes)
+;   0x9ffe..0xa000  (2 bytes)
+DATA_paleta_9FFE:
+	defb 004h,076h	; 9ffe

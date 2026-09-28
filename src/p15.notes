@@ -1,1 +1,14 @@
 # Notas del banco 15: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
+
+# --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xABFB 0xACFB dibujos_ABFB  8 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:589D (256 bytes)
+F 0xABFB 32
+D 0xACFB 0xAD3B dibujos_ACFB  2 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58A8 (64 bytes)
+F 0xACFB 32
+D 0xAD3B 0xAD7B dibujos_AD3B  2 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58B3 (64 bytes)
+F 0xAD3B 32
+D 0xAD7B 0xAD9B dibujos_AD7B  1 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58BE (32 bytes)
+F 0xAD7B 32
+D 0xAD9B 0xBB1B dibujos_AD9B  108 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:58C9 (3456 bytes)
+F 0xAD9B 32
+# --- fin de los bloques de bloques.py ---
