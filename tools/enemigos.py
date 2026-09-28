@@ -312,9 +312,10 @@ def pinta_el_cuerpo_en(cart, v, img, dibujo, dy, dx):
                     img[y0 + j - dy][0x70 + i - dx] = rgb(v.paleta, c)
 
 
-def hoja(cart, por_tipo, tope=12, con_tramos=True):
+def hoja(cart, por_tipo, tope=12, con_tramos=True, columnas=1):
     """Una fila por tipo con sus cuadros (hasta `tope`), cada uno con los
-    patrones y la paleta de la habitacion donde se vio."""
+    patrones y la paleta de la habitacion donde se vio; las filas, en orden,
+    repartidas en `columnas` columnas de alto parecido."""
     salas = {}
     filas = []
     for tipo in sorted(set(por_tipo) | ({TRAMOS} if con_tramos else set())):
@@ -348,13 +349,30 @@ def hoja(cart, por_tipo, tope=12, con_tramos=True):
                 v.v[COLORES + 16 * s:COLORES + 16 * s + 16] = bytes([color]) * 16
             pinta_sprites(v, fila, len(spr), dy=0x80 + y0 - 4, dx=0x80 + caja[2] - 4 - k * ancho)
         filas.append(fila)
-    ancho = max(len(f[0]) for f in filas)
-    img = []
+    total = sum(len(f) + 1 for f in filas)
+    grupos, grupo, alto = [], [], 0
     for f in filas:
-        for linea in f:
-            img.append(linea + [(24, 24, 24)] * (ancho - len(linea)))
-        img.append([(24, 24, 24)] * ancho)
-    return img
+        if grupo and alto + (len(f) + 1) / 2 > total * (len(grupos) + 1) / columnas                 and len(grupos) < columnas - 1:
+            grupos.append(grupo)
+            grupo = []
+        grupo.append(f)
+        alto += len(f) + 1
+    grupos.append(grupo)
+    trozos = []
+    for grupo in grupos:
+        ancho = max(len(f[0]) for f in grupo)
+        img = []
+        for f in grupo:
+            for linea in f:
+                img.append(linea + [(24, 24, 24)] * (ancho - len(linea)))
+            img.append([(24, 24, 24)] * ancho)
+        trozos.append(img)
+    alto = max(len(t) for t in trozos)
+    for t in trozos:
+        t.extend([[(24, 24, 24)] * len(t[0])] * (alto - len(t)))
+    separa = [(0, 0, 0)] * 8
+    return [sum((t[j] + (separa if k < len(trozos) - 1 else []) for k, t in enumerate(trozos)), [])
+            for j in range(alto)]
 
 
 def main():
@@ -370,10 +388,10 @@ def main():
     print("muestras: " + ", ".join("%d %s" % (n, c) for c, n in clases.most_common()))
     por_tipo = vistos(cart)
     print("tipos vistos:", sorted(por_tipo))
-    print(guarda_png(hoja(cart, por_tipo), os.path.join(IMAGENES, "enemigos.png"), 2))
+    print(guarda_png(hoja(cart, por_tipo, columnas=3), os.path.join(IMAGENES, "enemigos.png"), 2))
     lanzado = vistos(cart, "lanzado")
     print("tipos lanzados vistos:", sorted(lanzado))
-    print(guarda_png(hoja(cart, lanzado, con_tramos=False), os.path.join(IMAGENES, "lo_que_lanzan.png"), 2))
+    print(guarda_png(hoja(cart, lanzado, con_tramos=False, columnas=2), os.path.join(IMAGENES, "lo_que_lanzan.png"), 2))
 
 
 if __name__ == "__main__":

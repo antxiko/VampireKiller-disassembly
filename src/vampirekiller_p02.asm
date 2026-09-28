@@ -2964,7 +2964,7 @@ puerta_de_la_fase_a_0xff:
 	jp abre_la_puerta_de_la_fase		;9176
 
 ; ----------------------------------------------------------------------
-; LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar cada vida); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
+; LOS VENDEDORES (los secretos 11x: un viejo encapuchado, el dibujo de la fila 0xA0 de la pagina 1). Al entrar en la habitacion, cada secreto de vendedor llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar cada vida); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
 ; ----------------------------------------------------------------------
 sale_un_vendedor:
 	ld (0c70dh),hl		;9179   ; guarda el secreto de 0xE000
@@ -3119,7 +3119,7 @@ pinta_el_vendedor:
 	jr z,L_925C		;9259
 	dec (hl)			;925b   ; si: ese golpe no cuenta (se sale sin comprar y se vuelve: la tienda otra vez; visto en openMSX)
 L_925C:
-	ld a,003h		;925c   ; el dibujo 3, la puerta
+	ld a,003h		;925c   ; el dibujo 3, el viejo blanco
 pinta_un_dibujo_de_vendedor:
 	rrca			;925e   ; el dibujo A de la fila 0xA0 de la pagina 1, x = A * 32...
 	rrca			;925f
@@ -3131,7 +3131,7 @@ pinta_un_dibujo_de_vendedor:
 	jp 049dbh		;9269
 
 ; ----------------------------------------------------------------------
-; REPINTA LOS VENDEDORES que estan puestos, con el dibujo de la puerta (tras borrar la pantalla: p02:8D1C, 95C2).
+; REPINTA LOS VENDEDORES que estan puestos, con el dibujo 3 (el viejo blanco) (tras borrar la pantalla: p02:8D1C, 95C2).
 ; ----------------------------------------------------------------------
 repinta_los_vendedores:
 	ld hl,0c5b5h		;926c
@@ -3157,7 +3157,7 @@ repinta_uno:
 	ld e,(hl)			;9287
 	inc l			;9288
 	ld d,(hl)			;9289
-	jp L_925C		;928a   ; y la puerta
+	jp L_925C		;928a   ; y el viejo blanco
 
 ; ----------------------------------------------------------------------
 ; LA CRUZ (p02:8DC2) se lleva a los vendedores pintados: pone 0xFF en sus golpes, y 0x91F2 les da el desenlace 6.

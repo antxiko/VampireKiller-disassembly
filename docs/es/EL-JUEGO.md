@@ -67,7 +67,7 @@ tres bits altos del segundo byte, qué es. En todo el castillo hay **620**:
 | bloques que se rompen | 92 | 4 × 4 dibujos de 0x8792 o 0x87A6 (p02:86CA) |
 | objetos a la vista | 76 | filas 0x50 y 0x60 de la página 1, con transparencia |
 | cofres | 71 | el objeto 0x19 |
-| puertas con vendedor | 16 | 32 × 32 de la página 1 (96, 0xA0) |
+| vendedores a la vista | 16 | el viejo blanco, 32 × 32 de la página 1 (96, 0xA0) |
 
 Lo que sale al romper una vela o un bloque, o al abrir un cofre, lo dicen los
 bits bajos. Lo más repetido: 129 corazones, 100 corazones grandes, 77 llaves y
@@ -79,7 +79,13 @@ El cartucho la pinta desde la ROM, seis piezas de 8 × 8 una debajo de otra.
 
 ### Los vendedores
 
-Tras 16 puertas, y dentro de 17 bloques, hay **33 vendedores**. Cada uno
+![Los cinco dibujos del vendedor](../imagenes/vendedores.png)
+
+Hay **33 vendedores**: 16 a la vista y 17 dentro de bloques que se rompen. El
+vendedor es un viejo encapuchado de 32 × 32, el mismo molde (0xBDA7) que
+p00:54F0 colorea cinco veces en la fila 0xA0 de la página 1. Sale blanco; al
+pegarle parpadea con el negro y se queda del color de lo que toca (0x9320):
+rojo, la tienda; rosa, corazones; azul, 0xD012; blanco, nada o se va. Cada uno
 vende una cosa (0x5B0B): vida llena, daga, cruz que vuelve, escudo, frasco,
 bastón, reloj de arena, la vela que marca los bloques… Pero **no siempre
 venden**: lo que pasa depende de su clase (dos bits del secreto) y de
@@ -103,6 +109,16 @@ cuenta (p02:925B).
 el blanco, más baratos; con el rojo, más caros. Se lleva uno u otro, nunca los
 dos.
 
+![La tienda del bastón sin libro, con el libro blanco y con el rojo](../imagenes/tienda.png)
+
+La ventana (p02:9397) sale 0x18 puntos por encima del vendedor y a su
+izquierda: 0x50 × 0x20, borrada y con un marco del color 0x0E; dentro, los
+rótulos de 0x9485 y 0x948A, el precio en dos cifras y el objeto en su marco.
+Se compra con el disparo o el espacio; con el otro botón, sin corazones o al
+cabo de 0x14 plazos de 32 cuadros, se cierra. **Cotejo**: `coteja.py tienda`,
+seis volcados de la tienda abierta (`tools/lanza_tiendas.sh`), 0 puntos
+distintos.
+
 | lo que vende | sin libro | libro blanco | libro rojo |
 |---|---|---|---|
 | daga | 50 | 30 | 90 |
@@ -116,6 +132,44 @@ dos.
 | vela | 20 | 15 | 60 |
 
 Visto en openMSX golpe a golpe, con un vendedor de cada clase.
+
+### Los objetos
+
+![Los 29 objetos con dibujo](../imagenes/objetos.png)
+
+El objeto del tipo t es el dibujo t − 1 de la página 1: los dieciséis
+primeros en la fila 0x50 y los demás en la 0x60 (p02:8CC1). Lo que hace cada
+uno lo reparte p02:8D3E; los nombres son los de su dibujo.
+
+| tipo | objeto | lo que hace |
+|---|---|---|
+| 0x01 | corazón | un corazón |
+| 0x02 | corazón grande | cinco corazones |
+| 0x03 | escudo rojo | para 16 golpes (0xC441) |
+| 0x04 | escudo | para 16 golpes (0xC441) |
+| 0x05 | cruz blanca | borra lo que hay en la habitación, y los vendedores se van (p02:8DC2) |
+| 0x06 | cruz gris | la cuenta del arma a 0x96 cuadros (0xC440) |
+| 0x07 | bola roja | 8 de vida |
+| 0x08 | bola azul | invencible 0x96 cuadros (0xC43A) |
+| 0x09 | anillo | mata al tocar mientras dura (0xC434) |
+| 0x0A | reloj de arena | un bit de lo que lleva (0xC701, bit 6) |
+| 0x0B | lazo | las cuentas duran 0xF0 en vez de 0x96 (0xC431, bit 2) |
+| 0x0C | botas | un bit (0xC431, bit 3) |
+| 0x0D | alas | un bit (0xC431, bit 4) |
+| 0x0E | vela | marca los bloques que se rompen (0xC702, bit 0) |
+| 0x0F | pergamino | tres usos del mapa con F2 (0xC70F) |
+| 0x10 | libro rojo | la tienda, más cara (0xC702, bit 6) |
+| 0x11 | libro blanco | la tienda, más barata (0xC702, bit 7) |
+| 0x12 | bastón | un bit (0xC431, bit 1) y otro de lo que lleva |
+| 0x13 | bolsa blanca | 5.000 puntos |
+| 0x14 | bolsa azul | 1.000 puntos |
+| 0x15 | — | un enemigo (p02:8AD0) |
+| 0x16 | botella | vida llena |
+| 0x17 | llave | un bit de lo que lleva (bit 1) y 0xC700 = 1 |
+| 0x18 | llave blanca | un bit de lo que lleva (bit 0) |
+| 0x19 | cofre | lo que esconde |
+| 0x1A-0x1D | armas 1 a 4 | látigo de cadena, daga, hacha y cruz que vuelve: a 0xC416 y al marcador (p02:8D70) |
+| 0x1E | frasco, el arma 5 | un bit de lo que lleva (bit 3, p02:8D8D) |
 
 ## Simon
 
@@ -215,3 +269,40 @@ números de tipo (p02:9E5C; los parámetros de cada uno, en 0xA08F): bolas de
 fuego (del murciélago gigante, de la columna de calaveras, de Drácula y en la
 sala del monstruo), los huesos del esqueleto, las serpientes de Medusa, las
 hoces de la Muerte y las hachas del caballero naranja.
+
+## El final
+
+Tras Drácula, p01:66BA sube un texto renglón a renglón con el registro 23 del
+VDP (el desplazamiento vertical), con la música 0x8E. Los 41 renglones están
+en los bancos 5 y 8, con la tabla de punteros en 0x678E: cada uno lleva el
+momento en que sale, la columna y el texto en ASCII. La fuente la completa
+p00:53DE con letras del banco 14, y en ella el «:» se dibuja como un punto y el
+«;» como un apóstrofo; aquí va como se ve:
+
+    SO THE BRAVE YOUNG MAN
+    PUT DRACULA INTO DEEP
+    SLEEP AGAIN AND THE TOWN
+    RESTORED ITS PEACE.
+
+    LET'S PRAY THAT THE EVIL
+    MIND OF HUMANBEINGS WILL
+    NOT LET DRACULA COME TO
+    LIFE EVER AGAIN....
+
+Y el STAFF:
+
+| | |
+|---|---|
+| GAME DESIGNER | A. NAGATA |
+| PROGRAMMER | A. HARIMA, I. AKADA, K. NAGAE |
+| SOUND PROGRAMMER | H. SHIKAMA |
+| GRAPHIC DESIGNER | S. IWAMOTO, N. MATSUI, K. MIZUTANI, A. FUJIMOTO |
+| SOUND EFFECT BY | K. UEHARA |
+| MUSIC BY | K. YAMASHITA, S. TERASHIMA |
+| ART DESIGNER | F. HAYAKAWA |
+| ASSISTANT PROGRAMMER | K. TOYOHARA, T. OKA, H. EDA, T. OHTSUKA, T. DANJYO |
+| SPECIAL THANKS | K. HIRAOKA, FC. TEAM |
+| PRODUCED BY | AKIHIKO NAGATA |
+| PRESENTED BY | KONAMI |
+
+Al acabar, p01:6701 sube 0xD012, hasta 2.

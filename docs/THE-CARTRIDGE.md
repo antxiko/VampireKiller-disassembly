@@ -58,9 +58,9 @@ accounted for (`make sanity`).
 The game runs in **SCREEN 5**: 256 pixels wide, 16 colours out of a palette
 of 512 (p00:4B61). **Page 1** of the VRAM is the store: that is where the
 stage's 191 8 × 8 background tiles go when it starts, along with the 16 × 16
-items (rows 0x50, 0x60 and 0x70) and the five 32 × 32 doors (row 0xA0). Page 0
+items (rows 0x50, 0x60 and 0x70) and the five 32 × 32 vendors (row 0xA0). Page 0
 is the screen: the room is drawn from the buffer at 0xD100, and the items, the
-doors and Dracula are copied from page 1 with the VDP commands (LMMM, HMMM,
+vendors and Dracula are copied from page 1 with the VDP commands (LMMM, HMMM,
 HMMC).
 
 The sprites are **mode 2** (16 × 16, coloured line by line). Since the VDP

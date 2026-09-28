@@ -59,9 +59,9 @@ El juego corre en **SCREEN 5**: 256 puntos de ancho, 16 colores de una paleta
 de 512 (p00:4B61).
 La **página 1** de la VRAM es el almacén: ahí se suben al entrar en la fase
 los 191 dibujos de 8 × 8 del decorado, los objetos de 16 × 16 (filas 0x50,
-0x60 y 0x70) y las cinco puertas de 32 × 32 (fila 0xA0). La página 0 es la
-pantalla: la habitación se pinta desde el búfer 0xD100, y los objetos, las
-puertas y Drácula se copian desde la página 1 con las órdenes del VDP (LMMM,
+0x60 y 0x70) y los cinco vendedores de 32 × 32 (fila 0xA0). La página 0 es la
+pantalla: la habitación se pinta desde el búfer 0xD100, y los objetos, los
+vendedores y Drácula se copian desde la página 1 con las órdenes del VDP (LMMM,
 HMMM, HMMC).
 
 Los sprites son de **modo 2** (16 × 16, color por línea). Como el VDP no pinta

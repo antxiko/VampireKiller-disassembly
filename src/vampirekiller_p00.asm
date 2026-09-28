@@ -3192,7 +3192,7 @@ DATA_hmmc_546D:
 
 
 ; ----------------------------------------------------------------------
-; LOS OBJETOS Y LAS PUERTAS, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y las cinco puertas de los vendedores.
+; LOS OBJETOS Y EL VENDEDOR, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y los cinco dibujos del vendedor.
 ; ----------------------------------------------------------------------
 sube_los_objetos:
 	call bancos_9_10		;548d   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
@@ -3234,29 +3234,29 @@ L_54B9:
 	ld b,005h		;54e2
 	call sube_dibujos_de_16		;54e4   ; sube_dibujos_de_16: B dibujos de 16x16 a 4 bits de HL
 	call bancos_9_10		;54e7   ; bancos_9_10: pone los bancos 9 y 10 en 0x8000 y 0xA000
-	call las_puertas_de_los_vendedores		;54ea   ; las puertas de los vendedores
+	call los_cinco_vendedores		;54ea   ; los cinco vendedores
 	jp bancos_1_2_3		;54ed   ; bancos_1_2_3: vuelve a poner los bancos 1, 2 y 3
 
 ; ----------------------------------------------------------------------
-; LAS CINCO PUERTAS DE LOS VENDEDORES (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
+; LOS CINCO VENDEDORES, un viejo encapuchado con baston en cinco colores (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
 ; ----------------------------------------------------------------------
-las_puertas_de_los_vendedores:
+los_cinco_vendedores:
 	ld ix,0558eh		;54f0   ; los cinco colores
 	ld de,0d000h		;54f4   ; en la VRAM 0xD000: (0, 0xA0) de la pagina 1
 	ld b,005h		;54f7   ; cinco
-una_puerta_de_vendedor:
+un_vendedor_de_color:
 	push bc			;54f9
 	push de			;54fa
-	call arma_la_puerta		;54fb   ; se arma...
-	call sube_la_puerta		;54fe   ; ... y se sube
+	call arma_el_vendedor		;54fb   ; se arma...
+	call sube_el_vendedor		;54fe   ; ... y se sube
 	pop de			;5501   ; la siguiente, 32 puntos mas alla
 	ld a,010h		;5502
 	call de_mas_a		;5504   ; de_mas_a: DE += A
 	pop bc			;5507
 	inc ix		;5508   ; con el color siguiente
-	djnz una_puerta_de_vendedor		;550a
+	djnz un_vendedor_de_color		;550a
 	ret			;550c
-arma_la_puerta:
+arma_el_vendedor:
 	exx			;550d
 	ld de,0e800h		;550e   ; en 0xE800...
 	ld hl,0bda7h		;5511   ; ... desde el molde de 0xBDA7...
@@ -3273,7 +3273,7 @@ un_byte_del_molde:
 	and 00fh		;551e
 	cp 00fh		;5520   ; ... 0xF?
 	jr nz,a_la_izquierda		;5522
-	and (ix+000h)		;5524   ; si: el color de esta puerta
+	and (ix+000h)		;5524   ; si: el color de este vendedor
 a_la_izquierda:
 	add a,a			;5527   ; al nibble alto
 	add a,a			;5528
@@ -3300,14 +3300,14 @@ los_dos_puntos:
 	ldir		;5544
 	exx			;5546
 	ret			;5547
-sube_la_puerta:
+sube_el_vendedor:
 	ld hl,0556eh		;5548   ; los 16 dibujos de 0x556E...
 	ld b,004h		;554b   ; ... cuatro filas...
 L_554D:
 	push bc			;554d
 	push de			;554e
 	ld b,004h		;554f   ; ... de cuatro
-un_dibujo_de_la_puerta:
+un_dibujo_del_vendedor:
 	push bc			;5551
 	push hl			;5552
 	ld a,(hl)			;5553   ; el dibujo, en la RAM
@@ -3321,7 +3321,7 @@ un_dibujo_de_la_puerta:
 	inc hl			;5560
 	inc hl			;5561
 	pop bc			;5562
-	djnz un_dibujo_de_la_puerta		;5563
+	djnz un_dibujo_del_vendedor		;5563
 	pop de			;5565
 	ld a,d			;5566   ; la fila siguiente, ocho lineas mas abajo (0x400)
 	add a,004h		;5567

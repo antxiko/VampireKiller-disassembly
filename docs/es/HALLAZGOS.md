@@ -3,20 +3,33 @@
 Lo que apareció al desmontar el cartucho. Cada cosa lleva la dirección donde
 se puede comprobar.
 
-## Las puertas cerradas son vendedores, y no siempre venden
+## Los vendedores son viejos, y cuentan los golpes
 
-Las 16 puertas blancas del castillo, y otros 17 secretos escondidos en
-bloques, son **33 vendedores** (p02:9179). Cada uno vende una cosa (tabla
+Hay **33 vendedores** (p02:9179): 16 a la vista y 17 dentro de bloques que se
+rompen. Es un viejo encapuchado, el mismo dibujo en cinco colores (fila 0xA0
+de la página 1); el color dice lo que toca (0x9320): rojo, la tienda; rosa,
+corazones; azul, 0xD012; blanco, nada. Cada uno vende una cosa (tabla
 0x5B0B), pero lo que pasa depende de su **clase** (dos bits del secreto) y de
 **cuántas veces se le ha pegado**: la tabla 0x9300 da ocho golpes por clase
 (p02:92BB). Un vendedor de clase 3 no abre la tienda hasta el quinto golpe;
-uno de clase 2 puede quitar cinco corazones; todos se van en el octavo. La tabla entera está en [El juego](EL-JUEGO.md#los-vendedores).
+uno de clase 2 puede quitar cinco corazones; todos se van en el octavo. Al
+morir, la cuenta vuelve a cero. Visto en openMSX golpe a golpe; la tabla
+entera está en [El juego](EL-JUEGO.md#los-vendedores).
 
 ## Los libros cambian los precios
 
 Con el libro blanco la tienda cobra menos y con el rojo, más (0xC702,
 p02:9418): la vida llena cuesta 15, 40 u 80 corazones según el libro. Visto
 en openMSX; la tabla entera está en [El juego](EL-JUEGO.md#los-vendedores).
+
+## El final trae su historia y sus créditos
+
+Tras Drácula, p01:66BA sube un texto renglón a renglón con el registro 23 del
+VDP: ocho líneas de historia («SO THE BRAVE YOUNG MAN PUT DRACULA INTO DEEP
+SLEEP AGAIN…») y el STAFF, veinte nombres, del GAME DESIGNER A. NAGATA a
+PRODUCED BY AKIHIKO NAGATA (tabla 0x678E, bancos 5 y 8). En la ROM los puntos
+son «:» y el apóstrofo es «;»: la fuente que p00:53DE sube para el final los
+dibuja así. El texto entero está en [El juego](EL-JUEGO.md#el-final).
 
 ## Drácula es un sprite y un dibujo del VDP
 

@@ -255,32 +255,32 @@ def carga_los_dibujos_de_los_objetos(cart, vram=None):
         hmmc(cart, B910, 0x9A90, 0x80 + 8 * k, 0x74, 8, 8, 1, vram)
     sube_dibujos_de_16(cart, B456, 0xB9C8, 0xB030, 8, vram)
     sube_dibujos_de_16(cart, B456, 0xBDC8, 0xB800, 5, vram)
-    carga_las_puertas(cart, vram)
+    carga_los_vendedores(cart, vram)
     return vram
 
 
-PUERTA_SIN_COLOR = 0xBDA7            # banco 10: 256 bytes, el 0xF es "el color"
-COLORES_DE_LAS_PUERTAS = (3, 8, 2, 14, 15)   # p00:558E
-PIEZAS_DE_LA_PUERTA_GRANDE = 0x556E  # banco 0: 16 punteros a la RAM de 0xE800
-PRIMERA_PUERTA = 0xD000              # VRAM: (0, 0xA0) de la pagina 1
+MOLDE_DEL_VENDEDOR = 0xBDA7            # banco 10: 256 bytes, el 0xF es "el color"
+COLORES_DEL_VENDEDOR = (3, 8, 2, 14, 15)   # p00:558E
+PIEZAS_DEL_VENDEDOR = 0x556E  # banco 0: 16 punteros a la RAM de 0xE800
+PRIMER_VENDEDOR = 0xD000              # VRAM: (0, 0xA0) de la pagina 1
 
 
-def carga_las_puertas(cart, vram):
-    """p00:54F0: la puerta de 32x32 de 0xBDA7 -ocho dibujos de 8x8 con el
-    nibble 0xF de comodin- coloreada cinco veces (p00:550D, un color por
+def carga_los_vendedores(cart, vram):
+    """p00:54F0: el vendedor de 32x32 de 0xBDA7 -un viejo encapuchado, con el
+    nibble 0xF de comodin- coloreado cinco veces (p00:550D, un color por
     vuelta) y subida como 4 x 4 piezas (p00:5548) en la fila 0xA0 de la
-    pagina 1, una puerta cada 32 puntos. La cuarta, la blanca (color 14), es
-    la puerta de los vendedores (p02:925E con A = 3)."""
-    for k, color in enumerate(COLORES_DE_LAS_PUERTAS):
+    pagina 1, uno cada 32 puntos. El cuarto, el blanco (color 14), es
+    el que sale al entrar (p02:925E con A = 3)."""
+    for k, color in enumerate(COLORES_DEL_VENDEDOR):
         ram = bytearray(0x120)                        # 0xE800-0xE91F
         for i in range(256):
-            b = cart.leer(PUERTA_SIN_COLOR + i, B910)
+            b = cart.leer(MOLDE_DEL_VENDEDOR + i, B910)
             hi, lo = b >> 4, b & 0x0F
             ram[i] = ((color if hi == 0xF else hi) << 4) | (color if lo == 0xF else lo)
-        base = PRIMERA_PUERTA + 0x10 * k
+        base = PRIMER_VENDEDOR + 0x10 * k
         for f in range(4):
             for c in range(4):
-                src = cart.palabra(PIEZAS_DE_LA_PUERTA_GRANDE + 2 * (4 * f + c), B123) - 0xE800
+                src = cart.palabra(PIEZAS_DEL_VENDEDOR + 2 * (4 * f + c), B123) - 0xE800
                 dest = base + 0x400 * f + 4 * c
                 for fila in range(8):
                     for j in range(4):
@@ -430,8 +430,8 @@ def carga_la_sala_de_dracula(cart, vram):
       p00:5880  del banco 15: dibujos de 8x8 tal cual (p00:5895) y del reves
                 (p00:58CC), tres pares volteados de arriba abajo desde la
                 VRAM (p00:592A), y ocho dibujos de 16x16 (p00:598B) mas cuatro
-                del reves (p00:5996) en la fila 0xA0, donde estaban las
-                puertas.
+                del reves (p00:5996) en la fila 0xA0, donde estaban los
+                vendedores.
       p00:57DF  dos dibujos de 32x32 (0xB5A1 y 0xB719 del banco 13) en la
                 fila 0x80, cada uno tal cual y del reves."""
     pon_paleta(cart, B910, PALETA_BASE, vram)

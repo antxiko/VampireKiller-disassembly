@@ -25,14 +25,14 @@ from graficos import (Cartucho, IMAGENES, B123, B111213, CASILLA_DE_CADA_HABITAC
                       SALIDAS_DE_CADA_FASE, FILA_DE_LA_HABITACION, cuantas_habitaciones,
                       habitacion, foto, rgb, guarda_png)
 from secretos import (pinta_secretos, secretos, que_sale, describe, BICHO,  # noqa: E402
-                      FILA_DE_LOS_OBJETOS, TIPO_DEL_COFRE, PUERTA_CERRADA)
+                      FILA_DE_LOS_OBJETOS, TIPO_DEL_COFRE, VENDEDOR_BLANCO)
 
 COLUMNAS, FILAS = 6, 5
 ESCALA = 2                           # la habitacion a 2x; los secretos, a 1x encima
 ANCHO, ALTO = 256 * ESCALA, 176 * ESCALA
 HUECO = 24
 MARCO_BLOQUE = (255, 230, 0)         # un bloque que se rompe
-MARCO_PUERTA = (255, 0, 255)         # un vendedor, o lo que lo saca
+MARCO_VENDEDOR = (255, 0, 255)         # un vendedor, o lo que lo saca
 MARCO_BICHO = (255, 40, 40)          # sale un bicho
 NEGRO = (0, 0, 0)
 FONDO = (24, 24, 24)
@@ -114,20 +114,20 @@ def marca_los_secretos(img, v, cart, fase, hab, x0, y0):
     for e in secretos(cart, fase, hab):
         x, y = x0 + e["x"] * ESCALA, y0 + (e["y"] - FILA_DE_LA_HABITACION) * ESCALA
         que, tipo = que_sale(e)
-        lado = 32 * ESCALA if e.get("tamano") == 3 or e["que"] == "puerta" else 16 * ESCALA
+        lado = 32 * ESCALA if e.get("tamano") == 3 or e["que"] == "vendedor" else 16 * ESCALA
         if e["que"] == "bloque":
             _marco(img, x, y, lado, lado, MARCO_BLOQUE)
-        elif e["que"] == "puerta":
-            _marco(img, x, y, lado, lado, MARCO_PUERTA)
+        elif e["que"] == "vendedor":
+            _marco(img, x, y, lado, lado, MARCO_VENDEDOR)
             continue
         elif e["que"] == "objeto":
             continue                          # ya esta pintado
         cx, cy = x + lado // 2 - 8, y + lado // 2 - 8
         if e["que"] in ("vela", "cofre"):
             cx, cy = x + lado - 4, y - 8      # arriba a la derecha de la vela o el cofre
-        if que == "puerta":
-            _marco(img, x + 2, y + 2, lado - 4, lado - 4, MARCO_PUERTA)
-            _pega(img, _dibujo(v, PUERTA_CERRADA[0], PUERTA_CERRADA[1], 32, 32), x + lado // 2 - 16, y + lado // 2 - 16)
+        if que == "vendedor":
+            _marco(img, x + 2, y + 2, lado - 4, lado - 4, MARCO_VENDEDOR)
+            _pega(img, _dibujo(v, VENDEDOR_BLANCO[0], VENDEDOR_BLANCO[1], 32, 32), x + lado // 2 - 16, y + lado // 2 - 16)
         elif tipo == BICHO:
             _exclamacion(img, cx + 6, cy + 1, MARCO_BICHO)
         elif tipo == 0:

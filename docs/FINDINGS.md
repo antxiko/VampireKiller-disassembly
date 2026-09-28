@@ -3,20 +3,35 @@
 What turned up when the cartridge was taken apart. Each item carries the
 address where it can be checked.
 
-## The locked doors are vendors, and they do not always sell
+## The vendors are old men, and they count the hits
 
-The castle's 16 white doors, and another 17 secrets hidden inside blocks, are
-**33 vendors** (p02:9179). Each one sells one thing (table 0x5B0B), but what
+There are **33 vendors** (p02:9179): 16 in plain sight and 17 inside
+breakable blocks. Each one is a hooded old man, the same drawing in five
+colours (row 0xA0 of page 1); the colour tells what comes (0x9320): red, the
+shop; pink, hearts; blue, 0xD012; white, nothing. Each one sells one thing
+(table 0x5B0B), but what
 happens depends on their **class** (two bits of the secret) and on **how many
 times you have hit them**: the table at 0x9300 gives eight hits per class
 (p02:92BB). A class 3 vendor does not open the shop until the fifth hit; a
-class 2 one can take five hearts away; they all leave on the eighth. The whole table is in [The game](THE-GAME.md#the-vendors).
+class 2 one can take five hearts away; they all leave on the eighth. Dying
+resets the count. Seen in openMSX hit by hit; the whole table is in
+[The game](THE-GAME.md#the-vendors).
 
 ## The books change the prices
 
 With the white book the shop charges less, and with the red one more
 (0xC702, p02:9418): full life costs 15, 40 or 80 hearts depending on the
 book. Seen in openMSX; the whole table is in [The game](THE-GAME.md#the-vendors).
+
+## The ending carries its story and its credits
+
+After Dracula, p01:66BA scrolls up a text line by line with VDP register 23:
+eight lines of story ("SO THE BRAVE YOUNG MAN PUT DRACULA INTO DEEP SLEEP
+AGAIN…") and the STAFF, twenty names, from GAME DESIGNER A. NAGATA to
+PRODUCED BY AKIHIKO NAGATA (table 0x678E, banks 5 and 8). In the ROM the full
+stops are ":" and the apostrophe is ";": the font that p00:53DE uploads for
+the ending draws them that way. The whole text is in
+[The game](THE-GAME.md#the-ending).
 
 ## Dracula is a sprite and a VDP drawing
 

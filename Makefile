@@ -167,6 +167,8 @@ imagenes: $(ROM)
 	python3 tools/simon.py
 	python3 tools/enemigos.py
 	python3 tools/dracula.py
+	python3 tools/tienda.py
+	python3 tools/objetos.py
 
 coteja: $(ROM)
 	python3 tools/coteja.py

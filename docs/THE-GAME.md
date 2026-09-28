@@ -67,7 +67,7 @@ of the second byte, what it is. The whole castle has **620**:
 | breakable blocks | 92 | 4 × 4 tiles from 0x8792 or 0x87A6 (p02:86CA) |
 | items in plain sight | 76 | rows 0x50 and 0x60 of page 1, with transparency |
 | chests | 71 | item 0x19 |
-| doors with a vendor | 16 | 32 × 32 from page 1 (96, 0xA0) |
+| vendors in plain sight | 16 | the white old man, 32 × 32 from page 1 (96, 0xA0) |
 
 What comes out of a candle or a block, or out of a chest, is in the low bits.
 The most common: 129 hearts, 100 big hearts, 77 keys and 21 white keys. In 52
@@ -79,8 +79,14 @@ draws it from the ROM, six 8 × 8 pieces one under the other.
 
 ### The vendors
 
-Behind 16 doors, and inside 17 blocks, there are **33 vendors**. Each one
-sells one thing (0x5B0B): full life, dagger, boomerang cross, shield, flask,
+![The vendor's five drawings](imagenes/vendedores.png)
+
+There are **33 vendors**: 16 in plain sight and 17 inside breakable blocks.
+The vendor is a 32 × 32 hooded old man, the same mould (0xBDA7) that
+p00:54F0 colours five times on row 0xA0 of page 1. He comes out white; when
+hit he blinks with the black one and stays in the colour of what comes
+(0x9320): red, the shop; pink, hearts; blue, 0xD012; white, nothing or he
+leaves. Each one sells one thing (0x5B0B): full life, dagger, boomerang cross, shield, flask,
 staff, hourglass, the candle that marks the blocks… But **they do not always
 sell**: what happens depends on their class (two bits of the secret) and on
 **how many times you have hit them**. Each hit adds one (p02:8115), and the
@@ -103,6 +109,15 @@ buying, that hit does not count when you come back (p02:925B).
 one, cheaper; with the red one, dearer. You carry one or the other, never
 both.
 
+![The staff shop with no book, with the white book and with the red one](imagenes/tienda.png)
+
+The window (p02:9397) opens 0x18 dots above the vendor and to his left:
+0x50 × 0x20, cleared and framed in colour 0x0E; inside, the labels at 0x9485
+and 0x948A, the two-digit price and the item in its frame. Fire or space
+buys; the other button, no hearts, or 0x14 spells of 32 frames close it.
+**Check**: `coteja.py tienda`, six dumps of the open shop
+(`tools/lanza_tiendas.sh`), 0 dots different.
+
 | what it sells | no book | white book | red book |
 |---|---|---|---|
 | dagger | 50 | 30 | 90 |
@@ -116,6 +131,44 @@ both.
 | candle | 20 | 15 | 60 |
 
 Seen in openMSX hit by hit, with one vendor of each class.
+
+### The items
+
+![The 29 items that have a drawing](imagenes/objetos.png)
+
+The item of type t is drawing t − 1 of page 1: the first sixteen on row 0x50
+and the rest on 0x60 (p02:8CC1). What each one does is handed out by
+p02:8D3E; the names are those of its drawing.
+
+| type | item | what it does |
+|---|---|---|
+| 0x01 | heart | one heart |
+| 0x02 | big heart | five hearts |
+| 0x03 | red shield | for 16 hits (0xC441) |
+| 0x04 | shield | for 16 hits (0xC441) |
+| 0x05 | white cross | clears what is in the room, and the vendors leave (p02:8DC2) |
+| 0x06 | grey cross | the weapon counter to 0x96 frames (0xC440) |
+| 0x07 | red orb | 8 of life |
+| 0x08 | blue orb | invincible for 0x96 frames (0xC43A) |
+| 0x09 | ring | kills on touch while it lasts (0xC434) |
+| 0x0A | hourglass | a bit of what he carries (0xC701, bit 6) |
+| 0x0B | bow | counters last 0xF0 instead of 0x96 (0xC431, bit 2) |
+| 0x0C | boots | a bit (0xC431, bit 3) |
+| 0x0D | wings | a bit (0xC431, bit 4) |
+| 0x0E | candle | marks the breakable blocks (0xC702, bit 0) |
+| 0x0F | scroll | three uses of the map with F2 (0xC70F) |
+| 0x10 | red book | the shop, dearer (0xC702, bit 6) |
+| 0x11 | white book | the shop, cheaper (0xC702, bit 7) |
+| 0x12 | staff | a bit (0xC431, bit 1) and another of what he carries |
+| 0x13 | white bag | 5,000 points |
+| 0x14 | blue bag | 1,000 points |
+| 0x15 | — | an enemy (p02:8AD0) |
+| 0x16 | bottle | full life |
+| 0x17 | key | a bit of what he carries (bit 1) and 0xC700 = 1 |
+| 0x18 | white key | a bit of what he carries (bit 0) |
+| 0x19 | chest | what it hides |
+| 0x1A-0x1D | weapons 1 to 4 | chain whip, dagger, axe and boomerang cross: to 0xC416 and to the scoreboard (p02:8D70) |
+| 0x1E | flask, weapon 5 | a bit of what he carries (bit 3, p02:8D8D) |
 
 ## Simon
 
@@ -215,3 +268,40 @@ own type numbers (p02:9E5C; the parameters of each, at 0xA08F): fireballs
 (from the giant bat, the pillar of skulls, Dracula and in the monster's
 room), the skeleton's bones, Medusa's snakes, Death's sickles and the orange
 knight's axes.
+
+## The ending
+
+After Dracula, p01:66BA scrolls up a text line by line with VDP register 23
+(the vertical scroll), to music 0x8E. The 41 lines are in banks 5 and 8, with
+the pointer table at 0x678E: each one carries the moment it appears, the
+column and the text in ASCII. The font is completed by p00:53DE with letters
+from bank 14, where “:” is drawn as a full stop and “;” as an apostrophe; here
+it is as it looks:
+
+    SO THE BRAVE YOUNG MAN
+    PUT DRACULA INTO DEEP
+    SLEEP AGAIN AND THE TOWN
+    RESTORED ITS PEACE.
+
+    LET'S PRAY THAT THE EVIL
+    MIND OF HUMANBEINGS WILL
+    NOT LET DRACULA COME TO
+    LIFE EVER AGAIN....
+
+And the STAFF:
+
+| | |
+|---|---|
+| GAME DESIGNER | A. NAGATA |
+| PROGRAMMER | A. HARIMA, I. AKADA, K. NAGAE |
+| SOUND PROGRAMMER | H. SHIKAMA |
+| GRAPHIC DESIGNER | S. IWAMOTO, N. MATSUI, K. MIZUTANI, A. FUJIMOTO |
+| SOUND EFFECT BY | K. UEHARA |
+| MUSIC BY | K. YAMASHITA, S. TERASHIMA |
+| ART DESIGNER | F. HAYAKAWA |
+| ASSISTANT PROGRAMMER | K. TOYOHARA, T. OKA, H. EDA, T. OHTSUKA, T. DANJYO |
+| SPECIAL THANKS | K. HIRAOKA, FC. TEAM |
+| PRODUCED BY | AKIHIKO NAGATA |
+| PRESENTED BY | KONAMI |
+
+When it ends, p01:6701 raises 0xD012, up to 2.

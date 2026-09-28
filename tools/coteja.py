@@ -23,7 +23,10 @@ p01:6321 encienda la pantalla).
                 enemigos, y 0xD700, lo que lanzan-, cada muestra explicada por
                 su composicion (tools/enemigos.py).
 
-Uso:  coteja.py [habitaciones] [mapa] [titulo] [simon] [dracula] [enemigos] [-v]
+  tienda        la ventana de la tienda y el vendedor contra work/tiendas
+                (tools/lanza_tiendas.sh).
+
+Uso:  coteja.py [habitaciones] [mapa] [titulo] [simon] [dracula] [enemigos] [tienda] [-v]
 """
 import glob
 import os
@@ -276,8 +279,41 @@ def enemigos(cart, detalle=False):
     return sum(clases.values()) > 0 and not raras
 
 
+def tienda(cart, detalle=False):
+    """La tienda abierta (tools/tienda.py) contra work/tiendas
+    (tools/lanza_tiendas.sh, la sonda omsx_vendedor.tcl con VK_VOLCADO): el
+    sitio de la ventana (0xC704) y el precio (0xC707) de la RAM, y en la
+    pagina 0, punto a punto, la ventana y el vendedor."""
+    import re
+    from tienda import la_tienda
+    vistos = malos = 0
+    for ruta in sorted(glob.glob(os.path.join(WORK, "tiendas", "vend_f*_tienda.vram"))):
+        m = re.search(r"vend_f(\d+)_h(\d+)_l([0-9A-F]{2})_tienda", ruta)
+        fase, hab, libro = int(m.group(1)), int(m.group(2)), int(m.group(3), 16)
+        d, r = _lee(ruta), _lee(ruta[:-5] + ".ram")
+        vram, v, (x, y), precio = la_tienda(cart, fase, hab, libro)
+        vistos += 1
+        dsitio = (r[0xC705 - 0xC000], r[0xC704 - 0xC000]) != (x, y)
+        dprecio = r[0xC707 - 0xC000] != precio
+        rects = ((x, y, 0x50, 0x20), (v["x"], v["y"], 32, 32))
+        dpuntos = 0
+        for rx, ry, an, al in rects:
+            for j in range(al):
+                for i in range(an):
+                    a = (ry + j) * ANCHO_DE_LINEA + ((rx + i) & 0xFF) // 2
+                    sh = 4 if (rx + i) % 2 == 0 else 0
+                    if (d[a] >> sh) & 15 != vram.punto(0, (rx + i) & 0xFF, ry + j):
+                        dpuntos += 1
+        if dsitio or dprecio or dpuntos:
+            malos += 1
+        print("  fase %d hab %d libro %02X: ventana en (0x%02X, 0x%02X), precio %X; sitio %s, precio %s, puntos %d"
+              % (fase, hab, libro, x, y, precio, "MAL" if dsitio else "bien", "MAL" if dprecio else "bien", dpuntos))
+    print("tienda: %d volcados, %d con diferencias" % (vistos, malos))
+    return vistos > 0 and malos == 0
+
+
 PRUEBAS = {"habitaciones": habitaciones, "mapa": mapa, "titulo": titulo, "simon": simon, "dracula": dracula,
-           "enemigos": enemigos}
+           "enemigos": enemigos, "tienda": tienda}
 
 
 def main():

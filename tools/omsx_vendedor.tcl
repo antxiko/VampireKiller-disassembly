@@ -160,6 +160,25 @@ proc tienda {} {
     say "   p02:9427 tienda: vende C708=[hx 0xC708] precio C707=[hx 0xC707] (C702=[hx 0xC702])"
 }
 
+# Con VK_VOLCADO, al acabar de pintar la ventana de la tienda (el ret de
+# p02:93FE, y 0,2 s para que el V9938 acabe sus ordenes) vuelca la VRAM, la
+# paleta y la RAM en <nombre>_tienda.*, para tools/coteja.py tienda.
+proc vuelca_la_tienda {} {
+    global OUT NOMBRE
+    if {$::tienda_volcada} return
+    set ::tienda_volcada 1
+    set f [open "$OUT/${NOMBRE}_tienda.vram" wb]
+    puts -nonewline $f [debug read_block VRAM 0 131072]
+    close $f
+    set f [open "$OUT/${NOMBRE}_tienda.pal" wb]
+    puts -nonewline $f [debug read_block "VDP palette" 0 32]
+    close $f
+    set f [open "$OUT/${NOMBRE}_tienda.ram" wb]
+    puts -nonewline $f [debug read_block memory 0xC000 8192]
+    close $f
+    say "   volcada la tienda: ventana en C704=[hx 0xC705],[hx 0xC704] vende [hx 0xC708] precio [hx 0xC707]"
+}
+
 proc repinta {} {
     say "   p02:925B el hueco tenia la tienda sin comprar: la cuenta baja ([hx 0xC70C])"
 }
@@ -175,6 +194,10 @@ debug set_bp 0x6324 {} {seguro encendida}
 debug set_bp 0x920C {[debug read memory 0xF0F2] == 2} {seguro elegido}
 debug set_bp 0x92A7 {[debug read memory 0xF0F2] == 2} {seguro pasa}
 debug set_bp 0x9427 {[debug read memory 0xF0F2] == 2} {seguro tienda}
+set ::tienda_volcada 0
+if {[info exists ::env(VK_VOLCADO)]} {
+    debug set_bp 0x93FE {[debug read memory 0xF0F2] == 2} {after time 0.2 {seguro vuelca_la_tienda}}
+}
 debug set_bp 0x925B {[debug read memory 0xF0F2] == 2} {seguro repinta}
 after time 4 { pulsa 8 1 0.2 }
 after time 7 { pulsa 8 1 0.2 }

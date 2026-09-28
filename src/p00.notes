@@ -1126,7 +1126,7 @@ C 0x540A el dibujo de la pieza...
 C 0x540E ... 8 x 8 por HMMC en la pagina 0
 C 0x5416 la siguiente...
 C 0x5419 ... ocho puntos mas abajo
-B 0x548D LOS OBJETOS Y LAS PUERTAS, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y las cinco puertas de los vendedores.
+B 0x548D LOS OBJETOS Y EL VENDEDOR, a la pagina 1: 20 dibujos de 16 x 16 desde (0, 0x50) y uno en (0x50, 0x60) (banco 10), cinco trozos por HMMC en (0x8C, 0x70) y (0x80 + 8k, 0x74), 8 de 16 x 16 en (0x60, 0x60) y 5 en (0, 0x70) (bancos 5-6), y los cinco dibujos del vendedor.
 L 0x548D sube_los_objetos
 C 0x5490 de 0x9000...
 C 0x5493 ... a (0, 0x50) de la pagina 1...
@@ -1139,18 +1139,18 @@ C 0x54B7 ... en (0x80, 0x74), (0x88, 0x74)...
 C 0x54C8 ocho a la derecha
 C 0x54D1 de 0xB9C8, ocho en (0x60, 0x60)
 C 0x54DC de 0xBDC8, cinco en (0, 0x70)
-C 0x54EA las puertas de los vendedores
-B 0x54F0 LAS CINCO PUERTAS DE LOS VENDEDORES (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
-L 0x54F0 las_puertas_de_los_vendedores
+C 0x54EA los cinco vendedores
+B 0x54F0 LOS CINCO VENDEDORES, un viejo encapuchado con baston en cinco colores (32 x 32, en la fila 0xA0 de la pagina 1, x = 32 * k): un solo molde de 0xBDA7 en el que el nibble 0xF se pinta de uno de los cinco colores de 0x558E; se arma en 0xE800 y se sube en 4 x 4 dibujos de 8 x 8 (0x556E).
+L 0x54F0 los_cinco_vendedores
 C 0x54F0 los cinco colores
 C 0x54F4 en la VRAM 0xD000: (0, 0xA0) de la pagina 1
 C 0x54F7 cinco
-L 0x54F9 una_puerta_de_vendedor
+L 0x54F9 un_vendedor_de_color
 C 0x54FB se arma...
 C 0x54FE ... y se sube
 C 0x5501 la siguiente, 32 puntos mas alla
 C 0x5508 con el color siguiente
-L 0x550D arma_la_puerta
+L 0x550D arma_el_vendedor
 C 0x550E en 0xE800...
 C 0x5511 ... desde el molde de 0xBDA7...
 C 0x5514 ... 256 bytes
@@ -1158,7 +1158,7 @@ L 0x5516 un_byte_del_molde
 C 0x5517 dos puntos
 C 0x5519 el de la izquierda...
 C 0x5520 ... 0xF?
-C 0x5524 si: el color de esta puerta
+C 0x5524 si: el color de este vendedor
 L 0x5527 a_la_izquierda
 C 0x5527 al nibble alto
 C 0x552C el de la derecha...
@@ -1168,11 +1168,11 @@ L 0x5536 los_dos_puntos
 C 0x5536 junto con el de la izquierda...
 C 0x5537 ... al molde armado
 C 0x553C y 32 bytes a cero detras
-L 0x5548 sube_la_puerta
+L 0x5548 sube_el_vendedor
 C 0x5548 los 16 dibujos de 0x556E...
 C 0x554B ... cuatro filas...
 C 0x554F ... de cuatro
-L 0x5551 un_dibujo_de_la_puerta
+L 0x5551 un_dibujo_del_vendedor
 C 0x5553 el dibujo, en la RAM
 C 0x5557 a la VRAM
 C 0x555A ocho puntos a la derecha

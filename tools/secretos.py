@@ -20,7 +20,7 @@ como lo pinta el juego.
               (4 x 4), con lo de los bits 0-4 dentro; 0x1F es que lo dice el
               tercer byte.
       10x     un COFRE (p02:8A13: el objeto 0x19) con lo de los bits 0-4.
-      11x     un VENDEDOR tras una puerta (p02:9179, dos por habitacion en
+      11x     un VENDEDOR, el viejo encapuchado (p02:9179, dos por habitacion en
               0xC5B5 y 0xC5C5): vende lo que dicen los bits 5-2 en la tabla
               de 0x5B0B, y los bits 1-0 son su clase, la fila de 0x9300 que
               dice lo que pasa en cada visita (p02:92BB): la tienda, cinco
@@ -33,7 +33,7 @@ como lo pinta el juego.
             antorcha del patio, el cuarto).
   p02:86CA  los bloques se pintan con los dibujos de 0x8792 (bloque de fases
             0) o 0x87A6: cuatro para el pequeno y dieciseis para el grande.
-  p02:924C  las puertas cerradas, 32 x 32 de la pagina 1 (96, 0xA0), con
+  p02:924C  los vendedores, el viejo blanco: 32 x 32 de la pagina 1 (96, 0xA0), con
             transparencia.
   p13:BB37  LA PUERTA DE LA FASE: tres bytes por fase en 0xBB61 -la habitacion
             (bit 7: cerrada), la y y la x- y, cuando se entra en esa habitacion,
@@ -57,7 +57,7 @@ DIBUJOS_DE_LOS_BLOQUES = {0: 0x8792, 1: 0x87A6}   # banco 2, p02:86CF
 FILA_DE_LOS_OBJETOS = (0x50, 0x60)   # p02:8CC1
 FILA_DE_LAS_VELAS = 0x70
 COLUMNA_DE_LA_ANTORCHA = 48          # el cuarto dibujo de la fila 0x70
-PUERTA_CERRADA = (96, 0xA0)          # p02:925E con A = 3
+VENDEDOR_BLANCO = (96, 0xA0)          # p02:925E con A = 3
 TIPO_DEL_COFRE = 0x19
 PUERTA_DE_CADA_FASE = 0xBB61         # banco 13
 PIEZAS_DE_LA_PUERTA = 0x5421         # banco 0, seis punteros
@@ -115,7 +115,7 @@ def decodifica(cart, b1, b2, b3):
     elif clase in (4, 5):
         e.update(que="cofre", contenido=bajo)
     else:
-        e.update(que="puerta", vende=cart.leer(LO_QUE_VENDEN + ((b2 >> 2) & 0x0F), B123),
+        e.update(que="vendedor", vende=cart.leer(LO_QUE_VENDEN + ((b2 >> 2) & 0x0F), B123),
                  clase=b2 & 3)
     return e
 
@@ -181,12 +181,12 @@ BICHO = 0x15
 
 def que_sale(e):
     """Lo que esconde una entrada: (que, tipo). que es 'objeto', 'cofre' (un
-    cofre con el tipo dentro, tercer byte 10xxxxxx: p02:8827) o 'puerta' (un
+    cofre con el tipo dentro, tercer byte 10xxxxxx: p02:8827) o 'vendedor' (un
     vendedor, tercer byte 11xxxxxx: p02:8831)."""
     if e["que"] == "bloque" and e["bytes"][2] is not None:
         b3 = e["bytes"][2]
         if b3 & 0xC0 == 0xC0:
-            return "puerta", None
+            return "vendedor", None
         return "cofre", b3 & 0x1F
     if e["que"] == "cofre":
         return "cofre", e["contenido"]
@@ -194,16 +194,16 @@ def que_sale(e):
         return "objeto", e["tipo"]
     if e["que"] in ("vela", "bloque"):
         return "objeto", e["contenido"]
-    return "puerta", None
+    return "vendedor", None
 
 
 def describe(e):
     que, tipo = que_sale(e)
-    if e["que"] == "puerta":
+    if e["que"] == "vendedor":
         return "vendedor de %s (clase %d)" % (NOMBRES.get(e["vende"], "tipo %d" % e["vende"]), e["clase"])
     donde = {"vela": "vela", "bloque": "bloque que se rompe" + (" grande" if e.get("tamano") == 3 else ""),
              "cofre": "cofre", "objeto": "a la vista"}[e["que"]]
-    if que == "puerta":
+    if que == "vendedor":
         return "%s: sale un vendedor de %s (clase %d)" % (
             donde, NOMBRES.get(e["vende"], "tipo %d" % e["vende"]), e["clase"])
     if que == "cofre" and e["que"] != "cofre":
@@ -252,8 +252,8 @@ def pinta_bloque(cart, vram, fase, tamano, x, y):
                     vram.pon_punto(0, x + 8 * c + i, y + 8 * f + j, vram.punto(1, x0 + i, y0 + j))
 
 
-def pinta_puerta(vram, x, y):
-    _lmmm(vram, PUERTA_CERRADA[0], PUERTA_CERRADA[1], x, y, 32, 32)
+def pinta_vendedor(vram, x, y):
+    _lmmm(vram, VENDEDOR_BLANCO[0], VENDEDOR_BLANCO[1], x, y, 32, 32)
 
 
 def pinta_puerta_de_la_fase(cart, vram, fase, habitacion):
@@ -344,8 +344,8 @@ def pinta_secretos(cart, vram, fase, habitacion, pasos_de_las_velas=(0,), con_ob
             pinta_bloque(cart, vram, fase, e["tamano"], e["x"], e["y"])
         elif e["que"] == "cofre":
             pinta_objeto(vram, TIPO_DEL_COFRE, e["x"], e["y"])
-        elif e["que"] == "puerta":
-            pinta_puerta(vram, e["x"], e["y"])
+        elif e["que"] == "vendedor":
+            pinta_vendedor(vram, e["x"], e["y"])
     pinta_puerta_de_la_fase(cart, vram, fase, habitacion)
     if clase_especial(cart, fase, habitacion) == 6:
         remata_la_sala_de_dracula(vram)
