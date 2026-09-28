@@ -3,12 +3,11 @@
 What the listing does not know yet. The whole cartridge is assigned to code
 or data, but assigned is not the same as fully understood.
 
-## What happens on loop 3
+## What happens with 0xD012 at 3
 
-The ending raises the loop (0xD012) up to 2, and class 1 vendors up to 3 (see
-[Findings](FINDINGS.md)). The routines that read it comment it as "0, 1 or
-2". With 3, p03:A35A waits 0x30 − 4 × 3 frames and p03:A65A adds 32 per loop:
-nobody has seen in the emulator whether the game behaves.
+The ending leaves 0xD012 at 2 at most (p01:6701), but p02:9333 allows up to
+3. With 3, p03:A35A waits 0x30 − 4 × 3 frames and p03:A65A adds 32 per
+level: nobody has seen in the emulator whether the game behaves.
 
 ## What 0xCF34 counts
 

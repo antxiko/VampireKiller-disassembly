@@ -83,19 +83,39 @@ Behind 16 doors, and inside 17 blocks, there are **33 vendors**. Each one
 sells one thing (0x5B0B): full life, dagger, boomerang cross, shield, flask,
 staff, hourglass, the candle that marks the blocks… But **they do not always
 sell**: what happens depends on their class (two bits of the secret) and on
-how many times you have visited. That is the table at 0x9300, eight visits
-per class (p02:92BB); from the eighth on, the last one repeats:
+**how many times you have hit them**. Each hit adds one (p02:8115), and the
+table at 0x9300 says what each hit brings, eight per class (p02:92BB). From
+the eighth on, the last one repeats:
 
-| class | vendors | visit 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| class | vendors | hit 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | 10 | shop | +5 ♥ or nothing | +5 ♥ or nothing | +5 ♥ or nothing | −5 ♥ or nothing | −5 ♥ or nothing | nothing | leaves |
-| 1 | 7 | shop | +5 ♥ | +5 ♥ | loop +1 | nothing | nothing | nothing | leaves |
-| 2 | 6 | +5 or −5 ♥ | +5 or −5 ♥ | shop | nothing | nothing | nothing | loop −1 | leaves |
+| 1 | 7 | shop | +5 ♥ | +5 ♥ | 0xD012 +1 | nothing | nothing | nothing | leaves |
+| 2 | 6 | +5 or −5 ♥ | +5 or −5 ♥ | shop | nothing | nothing | nothing | 0xD012 −1 | leaves |
 | 3 | 10 | nothing | nothing | nothing | nothing | shop | +5 ♥ | nothing | leaves |
 
-Where it says "or", the cartridge draws lots with the Z80's R register. The
-"loop" is 0xD012: it shortens the enemies' waits and sharpens their aim
-(p03:A0E5, p03:A35A, p03:A65A).
+Where it says "or", the Z80's R register draws lots. "Leaves" gives 5,000
+points and the vendor does not come back. The hit count is cleared at the
+start of every life (p00:5AAF). If the shop opens and you leave without
+buying, that hit does not count when you come back (p02:925B).
+
+**Prices, in hearts, depend on the books** (0xC702, p02:9418): with the white
+one, cheaper; with the red one, dearer. You carry one or the other, never
+both.
+
+| what it sells | no book | white book | red book |
+|---|---|---|---|
+| dagger | 50 | 30 | 90 |
+| full life | 40 | 15 | 80 |
+| hourglass | 40 | 20 | 80 |
+| staff | 30 | 20 | 60 |
+| flask | 30 | 10 | 50 |
+| shield | 20 | 10 | 80 |
+| boomerang cross | 20 | 10 | 80 |
+| red shield | 20 | 10 | 60 |
+| candle | 20 | 15 | 60 |
+
+Seen in openMSX hit by hit, with one vendor of each class.
 
 ## Simon
 

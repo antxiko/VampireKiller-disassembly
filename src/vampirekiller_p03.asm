@@ -122,7 +122,7 @@ DATA_tablas_por_tipo:
 
 
 ; ----------------------------------------------------------------------
-; APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
+; APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por NIVEL DE DIFICULTAD (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 ; ----------------------------------------------------------------------
 apunta_a_simon:
 	ld a,080h		;a0e5   ; la rapidez de siempre
@@ -131,12 +131,12 @@ apunta_a_simon_con_a:
 	ld d,(ix+005h)		;a0ea   ; lee la x de la cosa
 apunta_de_de_a_simon:
 	ld c,a			;a0ed
-	ld a,(0d012h)		;a0ee   ; lee la VUELTA (0, 1 o 2)
+	ld a,(0d012h)		;a0ee   ; lee el NIVEL DE DIFICULTAD (0 a 3)
 	add a,a			;a0f1
 	add a,a			;a0f2
 	add a,a			;a0f3
 	add a,c			;a0f4
-	ld (0cff0h),a		;a0f5   ; la rapidez de la vuelta (aqui 0xCFF0 no es un tipo)
+	ld (0cff0h),a		;a0f5   ; la rapidez del nivel (aqui 0xCFF0 no es un tipo)
 	call direccion_hacia_simon		;a0f8   ; la direccion hacia Simon, de 0xA1A2
 	ld a,(0cff8h)		;a0fb
 	ld e,a			;a0fe
@@ -274,7 +274,7 @@ DATA_arcotangente:
 
 
 ; ----------------------------------------------------------------------
-; EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con la VUELTA (0x28 - 8 * vuelta cuadros).
+; EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con el NIVEL DE DIFICULTAD (0x28 - 8 * nivel cuadros).
 ; ----------------------------------------------------------------------
 nace_el_tipo_0a:
 	call mira_a_simon_el_tipo_0a		;a222
@@ -292,11 +292,11 @@ mueve_el_tipo_0a:
 	ret nz			;a23d
 	inc (ix+001h)		;a23e   ; sube el paso en que va la cosa
 	ld (ix+011h),018h		;a241   ; ... y a parpadear 0x18 cuadros
-	ld a,(0d012h)		;a245   ; lee la VUELTA (0, 1 o 2)
+	ld a,(0d012h)		;a245   ; lee el NIVEL DE DIFICULTAD (0 a 3)
 	add a,a			;a248
 	add a,a			;a249
 	add a,a			;a24a
-	sub 028h		;a24b   ; la siguiente espera: 0x28 - 8 * vuelta
+	sub 028h		;a24b   ; la siguiente espera: 0x28 - 8 * nivel
 	neg		;a24d
 	ld (ix+010h),a		;a24f
 	ret			;a252
@@ -432,7 +432,7 @@ L_A348:
 	ld a,(ix+003h)		;a352   ; ... la y, a la celda
 	and 0f8h		;a355
 	ld (ix+003h),a		;a357   ; guarda la y de la cosa
-	ld a,(0d012h)		;a35a   ; la espera hasta escupir: 0x30 - 4 * vuelta
+	ld a,(0d012h)		;a35a   ; la espera hasta escupir: 0x30 - 4 * nivel
 	add a,a			;a35d
 	add a,a			;a35e
 	sub 030h		;a35f
@@ -667,7 +667,7 @@ nace_el_tipo_8:
 	jr c,L_A518		;a513
 	ld de,0fd80h		;a515   ; ... y si no, hacia la izquierda
 L_A518:
-	jp velocidad_x_con_la_vuelta		;a518
+	jp velocidad_x_con_el_nivel		;a518
 mueve_el_tipo_8:
 	ld c,071h		;a51b   ; el dibujo 0x71...
 	ld a,(0d000h)		;a51d   ; lee la FASE (0 el patio, 1-18)
@@ -768,13 +768,13 @@ L_A5DC:
 	jr nc,L_A5FE		;a5df
 	bit 0,(ix+011h)		;a5e1   ; ya lo sabia: sigue
 	jr nz,L_A602		;a5e5
-	ld de,00160h		;a5e7   ; a por el: 0x160 hacia Simon, mas lo de la vuelta
+	ld de,00160h		;a5e7   ; a por el: 0x160 hacia Simon, mas lo del nivel
 	ld a,(0c427h)		;a5ea   ; lee la X de Simon
 	cp (ix+005h)		;a5ed   ; compara con la x de la cosa
 	jr nc,L_A5F5		;a5f0
 	ld de,0fea0h		;a5f2
 L_A5F5:
-	call velocidad_x_con_la_vuelta		;a5f5
+	call velocidad_x_con_el_nivel		;a5f5
 	ld (ix+011h),001h		;a5f8   ; lo sabe
 	jr L_A60F		;a5fc
 L_A5FE:
@@ -834,13 +834,13 @@ media_vuelta:
 	pop de			;a650
 	pop af			;a651
 	ret			;a652
-velocidad_x_con_la_vuelta:
+velocidad_x_con_el_nivel:
 	ld a,d			;a653   ; DE = 0: parado
 	or e			;a654
 	jp z,pon_velocidad_x		;a655   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	push hl			;a658
 	ex de,hl			;a659
-	ld a,(0d012h)		;a65a   ; mas rapido en cada VUELTA: 32 por vuelta...
+	ld a,(0d012h)		;a65a   ; mas rapido en cada NIVEL DE DIFICULTAD (0xD012): 32 por nivel...
 	add a,a			;a65d
 	add a,a			;a65e
 	add a,a			;a65f
@@ -1237,7 +1237,7 @@ L_A930:
 	ret			;a933
 
 ; ----------------------------------------------------------------------
-; EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por VUELTA) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
+; EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por nivel de dificultad) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
 ; ----------------------------------------------------------------------
 nace_el_tipo_1:
 	ld (ix+006h),001h		;a934   ; la cosa se mueve
@@ -1251,7 +1251,7 @@ nace_el_tipo_1:
 L_A94B:
 	ld (ix+011h),e		;a94b   ; la velocidad, guardada para despues de caer
 	ld (ix+012h),d		;a94e
-	call velocidad_x_con_la_vuelta		;a951
+	call velocidad_x_con_el_nivel		;a951
 	ld (ix+00bh),b		;a954   ; guarda el dibujo de la cosa
 	ld (ix+00ch),008h		;a957   ; la cuenta de cuadros del paso = 0x08
 	ld (ix+010h),c		;a95b
@@ -1283,7 +1283,7 @@ L_A984:
 	call pon_velocidad_y		;a992   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld e,(ix+011h)		;a995
 	ld d,(ix+012h)		;a998
-	call velocidad_x_con_la_vuelta		;a99b
+	call velocidad_x_con_el_nivel		;a99b
 	ld (ix+006h),001h		;a99e   ; la cosa se mueve
 y_en_la_celda:
 	ld a,(ix+003h)		;a9a2   ; la y, a multiplo de 8
@@ -1932,7 +1932,7 @@ nace_el_tipo_0x10:
 	ld (ix+006h),001h		;adde   ; la cosa se mueve
 	ld de,00000h		;ade2
 	call pon_velocidad_y		;ade5   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	call velocidad_x_con_la_vuelta		;ade8
+	call velocidad_x_con_el_nivel		;ade8
 	ld (ix+00bh),05fh		;adeb   ; el dibujo de la cosa = 0x5F
 	ld (ix+010h),000h		;adef
 	ld (ix+011h),03ch		;adf3
@@ -1958,7 +1958,7 @@ L_AE0C:
 	ld de,0fec0h		;ae26   ; ... o a la izquierda
 	ld (ix+00bh),05fh		;ae29   ; el dibujo de la cosa = 0x5F
 L_AE2D:
-	call velocidad_x_con_la_vuelta		;ae2d   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;ae2d   ; mas lo del nivel
 	ld de,00000h		;ae30   ; sin caer
 	jp pon_velocidad_y		;ae33   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_AE36:
@@ -1993,7 +1993,7 @@ L_AE64:
 	jr c,L_AE80		;ae7b   ; ... hacia el lado contrario de Simon
 	ld de,0fec0h		;ae7d   ; (Simon a su derecha: a la izquierda)
 L_AE80:
-	call velocidad_x_con_la_vuelta		;ae80   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;ae80   ; mas lo del nivel
 	ld (ix+010h),001h		;ae83   ; viene de cerca
 	jr L_AEA2		;ae87   ; a mirar si lanza
 L_AE89:
@@ -2005,7 +2005,7 @@ L_AE89:
 	jr nc,L_AE9B		;ae96   ; ... a la derecha...
 	ld de,0fec0h		;ae98   ; ... o a la izquierda
 L_AE9B:
-	call velocidad_x_con_la_vuelta		;ae9b   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;ae9b   ; mas lo del nivel
 	ld (ix+010h),000h		;ae9e   ; viene de lejos
 L_AEA2:
 	ld a,(ix+005h)		;aea2   ; lee la x de la cosa
@@ -2163,7 +2163,7 @@ L_AFB0:
 	ld (ix+00bh),023h		;afb4   ; el dibujo de la cosa = 0x23
 	ld de,0fde0h		;afb8   ; ... a -0x220
 L_AFBB:
-	jp velocidad_x_con_la_vuelta		;afbb   ; mas lo de la vuelta
+	jp velocidad_x_con_el_nivel		;afbb   ; mas lo del nivel
 tipo_9_andando:
 	ld a,(ix+005h)		;afbe   ; lee la x de la cosa
 	bit 7,(ix+00ah)		;afc1   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
@@ -2202,7 +2202,7 @@ L_AFFD:
 	ld e,(ix+009h)		;b005   ; lee la velocidad horizontal (parte baja)
 	ld d,(ix+00ah)		;b008   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	call niega_de		;b00b   ; niega_de: DE = -DE
-	call velocidad_x_con_la_vuelta		;b00e   ; ... y la velocidad, del reves, con lo de la vuelta
+	call velocidad_x_con_el_nivel		;b00e   ; ... y la velocidad, del reves, con lo del nivel
 L_B011:
 	bit 2,(ix+00ch)		;b011   ; mira el bit 2 de la cuenta de cuadros del paso
 	ld c,021h		;b015   ; el dibujo: 0x21...
@@ -2307,7 +2307,7 @@ L_B0CE:
 	ld a,(0c427h)		;b0d7   ; lee la X de Simon
 	sub (ix+005h)		;b0da   ; le resta la x de la cosa
 	call c,niega_de		;b0dd   ; niega_de: DE = -DE
-	call velocidad_x_con_la_vuelta		;b0e0   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;b0e0   ; mas lo del nivel
 	ld (ix+006h),001h		;b0e3   ; la cosa se mueve
 	ld (ix+011h),000h		;b0e7   ; la cuenta de la animacion
 	ld a,(ix+002h)		;b0eb   ; lee la fraccion de la y de la cosa
@@ -2641,7 +2641,7 @@ nace_el_tipo_0x0b:
 	jr nc,L_B353		;b34e
 	ld de,0fdc0h		;b350   ; ... o a la izquierda
 L_B353:
-	call velocidad_x_con_la_vuelta		;b353   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;b353   ; mas lo del nivel
 	ld de,00000h		;b356   ; sin velocidad vertical
 	call pon_velocidad_y		;b359   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+006h),001h		;b35c   ; la cosa se mueve
@@ -2707,7 +2707,7 @@ L_B3A9:
 	jr c,L_B3C3		;b3be
 	ld de,0fdc0h		;b3c0   ; ... o a la izquierda
 L_B3C3:
-	call velocidad_x_con_la_vuelta		;b3c3   ; mas lo de la vuelta
+	call velocidad_x_con_el_nivel		;b3c3   ; mas lo del nivel
 	ld a,(ix+012h)		;b3c6   ; dos cuadros de cada ocho...
 	and 006h		;b3c9   ; (los bits 1 y 2 de la cuenta a cero)
 	jr nz,L_B3DB		;b3cb   ; (los demas, sigue)
@@ -2725,7 +2725,7 @@ L_B3DB:
 	call 07bbeh		;b3eb   ; a la derecha...
 	jr nc,L_B403		;b3ee
 	ld de,0fdc0h		;b3f0   ; ... pared: a la izquierda
-	call velocidad_x_con_la_vuelta		;b3f3
+	call velocidad_x_con_el_nivel		;b3f3
 	jr L_B403		;b3f6
 L_B3F8:
 	call 07c1ah		;b3f8   ; a la izquierda...
@@ -2766,7 +2766,7 @@ no_sale_de_la_pantalla:
 	ld e,(ix+009h)		;b448   ; lee la velocidad horizontal (parte baja)
 	ld d,(ix+00ah)		;b44b   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 L_B44E:
-	jp velocidad_x_con_la_vuelta		;b44e   ; con lo de la vuelta
+	jp velocidad_x_con_el_nivel		;b44e   ; con lo del nivel
 tipo_0x0b_saltando:
 	ld bc,0080ch		;b451   ; una pared delante, en 8 x 12?
 	ld e,(ix+003h)		;b454   ; lee la y de la cosa

@@ -80,7 +80,7 @@ Simon's check is done against the RAM.
 | 0xC434 | the ring's counter |
 | 0xC800 | the enemy list |
 | 0xD000 / 0xD001 / 0xD002 | stage, room and block of three stages |
-| 0xD012 | the loop (0-3) |
+| 0xD012 | the difficulty level (0-3) |
 | 0xD700 | what the enemies throw |
 | 0xE000 | the stage's secrets, copied from bank 14 |
 | 0xE600 | 0xFF if there is a Game Master in another slot |

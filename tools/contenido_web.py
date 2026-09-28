@@ -89,15 +89,15 @@ PORTADA = {
 HALLAZGOS = {
     "es": [
         ("Las puertas cerradas son vendedores",
-         "<p>Hay <b>33</b> en el castillo. Lo que pasa al entrar depende de su "
-         "clase y de cu&aacute;ntas veces se les ha visitado (tabla "
-         "<code>0x9300</code>): uno abre la tienda a la primera, otro a la "
-         "quinta, otro puede quitarte cinco corazones, y todos se van a la "
-         "octava.</p>"),
-        ("Un vendedor sube la dificultad m&aacute;s que el final",
-         "<p>La vuelta (<code>0xD012</code>) acelera a los enemigos. El final "
-         "la sube <b>hasta 2</b> (<code>p01:6701</code>); los vendedores de "
-         "clase 1, <b>hasta 3</b> (<code>p02:9333</code>).</p>"),
+         "<p>Hay <b>33</b> en el castillo. Lo que pasa al pegarles depende de "
+         "su clase y de cu&aacute;ntos golpes llevan (tabla "
+         "<code>0x9300</code>): uno abre la tienda al primero, otro al "
+         "quinto, otro puede quitarte cinco corazones, y todos se van al "
+         "octavo.</p>"),
+        ("Los libros cambian los precios",
+         "<p>Con el libro blanco la tienda cobra menos y con el rojo, "
+         "m&aacute;s: la vida llena cuesta 15, 40 u 80 corazones "
+         "(<code>p02:9418</code>). Visto en openMSX.</p>"),
         ("Dr&aacute;cula, medio sprite y medio VDP",
          "<p>La cabeza es un sprite; el cuerpo lo copia el VDP desde la "
          "p&aacute;gina 1 con LMMM, tras guardar el fondo "
@@ -116,15 +116,15 @@ HALLAZGOS = {
     ],
     "en": [
         ("The locked doors are vendors",
-         "<p>There are <b>33</b> in the castle. What happens when you walk in "
-         "depends on their class and on how many times you have visited "
-         "(table <code>0x9300</code>): one opens the shop the first time, "
+         "<p>There are <b>33</b> in the castle. What happens when you hit "
+         "them depends on their class and on how many hits they have taken "
+         "(table <code>0x9300</code>): one opens the shop on the first, "
          "another on the fifth, another can take five hearts away, and they "
          "all leave on the eighth.</p>"),
-        ("A vendor raises the difficulty more than the ending",
-         "<p>The loop (<code>0xD012</code>) speeds the enemies up. The ending "
-         "raises it <b>up to 2</b> (<code>p01:6701</code>); class 1 vendors, "
-         "<b>up to 3</b> (<code>p02:9333</code>).</p>"),
+        ("The books change the prices",
+         "<p>With the white book the shop charges less, and with the red one "
+         "more: full life costs 15, 40 or 80 hearts "
+         "(<code>p02:9418</code>). Seen in openMSX.</p>"),
         ("Dracula, half sprite and half VDP",
          "<p>The head is a sprite; the body is copied by the VDP from page 1 "
          "with LMMM, after saving the background (<code>p03:AD80</code>). "

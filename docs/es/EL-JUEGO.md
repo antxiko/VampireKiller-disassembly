@@ -82,20 +82,40 @@ El cartucho la pinta desde la ROM, seis piezas de 8 × 8 una debajo de otra.
 Tras 16 puertas, y dentro de 17 bloques, hay **33 vendedores**. Cada uno
 vende una cosa (0x5B0B): vida llena, daga, cruz que vuelve, escudo, frasco,
 bastón, reloj de arena, la vela que marca los bloques… Pero **no siempre
-venden**: lo que pasa depende de su clase (dos bits del secreto) y de cuántas
-veces se le ha visitado. Es la tabla de 0x9300, ocho visitas por clase
-(p02:92BB); de la octava en adelante se repite la última:
+venden**: lo que pasa depende de su clase (dos bits del secreto) y de
+**cuántas veces se le ha pegado**. Cada golpe suma uno (p02:8115), y la tabla
+de 0x9300 dice qué toca en cada golpe, ocho por clase (p02:92BB). A partir del
+octavo se repite el último:
 
-| clase | vendedores | visita 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| clase | vendedores | golpe 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | 10 | tienda | +5 ♥ o nada | +5 ♥ o nada | +5 ♥ o nada | −5 ♥ o nada | −5 ♥ o nada | nada | se va |
-| 1 | 7 | tienda | +5 ♥ | +5 ♥ | vuelta +1 | nada | nada | nada | se va |
-| 2 | 6 | +5 o −5 ♥ | +5 o −5 ♥ | tienda | nada | nada | nada | vuelta −1 | se va |
+| 1 | 7 | tienda | +5 ♥ | +5 ♥ | 0xD012 +1 | nada | nada | nada | se va |
+| 2 | 6 | +5 o −5 ♥ | +5 o −5 ♥ | tienda | nada | nada | nada | 0xD012 −1 | se va |
 | 3 | 10 | nada | nada | nada | nada | tienda | +5 ♥ | nada | se va |
 
-Donde dice «o», el cartucho lo sortea con el registro R del Z80. La «vuelta»
-es 0xD012: acorta las esperas de los enemigos y afina su puntería
-(p03:A0E5, p03:A35A, p03:A65A).
+Donde dice «o», lo sortea el registro R del Z80. «Se va» da 5.000 puntos y el
+vendedor no vuelve. La cuenta de golpes se borra al empezar cada vida
+(p00:5AAF). Si se abre la tienda y se sale sin comprar, al volver ese golpe no
+cuenta (p02:925B).
+
+**Los precios, en corazones, dependen de los libros** (0xC702, p02:9418): con
+el blanco, más baratos; con el rojo, más caros. Se lleva uno u otro, nunca los
+dos.
+
+| lo que vende | sin libro | libro blanco | libro rojo |
+|---|---|---|---|
+| daga | 50 | 30 | 90 |
+| vida llena | 40 | 15 | 80 |
+| reloj de arena | 40 | 20 | 80 |
+| bastón | 30 | 20 | 60 |
+| frasco | 30 | 10 | 50 |
+| escudo | 20 | 10 | 80 |
+| cruz que vuelve | 20 | 10 | 80 |
+| escudo rojo | 20 | 10 | 60 |
+| vela | 20 | 15 | 60 |
+
+Visto en openMSX golpe a golpe, con un vendedor de cada clase.
 
 ## Simon
 

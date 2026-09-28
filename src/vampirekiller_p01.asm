@@ -962,7 +962,7 @@ final_acaba:
 	ld (0ce40h),a		;66fa
 	inc a			;66fd
 	ld (0c409h),a		;66fe
-	ld hl,0d012h		;6701   ; LA VUELTA: una mas...
+	ld hl,0d012h		;6701   ; EL NIVEL DE DIFICULTAD (0xD012): uno mas...
 	ld a,(hl)			;6704
 	inc a			;6705
 	cp 003h		;6706   ; ... hasta la 2

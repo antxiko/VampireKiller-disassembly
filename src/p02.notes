@@ -1005,7 +1005,7 @@ C 0x8EF0 el bit de arriba...
 C 0x8EF2 ... puesto: se pinta
 C 0x8EF5 el siguiente
 
-B 0x9179 LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar el bloque); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
+B 0x9179 LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar cada vida); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
 L 0x9179 sale_un_vendedor
 C 0x9179 guarda el secreto de 0xE000
 C 0x917C busca lo que vende entre los dos huecos...
@@ -1055,18 +1055,18 @@ C 0x91F8 se gastan
 C 0x91FB B = cual...
 C 0x91FD ... C = la clase
 C 0x91FF 0xFF, la cruz?
-C 0x9203 no: una visita mas en su hueco...
+C 0x9203 no: un golpe mas en su hueco...
 C 0x9206 ... la que cuenta (sin el bit 7)
-C 0x9209 lo que toca en esta visita
+C 0x9209 lo que toca en este golpe
 C 0x920C 0x20 cuadros...
 C 0x9210 ... en el estado 3
 L 0x9215 la_cruz_lo_quita
 C 0x9215 el desenlace 6 (se va)...
 C 0x921A ... con el dibujo 3
-L 0x9221 su_cuenta_de_visitas
+L 0x9221 su_cuenta_de_golpes
 C 0x9221 el hueco de la ficha...
 C 0x9224 ... en 0xDE00...
-C 0x9227 ... su segundo byte: las visitas
+C 0x9227 ... su segundo byte: los golpes
 L 0x9229 vendedor_dando
 C 0x9229 un cuadro menos
 C 0x922F en los impares...
@@ -1079,9 +1079,9 @@ C 0x9245 ... vuelve al estado 2...
 C 0x9249 ... y pasa lo que toca
 L 0x924C pinta_el_vendedor
 C 0x924C guarda las 4 x 4 celdas del mapa que tapa (16 bytes por hueco en 0xE580)
-C 0x9254 las visitas del hueco:
+C 0x9254 los golpes del hueco:
 C 0x9257 la tienda quedo abierta sin comprar (bit 7)?
-C 0x925B si: esa visita no cuenta
+C 0x925B si: ese golpe no cuenta (se sale sin comprar y se vuelve: la tienda otra vez; visto en openMSX)
 C 0x925C el dibujo 3, la puerta
 L 0x925E pinta_un_dibujo_de_vendedor
 C 0x925E el dibujo A de la fila 0xA0 de la pagina 1, x = A * 32...
@@ -1106,11 +1106,11 @@ C 0x929D ... a 0xFF
 C 0x92A0 la siguiente, 16 bytes mas
 L 0x92A7 pasa_lo_que_toca
 C 0x92A7 el desenlace (0 a 6), por la tabla de detras
-B 0x92BB LO QUE TOCA EN ESTA VISITA: la fila de la clase en 0x9300 (ocho bytes), en la columna de la visita (la octava y siguientes, la ultima). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
+B 0x92BB LO QUE TOCA EN ESTE GOLPE: la fila de la clase en 0x9300 (ocho bytes), en la columna del golpe (el octavo y siguientes, la ultima). Visto en openMSX golpe a golpe con las cuatro clases (tools/omsx_vendedor.tcl). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
 L 0x92BB lo_que_toca
 C 0x92BE (su clase, por ocho)
 C 0x92C4 la fila de la clase
-C 0x92C7 la visita, desde 0...
+C 0x92C7 el golpe, desde 0...
 C 0x92C9 ... hasta la octava
 C 0x92CF su columna
 C 0x92D2 el desenlace
@@ -1126,10 +1126,10 @@ C 0x92F2 su dibujo, de 0x9320
 L 0x9327 abre_la_tienda
 C 0x9327 0: la tienda (0xC40C a 0xFF; el estado del juego la abre)
 C 0x932F con el hueco de este vendedor
-L 0x9333 una_vuelta_mas
-C 0x9333 1: una VUELTA mas, hasta 3
-L 0x933C una_vuelta_menos
-C 0x933C 2: una VUELTA menos, hasta 0
+L 0x9333 un_nivel_mas
+C 0x9333 1: un NIVEL DE DIFICULTAD mas (0xD012), hasta 3
+L 0x933C un_nivel_menos
+C 0x933C 2: un NIVEL DE DIFICULTAD menos (0xD012), hasta 0
 L 0x9343 no_pasa_nada
 C 0x9343 5: nada
 L 0x9344 da_cinco_corazones
@@ -1180,7 +1180,7 @@ C 0x93F7 ... el dibujo de lo que vende
 L 0x93FF lo_que_vende_y_su_precio
 C 0x93FF su hueco en 0xDE00
 C 0x9402 lo que vende, a 0xC708
-C 0x9406 las visitas...
+C 0x9406 los golpes...
 C 0x9407 ... con el bit 7: tienda abierta sin comprar
 C 0x9409 buscalo entre los nueve de 0x9428
 C 0x940E es este?
@@ -1194,7 +1194,7 @@ C 0x9421 (sin ninguno, el segundo)
 C 0x9423 el precio, en corazones BCD, a 0xC707
 L 0x944C el_hueco_del_vendedor
 C 0x944C A = el hueco de la tienda
-B 0x944F EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][visitas] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
+B 0x944F EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][golpes] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
 L 0x944F hueco_en_0xde00
 C 0x9450 columna 0 en el patio
 C 0x9459 fase 1-18: la columna de 0x9473
@@ -1215,7 +1215,7 @@ L 0x94AF en_la_ventana
 C 0x94AF DE = el sitio de la ventana...
 C 0x94B3 ... mas B en la x...
 C 0x94B6 ... y C en la y
-B 0x94BA LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja la visita contada); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
+B 0x94BA LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja el golpe contado); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
 L 0x94BA la_tienda_cada_cuadro
 C 0x94BA uno de cada 32 cuadros...
 C 0x94C1 ... un plazo menos
@@ -1234,7 +1234,7 @@ C 0x94E2 quita el precio de los corazones
 C 0x94E5 da lo que vende
 C 0x94EC y vuelve la ventana, si se quito
 C 0x94EF efecto 0x12
-C 0x94F4 la visita queda contada...
+C 0x94F4 el golpe queda contado...
 C 0x94F8 ... (sin el bit 7)
 C 0x94FA Z: se cierra
 L 0x94FC sale_de_la_tienda
@@ -1628,7 +1628,7 @@ C 0x9CAC los primeros, de 0x9CBB
 C 0x9CAF siete generadores
 C 0x9CB1 el primer plazo...
 C 0x9CB5 ... y ninguno salido
-B 0x9CC3 EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por VUELTA (y como poco 1), y devuelve Z: toca sacar uno.
+B 0x9CC3 EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por NIVEL DE DIFICULTAD (0xD012; y como poco 1), y devuelve Z: toca sacar uno.
 L 0x9CC3 el_plazo_de_un_generador
 C 0x9CC4 el reloj comun...
 C 0x9CC7 ... baja...
@@ -1637,7 +1637,7 @@ C 0x9CCD el plazo, uno menos
 C 0x9CCE aun no: NZ
 C 0x9CCF uno salido mas
 C 0x9CD3 el plazo siguiente, de los ocho...
-C 0x9CD8 ... menos dos por VUELTA
+C 0x9CD8 ... menos dos por nivel de dificultad
 C 0x9CE1 (no menos de 0)
 C 0x9CE2 mas uno
 C 0x9CE4 Z: toca
@@ -1910,7 +1910,7 @@ D 0x906C 0x909B dos_listas  dos listas que termina un 0xFF: la de 0x906C la reco
 F 0x906C 16
 D 0x913F 0x9147 cuatro_pares  cuatro pares que p02:9112 recorre con IX (`ld b,4`)
 F 0x913F 16
-D 0x9300 0x9327 tres_tablas_pequenas  la de 0x9300, lo que toca a cada vendedor: una fila de ocho visitas por clase (p02:92BB, con la clase * 8); la de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320, el dibujo de cada desenlace (p02:92F5, con 0xC70C)
+D 0x9300 0x9327 tres_tablas_pequenas  la de 0x9300, lo que toca a cada vendedor: una fila de ocho golpes por clase (p02:92BB, con la clase * 8); la de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320, el dibujo de cada desenlace (p02:92F5, con 0xC70C)
 F 0x9300 16
 D 0x9428 0x944C lo_que_venden  los nueve de la tienda (p02:9409): lo que vende y su precio en corazones BCD, sin libro, con el blanco y con el rojo
 F 0x9428 16

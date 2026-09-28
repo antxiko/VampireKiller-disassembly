@@ -85,8 +85,8 @@ audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
 <div class="w"><nav class="top"><a href="index.html">Portada</a><a href="EMPEZAR.html">Empezar</a><a href="EL-JUEGO.html">El juego</a><a href="EL-CARTUCHO.html">El cartucho</a><a href="EL-CODIGO.html">El código</a><a href="HALLAZGOS.html">Hallazgos</a><a href="EN-EL-EMULADOR.html">En el emulador</a><a href="PREGUNTAS-ABIERTAS.html" style=color:var(--tinta)>Preguntas abiertas</a><a href="../OPEN-QUESTIONS.html" style="margin-left:auto;color:var(--oro)">English</a></nav>
 <h1 id="preguntas-abiertas">Preguntas abiertas</h1>
 <p>Lo que el listado no sabe todavía. Todo el cartucho está asignado a código o a datos, pero asignado no es entendido del todo.</p>
-<h2 id="que-pasa-con-la-vuelta-3">Qué pasa con la vuelta 3</h2>
-<p>El final sube la vuelta (0xD012) hasta 2, y los vendedores de clase 1 hasta 3 (ver <a href="HALLAZGOS.html">Hallazgos</a>). Los que la leen la comentan como «0, 1 o 2». Con 3, p03:A35A espera 0x30 − 4 × 3 cuadros y p03:A65A suma 32 por vuelta: no se ha visto en el emulador si el juego se comporta bien.</p>
+<h2 id="que-pasa-con-0xd012-a-3">Qué pasa con 0xD012 a 3</h2>
+<p>El final deja 0xD012 en 2 como mucho (p01:6701), pero p02:9333 admite hasta 3. Con 3, p03:A35A espera 0x30 − 4 × 3 cuadros y p03:A65A suma 32 por nivel: no se ha visto en el emulador si el juego se comporta bien.</p>
 <h2 id="que-cuenta-0xcf34">Qué cuenta 0xCF34</h2>
 <p>El estado 8, tras el sexto bloque, vuelve al primero con la vida llena y suma uno a 0xCF34; cuando llega a 2, va a la presentación (p00:433A). No se ha seguido qué lo pone a cero ni cómo se enlaza con el final de p01:66F1.</p>
 <h2 id="los-enemigos-sin-nombre">Los enemigos sin nombre</h2>

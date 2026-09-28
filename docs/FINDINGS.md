@@ -7,21 +7,16 @@ address where it can be checked.
 
 The castle's 16 white doors, and another 17 secrets hidden inside blocks, are
 **33 vendors** (p02:9179). Each one sells one thing (table 0x5B0B), but what
-happens when you walk in depends on their **class** (two bits of the secret)
-and on **how many times you have visited**: the table at 0x9300 gives eight
-visits per class (p02:92BB). A class 3 vendor does not open the shop until
-the fifth visit; a class 2 one can take five hearts away; they all leave on
-the eighth. The whole table is in [The game](THE-GAME.md#the-vendors).
+happens depends on their **class** (two bits of the secret) and on **how many
+times you have hit them**: the table at 0x9300 gives eight hits per class
+(p02:92BB). A class 3 vendor does not open the shop until the fifth hit; a
+class 2 one can take five hearts away; they all leave on the eighth. The whole table is in [The game](THE-GAME.md#the-vendors).
 
-## A vendor can raise the difficulty past the ending
+## The books change the prices
 
-The "loop", 0xD012, shortens the enemies' waits and sharpens their aim
-(p03:A0E5, p03:A35A, p03:A65A). The ending raises it one at a time **up to
-2** (p01:6701: `cp 3` / `jr nc`). Class 1 vendors, on the fourth visit, raise
-it **up to 3** (p02:9333: `cp 3` / `ret z` / `inc`). With seven class 1
-vendors in the castle, a game can reach a loop the ending never gives. This
-is read from the code; what happens on loop 3 has not been tried in the
-emulator.
+With the white book the shop charges less, and with the red one more
+(0xC702, p02:9418): full life costs 15, 40 or 80 hearts depending on the
+book. Seen in openMSX; the whole table is in [The game](THE-GAME.md#the-vendors).
 
 ## Dracula is a sprite and a VDP drawing
 

@@ -4095,7 +4095,7 @@ lista_del_bloque:
 	ret			;5aae
 
 ; ----------------------------------------------------------------------
-; LOS VENDEDORES DEL BLOQUE en 0xDE00: cuatro bytes por habitacion (dos huecos de [lo que vende][visitas]), a cero, y en cada hueco lo que vende (0x5B0B) cada secreto 11x de la habitacion, dos como mucho; un bloque que se rompe con un tercer byte 11x cuenta tambien.
+; LOS VENDEDORES en 0xDE00 (al empezar cada vida, p01:62F2: morir los pone a cero; visto en openMSX): cuatro bytes por habitacion (dos huecos de [lo que vende][golpes]), a cero, y en cada hueco lo que vende (0x5B0B) cada secreto 11x de la habitacion, dos como mucho; un bloque que se rompe con un tercer byte 11x cuenta tambien.
 ; ----------------------------------------------------------------------
 los_vendedores_del_bloque:
 	ld hl,0de00h		;5aaf   ; 0xC0 bytes a cero desde 0xDE00
@@ -4143,7 +4143,7 @@ es_un_vendedor:
 	rrca			;5af1
 	call hl_mas_a		;5af2   ; hl_mas_a: HL += A
 	ldi		;5af5   ; ... al hueco
-	inc de			;5af7   ; (sus visitas, a cero)
+	inc de			;5af7   ; (sus golpes, a cero)
 	pop hl			;5af8
 	pop bc			;5af9
 	dec c			;5afa   ; los dos huecos llenos: listo
@@ -4163,7 +4163,7 @@ bloque_con_tercer_byte:
 
 ; ----------------------------------------------------------------------
 ; DATOS lo_que_vende_cada_vendedor: lo que vende el vendedor de un secreto
-;   11x, por los bits 5-2 del secreto (p00:5AEB al empezar el bloque, p02:91A4
+;   11x, por los bits 5-2 del secreto (p00:5AEB al empezar cada vida, p02:91A4
 ;   al salir): vela, baston, escudo rojo, escudo, reloj de arena, vida llena,
 ;   frasco, cruz que vuelve y daga
 ;   0x5b0b..0x5b1b  (16 bytes)

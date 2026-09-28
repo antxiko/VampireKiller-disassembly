@@ -81,7 +81,7 @@ contra la RAM.
 | 0xC434 | la cuenta del anillo |
 | 0xC800 | la lista de enemigos |
 | 0xD000 / 0xD001 / 0xD002 | fase, habitación y bloque de tres fases |
-| 0xD012 | la vuelta (0-3) |
+| 0xD012 | el nivel de dificultad (0-3) |
 | 0xD700 | lo que lanzan los enemigos |
 | 0xE000 | los secretos de la fase, copiados del banco 14 |
 | 0xE600 | 0xFF si hay un Game Master en otra ranura |

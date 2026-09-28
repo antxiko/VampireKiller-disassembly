@@ -85,8 +85,10 @@ audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
 <div class="w"><nav class="top"><a href="index.html">Home</a><a href="GETTING-STARTED.html">Start</a><a href="THE-GAME.html">The game</a><a href="THE-CARTRIDGE.html">The cartridge</a><a href="THE-CODE.html">The code</a><a href="FINDINGS.html">Findings</a><a href="IN-THE-EMULATOR.html">In the emulator</a><a href="OPEN-QUESTIONS.html" style=color:var(--tinta)>Open questions</a><a href="es/PREGUNTAS-ABIERTAS.html" style="margin-left:auto;color:var(--oro)">Castellano</a></nav>
 <h1 id="open-questions">Open questions</h1>
 <p>What the listing does not know yet. The whole cartridge is assigned to code or data, but assigned is not the same as fully understood.</p>
-<h2 id="what-happens-on-loop-3">What happens on loop 3</h2>
-<p>The ending raises the loop (0xD012) up to 2, and class 1 vendors up to 3 (see <a href="FINDINGS.html">Findings</a>). The routines that read it comment it as &quot;0, 1 or 2&quot;. With 3, p03:A35A waits 0x30 − 4 × 3 frames and p03:A65A adds 32 per loop: nobody has seen in the emulator whether the game behaves.</p>
+<h2 id="what-happens-with-0xd012-at-3">What happens with 0xD012 at 3</h2>
+<p>The ending leaves 0xD012 at 2 at most (p01:6701), but p02:9333 allows up to</p>
+<ol><li>With 3, p03:A35A waits 0x30 − 4 × 3 frames and p03:A65A adds 32 per</li></ol>
+<p>level: nobody has seen in the emulator whether the game behaves.</p>
 <h2 id="what-0xcf34-counts">What 0xCF34 counts</h2>
 <p>State 8, after the sixth block, goes back to the first with full life and adds one to 0xCF34; when it reaches 2, it goes to the intro (p00:433A). What resets it, and how it ties in with the ending at p01:66F1, has not been followed.</p>
 <h2 id="the-nameless-enemies">The nameless enemies</h2>

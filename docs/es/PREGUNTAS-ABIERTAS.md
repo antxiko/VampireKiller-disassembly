@@ -3,12 +3,11 @@
 Lo que el listado no sabe todavía. Todo el cartucho está asignado a código o
 a datos, pero asignado no es entendido del todo.
 
-## Qué pasa con la vuelta 3
+## Qué pasa con 0xD012 a 3
 
-El final sube la vuelta (0xD012) hasta 2, y los vendedores de clase 1 hasta 3
-(ver [Hallazgos](HALLAZGOS.md)). Los que la leen la comentan como «0, 1 o 2».
-Con 3, p03:A35A espera 0x30 − 4 × 3 cuadros y p03:A65A suma 32 por vuelta:
-no se ha visto en el emulador si el juego se comporta bien.
+El final deja 0xD012 en 2 como mucho (p01:6701), pero p02:9333 admite hasta 3.
+Con 3, p03:A35A espera 0x30 − 4 × 3 cuadros y p03:A65A suma 32 por nivel: no
+se ha visto en el emulador si el juego se comporta bien.
 
 ## Qué cuenta 0xCF34
 

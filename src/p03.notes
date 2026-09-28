@@ -21,7 +21,7 @@ C 0xAA69 el destino de este sprite
 C 0xAA6B ya esta?
 C 0xAA6E si no, un punto hacia alla
 C 0xAA76 el sprite siguiente: cinco bytes mas
-B 0xA222 EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con la VUELTA (0x28 - 8 * vuelta cuadros).
+B 0xA222 EL TIPO 0x0A: quieto, mirando a Simon (0xA2A8), cambia de color a cuadros alternos y cada tanto dispara en horizontal (0xA26B: crea_con_parametros con A = 0x0A, el tipo 3 de la lista de 0xD700, a 0x400 hacia donde mira). La espera se acorta con el NIVEL DE DIFICULTAD (0x28 - 8 * nivel cuadros).
 L 0xA222 nace_el_tipo_0a
 L 0xA22E mueve_el_tipo_0a
 C 0xA225 la espera del paso 0
@@ -29,7 +29,7 @@ C 0xA229 y la del parpadeo
 C 0xA231 paso 1: el parpadeo; paso 2: tras disparar
 C 0xA23A paso 0: espera...
 C 0xA241 ... y a parpadear 0x18 cuadros
-C 0xA24B la siguiente espera: 0x28 - 8 * vuelta
+C 0xA24B la siguiente espera: 0x28 - 8 * nivel
 C 0xA253 un color u otro, a cuadros alternos
 C 0xA264 la espera tras disparar
 L 0xA26B dispara_el_tipo_0a
@@ -63,7 +63,7 @@ C 0xA33E mirando a la derecha, la celda de delante
 C 0xA348 toca suelo?
 C 0xA34D si: el efecto de caer...
 C 0xA352 ... la y, a la celda
-C 0xA35A la espera hasta escupir: 0x30 - 4 * vuelta
+C 0xA35A la espera hasta escupir: 0x30 - 4 * nivel
 L 0xA366 a_andar_el_hombre_pez
 C 0xA37A sin velocidad vertical
 C 0xA380 sin suelo: cayendo hasta y = 0xC0
@@ -138,7 +138,7 @@ C 0xA5C1 contra el borde derecho de la pantalla...
 C 0xA5D0 ... o el izquierdo: media vuelta
 C 0xA5DC Simon a su altura?
 C 0xA5E1 ya lo sabia: sigue
-C 0xA5E7 a por el: 0x160 hacia Simon, mas lo de la vuelta
+C 0xA5E7 a por el: 0x160 hacia Simon, mas lo del nivel
 C 0xA5F8 lo sabe
 C 0xA5FE Simon no esta a su altura
 C 0xA602 cada 0x60 cuadros...
@@ -149,9 +149,9 @@ L 0xA637 simon_a_su_altura
 C 0xA637 carry si Simon esta de y - 8 a y + 7
 L 0xA642 media_vuelta
 C 0xA642 la velocidad horizontal, cambiada de signo
-L 0xA653 velocidad_x_con_la_vuelta
+L 0xA653 velocidad_x_con_el_nivel
 C 0xA653 DE = 0: parado
-C 0xA65A mas rapido en cada VUELTA: 32 por vuelta...
+C 0xA65A mas rapido en cada NIVEL DE DIFICULTAD (0xD012): 32 por nivel...
 C 0xA665 ... hacia donde vaya
 B 0xA670 EL MURCIELAGO (el tipo 0x0C; por su dibujo). Colgado 0x18 cuadros (dibujo 0x89); luego vuela hacia Simon a 0x200 en horizontal y, en vertical, con una de las cuatro velocidades de 0xA813 (Simon mas arriba) o 0xA81B (mas abajo); se para a 0x18 cuadros al llegar a un borde (0xA82D) o al frenar, se vuelve a lanzar y, al pasar junto a Simon, frena y da la vuelta. Pasos en 0xA686.
 L 0xA670 nace_el_murcielago
@@ -232,7 +232,7 @@ C 0xA916 los dibujos 0x40-0x42 a la izquierda...
 C 0xA923 ... o 0x44-0x46 a la derecha
 C 0xA925 los cuadros 1-3, B; de 4 a 9, B + 1...
 C 0xA92E ... y de 10 a 12, B - 1
-B 0xA934 EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por VUELTA) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
+B 0xA934 EL TIPO 1. Cruza la pantalla a 0x220 (mas 32 por nivel de dificultad) hacia el lado contrario al que nace, alternando dos dibujos cada cuatro cuadros (0x3D/0x3E o 0x3B/0x3C); sin suelo, cae (gravedad 0x60) sin avanzar y al tocar suelo sigue.
 L 0xA934 nace_el_tipo_1
 C 0xA938 nacio a la izquierda: a la derecha, dibujo 0x3D...
 C 0xA945 ... y si no, a la izquierda, dibujo 0x3B
@@ -256,7 +256,7 @@ C 0xAE0F en el suelo: la y, a la celda de 16
 C 0xAE17 a 0x140 hacia Simon...
 C 0xAE24 ... a la derecha...
 C 0xAE26 ... o a la izquierda
-C 0xAE2D mas lo de la vuelta
+C 0xAE2D mas lo del nivel
 C 0xAE30 sin caer
 C 0xAE36 el dibujo, mirando a Simon
 C 0xAE39 la celda de delante: x + 0x10...
@@ -273,7 +273,7 @@ C 0xAE70 no: mira si esta lejos
 C 0xAE72 si: se aparta, 0x140...
 C 0xAE7B ... hacia el lado contrario de Simon
 C 0xAE7D (Simon a su derecha: a la izquierda)
-C 0xAE80 mas lo de la vuelta
+C 0xAE80 mas lo del nivel
 C 0xAE83 viene de cerca
 C 0xAE87 a mirar si lanza
 C 0xAE89 a 0x5C o mas?
@@ -281,7 +281,7 @@ C 0xAE8B entre medias: como iba
 C 0xAE8D lejos: a 0x140 hacia Simon...
 C 0xAE96 ... a la derecha...
 C 0xAE98 ... o a la izquierda
-C 0xAE9B mas lo de la vuelta
+C 0xAE9B mas lo del nivel
 C 0xAE9E viene de lejos
 C 0xAEA5 en el borde derecho, se para si va a la derecha
 C 0xAEAA en el borde izquierdo, si va a la izquierda
@@ -349,7 +349,7 @@ C 0xAFA3 a la derecha: mirando a la derecha...
 C 0xAFAB ... a 0x220
 C 0xAFB0 a la izquierda: mirando a la izquierda...
 C 0xAFB8 ... a -0x220
-C 0xAFBB mas lo de la vuelta
+C 0xAFBB mas lo del nivel
 L 0xAFBE tipo_9_andando
 C 0xAFC5 la celda de delante: x + 0x10...
 C 0xAFC9 ... o x - 0x10
@@ -368,7 +368,7 @@ C 0xAFF8 suelo a la izquierda?
 C 0xAFFB lo hay: sigue
 C 0xAFFD media vuelta: el lado...
 C 0xB000 ... del reves...
-C 0xB00E ... y la velocidad, del reves, con lo de la vuelta
+C 0xB00E ... y la velocidad, del reves, con lo del nivel
 C 0xB015 el dibujo: 0x21...
 C 0xB017 (cada cuatro cuadros...)
 C 0xB019 ... o 0x22
@@ -415,7 +415,7 @@ B 0xB0CA EL TIPO 4 (y el 0x1F, que se mueve igual). Colgado con el dibujo 0x1A h
 L 0xB0CA nace_el_tipo_4
 C 0xB0CE bajando a 0x180...
 C 0xB0D4 ... y a 0x300 hacia Simon
-C 0xB0E0 mas lo de la vuelta
+C 0xB0E0 mas lo del nivel
 C 0xB0E7 la cuenta de la animacion
 C 0xB0EE la altura alrededor de la que ondula: la de nacer
 C 0xB0F7 al paso 2, ondulando
@@ -551,7 +551,7 @@ L 0xB344 nace_el_tipo_0x0b
 C 0xB34A Simon a la derecha?
 C 0xB34B si: 0x240 hacia el...
 C 0xB350 ... o a la izquierda
-C 0xB353 mas lo de la vuelta
+C 0xB353 mas lo del nivel
 C 0xB356 sin velocidad vertical
 L 0xB364 anima_el_tipo_0x0b
 C 0xB36A el dibujo 0x47 mirando a la izquierda...
@@ -576,7 +576,7 @@ C 0xB3B3 ... por debajo de 0xA0: entre 0x30 y 0x50, como iba
 C 0xB3BA lejos: va a por el...
 C 0xB3BB ... a la derecha si esta a su derecha...
 C 0xB3C0 ... o a la izquierda
-C 0xB3C3 mas lo de la vuelta
+C 0xB3C3 mas lo del nivel
 C 0xB3C6 dos cuadros de cada ocho...
 C 0xB3C9 (los bits 1 y 2 de la cuenta a cero)
 C 0xB3CB (los demas, sigue)
@@ -601,7 +601,7 @@ C 0xB43A por la izquierda de 0x10...
 C 0xB43C ... a la derecha
 C 0xB441 por la derecha de 0xEE...
 C 0xB443 ... a la izquierda
-C 0xB44E con lo de la vuelta
+C 0xB44E con lo del nivel
 L 0xB451 tipo_0x0b_saltando
 C 0xB451 una pared delante, en 8 x 12?
 C 0xB45E va a la derecha: la de la derecha
@@ -824,12 +824,12 @@ C 0xB874 las dos caidas?
 C 0xB877 (0xCE15)
 C 0xB878 no: sigue
 C 0xB879 si: a rematar
-B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
+B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por NIVEL DE DIFICULTAD (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
 L 0xA0ED apunta_de_de_a_simon
 C 0xA0E5 la rapidez de siempre
-C 0xA0F5 la rapidez de la vuelta (aqui 0xCFF0 no es un tipo)
+C 0xA0F5 la rapidez del nivel (aqui 0xCFF0 no es un tipo)
 C 0xA0F8 la direccion hacia Simon, de 0xA1A2
 C 0xA102 0x3F menos la direccion...
 C 0xA106 ... y los dos senos: el de la direccion, en C...
@@ -1226,7 +1226,7 @@ C 0xA078 pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xA07B lee la velocidad horizontal (el bit 7, hacia la izquierda)
 C 0xA0E7 lee la y de la cosa
 C 0xA0EA lee la x de la cosa
-C 0xA0EE lee la VUELTA (0, 1 o 2)
+C 0xA0EE lee el NIVEL DE DIFICULTAD (0 a 3)
 C 0xA117 lee la posicion de la cosa que se crea
 C 0xA11E guarda la ficha de la cosa que se crea
 C 0xA139 lee la Y de Simon
@@ -1234,7 +1234,7 @@ C 0xA14A lee la X de Simon
 C 0xA15E hl_mas_a: HL += A
 C 0xA166 lee la posicion de la cosa que se crea
 C 0xA23E sube el paso en que va la cosa
-C 0xA245 lee la VUELTA (0, 1 o 2)
+C 0xA245 lee el NIVEL DE DIFICULTAD (0 a 3)
 C 0xA268 sube el paso en que va la cosa
 C 0xA271 mira el bit 0 de el dibujo de la cosa
 C 0xA280 lee la x de la cosa

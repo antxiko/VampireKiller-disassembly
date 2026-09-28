@@ -2964,7 +2964,7 @@ puerta_de_la_fase_a_0xff:
 	jp abre_la_puerta_de_la_fase		;9176
 
 ; ----------------------------------------------------------------------
-; LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar el bloque); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
+; LOS VENDEDORES (las puertas de los secretos 11x). Al entrar en la habitacion, cada secreto de puerta llega aqui (p00:5BCA, p02:883B) con D = x, E = y, B = cual (bits 5-2: lo que vende, 0x5B0B[B]) y C = su clase (bits 1-0), y HL en el secreto de 0xE000. Se busca lo que vende entre los dos huecos de la habitacion en 0xDE00 (p00:5AAF los llena al empezar cada vida); si no esta, no sale. Ficha de 16 bytes en 0xC5B5 (hueco 0) o 0xC5C5 (hueco 1): estado, y, x, golpes, cual, clase, -, el secreto (dos bytes), el hueco, cuadros.
 ; ----------------------------------------------------------------------
 sale_un_vendedor:
 	ld (0c70dh),hl		;9179   ; guarda el secreto de 0xE000
@@ -3072,10 +3072,10 @@ vendedor_esperando:
 	inc l			;91fe
 	cp 0ffh		;91ff   ; 0xFF, la cruz?
 	jr z,la_cruz_lo_quita		;9201
-	call su_cuenta_de_visitas		;9203   ; no: una visita mas en su hueco...
+	call su_cuenta_de_golpes		;9203   ; no: un golpe mas en su hueco...
 	res 7,(hl)		;9206   ; ... la que cuenta (sin el bit 7)
 	inc (hl)			;9208
-	call lo_que_toca		;9209   ; lo que toca en esta visita
+	call lo_que_toca		;9209   ; lo que toca en este golpe
 L_920C:
 	ld (ix+00ah),020h		;920c   ; 0x20 cuadros...
 	ld (ix+000h),003h		;9210   ; ... en el estado 3
@@ -3086,10 +3086,10 @@ la_cruz_lo_quita:
 	ld a,003h		;921a   ; ... con el dibujo 3
 	ld (0c70bh),a		;921c
 	jr L_920C		;921f
-su_cuenta_de_visitas:
+su_cuenta_de_golpes:
 	ld a,(ix+009h)		;9221   ; el hueco de la ficha...
 	call hueco_en_0xde00		;9224   ; ... en 0xDE00...
-	inc hl			;9227   ; ... su segundo byte: las visitas
+	inc hl			;9227   ; ... su segundo byte: los golpes
 	ret			;9228
 vendedor_dando:
 	dec (ix+00ah)		;9229   ; un cuadro menos
@@ -3114,10 +3114,10 @@ pinta_el_vendedor:
 	ld hl,0e580h		;924d
 	call guarda_4x4_celdas		;9250
 	pop de			;9253
-	call su_cuenta_de_visitas		;9254   ; las visitas del hueco:
+	call su_cuenta_de_golpes		;9254   ; los golpes del hueco:
 	bit 7,(hl)		;9257   ; la tienda quedo abierta sin comprar (bit 7)?
 	jr z,L_925C		;9259
-	dec (hl)			;925b   ; si: esa visita no cuenta
+	dec (hl)			;925b   ; si: ese golpe no cuenta (se sale sin comprar y se vuelve: la tienda otra vez; visto en openMSX)
 L_925C:
 	ld a,003h		;925c   ; el dibujo 3, la puerta
 pinta_un_dibujo_de_vendedor:
@@ -3208,7 +3208,7 @@ DATA_tabla_92AD:
 
 
 ; ----------------------------------------------------------------------
-; LO QUE TOCA EN ESTA VISITA: la fila de la clase en 0x9300 (ocho bytes), en la columna de la visita (la octava y siguientes, la ultima). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
+; LO QUE TOCA EN ESTE GOLPE: la fila de la clase en 0x9300 (ocho bytes), en la columna del golpe (el octavo y siguientes, la ultima). Visto en openMSX golpe a golpe con las cuatro clases (tools/omsx_vendedor.tcl). Del 7 al 9 se sortea con el registro R: 7 da 3 o 5, 8 da 4 o 5, 9 da 3 o 4. El desenlace va a 0xC70C y su dibujo (0x9320) a 0xC70B.
 ; ----------------------------------------------------------------------
 lo_que_toca:
 	ld de,09300h		;92bb
@@ -3217,7 +3217,7 @@ lo_que_toca:
 	add a,a			;92c2
 	add a,a			;92c3
 	call 04066h		;92c4   ; la fila de la clase
-	ld a,(hl)			;92c7   ; la visita, desde 0...
+	ld a,(hl)			;92c7   ; el golpe, desde 0...
 	dec a			;92c8
 	cp 008h		;92c9   ; ... hasta la octava
 	jr c,L_92CF		;92cb
@@ -3252,7 +3252,7 @@ L_92F2:
 
 ; ----------------------------------------------------------------------
 ; DATOS tres_tablas_pequenas: la de 0x9300, lo que toca a cada vendedor: una
-;   fila de ocho visitas por clase (p02:92BB, con la clase * 8); la de 0x930B
+;   fila de ocho golpes por clase (p02:92BB, con la clase * 8); la de 0x930B
 ;   la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320, el dibujo de cada
 ;   desenlace (p02:92F5, con 0xC70C)
 ;   0x9300..0x9327  (39 bytes)
@@ -3272,15 +3272,15 @@ abre_la_tienda:
 	ld a,(ix+009h)		;932c   ; lee la velocidad horizontal (parte baja)
 	ld (0c703h),a		;932f   ; con el hueco de este vendedor
 	ret			;9332
-una_vuelta_mas:
-	ld hl,0d012h		;9333   ; 1: una VUELTA mas, hasta 3
+un_nivel_mas:
+	ld hl,0d012h		;9333   ; 1: un NIVEL DE DIFICULTAD mas (0xD012), hasta 3
 	ld a,(hl)			;9336
 	cp 003h		;9337
 	ret z			;9339
 	inc (hl)			;933a
 	ret			;933b
-una_vuelta_menos:
-	ld hl,0d012h		;933c   ; 2: una VUELTA menos, hasta 0
+un_nivel_menos:
+	ld hl,0d012h		;933c   ; 2: un NIVEL DE DIFICULTAD menos (0xD012), hasta 0
 	ld a,(hl)			;933f
 	or a			;9340
 	ret z			;9341
@@ -3383,7 +3383,7 @@ lo_que_vende_y_su_precio:
 	call el_hueco_del_vendedor		;93ff   ; su hueco en 0xDE00
 	ld a,(hl)			;9402   ; lo que vende, a 0xC708
 	ld (0c708h),a		;9403
-	inc hl			;9406   ; las visitas...
+	inc hl			;9406   ; los golpes...
 	set 7,(hl)		;9407   ; ... con el bit 7: tienda abierta sin comprar
 	ld hl,09428h		;9409   ; buscalo entre los nueve de 0x9428
 	ld b,009h		;940c
@@ -3428,7 +3428,7 @@ el_hueco_del_vendedor:
 	ld a,(0c703h)		;944c   ; A = el hueco de la tienda
 
 ; ----------------------------------------------------------------------
-; EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][visitas] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
+; EL HUECO A (0 o 1) DE LA HABITACION en 0xDE00: cuatro bytes por habitacion ([lo que vende][golpes] dos veces), 64 por fase, y la fase en su columna del bloque (0x9473). Devuelve HL en el primer byte.
 ; ----------------------------------------------------------------------
 hueco_en_0xde00:
 	push af			;944f
@@ -3496,7 +3496,7 @@ en_la_ventana:
 	ret			;94b9
 
 ; ----------------------------------------------------------------------
-; LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja la visita contada); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
+; LA TIENDA, cada cuadro (p00:43F2): devuelve NZ mientras sigue abierta. Con el disparo o el espacio compra si hay corazones (quita el precio, da el objeto por 0x8D30, efecto 0x12 y deja el golpe contado); con el segundo boton o SHIFT, o sin corazones, o al acabar los plazos, efecto 2 y fuera.
 ; ----------------------------------------------------------------------
 la_tienda_cada_cuadro:
 	ld a,(0c003h)		;94ba   ; uno de cada 32 cuadros...
@@ -3526,7 +3526,7 @@ lee_la_compra:
 	call c,pinta_la_ventana_de_la_tienda		;94ec   ; y vuelve la ventana, si se quito
 	ld a,012h		;94ef   ; efecto 0x12
 	call 0509fh		;94f1   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	call el_hueco_del_vendedor		;94f4   ; la visita queda contada...
+	call el_hueco_del_vendedor		;94f4   ; el golpe queda contado...
 	inc hl			;94f7
 	res 7,(hl)		;94f8   ; ... (sin el bit 7)
 	xor a			;94fa   ; Z: se cierra
@@ -4564,7 +4564,7 @@ DATA_cuentas_iniciales:
 
 
 ; ----------------------------------------------------------------------
-; EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por VUELTA (y como poco 1), y devuelve Z: toca sacar uno.
+; EL PLAZO DE UN GENERADOR (HL en sus dos bytes de 0xCF00, DE en sus ocho plazos). Cuenta una de cada cuatro llamadas (el reloj comun de 0xCF10); al acabar el plazo toma el siguiente de la tabla, menos dos por NIVEL DE DIFICULTAD (0xD012; y como poco 1), y devuelve Z: toca sacar uno.
 ; ----------------------------------------------------------------------
 el_plazo_de_un_generador:
 	exx			;9cc3
@@ -4582,7 +4582,7 @@ el_plazo_de_un_generador:
 	dec l			;9cd2
 	and 007h		;9cd3   ; el plazo siguiente, de los ocho...
 	call 04066h		;9cd5   ; de_mas_a: DE += A
-	ld a,(0d012h)		;9cd8   ; ... menos dos por VUELTA
+	ld a,(0d012h)		;9cd8   ; ... menos dos por nivel de dificultad
 	add a,a			;9cdb
 	ld c,a			;9cdc
 	ld a,(de)			;9cdd

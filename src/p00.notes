@@ -1427,7 +1427,7 @@ C 0x5A98 en el patio...
 C 0x5A9C ... la de 0x800C
 C 0x5AA0 si no, la del bloque...
 C 0x5AA3 ... de la tabla de 0x8000
-B 0x5AAF LOS VENDEDORES DEL BLOQUE en 0xDE00: cuatro bytes por habitacion (dos huecos de [lo que vende][visitas]), a cero, y en cada hueco lo que vende (0x5B0B) cada secreto 11x de la habitacion, dos como mucho; un bloque que se rompe con un tercer byte 11x cuenta tambien.
+B 0x5AAF LOS VENDEDORES en 0xDE00 (al empezar cada vida, p01:62F2: morir los pone a cero; visto en openMSX): cuatro bytes por habitacion (dos huecos de [lo que vende][golpes]), a cero, y en cada hueco lo que vende (0x5B0B) cada secreto 11x de la habitacion, dos como mucho; un bloque que se rompe con un tercer byte 11x cuenta tambien.
 L 0x5AAF los_vendedores_del_bloque
 C 0x5AAF 0xC0 bytes a cero desde 0xDE00
 C 0x5ABE las 48 habitaciones de 0xE000
@@ -1446,7 +1446,7 @@ C 0x5AE2 11x: un vendedor
 C 0x5AE8 lo que vende...
 C 0x5AEB ... de 0x5B0B, por los bits 5-2...
 C 0x5AF5 ... al hueco
-C 0x5AF7 (sus visitas, a cero)
+C 0x5AF7 (sus golpes, a cero)
 C 0x5AFA los dos huecos llenos: listo
 L 0x5AFC el_secreto_siguiente
 C 0x5AFC al primer byte del siguiente
@@ -1696,7 +1696,7 @@ D 0x556E 0x558E dibujos_de_cinco_colores_en_ram  16 punteros (4 x 4) a la RAM de
 F 0x556E 16
 D 0x55DD 0x55EC tres_volteos  tres ordenes de 0x473E, cinco bytes cada una ([origen en VRAM][cuantos][destino]): dan la vuelta a dibujos que ya estan en la VRAM (p00:55C0, 55C8 y 55CE)
 F 0x55DD 16
-D 0x5B0B 0x5B1B lo_que_vende_cada_vendedor  lo que vende el vendedor de un secreto 11x, por los bits 5-2 del secreto (p00:5AEB al empezar el bloque, p02:91A4 al salir): vela, baston, escudo rojo, escudo, reloj de arena, vida llena, frasco, cruz que vuelve y daga
+D 0x5B0B 0x5B1B lo_que_vende_cada_vendedor  lo que vende el vendedor de un secreto 11x, por los bits 5-2 del secreto (p00:5AEB al empezar cada vida, p02:91A4 al salir): vela, baston, escudo rojo, escudo, reloj de arena, vida llena, frasco, cruz que vuelve y daga
 F 0x5B0B 16
 D 0x5C04 0x5C16 fila_de_cada_fase  18 bytes, uno por fase (1-18): p00:5BE1 lo multiplica por 16 y lo usa de desplazamiento en el bufer de 0xE000; la fase 0 no pasa por aqui
 F 0x5C04 16

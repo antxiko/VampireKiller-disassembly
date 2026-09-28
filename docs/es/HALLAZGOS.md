@@ -7,21 +7,16 @@ se puede comprobar.
 
 Las 16 puertas blancas del castillo, y otros 17 secretos escondidos en
 bloques, son **33 vendedores** (p02:9179). Cada uno vende una cosa (tabla
-0x5B0B), pero lo que pasa al entrar depende de su **clase** (dos bits del
-secreto) y de **cuántas veces se le ha visitado**: la tabla 0x9300 da ocho
-visitas por clase (p02:92BB). Un vendedor de clase 3 no abre la tienda hasta
-la quinta visita; uno de clase 2 puede quitar cinco corazones; todos se van en
-la octava. La tabla entera está en [El juego](EL-JUEGO.md#los-vendedores).
+0x5B0B), pero lo que pasa depende de su **clase** (dos bits del secreto) y de
+**cuántas veces se le ha pegado**: la tabla 0x9300 da ocho golpes por clase
+(p02:92BB). Un vendedor de clase 3 no abre la tienda hasta el quinto golpe;
+uno de clase 2 puede quitar cinco corazones; todos se van en el octavo. La tabla entera está en [El juego](EL-JUEGO.md#los-vendedores).
 
-## Un vendedor puede subir la dificultad por encima del final
+## Los libros cambian los precios
 
-La «vuelta», 0xD012, acorta las esperas de los enemigos y afina su puntería
-(p03:A0E5, p03:A35A, p03:A65A). El final del juego la sube de una en una
-**hasta 2** (p01:6701: `cp 3` / `jr nc`). Los vendedores de clase 1, en la
-cuarta visita, la suben **hasta 3** (p02:9333: `cp 3` / `ret z` / `inc`). Con
-siete vendedores de clase 1 en el castillo, una partida puede llegar a una
-vuelta que el final nunca da. Está leído en el código; qué pasa con la vuelta
-3 no se ha probado en el emulador.
+Con el libro blanco la tienda cobra menos y con el rojo, más (0xC702,
+p02:9418): la vida llena cuesta 15, 40 u 80 corazones según el libro. Visto
+en openMSX; la tabla entera está en [El juego](EL-JUEGO.md#los-vendedores).
 
 ## Drácula es un sprite y un dibujo del VDP
 

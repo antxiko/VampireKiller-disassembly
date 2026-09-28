@@ -170,7 +170,7 @@ RAM = {
     0xCFF0: ("el tipo de la cosa que se crea", "p00:5F2B"),
     0xCFF1: ("la posicion de la cosa que se crea", "p00:5F2E"),
     0xCFF3: ("la ficha de la cosa que se crea", "p00:5F45"),
-    0xD012: ("la VUELTA (0, 1 o 2)", "p01:6701 la sube al acabar el juego, hasta 2; p02:9CD8 acorta con ella los plazos de las cosas"),
+    0xD012: ("el NIVEL DE DIFICULTAD (0 a 3)", "p01:6701 lo sube al acabar el juego, hasta 2; los vendedores de clase 1 hasta 3 y los de clase 2 lo bajan (p02:9333, 933C); p02:9CD8 acorta con el los plazos de las cosas"),
     0xC00F: ("el giro del orden de los sprites", "p01:6560 le suma 0x68 cada cuadro"),
     0xD000: ("la FASE (0 el patio, 1-18)", "p00:4357 la sube y 0x5742 tiene una entrada por fase"),
     0xD001: ("la HABITACION dentro de la fase", "p00:5797 elige por ella en la tabla de habitaciones"),
