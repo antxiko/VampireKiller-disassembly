@@ -235,6 +235,46 @@ def fin_filas(rom, s, a):
     return a
 
 
+FUENTE = {0x00: " ", 0x30: "-"}
+FUENTE.update({0x31 + i: chr(0x41 + i) for i in range(26)})
+
+
+def texto(rom, s, a, f):
+    """Lo que dicen los bytes de [a, f) con la fuente del juego (la A es 0x31)."""
+    return "".join(FUENTE.get(byte(rom, s, x), "{%02X}" % byte(rom, s, x)) for x in range(a, f))
+
+
+def recorre_rotulo(rom, s, a):
+    """0x4ACB: [x][y] y caracteres; 0xFE da otra posicion, 0xFF acaba.
+    Devuelve (fin, [textos])."""
+    textos = []
+    while True:
+        a += 2
+        ini = a
+        while byte(rom, s, a) not in (0xFE, 0xFF):
+            a += 1
+        textos.append(texto(rom, s, ini, a))
+        if byte(rom, s, a) == 0xFF:
+            return a + 1, textos
+        a += 1
+
+
+def recorre_rotulo_de(rom, s, a):
+    """p01:7B32: caracteres; 0xFE [dx] baja una fila y corre dx; 0xFF acaba."""
+    textos, ini = [], a
+    while True:
+        c = byte(rom, s, a)
+        if c == 0xFF:
+            textos.append(texto(rom, s, ini, a))
+            return a + 1, textos
+        if c == 0xFE:
+            textos.append(texto(rom, s, ini, a))
+            a += 2
+            ini = a
+            continue
+        a += 1
+
+
 def recorre_guion(rom, s, a, bl, quien, nom):
     """El guion de 0x4714: anota el guion y lo que manda leer."""
     ini = a
@@ -276,9 +316,16 @@ def dibujos_de_cada_fase(rom, t, bl):
              "de 8x8 de su decorado; los lee p00:565B con la fase de 0xD000", "p00:565B")
     for fase, w in enumerate(ptrs):
         s = (4, 5, 6) if fase < 13 else (4, 7, 8)
-        bl.anota(s, w, w + 191 * 32, "dibujos_%04X" % w,
-                 "191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado",
-                 "fase %d" % fase, ancho=32)
+        fin = w + 191 * 32
+        que = "191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado"
+        if w < 0xB473 < fin:
+            # los ultimos quince que se suben para las fases 10-12 son en
+            # realidad la tabla de sprites de p01:6445: se suben, pero no son
+            # dibujos
+            fin = 0xB473
+            que += ("; se suben 191, pero los 15 ultimos (0xB473-0xB652) son la tabla de "
+                    "sprites de p01:6445, no dibujos")
+        bl.anota(s, w, fin, "dibujos_%04X" % w, que, "fase %d" % fase, ancho=32)
     # p00:5670 entra en la misma subida con los bancos 9 y 10 y HL=0x8000
     # (`call 0x537A / ld hl,0x8000 / jr 0x5665`)
     bl.anota((1, 9, 10), 0x8000, 0x8000 + 191 * 32, "dibujos_8000",
@@ -298,6 +345,10 @@ LECTORES = {
     0x498A: ("hmmc", "hl"),
     0x582D: ("filas", "hl"),
     0x483E: ("paleta", "hl"),
+    0x4ACB: ("rotulo", "hl"),
+    0x4ACF: ("rotulo_borra", "hl"),
+    0x5D90: ("rotulo", "hl"),
+    0x7B32: ("rotulo_de", "hl"),
 }
 # Los lectores se llaman entre ellos: esas llamadas no traen un puntero nuevo.
 DENTRO_DE_LOS_LECTORES = (0x4600, 0x4900)
@@ -378,6 +429,14 @@ def llamadas_a_lectores(rom, t, bl):
                 bl.anota(s, ptr, fin_paleta(rom, s, ptr), "paleta_%04X" % ptr,
                          "cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en "
                          "el registro 16 del V9938 y en la copia de 0xF680", quien, ancho=3)
+            elif fmt in ("rotulo", "rotulo_borra", "rotulo_de"):
+                fin, txts = (recorre_rotulo_de if fmt == "rotulo_de" else recorre_rotulo)(rom, s, ptr)
+                bl.anota(s, ptr, fin, "rotulo_%04X" % ptr,
+                         "%s: \"%s\"" % (
+                             "rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF acaba)"
+                             if fmt == "rotulo_de" else
+                             "rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba)",
+                             " / ".join(txts)), quien)
             elif fmt == "letras":
                 n = registro_antes(b, pc, "b")
                 if n is None:
@@ -587,6 +646,86 @@ def huecos_que_cierran(rom, t, bl):
             except FueraDelBanco:
                 pass
             x = y
+
+
+def sin_llamar(rom, t, bl):
+    """Lo que no alcanza nadie en los bancos de codigo, si cierra clavado.
+
+    Para cada hueco que quede sin explicar en los bancos 0 a 3 se prueba:
+      - como CODIGO: instrucciones enteras que acaban justo en el borde del
+        hueco con un `ret`, `jp`, `jr` o `jp (hl)`;
+      - como ROTULO de 0x4ACB: acaba en su 0xFF justo en el borde.
+    Y en los dos casos su direccion no puede aparecer como palabra en ningun
+    sitio de los 128 KB: si apareciera, alguien podria llamarlo y habria que
+    buscar quien. Lo que no cumple las dos cosas se queda sin declarar.
+    """
+    for b in (0, 1, 2, 3):
+        s = tuple(b if ORG[b] == r else {0x6000: 1, 0x8000: 2, 0xA000: 3}[r]
+                  for r in (0x6000, 0x8000, 0xA000))
+        ocup = ocupado(b)
+        for (i, f) in list(bl.d.get(b, {})):
+            for x in range(i - ORG[b], f - ORG[b]):
+                ocup[x] = 1
+        x = 0
+        while x < TAM_PAGINA:
+            if ocup[x]:
+                x += 1
+                continue
+            y = x
+            while y < TAM_PAGINA and not ocup[y]:
+                y += 1
+            a, f = ORG[b] + x, ORG[b] + y
+            x = y
+            if bytes([a & 0xFF, a >> 8]) in rom:
+                continue
+            pc, ultimo = a, None
+            while pc < f:
+                n = t.ilen(pc, s)
+                if not n:
+                    break
+                ultimo = byte(rom, s, pc)
+                pc += n
+            if pc == f and ultimo in (0xC9, 0xC3, 0x18, 0xE9):
+                bl.anota(s, a, f, "codigo_sin_llamar_%04X" % a,
+                         "instrucciones que no alcanza nadie: desensamblan enteras hasta un "
+                         "%s justo en el borde y su direccion no aparece como palabra en el "
+                         "cartucho" % {0xC9: "ret", 0xC3: "jp", 0x18: "jr", 0xE9: "jp (hl)"}[ultimo],
+                         "nadie")
+                continue
+            try:
+                fin, txts = recorre_rotulo(rom, s, a)
+                if fin == f:
+                    bl.anota(s, a, f, "rotulo_sin_usar_%04X" % a,
+                             "rotulo para 0x4ACB que no lee nadie y cierra clavado: \"%s\""
+                             % " / ".join(txts), "nadie")
+            except FueraDelBanco:
+                pass
+
+
+def sin_usar_que_cierran(rom, t, bl):
+    """Cinco bloques a los que no apunta nada y que cierran CLAVADOS.
+
+    Ninguna tabla los nombra (su direccion no aparece como palabra en los 128
+    KB), pero leidos con el formato de sus vecinos acaban exactamente donde
+    empieza lo siguiente: dos guiones de carga seguidos en el banco 9, dos
+    paletas entre las que si se usan, y un rle con destino. Son restos: cosas
+    que el juego tuvo y ya no usa.
+    """
+    s = (1, 9, 10)
+    for a in (0x9E26, 0x9E41):
+        ini = a
+        while byte(rom, s, a) != 0xFF:
+            m = byte(rom, s, a)
+            a += 5 if m in (0x00, 0x01) else 7
+        bl.anota(s, ini, a + 1, "guion_sin_usar_%04X" % ini,
+                 "guion de carga de 0x4714 que no lee nadie y cierra clavado (lo que manda leer "
+                 "son rle que si usan otros guiones)", "nadie")
+    for a in (0xA03D, 0xA04B):
+        bl.anota(s, a, fin_paleta(rom, s, a), "paleta_sin_usar_%04X" % a,
+                 "cambios de paleta ([color][RB][G], 0xFF acaba) entre los que si se usan, pero "
+                 "que no nombra ninguna habitacion", "nadie", ancho=3)
+    bl.anota(s, 0xB50B, fin_rle(rom, s, 0xB50B, True), "rle_sin_usar_B50B",
+             "rle con el destino delante (0xFEC0) que no lee nadie y cierra clavado", "nadie")
 
 
 def rellenos(rom, t, bl):
@@ -861,12 +1000,103 @@ def sonido(rom, t, bl):
                      "efecto %d" % i)
 
 
+def final_y_creditos(rom, t, bl):
+    """p01:6743: el texto del final y los creditos, con los bancos 5 y 8.
+
+    0x678E son 43 punteros (0xCE31 es el renglon que toca). Cada renglon es
+    [cuando][fila][texto hasta 0xFF] y sale cuando la cuenta de 0xCE33 llega
+    a su primer byte; 0x4AD5 lo imprime. Una fila 0xFF es el final de todo.
+    En el texto, 0x00 es un espacio, ';' el apostrofo y ':' el punto.
+    """
+    s = (1, 5, 8)
+    ptrs = [palabra(rom, s, 0x678E + 2 * i) for i in range(43)]
+    bl.anota((1, 2, 3), 0x678E, 0x67E4, "renglones_del_final",
+             "43 punteros a los renglones del texto del final y de los creditos (bancos 5 y 8)",
+             "p01:675A", ancho=2)
+    for w in sorted(set(ptrs)):
+        a = w + 2
+        if byte(rom, s, w + 1) != 0xFF:
+            while byte(rom, s, a) != 0xFF:
+                a += 1
+            a += 1
+        txt = "".join(" " if c == 0 else chr(c) for c in rom[banco_de(w, s) * TAM_PAGINA + (w & 0x1FFF) + 2:
+                                                                  banco_de(w, s) * TAM_PAGINA + (w & 0x1FFF) + max(2, a - w - 1)])
+        bl.anota(s, w, a, "renglon_%04X" % w,
+                 "renglon [cuando][fila][texto][0xFF]: \"%s\"" % txt.replace(";", "'").replace(":", ".")
+                 if byte(rom, s, w + 1) != 0xFF else "el renglon que acaba el final (fila 0xFF)",
+                 "p01:6769", ancho=16)
+
+
+def sprites_de_cada_cosa(rom, t, bl):
+    """p01:6445: como se compone con sprites cada cosa, con el banco 6.
+
+    0xB473 tiene un puntero por tipo (el de (ix+0x0B)) a una lista de tres
+    bytes por sprite, [dy][dx][patron], tantos como diga (ix+0x20); 0x80,
+    0x81 y 0x82 en su primer byte cambian las posiciones por las de 0x64CD,
+    0x64D5 y 0x64D9 y dejan solo los patrones. Las listas van seguidas, asi
+    que cada una acaba donde empieza la siguiente.
+    """
+    s = (1, 2, 6)
+    ptrs = []
+    a = 0xB473
+    while a < min([0xC000] + ptrs):
+        ptrs.append(palabra(rom, s, a))
+        a += 2
+    bl.anota(s, 0xB473, a, "sprites_de_cada_tipo",
+             "%d punteros, uno por tipo de cosa, a como se compone con sprites" % len(ptrs),
+             "p01:645B", ancho=2)
+    orden = sorted(set(ptrs))
+    fin_total = 0xB9C8
+    for i, w in enumerate(orden):
+        f = orden[i + 1] if i + 1 < len(orden) else fin_total
+        bl.anota(s, w, f, "sprites_%04X" % w,
+                 "[dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones)",
+                 "p01:6469", ancho=3)
+
+
+def tablas_del_despachador(rom, t, bl):
+    """Las tablas de destinos pegadas detras de cada `call 0x406B`.
+
+    Las mide tools/bancos.py (hasta el destino mas bajo, o lo que diga
+    src/tablas.txt) y ya estan en el .nocode para que el trazador no entre;
+    aqui se declaran como datos, con cuantos destinos tienen.
+    """
+    for (b, pc), (tab, n, dest, ss) in sorted(t.tablas.items()):
+        if not n:
+            continue
+        bl.anota(ss, tab, tab + 2 * n, "tabla_%04X" % tab,
+                 "%d destinos del despachador de 0x406B (call en %s:%04X): %s"
+                 % (n, nombre(b), pc, ", ".join("0x%04X" % w for w in dest[:8])
+                    + (" ..." if n > 8 else "")),
+                 "%s:%04X" % (nombre(b), pc), ancho=2)
+
+
+def cabecera(rom, t, bl):
+    """0x4000-0x4027: la cabecera AB y la que lee el Konami Game Master.
+
+    0x4000 'AB', INIT 0x4075 y los otros tres vectores a cero. De 0x4010 en
+    adelante, la cabecera de Konami: 'CD' y los datos del cartucho que usa el
+    Game Master (el mismo esquema que el resto de cartuchos de la casa).
+    """
+    s = (1, 2, 3)
+    bl.anota(s, 0x4000, 0x4010, "cabecera_ab",
+             "la cabecera del cartucho: 'AB', INIT (0x4075) y STATEMENT, DEVICE y TEXT a cero",
+             "la BIOS", ancho=16)
+    bl.anota(s, 0x4010, 0x4028, "cabecera_de_konami",
+             "la cabecera de Konami que empieza por 'CD' y lee el Game Master", "el Game Master",
+             ancho=8)
+
+
 # Llamadas cuyo puntero ya lo pone un recorrido de arriba.
-DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5), (0, 0x5412), (0, 0x57AE)}
+DE_LOS_RECORRIDOS = {(0, 0x566A), (0, 0x57A5), (0, 0x5412), (0, 0x57AE),
+                     # los impresores se llaman a si mismos
+                     (0, 0x4ADB), (0, 0x5D95), (1, 0x7B45)}
 
 RECORRIDOS = [dibujos_de_cada_fase, llamadas_a_lectores, habitaciones, tabla_5421, mapas,
               salidas_y_puertas, sueltos_de_p00, listas_del_banco_14,
-              por_habitacion_y_sonido, sonido, huecos_que_cierran,
+              por_habitacion_y_sonido, sonido, final_y_creditos, sprites_de_cada_cosa,
+              tablas_del_despachador, cabecera, huecos_que_cierran, sin_llamar,
+              sin_usar_que_cierran,
               rellenos]
 
 

@@ -48,10 +48,23 @@ L_A021:
 	call 0406bh		;a031
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa034..0xa04c  (24 bytes)
-DATA_A034:
-	defb 04ch,0a0h,04ch,0a0h,04ch,0a0h,04ch,0a0h,04ch,0a0h,04ch,0a0h,04dh,0a0h,06ah,0a0h	; a034  L.L.L.L.L.L.M.j.
-	defb 07bh,0a0h,04ch,0a0h,04ch,0a0h,060h,09bh	; a044  {.L.L.`.
+; DATOS tabla_A034: 12 destinos del despachador de 0x406B (call en p03:A031):
+;   0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04D, 0xA06A ...; lo
+;   leen p03:A031 (24 bytes)
+;   0xa034..0xa04c  (24 bytes)
+DATA_tabla_A034:
+	defb 04ch,0a0h	; a034
+	defb 04ch,0a0h	; a036
+	defb 04ch,0a0h	; a038
+	defb 04ch,0a0h	; a03a
+	defb 04ch,0a0h	; a03c
+	defb 04ch,0a0h	; a03e
+	defb 04dh,0a0h	; a040
+	defb 06ah,0a0h	; a042
+	defb 07bh,0a0h	; a044
+	defb 04ch,0a0h	; a046
+	defb 04ch,0a0h	; a048
+	defb 060h,09bh	; a04a
 
 ; ======================================================================
 ; CODIGO 0xa04c..0xa08f  (67 bytes)
@@ -88,8 +101,13 @@ L_A07B:
 	ret			;a08e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa08f..0xa0e5  (86 bytes)
-DATA_A08F:
+; DATOS tablas_por_tipo: tres tablas seguidas: 0xA08F, un byte por tipo de
+;   cosa que p02:9F8C lee con 0xA08E + tipo; 0xA0BF, punteros por tipo
+;   (p03:A011 con DE = 0xA0BD, via 0x6542) a las cuatro listas cortas de
+;   0xA0D7-0xA0E4, que se copian a los sprites de la cosa (p03:A017); los
+;   mismos bytes usan p01:68EA y p03:BBFD como coordenadas de VRAM
+;   0xa08f..0xa0e5  (86 bytes)
+DATA_tablas_por_tipo:
 	defb 001h,001h,002h,001h,001h,001h,001h,001h,001h,003h,004h,001h,001h,001h,001h,009h	; a08f  ................
 	defb 005h,001h,006h,007h,001h,008h,00bh,00ah,001h,001h,001h,001h,001h,001h,001h,001h	; a09f  ................
 	defb 001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h,001h	; a0af  ................
@@ -230,8 +248,12 @@ L_A19F:
 	ret			;a1a1
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa1a2..0xa222  (128 bytes)
-DATA_A1A2:
+; DATOS arcotangente: una tabla de 64 bytes (8 x 8) que p03:A15B indexa con
+;   dos diferencias de tres bits para sacar una direccion (0xCFF8), y detras,
+;   en 0xA1E2, 64 valores de 0x00 a 0xFF que crecen como un seno (p03:A106):
+;   con las dos se apunta a Simon
+;   0xa1a2..0xa222  (128 bytes)
+DATA_arcotangente:
 	defb 020h,008h,004h,003h,002h,002h,001h,001h,038h,020h,015h,00fh,00ch,009h,008h,007h	; a1a2   .......8 ......
 	defb 03bh,02bh,020h,019h,014h,010h,00eh,00ch,03dh,031h,027h,020h,01ah,016h,013h,011h	; a1b2  ;+ .....=1' ....
 	defb 03dh,034h,02ch,025h,020h,01ch,018h,015h,03eh,036h,02fh,029h,024h,020h,01ch,019h	; a1c2  =4,% ...>6/)$ ..
@@ -309,8 +331,10 @@ L_A299:
 	jr L_A26B		;a2a4
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa2a6..0xa2a8  (2 bytes)
-DATA_A2A6:
+; DATOS dos_bytes_sueltos: dos bytes (0x3E 0x4C) entre dos rutinas que no lee
+;   nadie; su direccion no aparece como palabra en el cartucho
+;   0xa2a6..0xa2a8  (2 bytes)
+DATA_dos_bytes_sueltos:
 	defb 03eh,04ch	; a2a6
 
 ; ======================================================================
@@ -501,8 +525,11 @@ L_A43A:
 	ret			;a451
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa452..0xa45a  (8 bytes)
-DATA_A452:
+; DATOS dos_animaciones_A452: dos animaciones de cuatro dibujos (0xA452 y
+;   0xA456) que p03:A403 elige con el bit 0 de (ix+0x12) y cambia cada ocho
+;   cuadros
+;   0xa452..0xa45a  (8 bytes)
+DATA_dos_animaciones_A452:
 	defb 008h,009h,00fh,010h,00bh,00ch,012h,013h	; a452  ........
 
 ; ======================================================================
@@ -554,8 +581,10 @@ L_A4A1:
 	jp 09f6dh		;a4ac
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa4af..0xa4b3  (4 bytes)
-DATA_A4AF:
+; DATOS cuatro_dibujos_A4AF: cuatro dibujos que p03:A46A usa segun la
+;   distancia
+;   0xa4af..0xa4b3  (4 bytes)
+DATA_cuatro_dibujos_A4AF:
 	defb 00fh,012h,011h,014h	; a4af
 
 ; ======================================================================
@@ -598,8 +627,11 @@ L_A4E8:
 	jp 0509fh		;a4f0
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa4f3..0xa4fb  (8 bytes)
-DATA_A4F3:
+; DATOS dos_animaciones_A4F3: dos animaciones de cuatro valores (0xA4F3 y
+;   0xA4F7) que p03:A4CF elige con el bit 0 de (ix+0x19) e indexa con los dos
+;   bits bajos de (ix+0x1D)
+;   0xa4f3..0xa4fb  (8 bytes)
+DATA_dos_animaciones_A4F3:
 	defb 010h,020h,018h,030h,008h,010h,00bh,006h	; a4f3  . .0....
 
 ; ======================================================================
@@ -749,8 +781,10 @@ L_A624:
 	jr $+10		;a625
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa627..0xa62f  (8 bytes)
-DATA_A627:
+; DATOS dos_animaciones_A627: dos animaciones de cuatro dibujos que p03:A619
+;   elige segun mire a un lado o al otro (bit 7 de (ix+0x0A))
+;   0xa627..0xa62f  (8 bytes)
+DATA_dos_animaciones_A627:
 	defb 050h,051h,052h,051h,053h,054h,055h,054h	; a627  PQRQSTUT
 
 ; ======================================================================
@@ -811,9 +845,19 @@ L_A67D:
 	call 0406bh		;a683
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa686..0xa696  (16 bytes)
-DATA_A686:
-	defb 096h,0a6h,0a5h,0a6h,0d7h,0a6h,0eah,0a6h,0feh,0a6h,028h,0a7h,064h,0a7h,093h,0a7h	; a686  ..........(.d...
+; DATOS tabla_A686: 8 destinos del despachador de 0x406B (call en p03:A683):
+;   0xA696, 0xA6A5, 0xA6D7, 0xA6EA, 0xA6FE, 0xA728, 0xA764, 0xA793; lo leen
+;   p03:A683 (16 bytes)
+;   0xa686..0xa696  (16 bytes)
+DATA_tabla_A686:
+	defb 096h,0a6h	; a686
+	defb 0a5h,0a6h	; a688
+	defb 0d7h,0a6h	; a68a
+	defb 0eah,0a6h	; a68c
+	defb 0feh,0a6h	; a68e
+	defb 028h,0a7h	; a690
+	defb 064h,0a7h	; a692
+	defb 093h,0a7h	; a694
 
 ; ======================================================================
 ; CODIGO 0xa696..0xa7b9  (291 bytes)
@@ -950,8 +994,10 @@ L_A7A3:
 	ret			;a7b8
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa7b9..0xa7bd  (4 bytes)
-DATA_A7B9:
+; DATOS dos_animaciones_A7B9: dos animaciones de dos dibujos (0xA7B9 y
+;   0xA7BB), una por lado (p03:A797)
+;   0xa7b9..0xa7bd  (4 bytes)
+DATA_dos_animaciones_A7B9:
 	defb 08ah,08bh,087h,088h	; a7b9
 
 ; ======================================================================
@@ -1003,8 +1049,11 @@ L_A80B:
 	jp L_A55D		;a810
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa813..0xa823  (16 bytes)
-DATA_A813:
+; DATOS dos_tablas_A813: dos tablas de ocho bytes (0xA813 y 0xA81B) que
+;   p03:A7E2 elige segun Simon este a un lado o al otro; los mismos bytes los
+;   usa p00:4DA5 como coordenadas de VRAM
+;   0xa813..0xa823  (16 bytes)
+DATA_dos_tablas_A813:
 	defb 0fdh,0e0h,0fdh,080h,0fdh,000h,0fbh,080h,002h,020h,002h,080h,003h,000h,003h,080h	; a813  ......... ......
 
 ; ======================================================================
@@ -1068,9 +1117,13 @@ L_A87D:
 	call 0406bh		;a888
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa88b..0xa891  (6 bytes)
-DATA_A88B:
-	defb 091h,0a8h,0ach,0a8h,0d2h,0a8h	; a88b
+; DATOS tabla_A88B: 3 destinos del despachador de 0x406B (call en p03:A888):
+;   0xA891, 0xA8AC, 0xA8D2; lo leen p03:A888 (6 bytes)
+;   0xa88b..0xa891  (6 bytes)
+DATA_tabla_A88B:
+	defb 091h,0a8h	; a88b
+	defb 0ach,0a8h	; a88d
+	defb 0d2h,0a8h	; a88f
 
 ; ======================================================================
 ; CODIGO 0xa891..0xa9c1  (304 bytes)
@@ -1217,9 +1270,13 @@ L_A9B7:
 	call 0406bh		;a9be
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa9c1..0xa9c7  (6 bytes)
-DATA_A9C1:
-	defb 0d8h,0a9h,00bh,0aah,037h,0aah	; a9c1
+; DATOS tabla_A9C1: 3 destinos del despachador de 0x406B (call en p03:A9BE):
+;   0xA9D8, 0xAA0B, 0xAA37; lo leen p03:A9BE (6 bytes)
+;   0xa9c1..0xa9c7  (6 bytes)
+DATA_tabla_A9C1:
+	defb 0d8h,0a9h	; a9c1
+	defb 00bh,0aah	; a9c3
+	defb 037h,0aah	; a9c5
 
 ; ======================================================================
 ; CODIGO 0xa9c7..0xaaad  (230 bytes)
@@ -1356,8 +1413,10 @@ L_AAA1:
 	ret			;aaac
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xaaad..0xaacd  (32 bytes)
-DATA_AAAD:
+; DATOS ocho_registros_de_cuatro: ocho registros de cuatro bytes que p03:AA94
+;   indexa con A * 4
+;   0xaaad..0xaacd  (32 bytes)
+DATA_ocho_registros_de_cuatro:
 	defb 000h,000h,000h,000h,0ech,0f2h,0f8h,0feh,020h,018h,010h,002h,010h,014h,00ch,002h	; aaad  ........ .......
 	defb 0fch,0fch,004h,0feh,004h,00ch,000h,002h,020h,018h,010h,002h,000h,0f4h,0fch,000h	; aabd  ........ .......
 
@@ -1405,8 +1464,10 @@ L_AAFC:
 	ret			;ab0d
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xab0e..0xab22  (20 bytes)
-DATA_AB0E:
+; DATOS sprites_de_la_cosa: lo que p03:AAF9 y p03:AAE2 copian a los sprites de
+;   la cosa: cuatro pares y cuatro desplazamientos
+;   0xab0e..0xab22  (20 bytes)
+DATA_sprites_de_la_cosa:
 	defb 080h,002h,084h,04ch,078h,002h,07ch,04ch,078h,002h,07ch,04ch,078h,002h,07ch,04ch	; ab0e  ...Lx.|Lx.|Lx.|L
 	defb 0d0h,0e0h,0f0h,000h	; ab1e
 
@@ -1434,10 +1495,21 @@ L_AB42:
 	call 0406bh		;ab49
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xab4c..0xab60  (20 bytes)
-DATA_AB4C:
-	defb 067h,0abh,086h,0abh,0abh,0abh,0d4h,0abh,0e9h,0abh,021h,0ach,040h,0ach,07eh,0ach	; ab4c  g.........!.@.~.
-	defb 0aeh,0ach,0d9h,0ach	; ab5c
+; DATOS tabla_AB4C: 10 destinos del despachador de 0x406B (call en p03:AB49):
+;   0xAB67, 0xAB86, 0xABAB, 0xABD4, 0xABE9, 0xAC21, 0xAC40, 0xAC7E ...; lo
+;   leen p03:AB49 (20 bytes)
+;   0xab4c..0xab60  (20 bytes)
+DATA_tabla_AB4C:
+	defb 067h,0abh	; ab4c
+	defb 086h,0abh	; ab4e
+	defb 0abh,0abh	; ab50
+	defb 0d4h,0abh	; ab52
+	defb 0e9h,0abh	; ab54
+	defb 021h,0ach	; ab56
+	defb 040h,0ach	; ab58
+	defb 07eh,0ach	; ab5a
+	defb 0aeh,0ach	; ab5c
+	defb 0d9h,0ach	; ab5e
 
 ; ======================================================================
 ; CODIGO 0xab60..0xac76  (278 bytes)
@@ -1563,8 +1635,10 @@ L_AC62:
 	jp L_ABA7		;ac73
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xac76..0xac7e  (8 bytes)
-DATA_AC76:
+; DATOS ocho_valores_AC76: ocho bytes que p03:AC54 elige segun (ix+0x10) sea
+;   menor que 7 o no
+;   0xac76..0xac7e  (8 bytes)
+DATA_ocho_valores_AC76:
 	defb 030h,0d0h,050h,0a0h,040h,0c0h,080h,0b0h	; ac76  0.P.@...
 
 ; ======================================================================
@@ -1590,8 +1664,11 @@ L_AC7E:
 	ret			;aca9
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xacaa..0xacae  (4 bytes)
-DATA_ACAA:
+; DATOS dibujos_ACAA: cuatro dibujos, dos por lado: 0xAD37 suma 2 si Simon
+;   esta por debajo y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA,
+;   AC4E, AC80)
+;   0xacaa..0xacae  (4 bytes)
+DATA_dibujos_ACAA:
 	defb 05bh,05ch,05dh,05eh	; acaa
 
 ; ======================================================================
@@ -1648,8 +1725,11 @@ L_AD18:
 	jr $+10		;ad1e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xad20..0xad28  (8 bytes)
-DATA_AD20:
+; DATOS codigo_sin_llamar_AD20: ocho bytes que desensamblan como `push ix / ld
+;   ix,0xC800 / ld b,7` y a los que no llega nadie; su direccion no aparece
+;   como palabra en el cartucho
+;   0xad20..0xad28  (8 bytes)
+DATA_codigo_sin_llamar_AD20:
 	defb 0ddh,0e5h,0ddh,021h,000h,0c8h,006h,007h	; ad20  ...!....
 
 ; ======================================================================
@@ -1683,8 +1763,10 @@ L_AD4A:
 	ret			;ad52
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xad53..0xad5b  (8 bytes)
-DATA_AD53:
+; DATOS colores_AD53: ocho bytes que p03:AD4A copia, con 0xAD6D, a los colores
+;   de los ocho sprites de la cosa ((ix+0x25) de cinco en cinco)
+;   0xad53..0xad5b  (8 bytes)
+DATA_colores_AD53:
 	defb 002h,048h,002h,048h,002h,048h,002h,048h	; ad53  .H.H.H.H
 
 ; ======================================================================
@@ -1753,8 +1835,10 @@ L_ADB7:
 	jp 04946h		;adb9
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xadbc..0xadc6  (10 bytes)
-DATA_ADBC:
+; DATOS cinco_pares: cinco pares (0x80 y 0x00, 0x20, 0x40, 0x60, 0x80) que
+;   p03:AD9B lee via 0x6542
+;   0xadbc..0xadc6  (10 bytes)
+DATA_cinco_pares:
 	defb 080h,000h,080h,020h,080h,040h,080h,060h,080h,080h	; adbc  ... .@.`..
 
 ; ======================================================================
@@ -1920,8 +2004,9 @@ L_AF22:
 	jp L_AD37		;af25
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xaf28..0xaf2c  (4 bytes)
-DATA_AF28:
+; DATOS dibujos_AF28: cuatro dibujos, dos por lado, para 0xAD37 (p03:AF22)
+;   0xaf28..0xaf2c  (4 bytes)
+DATA_dibujos_AF28:
 	defb 05fh,060h,061h,062h	; af28
 
 ; ======================================================================
@@ -1959,9 +2044,13 @@ L_AF5F:
 	call 0406bh		;af62
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xaf65..0xaf6b  (6 bytes)
-DATA_AF65:
-	defb 06bh,0afh,0beh,0afh,035h,0b0h	; af65
+; DATOS tabla_AF65: 3 destinos del despachador de 0x406B (call en p03:AF62):
+;   0xAF6B, 0xAFBE, 0xB035; lo leen p03:AF62 (6 bytes)
+;   0xaf65..0xaf6b  (6 bytes)
+DATA_tabla_AF65:
+	defb 06bh,0afh	; af65
+	defb 0beh,0afh	; af67
+	defb 035h,0b0h	; af69
 
 ; ======================================================================
 ; CODIGO 0xaf6b..0xb177  (524 bytes)
@@ -2205,8 +2294,10 @@ L_B16F:
 	ret			;b176
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb177..0xb17f  (8 bytes)
-DATA_B177:
+; DATOS dos_animaciones_B177: dos animaciones de cuatro dibujos, una por lado
+;   (bit 7 de (ix+0x0A)), que p03:B163 va poniendo en (ix+0x0B)
+;   0xb177..0xb17f  (8 bytes)
+DATA_dos_animaciones_B177:
 	defb 01eh,01fh,01eh,020h,01bh,01ch,01bh,01dh	; b177  ... ....
 
 ; ======================================================================
@@ -2284,8 +2375,9 @@ L_B209:
 	jp L_A62F		;b20c
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb20f..0xb212  (3 bytes)
-DATA_B20F:
+; DATOS tres_dibujos_B20F: tres dibujos que p03:B209 pasa a 0xA62F
+;   0xb20f..0xb212  (3 bytes)
+DATA_tres_dibujos_B20F:
 	defb 06dh,06eh,08dh	; b20f
 
 ; ======================================================================
@@ -2320,9 +2412,15 @@ L_B248:
 	call 0406bh		;b24b
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb24e..0xb258  (10 bytes)
-DATA_B24E:
-	defb 058h,0b2h,068h,0b2h,085h,0b2h,0c7h,0b2h,01ah,0b3h	; b24e  X.h.......
+; DATOS tabla_B24E: 5 destinos del despachador de 0x406B (call en p03:B24B):
+;   0xB258, 0xB268, 0xB285, 0xB2C7, 0xB31A; lo leen p03:B24B (10 bytes)
+;   0xb24e..0xb258  (10 bytes)
+DATA_tabla_B24E:
+	defb 058h,0b2h	; b24e
+	defb 068h,0b2h	; b250
+	defb 085h,0b2h	; b252
+	defb 0c7h,0b2h	; b254
+	defb 01ah,0b3h	; b256
 
 ; ======================================================================
 ; CODIGO 0xb258..0xb33a  (226 bytes)
@@ -2429,8 +2527,10 @@ L_B32D:
 	jp L_B2AA		;b337
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb33a..0xb33e  (4 bytes)
-DATA_B33A:
+; DATOS dibujos_B33A: cuatro dibujos, dos por lado, para 0xAD37 (p03:B287,
+;   B2C1, B2F3, B31C)
+;   0xb33a..0xb33e  (4 bytes)
+DATA_dibujos_B33A:
 	defb 067h,068h,06ah,06bh	; b33a
 
 ; ======================================================================
@@ -2474,9 +2574,13 @@ L_B37E:
 	call 0406bh		;b384
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb387..0xb38d  (6 bytes)
-DATA_B387:
-	defb 08dh,0b3h,051h,0b4h,0a9h,0b4h	; b387
+; DATOS tabla_B387: 3 destinos del despachador de 0x406B (call en p03:B384):
+;   0xB38D, 0xB451, 0xB4A9; lo leen p03:B384 (6 bytes)
+;   0xb387..0xb38d  (6 bytes)
+DATA_tabla_B387:
+	defb 08dh,0b3h	; b387
+	defb 051h,0b4h	; b389
+	defb 0a9h,0b4h	; b38b
 
 ; ======================================================================
 ; CODIGO 0xb38d..0xb4f3  (358 bytes)
@@ -2646,9 +2750,14 @@ L_B4EA:
 	call 0406bh		;b4f0
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb4f3..0xb4fb  (8 bytes)
-DATA_B4F3:
-	defb 0fbh,0b4h,00dh,0b5h,013h,0b5h,026h,0b5h	; b4f3  ......&.
+; DATOS tabla_B4F3: 4 destinos del despachador de 0x406B (call en p03:B4F0):
+;   0xB4FB, 0xB50D, 0xB513, 0xB526; lo leen p03:B4F0 (8 bytes)
+;   0xb4f3..0xb4fb  (8 bytes)
+DATA_tabla_B4F3:
+	defb 0fbh,0b4h	; b4f3
+	defb 00dh,0b5h	; b4f5
+	defb 013h,0b5h	; b4f7
+	defb 026h,0b5h	; b4f9
 
 ; ======================================================================
 ; CODIGO 0xb4fb..0xb642  (327 bytes)
@@ -2812,8 +2921,10 @@ L_B63E:
 	ret			;b641
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb642..0xb6ab  (105 bytes)
-DATA_B642:
+; DATOS tabla_B642: p03:B62D la indexa con cuatro bits: dibujos, punteros a
+;   las listas de 0xB665-0xB6A5 y las listas
+;   0xb642..0xb6ab  (105 bytes)
+DATA_tabla_B642:
 	defb 000h,09bh,09dh,09fh,0a1h,065h,0b6h,068h,0b6h,06bh,0b6h,06eh,0b6h,073h,0b6h,077h	; b642  .....e.h.k.n.s.w
 	defb 0b6h,07ch,0b6h,081h,0b6h,084h,0b6h,08ah,0b6h,090h,0b6h,094h,0b6h,099h,0b6h,09fh	; b652  .|..............
 	defb 0b6h,0a5h,0b6h,032h,032h,033h,033h,033h,033h,011h,013h,031h,044h,011h,001h,013h	; b662  ...223333..1D...
@@ -2837,9 +2948,17 @@ L_B6AB:
 	call 0406bh		;b6b6
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb6b9..0xb6c5  (12 bytes)
-DATA_B6B9:
-	defb 02bh,0beh,0dbh,0bch,057h,0b8h,026h,0bah,0f3h,0bbh,0b0h,065h	; b6b9  +...W.&....e
+; DATOS tabla_B6B9: 6 destinos del despachador de 0x406B (call en p03:B6B6):
+;   0xBE2B, 0xBCDB, 0xB857, 0xBA26, 0xBBF3, 0x65B0; lo leen p03:B6B6 (12
+;   bytes)
+;   0xb6b9..0xb6c5  (12 bytes)
+DATA_tabla_B6B9:
+	defb 02bh,0beh	; b6b9
+	defb 0dbh,0bch	; b6bb
+	defb 057h,0b8h	; b6bd
+	defb 026h,0bah	; b6bf
+	defb 0f3h,0bbh	; b6c1
+	defb 0b0h,065h	; b6c3
 
 ; ======================================================================
 ; CODIGO 0xb6c5..0xb6cb  (6 bytes)
@@ -2851,9 +2970,18 @@ L_B6C5:
 	call 0406bh		;b6c8
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb6cb..0xb6d9  (14 bytes)
-DATA_B6CB:
-	defb 0d9h,0b6h,0e3h,0b6h,0edh,0b6h,006h,0b7h,0e3h,0b6h,036h,0b7h,051h,0b7h	; b6cb  ..........6.Q.
+; DATOS tabla_B6CB: 7 destinos del despachador de 0x406B (call en p03:B6C8):
+;   0xB6D9, 0xB6E3, 0xB6ED, 0xB706, 0xB6E3, 0xB736, 0xB751; lo leen p03:B6C8
+;   (14 bytes)
+;   0xb6cb..0xb6d9  (14 bytes)
+DATA_tabla_B6CB:
+	defb 0d9h,0b6h	; b6cb
+	defb 0e3h,0b6h	; b6cd
+	defb 0edh,0b6h	; b6cf
+	defb 006h,0b7h	; b6d1
+	defb 0e3h,0b6h	; b6d3
+	defb 036h,0b7h	; b6d5
+	defb 051h,0b7h	; b6d7
 
 ; ======================================================================
 ; CODIGO 0xb6d9..0xb7a7  (206 bytes)
@@ -2961,9 +3089,13 @@ L_B7A1:
 	call 0406bh		;b7a4
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb7a7..0xb7ad  (6 bytes)
-DATA_B7A7:
-	defb 0adh,0b7h,018h,0b8h,03fh,0b8h	; b7a7
+; DATOS tabla_B7A7: 3 destinos del despachador de 0x406B (call en p03:B7A4):
+;   0xB7AD, 0xB818, 0xB83F; lo leen p03:B7A4 (6 bytes)
+;   0xb7a7..0xb7ad  (6 bytes)
+DATA_tabla_B7A7:
+	defb 0adh,0b7h	; b7a7
+	defb 018h,0b8h	; b7a9
+	defb 03fh,0b8h	; b7ab
 
 ; ======================================================================
 ; CODIGO 0xb7ad..0xb7fa  (77 bytes)
@@ -3018,8 +3150,11 @@ L_B7ED:
 	ret			;b7f9
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb7fa..0xb818  (30 bytes)
-DATA_B7FA:
+; DATOS dos_listas_de_quince: dos listas de quince bytes: p03:B7CB usa la de
+;   0xB7FA en la fase 3 y la de 0xB809 en las demas; los mismos bytes los usan
+;   p00:54DF y p02:8F4A como coordenadas de VRAM
+;   0xb7fa..0xb818  (30 bytes)
+DATA_dos_listas_de_quince:
 	defb 00eh,008h,006h,002h,000h,00eh,008h,006h,004h,002h,008h,006h,004h,002h,000h,00eh	; b7fa  ................
 	defb 008h,007h,002h,000h,00eh,008h,007h,005h,002h,008h,007h,005h,002h,000h	; b80a  ..............
 
@@ -3055,8 +3190,10 @@ L_B83F:
 	ret			;b852
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb853..0xb857  (4 bytes)
-DATA_B853:
+; DATOS cuatro_dibujos_B853: cuatro dibujos que p03:B848 elige con dos bits de
+;   una cuenta y deja en (ix+0x0B)
+;   0xb853..0xb857  (4 bytes)
+DATA_cuatro_dibujos_B853:
 	defb 08fh,090h,091h,090h	; b853
 
 ; ======================================================================
@@ -3069,9 +3206,12 @@ L_B857:
 	call 0406bh		;b85a
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb85d..0xb861  (4 bytes)
-DATA_B85D:
-	defb 061h,0b8h,074h,0b8h	; b85d
+; DATOS tabla_B85D: 2 destinos del despachador de 0x406B (call en p03:B85A):
+;   0xB861, 0xB874; lo leen p03:B85A (4 bytes)
+;   0xb85d..0xb861  (4 bytes)
+DATA_tabla_B85D:
+	defb 061h,0b8h	; b85d
+	defb 074h,0b8h	; b85f
 
 ; ======================================================================
 ; CODIGO 0xb861..0xb899  (56 bytes)
@@ -3104,9 +3244,14 @@ L_B893:
 	call 0406bh		;b896
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb899..0xb8a1  (8 bytes)
-DATA_B899:
-	defb 0a1h,0b8h,0adh,0b8h,0d0h,0b8h,060h,0b9h	; b899  ......`.
+; DATOS tabla_B899: 4 destinos del despachador de 0x406B (call en p03:B896):
+;   0xB8A1, 0xB8AD, 0xB8D0, 0xB960; lo leen p03:B896 (8 bytes)
+;   0xb899..0xb8a1  (8 bytes)
+DATA_tabla_B899:
+	defb 0a1h,0b8h	; b899
+	defb 0adh,0b8h	; b89b
+	defb 0d0h,0b8h	; b89d
+	defb 060h,0b9h	; b89f
 
 ; ======================================================================
 ; CODIGO 0xb8a1..0xb9c7  (294 bytes)
@@ -3237,8 +3382,10 @@ L_B9B6:
 	ret			;b9c6
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb9c7..0xb9cf  (8 bytes)
-DATA_B9C7:
+; DATOS ocho_valores_al_azar: ocho valores de los que p03:B9BA coge uno al
+;   azar (`ld a,r / and 7`) y lo deja en (ix+0x10)
+;   0xb9c7..0xb9cf  (8 bytes)
+DATA_ocho_valores_al_azar:
 	defb 040h,008h,030h,010h,020h,018h,038h,028h	; b9c7  @.0. .8(
 
 ; ======================================================================
@@ -3281,8 +3428,10 @@ L_BA15:
 	ret			;ba1f
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xba20..0xba26  (6 bytes)
-DATA_BA20:
+; DATOS dos_animaciones_BA20: dos animaciones de tres dibujos (0xBA20 y
+;   0xBA23) que p03:B9CF elige con el bit 0 de (ix+0x12)
+;   0xba20..0xba26  (6 bytes)
+DATA_dos_animaciones_BA20:
 	defb 033h,034h,035h,036h,037h,038h	; ba20
 
 ; ======================================================================
@@ -3295,9 +3444,12 @@ L_BA26:
 	call 0406bh		;ba29
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xba2c..0xba30  (4 bytes)
-DATA_BA2C:
-	defb 030h,0bah,047h,0bah	; ba2c
+; DATOS tabla_BA2C: 2 destinos del despachador de 0x406B (call en p03:BA29):
+;   0xBA30, 0xBA47; lo leen p03:BA29 (4 bytes)
+;   0xba2c..0xba30  (4 bytes)
+DATA_tabla_BA2C:
+	defb 030h,0bah	; ba2c
+	defb 047h,0bah	; ba2e
 
 ; ======================================================================
 ; CODIGO 0xba30..0xbacf  (159 bytes)
@@ -3380,8 +3532,10 @@ L_BAB9:
 	ret			;bace
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbacf..0xbad3  (4 bytes)
-DATA_BACF:
+; DATOS cuatro_dibujos_BACF: cuatro dibujos que p03:BAB9 va poniendo con la
+;   cuenta de (ix+0x11)
+;   0xbacf..0xbad3  (4 bytes)
+DATA_cuatro_dibujos_BACF:
 	defb 079h,07ah,07bh,07ah	; bacf
 
 ; ======================================================================
@@ -3530,9 +3684,12 @@ L_BBF3:
 	call 0406bh		;bbf6
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbbf9..0xbbfd  (4 bytes)
-DATA_BBF9:
-	defb 0fdh,0bbh,018h,0bch	; bbf9
+; DATOS tabla_BBF9: 2 destinos del despachador de 0x406B (call en p03:BBF6):
+;   0xBBFD, 0xBC18; lo leen p03:BBF6 (4 bytes)
+;   0xbbf9..0xbbfd  (4 bytes)
+DATA_tabla_BBF9:
+	defb 0fdh,0bbh	; bbf9
+	defb 018h,0bch	; bbfb
 
 ; ======================================================================
 ; CODIGO 0xbbfd..0xbc44  (71 bytes)
@@ -3577,8 +3734,10 @@ L_BC29:
 	jp 09f6dh		;bc41
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbc44..0xbc54  (16 bytes)
-DATA_BC44:
+; DATOS ocho_pares: ocho pares que p03:BC31 indexa con los tres bits bajos de
+;   A
+;   0xbc44..0xbc54  (16 bytes)
+DATA_ocho_pares:
 	defb 030h,030h,080h,0c0h,030h,0c0h,0c0h,030h,048h,080h,0a0h,080h,068h,030h,068h,0c0h	; bc44  00..0..0H...h0h.
 
 ; ======================================================================
@@ -3651,9 +3810,14 @@ L_BCDB:
 	call 0406bh		;bcde
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbce1..0xbce9  (8 bytes)
-DATA_BCE1:
-	defb 0e9h,0bch,0f1h,0bch,0f9h,0bch,011h,0bdh	; bce1  ........
+; DATOS tabla_BCE1: 4 destinos del despachador de 0x406B (call en p03:BCDE):
+;   0xBCE9, 0xBCF1, 0xBCF9, 0xBD11; lo leen p03:BCDE (8 bytes)
+;   0xbce1..0xbce9  (8 bytes)
+DATA_tabla_BCE1:
+	defb 0e9h,0bch	; bce1
+	defb 0f1h,0bch	; bce3
+	defb 0f9h,0bch	; bce5
+	defb 011h,0bdh	; bce7
 
 ; ======================================================================
 ; CODIGO 0xbce9..0xbd22  (57 bytes)
@@ -3690,9 +3854,12 @@ L_BD19:
 	call 0406bh		;bd1f
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbd22..0xbd26  (4 bytes)
-DATA_BD22:
-	defb 066h,0bdh,099h,0bdh	; bd22
+; DATOS tabla_BD22: 2 destinos del despachador de 0x406B (call en p03:BD1F):
+;   0xBD66, 0xBD99; lo leen p03:BD1F (4 bytes)
+;   0xbd22..0xbd26  (4 bytes)
+DATA_tabla_BD22:
+	defb 066h,0bdh	; bd22
+	defb 099h,0bdh	; bd24
 
 ; ======================================================================
 ; CODIGO 0xbd26..0xbe31  (267 bytes)
@@ -3826,9 +3993,12 @@ L_BE2B:
 	call 0406bh		;be2e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbe31..0xbe35  (4 bytes)
-DATA_BE31:
-	defb 035h,0beh,042h,0beh	; be31
+; DATOS tabla_BE31: 2 destinos del despachador de 0x406B (call en p03:BE2E):
+;   0xBE35, 0xBE42; lo leen p03:BE2E (4 bytes)
+;   0xbe31..0xbe35  (4 bytes)
+DATA_tabla_BE31:
+	defb 035h,0beh	; be31
+	defb 042h,0beh	; be33
 
 ; ======================================================================
 ; CODIGO 0xbe35..0xbe89  (84 bytes)
@@ -3879,9 +4049,17 @@ L_BE80:
 	call 0406bh		;be86
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbe89..0xbe95  (12 bytes)
-DATA_BE89:
-	defb 095h,0beh,0a2h,0beh,0a6h,0beh,0f0h,0beh,04ah,0bfh,092h,0bfh	; be89  ........J...
+; DATOS tabla_BE89: 6 destinos del despachador de 0x406B (call en p03:BE86):
+;   0xBE95, 0xBEA2, 0xBEA6, 0xBEF0, 0xBF4A, 0xBF92; lo leen p03:BE86 (12
+;   bytes)
+;   0xbe89..0xbe95  (12 bytes)
+DATA_tabla_BE89:
+	defb 095h,0beh	; be89
+	defb 0a2h,0beh	; be8b
+	defb 0a6h,0beh	; be8d
+	defb 0f0h,0beh	; be8f
+	defb 04ah,0bfh	; be91
+	defb 092h,0bfh	; be93
 
 ; ======================================================================
 ; CODIGO 0xbe95..0xbfc0  (299 bytes)

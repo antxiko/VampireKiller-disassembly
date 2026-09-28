@@ -92,9 +92,16 @@ DATA_paleta_A036:
 	defb 0ffh	; a03c
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa03d..0xa04a  (13 bytes)
-DATA_A03D:
-	defb 004h,076h,001h,005h,076h,006h,006h,075h,006h,007h,074h,006h,0ffh	; a03d  .v..v..u..t..
+; DATOS paleta_sin_usar_A03D: cambios de paleta ([color][RB][G], 0xFF acaba)
+;   entre los que si se usan, pero que no nombra ninguna habitacion; lo leen
+;   nadie (13 bytes)
+;   0xa03d..0xa04a  (13 bytes)
+DATA_paleta_sin_usar_A03D:
+	defb 004h,076h,001h	; a03d
+	defb 005h,076h,006h	; a040
+	defb 006h,075h,006h	; a043
+	defb 007h,074h,006h	; a046
+	defb 0ffh	; a049
 
 ; ----------------------------------------------------------------------
 ; DATOS paleta_A04A: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
@@ -104,9 +111,14 @@ DATA_paleta_A04A:
 	defb 0ffh	; a04a
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xa04b..0xa052  (7 bytes)
-DATA_A04B:
-	defb 004h,060h,000h,006h,065h,006h,0ffh	; a04b
+; DATOS paleta_sin_usar_A04B: cambios de paleta ([color][RB][G], 0xFF acaba)
+;   entre los que si se usan, pero que no nombra ninguna habitacion; lo leen
+;   nadie (7 bytes)
+;   0xa04b..0xa052  (7 bytes)
+DATA_paleta_sin_usar_A04B:
+	defb 004h,060h,000h	; a04b
+	defb 006h,065h,006h	; a04e
+	defb 0ffh	; a051
 
 ; ----------------------------------------------------------------------
 ; DATOS paleta_A052: cambios de paleta ([color][RB][G], 0xFF acaba) que pone
@@ -664,8 +676,10 @@ DATA_rle_B4A3:
 	defb 086h,078h,0f8h,0cah,040h,0a9h,052h,000h	; b503  .x..@.R.
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xb50b..0xb54b  (64 bytes)
-DATA_B50B:
+; DATOS rle_sin_usar_B50B: rle con el destino delante (0xFEC0) que no lee
+;   nadie y cierra clavado; lo leen nadie (64 bytes)
+;   0xb50b..0xb54b  (64 bytes)
+DATA_rle_sin_usar_B50B:
 	defb 0c0h,0feh,09dh,003h,007h,007h,005h,004h,004h,006h,073h,070h,058h,031h,003h,002h	; b50b  ..........spX1..
 	defb 003h,000h,000h,0e0h,030h,0c8h,0f8h,078h,030h,066h,0cfh,013h,00bh,0ceh,0c0h,0c0h	; b51b  ....0..x0f......
 	defb 004h,000h,002h,001h,08ah,002h,003h,003h,001h,000h,020h,030h,000h,001h,001h,004h	; b52b  .......... 0....

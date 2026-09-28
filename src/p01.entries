@@ -13,7 +13,7 @@
 # Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
 0x6028   # p00:5FC9 entrada 28 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x6029   # p00:5FB2 call
-0x6048   # p02:9FD1 call
+0x6048   # p00:5F68 call
 0x6202   # p00:419B call
 0x624C   # p00:417F call
 0x62D0   # p00:429B call
@@ -25,7 +25,6 @@
 0x6445   # p02:9923 call cc
 0x64E5   # p00:5C8F jp
 0x64EC   # p00:5C8C call
-0x6542   # p03:A014 call
 0x654B   # p00:5C28 call
 0x65B0   # p03:B6B6 entrada 5 de la tabla de 0xB6B9 (call 0x406B en 0xB6B6)
 0x65CC   # p01:65B3 entrada 0 de la tabla de 0x65B6 (call 0x406B en 0x65B3)

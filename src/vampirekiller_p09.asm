@@ -619,8 +619,11 @@ DATA_guion_9E0B:
 	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fch,004h,080h,0fch,0ffh	; 9e1b  z..........
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x9e26..0x9e62  (60 bytes)
-DATA_9E26:
+; DATOS guion_sin_usar_9E26: guion de carga de 0x4714 que no lee nadie y
+;   cierra clavado (lo que manda leer son rle que si usan otros guiones); se
+;   solapan 2 bloques (0x9E26-0x9E62, 0x9E41-0x9E62); lo leen nadie (60 bytes)
+;   0x9e26..0x9e62  (60 bytes)
+DATA_guion_sin_usar_9E26:
 	defb 000h,067h,0a3h,000h,0fdh,000h,0e5h,0a2h,000h,0feh,000h,051h,0b0h,080h,0feh,000h	; 9e26  .g.........Q....
 	defb 07ah,0b0h,0c0h,0feh,001h,000h,0fdh,004h,080h,0fdh,0ffh,000h,04ah,0a5h,000h,0fah	; 9e36  z...........J...
 	defb 000h,0a3h,0b4h,000h,0fch,000h,027h,0a8h,080h,0fch,000h,02dh,0b6h,040h,0fdh,001h	; 9e46  ......'....-.@..

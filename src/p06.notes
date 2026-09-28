@@ -1,8 +1,330 @@
 # Notas del banco 06: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
-D 0xA000 0xB653 dibujos_95B3_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x95B3); se solapan 2 bloques (0xA000-0xAD93, 0xA000-0xB653); lo leen fase 10, fase 11, fase 12, fase 4, fase 5, fase 6 (5715 bytes)
+D 0xA000 0xB473 dibujos_95B3_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x95B3); se solapan 2 bloques (0xA000-0xAD93, 0xA000-0xB473); lo leen fase 10, fase 11, fase 12, fase 4, fase 5, fase 6 (5235 bytes)
 F 0xA000 32
+D 0xB473 0xB5C3 sprites_de_cada_tipo  168 punteros, uno por tipo de cosa, a como se compone con sprites; lo leen p01:645B (336 bytes)
+F 0xB473 2
+D 0xB5C3 0xB5C9 sprites_B5C3  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (6 bytes)
+F 0xB5C3 3
+D 0xB5C9 0xB5CC sprites_B5C9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB5C9 3
+D 0xB5CC 0xB5CF sprites_B5CC  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB5CC 3
+D 0xB5CF 0xB5D5 sprites_B5CF  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (6 bytes)
+F 0xB5CF 3
+D 0xB5D5 0xB5DA sprites_B5D5  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5D5 3
+D 0xB5DA 0xB5DF sprites_B5DA  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5DA 3
+D 0xB5DF 0xB5E4 sprites_B5DF  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5DF 3
+D 0xB5E4 0xB5E9 sprites_B5E4  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5E4 3
+D 0xB5E9 0xB5EE sprites_B5E9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5E9 3
+D 0xB5EE 0xB5F3 sprites_B5EE  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5EE 3
+D 0xB5F3 0xB5F8 sprites_B5F3  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5F3 3
+D 0xB5F8 0xB5FD sprites_B5F8  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5F8 3
+D 0xB5FD 0xB602 sprites_B5FD  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB5FD 3
+D 0xB602 0xB607 sprites_B602  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB602 3
+D 0xB607 0xB60A sprites_B607  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB607 3
+D 0xB60A 0xB60F sprites_B60A  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB60A 3
+D 0xB60F 0xB614 sprites_B60F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB60F 3
+D 0xB614 0xB619 sprites_B614  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB614 3
+D 0xB619 0xB61E sprites_B619  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB619 3
+D 0xB61E 0xB623 sprites_B61E  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB61E 3
+D 0xB623 0xB628 sprites_B623  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB623 3
+D 0xB628 0xB62B sprites_B628  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB628 3
+D 0xB62B 0xB62E sprites_B62B  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB62B 3
+D 0xB62E 0xB631 sprites_B62E  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB62E 3
+D 0xB631 0xB634 sprites_B631  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB631 3
+D 0xB634 0xB637 sprites_B634  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB634 3
+D 0xB637 0xB63A sprites_B637  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB637 3
+D 0xB63A 0xB63D sprites_B63A  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB63A 3
+D 0xB63D 0xB640 sprites_B63D  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB63D 3
+D 0xB640 0xB643 sprites_B640  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB640 3
+D 0xB643 0xB646 sprites_B643  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB643 3
+D 0xB646 0xB649 sprites_B646  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB646 3
+D 0xB649 0xB64C sprites_B649  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB649 3
+D 0xB64C 0xB651 sprites_B64C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB64C 3
+D 0xB651 0xB656 sprites_B651  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB651 3
+D 0xB656 0xB65B sprites_B656  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB656 3
+D 0xB65B 0xB660 sprites_B65B  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB65B 3
+D 0xB660 0xB663 sprites_B660  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB660 3
+D 0xB663 0xB666 sprites_B663  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB663 3
+D 0xB666 0xB669 sprites_B666  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB666 3
+D 0xB669 0xB66C sprites_B669  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB669 3
+D 0xB66C 0xB66F sprites_B66C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB66C 3
+D 0xB66F 0xB672 sprites_B66F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB66F 3
+D 0xB672 0xB68A sprites_B672  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB672 3
+D 0xB68A 0xB6A2 sprites_B68A  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB68A 3
+D 0xB6A2 0xB6A5 sprites_B6A2  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6A2 3
+D 0xB6A5 0xB6A8 sprites_B6A5  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6A5 3
+D 0xB6A8 0xB6AB sprites_B6A8  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6A8 3
+D 0xB6AB 0xB6AE sprites_B6AB  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6AB 3
+D 0xB6AE 0xB6B1 sprites_B6AE  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6AE 3
+D 0xB6B1 0xB6B4 sprites_B6B1  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6B1 3
+D 0xB6B4 0xB6BB sprites_B6B4  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6B4 3
+D 0xB6BB 0xB6C2 sprites_B6BB  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6BB 3
+D 0xB6C2 0xB6C9 sprites_B6C2  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6C2 3
+D 0xB6C9 0xB6D0 sprites_B6C9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6C9 3
+D 0xB6D0 0xB6D7 sprites_B6D0  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6D0 3
+D 0xB6D7 0xB6DE sprites_B6D7  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (7 bytes)
+F 0xB6D7 3
+D 0xB6DE 0xB6E1 sprites_B6DE  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6DE 3
+D 0xB6E1 0xB6E4 sprites_B6E1  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB6E1 3
+D 0xB6E4 0xB6E9 sprites_B6E4  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB6E4 3
+D 0xB6E9 0xB6EE sprites_B6E9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB6E9 3
+D 0xB6EE 0xB6F3 sprites_B6EE  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB6EE 3
+D 0xB6F3 0xB6F8 sprites_B6F3  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB6F3 3
+D 0xB6F8 0xB704 sprites_B6F8  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB6F8 3
+D 0xB704 0xB710 sprites_B704  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB704 3
+D 0xB710 0xB71C sprites_B710  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB710 3
+D 0xB71C 0xB728 sprites_B71C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB71C 3
+D 0xB728 0xB734 sprites_B728  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB728 3
+D 0xB734 0xB740 sprites_B734  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB734 3
+D 0xB740 0xB74C sprites_B740  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB740 3
+D 0xB74C 0xB758 sprites_B74C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB74C 3
+D 0xB758 0xB75D sprites_B758  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB758 3
+D 0xB75D 0xB762 sprites_B75D  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB75D 3
+D 0xB762 0xB767 sprites_B762  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB762 3
+D 0xB767 0xB76C sprites_B767  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB767 3
+D 0xB76C 0xB772 sprites_B76C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (6 bytes)
+F 0xB76C 3
+D 0xB772 0xB775 sprites_B772  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB772 3
+D 0xB775 0xB778 sprites_B775  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB775 3
+D 0xB778 0xB790 sprites_B778  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB778 3
+D 0xB790 0xB7A8 sprites_B790  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB790 3
+D 0xB7A8 0xB7AD sprites_B7A8  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7A8 3
+D 0xB7AD 0xB7B2 sprites_B7AD  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7AD 3
+D 0xB7B2 0xB7B7 sprites_B7B2  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7B2 3
+D 0xB7B7 0xB7BC sprites_B7B7  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7B7 3
+D 0xB7BC 0xB7C1 sprites_B7BC  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7BC 3
+D 0xB7C1 0xB7C6 sprites_B7C1  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB7C1 3
+D 0xB7C6 0xB7C9 sprites_B7C6  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB7C6 3
+D 0xB7C9 0xB7CC sprites_B7C9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB7C9 3
+D 0xB7CC 0xB7CF sprites_B7CC  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB7CC 3
+D 0xB7CF 0xB7D2 sprites_B7CF  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB7CF 3
+D 0xB7D2 0xB7D5 sprites_B7D2  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB7D2 3
+D 0xB7D5 0xB7ED sprites_B7D5  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB7D5 3
+D 0xB7ED 0xB805 sprites_B7ED  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB7ED 3
+D 0xB805 0xB81D sprites_B805  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB805 3
+D 0xB81D 0xB835 sprites_B81D  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB81D 3
+D 0xB835 0xB83A sprites_B835  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB835 3
+D 0xB83A 0xB83F sprites_B83A  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB83A 3
+D 0xB83F 0xB844 sprites_B83F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB83F 3
+D 0xB844 0xB849 sprites_B844  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB844 3
+D 0xB849 0xB84C sprites_B849  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB849 3
+D 0xB84C 0xB84F sprites_B84C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB84C 3
+D 0xB84F 0xB852 sprites_B84F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB84F 3
+D 0xB852 0xB855 sprites_B852  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB852 3
+D 0xB855 0xB858 sprites_B855  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB855 3
+D 0xB858 0xB85B sprites_B858  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB858 3
+D 0xB85B 0xB85E sprites_B85B  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB85B 3
+D 0xB85E 0xB861 sprites_B85E  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB85E 3
+D 0xB861 0xB864 sprites_B861  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB861 3
+D 0xB864 0xB867 sprites_B864  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB864 3
+D 0xB867 0xB879 sprites_B867  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB867 3
+D 0xB879 0xB88B sprites_B879  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB879 3
+D 0xB88B 0xB88E sprites_B88B  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB88B 3
+D 0xB88E 0xB891 sprites_B88E  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB88E 3
+D 0xB891 0xB894 sprites_B891  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB891 3
+D 0xB894 0xB897 sprites_B894  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB894 3
+D 0xB897 0xB89A sprites_B897  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB897 3
+D 0xB89A 0xB89D sprites_B89A  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB89A 3
+D 0xB89D 0xB8A0 sprites_B89D  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB89D 3
+D 0xB8A0 0xB8A3 sprites_B8A0  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB8A0 3
+D 0xB8A3 0xB8B5 sprites_B8A3  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB8A3 3
+D 0xB8B5 0xB8C7 sprites_B8B5  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB8B5 3
+D 0xB8C7 0xB8D9 sprites_B8C7  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB8C7 3
+D 0xB8D9 0xB8FD sprites_B8D9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (36 bytes)
+F 0xB8D9 3
+D 0xB8FD 0xB900 sprites_B8FD  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB8FD 3
+D 0xB900 0xB903 sprites_B900  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB900 3
+D 0xB903 0xB906 sprites_B903  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB903 3
+D 0xB906 0xB909 sprites_B906  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB906 3
+D 0xB909 0xB90F sprites_B909  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (6 bytes)
+F 0xB909 3
+D 0xB90F 0xB912 sprites_B90F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB90F 3
+D 0xB912 0xB915 sprites_B912  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB912 3
+D 0xB915 0xB918 sprites_B915  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB915 3
+D 0xB918 0xB91B sprites_B918  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB918 3
+D 0xB91B 0xB91E sprites_B91B  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB91B 3
+D 0xB91E 0xB921 sprites_B91E  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB91E 3
+D 0xB921 0xB924 sprites_B921  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB921 3
+D 0xB924 0xB936 sprites_B924  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB924 3
+D 0xB936 0xB948 sprites_B936  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (18 bytes)
+F 0xB936 3
+D 0xB948 0xB954 sprites_B948  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB948 3
+D 0xB954 0xB963 sprites_B954  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (15 bytes)
+F 0xB954 3
+D 0xB963 0xB96F sprites_B963  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (12 bytes)
+F 0xB963 3
+D 0xB96F 0xB972 sprites_B96F  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB96F 3
+D 0xB972 0xB975 sprites_B972  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB972 3
+D 0xB975 0xB98D sprites_B975  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (24 bytes)
+F 0xB975 3
+D 0xB98D 0xB992 sprites_B98D  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB98D 3
+D 0xB992 0xB997 sprites_B992  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB992 3
+D 0xB997 0xB99C sprites_B997  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB997 3
+D 0xB99C 0xB9A1 sprites_B99C  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (5 bytes)
+F 0xB99C 3
+D 0xB9A1 0xB9A4 sprites_B9A1  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9A1 3
+D 0xB9A4 0xB9A7 sprites_B9A4  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9A4 3
+D 0xB9A7 0xB9AA sprites_B9A7  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9A7 3
+D 0xB9AA 0xB9AD sprites_B9AA  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9AA 3
+D 0xB9AD 0xB9B0 sprites_B9AD  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9AD 3
+D 0xB9B0 0xB9B3 sprites_B9B0  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9B0 3
+D 0xB9B3 0xB9B6 sprites_B9B3  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9B3 3
+D 0xB9B6 0xB9B9 sprites_B9B6  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9B6 3
+D 0xB9B9 0xB9BC sprites_B9B9  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9B9 3
+D 0xB9BC 0xB9BF sprites_B9BC  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9BC 3
+D 0xB9BF 0xB9C2 sprites_B9BF  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9BF 3
+D 0xB9C2 0xB9C5 sprites_B9C2  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9C2 3
+D 0xB9C5 0xB9C8 sprites_B9C5  [dy][dx][patron] por sprite (o 0x80/0x81/0x82 y solo los patrones); lo leen p01:6469 (3 bytes)
+F 0xB9C5 3
 D 0xB9C8 0xBDC8 dibujos16_B9C8  8 dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube en dieciseis filas de 8); lo leen p00:54D9 (1024 bytes)
 F 0xB9C8 8
 D 0xBDC8 0xC000 dibujos16_BDC8  5 dibujos de 16x16 a 4 bits (128 bytes cada uno, 0x4A7B los sube en dieciseis filas de 8); se sale de la ventana del cartucho: los ultimos 72 bytes los lee de la RAM, de 0xC000 a 0xC047; lo leen p00:54E4 (568 bytes)

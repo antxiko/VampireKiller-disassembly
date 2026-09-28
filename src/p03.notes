@@ -1,6 +1,102 @@
 # Notas del banco 03: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
+D 0xA08F 0xA0E5 tablas_por_tipo  tres tablas seguidas: 0xA08F, un byte por tipo de cosa que p02:9F8C lee con 0xA08E + tipo; 0xA0BF, punteros por tipo (p03:A011 con DE = 0xA0BD, via 0x6542) a las cuatro listas cortas de 0xA0D7-0xA0E4, que se copian a los sprites de la cosa (p03:A017); los mismos bytes usan p01:68EA y p03:BBFD como coordenadas de VRAM
+F 0xA08F 16
+D 0xA1A2 0xA222 arcotangente  una tabla de 64 bytes (8 x 8) que p03:A15B indexa con dos diferencias de tres bits para sacar una direccion (0xCFF8), y detras, en 0xA1E2, 64 valores de 0x00 a 0xFF que crecen como un seno (p03:A106): con las dos se apunta a Simon
+F 0xA1A2 16
+D 0xA2A6 0xA2A8 dos_bytes_sueltos  dos bytes (0x3E 0x4C) entre dos rutinas que no lee nadie; su direccion no aparece como palabra en el cartucho
+F 0xA2A6 16
+D 0xA452 0xA45A dos_animaciones_A452  dos animaciones de cuatro dibujos (0xA452 y 0xA456) que p03:A403 elige con el bit 0 de (ix+0x12) y cambia cada ocho cuadros
+F 0xA452 16
+D 0xA4AF 0xA4B3 cuatro_dibujos_A4AF  cuatro dibujos que p03:A46A usa segun la distancia
+F 0xA4AF 16
+D 0xA4F3 0xA4FB dos_animaciones_A4F3  dos animaciones de cuatro valores (0xA4F3 y 0xA4F7) que p03:A4CF elige con el bit 0 de (ix+0x19) e indexa con los dos bits bajos de (ix+0x1D)
+F 0xA4F3 16
+D 0xA627 0xA62F dos_animaciones_A627  dos animaciones de cuatro dibujos que p03:A619 elige segun mire a un lado o al otro (bit 7 de (ix+0x0A))
+F 0xA627 16
+D 0xA7B9 0xA7BD dos_animaciones_A7B9  dos animaciones de dos dibujos (0xA7B9 y 0xA7BB), una por lado (p03:A797)
+F 0xA7B9 16
+D 0xA813 0xA823 dos_tablas_A813  dos tablas de ocho bytes (0xA813 y 0xA81B) que p03:A7E2 elige segun Simon este a un lado o al otro; los mismos bytes los usa p00:4DA5 como coordenadas de VRAM
+F 0xA813 16
+D 0xAAAD 0xAACD ocho_registros_de_cuatro  ocho registros de cuatro bytes que p03:AA94 indexa con A * 4
+F 0xAAAD 16
+D 0xAB0E 0xAB22 sprites_de_la_cosa  lo que p03:AAF9 y p03:AAE2 copian a los sprites de la cosa: cuatro pares y cuatro desplazamientos
+F 0xAB0E 16
+D 0xAD20 0xAD28 codigo_sin_llamar_AD20  ocho bytes que desensamblan como `push ix / ld ix,0xC800 / ld b,7` y a los que no llega nadie; su direccion no aparece como palabra en el cartucho
+F 0xAD20 16
+D 0xADBC 0xADC6 cinco_pares  cinco pares (0x80 y 0x00, 0x20, 0x40, 0x60, 0x80) que p03:AD9B lee via 0x6542
+F 0xADBC 16
+D 0xB642 0xB6AB tabla_B642  p03:B62D la indexa con cuatro bits: dibujos, punteros a las listas de 0xB665-0xB6A5 y las listas
+F 0xB642 16
+D 0xB7FA 0xB818 dos_listas_de_quince  dos listas de quince bytes: p03:B7CB usa la de 0xB7FA en la fase 3 y la de 0xB809 en las demas; los mismos bytes los usan p00:54DF y p02:8F4A como coordenadas de VRAM
+F 0xB7FA 16
+D 0xBC44 0xBC54 ocho_pares  ocho pares que p03:BC31 indexa con los tres bits bajos de A
+F 0xBC44 16
+D 0xAC76 0xAC7E ocho_valores_AC76  ocho bytes que p03:AC54 elige segun (ix+0x10) sea menor que 7 o no
+F 0xAC76 16
+D 0xACAA 0xACAE dibujos_ACAA  cuatro dibujos, dos por lado: 0xAD37 suma 2 si Simon esta por debajo y 0xA62F pone el que toca en (ix+0x0B) (p03:ABAD, ABDA, AC4E, AC80)
+F 0xACAA 16
+D 0xAD53 0xAD5B colores_AD53  ocho bytes que p03:AD4A copia, con 0xAD6D, a los colores de los ocho sprites de la cosa ((ix+0x25) de cinco en cinco)
+F 0xAD53 16
+D 0xAF28 0xAF2C dibujos_AF28  cuatro dibujos, dos por lado, para 0xAD37 (p03:AF22)
+F 0xAF28 16
+D 0xB177 0xB17F dos_animaciones_B177  dos animaciones de cuatro dibujos, una por lado (bit 7 de (ix+0x0A)), que p03:B163 va poniendo en (ix+0x0B)
+F 0xB177 16
+D 0xB20F 0xB212 tres_dibujos_B20F  tres dibujos que p03:B209 pasa a 0xA62F
+F 0xB20F 16
+D 0xB33A 0xB33E dibujos_B33A  cuatro dibujos, dos por lado, para 0xAD37 (p03:B287, B2C1, B2F3, B31C)
+F 0xB33A 16
+D 0xB853 0xB857 cuatro_dibujos_B853  cuatro dibujos que p03:B848 elige con dos bits de una cuenta y deja en (ix+0x0B)
+F 0xB853 16
+D 0xB9C7 0xB9CF ocho_valores_al_azar  ocho valores de los que p03:B9BA coge uno al azar (`ld a,r / and 7`) y lo deja en (ix+0x10)
+F 0xB9C7 16
+D 0xBA20 0xBA26 dos_animaciones_BA20  dos animaciones de tres dibujos (0xBA20 y 0xBA23) que p03:B9CF elige con el bit 0 de (ix+0x12)
+F 0xBA20 16
+D 0xBACF 0xBAD3 cuatro_dibujos_BACF  cuatro dibujos que p03:BAB9 va poniendo con la cuenta de (ix+0x11)
+F 0xBACF 16
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0xA034 0xA04C tabla_A034  12 destinos del despachador de 0x406B (call en p03:A031): 0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04C, 0xA04D, 0xA06A ...; lo leen p03:A031 (24 bytes)
+F 0xA034 2
+D 0xA686 0xA696 tabla_A686  8 destinos del despachador de 0x406B (call en p03:A683): 0xA696, 0xA6A5, 0xA6D7, 0xA6EA, 0xA6FE, 0xA728, 0xA764, 0xA793; lo leen p03:A683 (16 bytes)
+F 0xA686 2
+D 0xA88B 0xA891 tabla_A88B  3 destinos del despachador de 0x406B (call en p03:A888): 0xA891, 0xA8AC, 0xA8D2; lo leen p03:A888 (6 bytes)
+F 0xA88B 2
+D 0xA9C1 0xA9C7 tabla_A9C1  3 destinos del despachador de 0x406B (call en p03:A9BE): 0xA9D8, 0xAA0B, 0xAA37; lo leen p03:A9BE (6 bytes)
+F 0xA9C1 2
+D 0xAB4C 0xAB60 tabla_AB4C  10 destinos del despachador de 0x406B (call en p03:AB49): 0xAB67, 0xAB86, 0xABAB, 0xABD4, 0xABE9, 0xAC21, 0xAC40, 0xAC7E ...; lo leen p03:AB49 (20 bytes)
+F 0xAB4C 2
+D 0xAF65 0xAF6B tabla_AF65  3 destinos del despachador de 0x406B (call en p03:AF62): 0xAF6B, 0xAFBE, 0xB035; lo leen p03:AF62 (6 bytes)
+F 0xAF65 2
+D 0xB24E 0xB258 tabla_B24E  5 destinos del despachador de 0x406B (call en p03:B24B): 0xB258, 0xB268, 0xB285, 0xB2C7, 0xB31A; lo leen p03:B24B (10 bytes)
+F 0xB24E 2
+D 0xB387 0xB38D tabla_B387  3 destinos del despachador de 0x406B (call en p03:B384): 0xB38D, 0xB451, 0xB4A9; lo leen p03:B384 (6 bytes)
+F 0xB387 2
+D 0xB4F3 0xB4FB tabla_B4F3  4 destinos del despachador de 0x406B (call en p03:B4F0): 0xB4FB, 0xB50D, 0xB513, 0xB526; lo leen p03:B4F0 (8 bytes)
+F 0xB4F3 2
+D 0xB6B9 0xB6C5 tabla_B6B9  6 destinos del despachador de 0x406B (call en p03:B6B6): 0xBE2B, 0xBCDB, 0xB857, 0xBA26, 0xBBF3, 0x65B0; lo leen p03:B6B6 (12 bytes)
+F 0xB6B9 2
+D 0xB6CB 0xB6D9 tabla_B6CB  7 destinos del despachador de 0x406B (call en p03:B6C8): 0xB6D9, 0xB6E3, 0xB6ED, 0xB706, 0xB6E3, 0xB736, 0xB751; lo leen p03:B6C8 (14 bytes)
+F 0xB6CB 2
+D 0xB7A7 0xB7AD tabla_B7A7  3 destinos del despachador de 0x406B (call en p03:B7A4): 0xB7AD, 0xB818, 0xB83F; lo leen p03:B7A4 (6 bytes)
+F 0xB7A7 2
+D 0xB85D 0xB861 tabla_B85D  2 destinos del despachador de 0x406B (call en p03:B85A): 0xB861, 0xB874; lo leen p03:B85A (4 bytes)
+F 0xB85D 2
+D 0xB899 0xB8A1 tabla_B899  4 destinos del despachador de 0x406B (call en p03:B896): 0xB8A1, 0xB8AD, 0xB8D0, 0xB960; lo leen p03:B896 (8 bytes)
+F 0xB899 2
+D 0xBA2C 0xBA30 tabla_BA2C  2 destinos del despachador de 0x406B (call en p03:BA29): 0xBA30, 0xBA47; lo leen p03:BA29 (4 bytes)
+F 0xBA2C 2
+D 0xBBF9 0xBBFD tabla_BBF9  2 destinos del despachador de 0x406B (call en p03:BBF6): 0xBBFD, 0xBC18; lo leen p03:BBF6 (4 bytes)
+F 0xBBF9 2
+D 0xBCE1 0xBCE9 tabla_BCE1  4 destinos del despachador de 0x406B (call en p03:BCDE): 0xBCE9, 0xBCF1, 0xBCF9, 0xBD11; lo leen p03:BCDE (8 bytes)
+F 0xBCE1 2
+D 0xBD22 0xBD26 tabla_BD22  2 destinos del despachador de 0x406B (call en p03:BD1F): 0xBD66, 0xBD99; lo leen p03:BD1F (4 bytes)
+F 0xBD22 2
+D 0xBE31 0xBE35 tabla_BE31  2 destinos del despachador de 0x406B (call en p03:BE2E): 0xBE35, 0xBE42; lo leen p03:BE2E (4 bytes)
+F 0xBE31 2
+D 0xBE89 0xBE95 tabla_BE89  6 destinos del despachador de 0x406B (call en p03:BE86): 0xBE95, 0xBEA2, 0xBEA6, 0xBEF0, 0xBF4A, 0xBF92; lo leen p03:BE86 (12 bytes)
+F 0xBE89 2
 D 0xBFC0 0xC000 relleno_p03  64 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (64 bytes)
 F 0xBFC0 16
 # --- fin de los bloques de bloques.py ---

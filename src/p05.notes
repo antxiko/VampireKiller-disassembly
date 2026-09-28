@@ -1,6 +1,6 @@
 # Notas del banco 05: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
-D 0x8000 0xA000 dibujos_7220_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x7220); se solapan 4 bloques (0x8000-0x8A00, 0x8493-0x9C73, 0x95B3-0xA000, 0x9E73-0xA000); lo leen fase 1, fase 10, fase 11, fase 12, fase 2, fase 3, fase 4, fase 5 y 4 mas (8192 bytes)
+D 0x8000 0xA000 dibujos_7220_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x7220); se solapan 39 bloques (0x8000-0x8A00, 0x82C0-0x82D6, 0x82D6-0x82DE, 0x82DE-0x82EE, 0x82EE-0x82F9, 0x82F9-0x8306); lo leen fase 1, fase 10, fase 11, fase 12, fase 2, fase 3, fase 4, fase 5 y 5 mas (8192 bytes)
 F 0x8000 32
 # --- fin de los bloques de bloques.py ---

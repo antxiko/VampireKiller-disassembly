@@ -12,7 +12,7 @@
 ; ----------------------------------------------------------------------
 ; DATOS dibujos_9640_cola: 191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del
 ;   decorado (sigue del banco anterior, 0x9640); se solapan 5 bloques
-;   (0xA000-0xAE20, 0xA4C0-0xBCA0, 0xAC80-0xAEA0, 0xAEA0-0xB260,
+;   (0xA000-0xAE20, 0xA4C0-0xB473, 0xAC80-0xAEA0, 0xAEA0-0xB260,
 ;   0xB260-0xBD80); lo leen fase 16, fase 17, fase 18, p00:5A06, p00:5A15,
 ;   p00:5A28 (7552 bytes)
 ;   0xa000..0xbd80  (7552 bytes)
@@ -317,26 +317,66 @@ DATA_dibujos_BF00:
 	defb 008h,080h,008h,080h,088h,0e8h,088h,088h,08eh,088h,088h,088h,08eh,088h,088h,088h,088h,088h,088h,088h,008h,088h,088h,080h,000h,088h,088h,000h,000h,008h,080h,000h	; bf00  ................................
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0xbf20..0xbfd1  (177 bytes)
-DATA_BF20:
+; DATOS renglon_BF20: renglon [cuando][fila][texto][0xFF]: "SO THE BRAVE YOUNG
+;   MAN"; lo leen p01:6769 (25 bytes)
+;   0xbf20..0xbf39  (25 bytes)
+DATA_renglon_BF20:
 	defb 008h,020h,053h,04fh,000h,054h,048h,045h,000h,042h,052h,041h,056h,045h,000h,059h	; bf20  . SO.THE.BRAVE.Y
-	defb 04fh,055h,04eh,047h,000h,04dh,041h,04eh,0ffh,018h,020h,050h,055h,054h,000h,044h	; bf30  OUNG.MAN.. PUT.D
-	defb 052h,041h,043h,055h,04ch,041h,000h,049h,04eh,054h,04fh,000h,044h,045h,045h,050h	; bf40  RACULA.INTO.DEEP
-	defb 0ffh,028h,020h,053h,04ch,045h,045h,050h,000h,041h,047h,041h,049h,04eh,000h,041h	; bf50  .( SLEEP.AGAIN.A
-	defb 04eh,044h,000h,054h,048h,045h,000h,054h,04fh,057h,04eh,0ffh,038h,020h,052h,045h	; bf60  ND.THE.TOWN.8 RE
-	defb 053h,054h,04fh,052h,045h,044h,000h,049h,054h,053h,000h,050h,045h,041h,043h,045h	; bf70  STORED.ITS.PEACE
-	defb 03ah,0ffh,058h,020h,04ch,045h,054h,03bh,053h,000h,050h,052h,041h,059h,000h,054h	; bf80  :.X LET;S.PRAY.T
-	defb 048h,041h,054h,000h,054h,048h,045h,000h,045h,056h,049h,04ch,0ffh,068h,020h,04dh	; bf90  HAT.THE.EVIL.h M
-	defb 049h,04eh,044h,000h,04fh,046h,000h,048h,055h,04dh,041h,04eh,042h,045h,049h,04eh	; bfa0  IND.OF.HUMANBEIN
-	defb 047h,053h,000h,057h,049h,04ch,04ch,0ffh,078h,020h,04eh,04fh,054h,000h,04ch,045h	; bfb0  GS.WILL.x NOT.LE
-	defb 054h,000h,044h,052h,041h,043h,055h,04ch,041h,000h,043h,04fh,04dh,045h,000h,054h	; bfc0  T.DRACULA.COME.T
-	defb 04fh	; bfd0
+	defb 04fh,055h,04eh,047h,000h,04dh,041h,04eh,0ffh	; bf30  OUNG.MAN.
 
 ; ----------------------------------------------------------------------
-; DATOS relleno_p08: 47 bytes a 0xFF hasta el final del banco: espacio libre;
-;   lo leen nadie (47 bytes)
-;   0xbfd1..0xc000  (47 bytes)
+; DATOS renglon_BF39: renglon [cuando][fila][texto][0xFF]: "PUT DRACULA INTO
+;   DEEP"; lo leen p01:6769 (24 bytes)
+;   0xbf39..0xbf51  (24 bytes)
+DATA_renglon_BF39:
+	defb 018h,020h,050h,055h,054h,000h,044h,052h,041h,043h,055h,04ch,041h,000h,049h,04eh	; bf39  . PUT.DRACULA.IN
+	defb 054h,04fh,000h,044h,045h,045h,050h,0ffh	; bf49  TO.DEEP.
+
+; ----------------------------------------------------------------------
+; DATOS renglon_BF51: renglon [cuando][fila][texto][0xFF]: "SLEEP AGAIN AND
+;   THE TOWN"; lo leen p01:6769 (27 bytes)
+;   0xbf51..0xbf6c  (27 bytes)
+DATA_renglon_BF51:
+	defb 028h,020h,053h,04ch,045h,045h,050h,000h,041h,047h,041h,049h,04eh,000h,041h,04eh	; bf51  ( SLEEP.AGAIN.AN
+	defb 044h,000h,054h,048h,045h,000h,054h,04fh,057h,04eh,0ffh	; bf61  D.THE.TOWN.
+
+; ----------------------------------------------------------------------
+; DATOS renglon_BF6C: renglon [cuando][fila][texto][0xFF]: "RESTORED ITS
+;   PEACE."; lo leen p01:6769 (22 bytes)
+;   0xbf6c..0xbf82  (22 bytes)
+DATA_renglon_BF6C:
+	defb 038h,020h,052h,045h,053h,054h,04fh,052h,045h,044h,000h,049h,054h,053h,000h,050h	; bf6c  8 RESTORED.ITS.P
+	defb 045h,041h,043h,045h,03ah,0ffh	; bf7c
+
+; ----------------------------------------------------------------------
+; DATOS renglon_BF82: renglon [cuando][fila][texto][0xFF]: "LET'S PRAY THAT
+;   THE EVIL"; lo leen p01:6769 (27 bytes)
+;   0xbf82..0xbf9d  (27 bytes)
+DATA_renglon_BF82:
+	defb 058h,020h,04ch,045h,054h,03bh,053h,000h,050h,052h,041h,059h,000h,054h,048h,041h	; bf82  X LET;S.PRAY.THA
+	defb 054h,000h,054h,048h,045h,000h,045h,056h,049h,04ch,0ffh	; bf92  T.THE.EVIL.
+
+; ----------------------------------------------------------------------
+; DATOS renglon_BF9D: renglon [cuando][fila][texto][0xFF]: "MIND OF
+;   HUMANBEINGS WILL"; lo leen p01:6769 (27 bytes)
+;   0xbf9d..0xbfb8  (27 bytes)
+DATA_renglon_BF9D:
+	defb 068h,020h,04dh,049h,04eh,044h,000h,04fh,046h,000h,048h,055h,04dh,041h,04eh,042h	; bf9d  h MIND.OF.HUMANB
+	defb 045h,049h,04eh,047h,053h,000h,057h,049h,04ch,04ch,0ffh	; bfad  EINGS.WILL.
+
+; ----------------------------------------------------------------------
+; DATOS renglon_BFB8: renglon [cuando][fila][texto][0xFF]: "NOT LET DRACULA
+;   COME TO"; lo leen p01:6769 (26 bytes)
+;   0xbfb8..0xbfd2  (26 bytes)
+DATA_renglon_BFB8:
+	defb 078h,020h,04eh,04fh,054h,000h,04ch,045h,054h,000h,044h,052h,041h,043h,055h,04ch	; bfb8  x NOT.LET.DRACUL
+	defb 041h,000h,043h,04fh,04dh,045h,000h,054h,04fh,0ffh	; bfc8  A.COME.TO.
+
+; ----------------------------------------------------------------------
+; DATOS relleno_p08: 46 bytes a 0xFF hasta el final del banco: espacio libre;
+;   lo leen nadie (46 bytes)
+;   0xbfd2..0xc000  (46 bytes)
 DATA_relleno_p08:
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd1  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe1  ................
-	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff1  ...............
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfd2  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bfe2  ................
+	defb 0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh,0ffh	; bff2  ..............

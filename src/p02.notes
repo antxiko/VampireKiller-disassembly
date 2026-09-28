@@ -1,8 +1,98 @@
 # Notas del banco 02: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
+D 0x8000 0x8001 cola_del_ld  el tercer byte (0xC4) de `ld (0xC433),a`, que empieza en p01:7FFE; el codigo sigue en 0x8001
+F 0x8000 16
+D 0x8048 0x804C cuatro_valores  cuatro bytes que p02:805F elige con (iy+1) - 2; los mismos bytes los usan como coordenadas de VRAM p00:58E7, p00:592A y p01:662B
+F 0x8048 16
+D 0x81CE 0x822A puntos_y_dano_de_cada_tipo  46 pares, uno por tipo de cosa (1-46): [puntos que da al morir, en BCD, que p02:81B9 pasa a 0x44EE][dano que hace al tocar a Simon, que p02:8178 pasa a 0x462B]
+F 0x81CE 16
+D 0x82CB 0x82FB un_byte_de_cada_tipo  48 bytes, uno por tipo de cosa (desde el 1), que lee p02:82BC
+F 0x82CB 16
+D 0x830D 0x8318 once_valores  once bytes, uno por tipo de cosa (desde el 1), que p02:82FF devuelve en A junto a la posicion (ix+5) y (ix+3)
+F 0x830D 16
+D 0x8792 0x87BA dos_tablas_de_veinte  dos tablas de 20 bytes que elige p02:86CB: la de 0x8792 en el primer bloque de fases (0xD002 = 0) y la de 0x87A6 en los demas
+F 0x8792 16
+D 0x892A 0x893B curva_sin_usar  17 desplazamientos (-6, -4, ... +6 y un 0) con forma de curva de salto que no nombra ninguna instruccion; su direccion no aparece como palabra en el cartucho
+F 0x892A 16
+D 0x8CBD 0x8CC1 cuatro_valores_por_cuadro  cuatro bytes que p02:8C9E elige con los dos bits bajos del contador de cuadros (0xC003)
+F 0x8CBD 16
+D 0x8F19 0x8F23 cinco_pares  cinco pares que p02:8F07 indexa con A * 2
+F 0x8F19 16
+D 0x8FBD 0x8FCF tres_registros_de_seis  tres registros de seis bytes que p02:8FA7 copia a 0xC580 (`ld b,3`)
+F 0x8FBD 16
+D 0x906C 0x909B dos_listas  dos listas que termina un 0xFF: la de 0x906C la recorre p02:9033; la de 0x9090 se la pasa p03:BCF9 a 0x5F1D
+F 0x906C 16
+D 0x913F 0x9147 cuatro_pares  cuatro pares que p02:9112 recorre con IX (`ld b,4`)
+F 0x913F 16
+D 0x9300 0x9327 tres_tablas_pequenas  la de 0x9300 la lee p02:92BB con (ix+5) * 4; la de 0x930B la pasa p00:4550 a 0x48DC con C = 14; la de 0x9320 la indexa p02:92F5 con 0xC70C
+F 0x9300 16
+D 0x9428 0x944C nueve_pares_y_mas  lo que compara p02:9409 (`ld b,9`, `cp (hl)` y `inc hl`)
+F 0x9428 16
+D 0x9473 0x9491 columna_y_dos_rotulos  18 bytes, uno por fase (1-18), que p02:945A usa de columna (0x00, 0x40 o 0x80); detras, los dos trozos de 0x9485 y 0x948A que p02:93DF y 93E8 pasan a 0x949F
+F 0x9473 16
+D 0x95F6 0x9609 un_tope_por_fase  19 bytes, uno por fase, contra los que p02:95F2 compara
+F 0x95F6 16
+D 0x9695 0x9793 casilla_de_cada_habitacion  19 punteros, uno por fase, a un byte por habitacion: su casilla en una rejilla de 6 x 5; p02:968A la convierte con la tabla de 30 palabras de 0x9757 en una posicion (x de 0x20 a 0xC0, y de 0x38 a 0x8C) y la deja en 0xCFF2
+F 0x9695 16
+D 0x97EC 0x97FA catorce_valores  14 bytes que p02:97B4 indexa con A (menor que 14)
+F 0x97EC 16
+D 0x9874 0x9890 dibujo_de_8x7  28 bytes, 8 x 7 puntos a 4 bits, que p02:9865 manda por HMMC (`ld bc,0x0807`) si el bit 0 esta a cero
+F 0x9874 16
+D 0x98AC 0x98E5 tres_bytes_por_fase  19 registros de tres bytes, uno por fase, que p02:9859 indexa con fase * 3
+F 0x98AC 16
+D 0x9B34 0x9B60 tabla_sin_usar  44 bytes (0x00, 0x10, 0x18, 0x20) que no nombra ninguna instruccion; su direccion no aparece como palabra en el cartucho
+F 0x9B34 16
+D 0x9C59 0x9C5D cuatro_valores_por_cuadro_2  cuatro bytes que p02:9C1E elige con los dos bits bajos del contador de cuadros; son los mismos cuatro que 0x8CBD
+F 0x9C59 16
+D 0x9CBB 0x9CC3 cuentas_iniciales  siete cuentas que p02:9CA9 copia a 0xCF00: el primer plazo de cada una de las siete cosas que puede soltar una habitacion
+F 0x9CBB 16
+D 0x9D43 0x9D4B plazos_de_la_cosa_1  ocho plazos (en cuatro cuadros) que 0x9CC3 recorre en bucle entre una salida y la siguiente de la cosa del bit 0 (p02:9CE6); 0xD012 los acorta
+F 0x9D43 16
+D 0x9D87 0x9D97 plazos_de_la_cosa_3  la tabla de p02:9D67 (ocho bytes, con los tres bits bajos de 0xCF03) y los ocho plazos de 0x9D8F de la cosa de p02:9D52
+F 0x9D87 16
+D 0x9DBB 0x9DC3 plazos_de_la_cosa_4  ocho plazos de la cosa de p02:9D97
+F 0x9DBB 16
+D 0x9DCD 0x9DD5 plazos_de_la_cosa_5  ocho plazos de la cosa de p02:9DC3
+F 0x9DCD 16
+D 0x9DDF 0x9DE7 plazos_de_la_cosa_6  ocho plazos de la cosa de p02:9DD5
+F 0x9DDF 16
+D 0x9E0E 0x9E16 plazos_de_la_cosa_7  ocho plazos de la cosa de p02:9DE7
+F 0x9E0E 16
+D 0x8AF0 0x8AF8 ocho_valores  ocho bytes que lee p02:8ADB, dentro del primer destino del despachador de p02:8A80
+F 0x8AF0 16
+D 0x8A8D 0x8A99 tabla_de_p02_8A80  seis destinos del despachador hecho a mano de p02:8A80 (`push de / exx / ret`): 0x8A99, 0x8AF8, 0x8B70, 0x8BA2, 0x8BCC y otra vez 0x8A99
+F 0x8A8D 16
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x8252 0x8258 tabla_8252  3 destinos del despachador de 0x406B (call en p02:824F): 0x8318, 0x8338, 0x8358; lo leen p02:824F (6 bytes)
+F 0x8252 2
+D 0x825E 0x8264 tabla_825E  3 destinos del despachador de 0x406B (call en p02:825B): 0x8328, 0x8348, 0x8368; lo leen p02:825B (6 bytes)
+F 0x825E 2
+D 0x826A 0x8270 tabla_826A  3 destinos del despachador de 0x406B (call en p02:8267): 0x8330, 0x8350, 0x8370; lo leen p02:8267 (6 bytes)
+F 0x826A 2
+D 0x8276 0x827C tabla_8276  3 destinos del despachador de 0x406B (call en p02:8273): 0x8320, 0x8340, 0x8360; lo leen p02:8273 (6 bytes)
+F 0x8276 2
+D 0x8282 0x8290 tabla_8282  7 destinos del despachador de 0x406B (call en p02:827F): 0x8380, 0x8398, 0x83DA, 0x83F2, 0x840A, 0x8428, 0x8440; lo leen p02:827F (14 bytes)
+F 0x8282 2
+D 0x8296 0x82A4 tabla_8296  7 destinos del despachador de 0x406B (call en p02:8293): 0x8378, 0x8390, 0x83D2, 0x83EA, 0x8402, 0x8420, 0x8438; lo leen p02:8293 (14 bytes)
+F 0x8296 2
+D 0x82AA 0x82B8 tabla_82AA  7 destinos del despachador de 0x406B (call en p02:82A7): 0x8388, 0x83AA, 0x83E2, 0x83FA, 0x8415, 0x8430, 0x8448; lo leen p02:82A7 (14 bytes)
+F 0x82AA 2
+D 0x8D3E 0x8D70 tabla_8D3E  25 destinos del despachador de 0x406B (call en p02:8D3B): 0x8DAF, 0x8DB7, 0x8D98, 0x8DA1, 0x8DBB, 0x8D7C, 0x8DDE, 0x8DCD ...; lo leen p02:8D3B (50 bytes)
+F 0x8D3E 2
+D 0x8E6B 0x8E6D codigo_sin_llamar_8E6B  instrucciones que no alcanza nadie: desensamblan enteras hasta un ret justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (2 bytes)
+F 0x8E6B 16
+D 0x8EF9 0x8F05 codigo_sin_llamar_8EF9  instrucciones que no alcanza nadie: desensamblan enteras hasta un ret justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (12 bytes)
+F 0x8EF9 16
+D 0x92AD 0x92BB tabla_92AD  7 destinos del despachador de 0x406B (call en p02:92AA): 0x9327, 0x9333, 0x933C, 0x9344, 0x934E, 0x9343, 0x9358; lo leen p02:92AA (14 bytes)
+F 0x92AD 2
 D 0x984B 0x9853 hmmc_984B  4x4 puntos a 4 bits (8 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p02:9841 (8 bytes)
 F 0x984B 8
 D 0x9890 0x98AC hmmc_9890  8x7 puntos a 4 bits (28 bytes) que 0x498A manda al V9938 con una orden HMMC; lo leen p02:9871 (28 bytes)
 F 0x9890 8
+D 0x9942 0x999E tabla_9942  46 destinos del despachador de 0x406B (call en p02:993F): 0xA964, 0xA310, 0xA310, 0xB0F8, 0xA87D, 0xA592, 0xB07B, 0xA51B ...; lo leen p02:993F (92 bytes)
+F 0x9942 2
+D 0x9E5F 0x9E77 tabla_9E5F  12 destinos del despachador de 0x406B (call en p02:9E5C): 0x9E77, 0x9E77, 0x9E77, 0x9F07, 0x9E77, 0x9E78, 0x9E90, 0x9F22 ...; lo leen p02:9E5C (24 bytes)
+F 0x9E5F 2
 # --- fin de los bloques de bloques.py ---

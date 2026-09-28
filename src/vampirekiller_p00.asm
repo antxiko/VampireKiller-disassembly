@@ -18,10 +18,19 @@
 l509eh:	equ 0x0509e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4000..0x4028  (40 bytes)
-DATA_4000:
+; DATOS cabecera_ab: la cabecera del cartucho: 'AB', INIT (0x4075) y
+;   STATEMENT, DEVICE y TEXT a cero; lo leen la BIOS (16 bytes)
+;   0x4000..0x4010  (16 bytes)
+DATA_cabecera_ab:
 	defb 041h,042h,075h,040h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h,000h	; 4000  ABu@............
-	defb 043h,000h,044h,000h,007h,000h,044h,000h,0e8h,000h,0c0h,004h,000h,011h,0c4h,000h	; 4010  C.D...D.........
+
+; ----------------------------------------------------------------------
+; DATOS cabecera_de_konami: la cabecera de Konami que empieza por 'CD' y lee
+;   el Game Master; lo leen el Game Master (24 bytes)
+;   0x4010..0x4028  (24 bytes)
+DATA_cabecera_de_konami:
+	defb 043h,000h,044h,000h,007h,000h,044h,000h	; 4010  C.D...D.
+	defb 0e8h,000h,0c0h,004h,000h,011h,0c4h,000h	; 4018  ........
 	defb 0d0h,012h,010h,0c4h,000h,000h,005h,0c4h	; 4020  ........
 
 ; ======================================================================
@@ -209,10 +218,25 @@ L_415E:
 	call L_406B		;415e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4161..0x417d  (28 bytes)
-DATA_4161:
-	defb 07dh,041h,0a0h,041h,0abh,041h,0d1h,041h,02ch,042h,057h,042h,094h,042h,0b2h,042h	; 4161  }A.A.A.A,BWB.B.B
-	defb 024h,043h,077h,043h,087h,043h,0dah,043h,0f0h,043h,014h,044h	; 4171  $CwC.C.C.C.D
+; DATOS tabla_4161: 14 destinos del despachador de 0x406B (call en p00:415E):
+;   0x417D, 0x41A0, 0x41AB, 0x41D1, 0x422C, 0x4257, 0x4294, 0x42B2 ...; lo
+;   leen p00:415E (28 bytes)
+;   0x4161..0x417d  (28 bytes)
+DATA_tabla_4161:
+	defb 07dh,041h	; 4161
+	defb 0a0h,041h	; 4163
+	defb 0abh,041h	; 4165
+	defb 0d1h,041h	; 4167
+	defb 02ch,042h	; 4169
+	defb 057h,042h	; 416b
+	defb 094h,042h	; 416d
+	defb 0b2h,042h	; 416f
+	defb 024h,043h	; 4171
+	defb 077h,043h	; 4173
+	defb 087h,043h	; 4175
+	defb 0dah,043h	; 4177
+	defb 0f0h,043h	; 4179
+	defb 014h,044h	; 417b
 
 ; ======================================================================
 ; CODIGO 0x417d..0x4300  (387 bytes)
@@ -427,8 +451,11 @@ L_42F8:
 	jp L_41C9		;42fd
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4300..0x4314  (20 bytes)
-DATA_4300:
+; DATOS rotulo_4300: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "F{25} / {4F} / CONTINUE"; lo leen p00:42F5 (20
+;   bytes)
+;   0x4300..0x4314  (20 bytes)
+DATA_rotulo_4300:
 	defb 050h,068h,036h,025h,0feh,064h,068h,04fh,0feh,070h,068h,033h,03fh,03eh,044h,039h	; 4300  Ph6%.dhO.ph3?>D9
 	defb 03eh,045h,035h,0ffh	; 4310
 
@@ -489,8 +516,11 @@ L_4347:
 	jp L_41B6		;4366
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4369..0x4370  (7 bytes)
-DATA_4369:
+; DATOS codigo_sin_llamar_4369: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un ret justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (7 bytes)
+;   0x4369..0x4370  (7 bytes)
+DATA_codigo_sin_llamar_4369:
 	defb 021h,000h,000h,022h,000h,0c0h,0c9h	; 4369
 
 ; ======================================================================
@@ -662,8 +692,10 @@ L_4495:
 	jp L_4ACB		;44ad
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x44b0..0x44b8  (8 bytes)
-DATA_44B0:
+; DATOS rotulo_44B0: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "PAUSE"; lo leen p00:44AD (8 bytes)
+;   0x44b0..0x44b8  (8 bytes)
+DATA_rotulo_44B0:
 	defb 06ch,058h,040h,031h,045h,043h,035h,0ffh	; 44b0  lX@1EC5.
 
 ; ======================================================================
@@ -696,8 +728,11 @@ L_44C6:
 	ret			;44e8
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x44e9..0x44ec  (3 bytes)
-DATA_44E9:
+; DATOS valores_iniciales_de_la_partida: los tres bytes que p00:44D3 copia a
+;   0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la
+;   fase en BCD) y 1
+;   0x44e9..0x44ec  (3 bytes)
+DATA_valores_iniciales_de_la_partida:
 	defb 003h,000h,001h	; 44e9
 
 ; ======================================================================
@@ -882,8 +917,12 @@ L_4614:
 	jp L_45B9		;4615
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4618..0x462b  (19 bytes)
-DATA_4618:
+; DATOS codigo_sin_llamar_4618: instrucciones a las que no llega nadie (`ld
+;   hl,0xC418 / ld a,(hl) / add a,b / cp 0x81 ... jp 0x45B3`); la palabra
+;   0x4618 solo aparece en p03:A31E, y ahi es parte de `bit 0,(ix+0x18)` (DD
+;   CB 18 46)
+;   0x4618..0x462b  (19 bytes)
+DATA_codigo_sin_llamar_4618:
 	defb 021h,018h,0c4h,07eh,080h,0feh,081h,038h,006h,03eh,080h,096h,047h,03eh,080h,077h	; 4618  !..~...8.>..G>.w
 	defb 0c3h,0b3h,045h	; 4628
 
@@ -922,8 +961,11 @@ L_4644:
 	jp L_45B3		;464a
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x464d..0x4651  (4 bytes)
-DATA_464D:
+; DATOS codigo_sin_llamar_464D: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un jr justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+;   0x464d..0x4651  (4 bytes)
+DATA_codigo_sin_llamar_464D:
 	defb 006h,001h,018h,0dah	; 464d
 
 ; ======================================================================
@@ -936,8 +978,11 @@ L_4651:
 	jp L_4605		;4653
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4656..0x465a  (4 bytes)
-DATA_4656:
+; DATOS codigo_sin_llamar_4656: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un jr justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+;   0x4656..0x465a  (4 bytes)
+DATA_codigo_sin_llamar_4656:
 	defb 006h,001h,018h,0e2h	; 4656
 
 ; ======================================================================
@@ -1002,8 +1047,11 @@ L_4698:
 	ret			;46a0
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x46a1..0x46af  (14 bytes)
-DATA_46A1:
+; DATOS codigo_sin_llamar_46A1: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un ret justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (14 bytes)
+;   0x46a1..0x46af  (14 bytes)
+DATA_codigo_sin_llamar_46A1:
 	defb 0c5h,0f5h,0cdh,0afh,046h,03ah,007h,000h,04fh,0f1h,0edh,079h,0c1h,0c9h	; 46a1  ....F:..O..y..
 
 ; ======================================================================
@@ -1788,8 +1836,11 @@ L_4AF3:
 	ret			;4aff
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4b00..0x4b0b  (11 bytes)
-DATA_4B00:
+; DATOS codigo_sin_llamar_4B00: un bucle al que no llega nadie (`push af /
+;   call 0x4AE7 / call 0x4B4F / pop af / djnz / ret`); la palabra 0x4B00 solo
+;   aparece dentro de los dibujos de los bancos 4, 5 y 9
+;   0x4b00..0x4b0b  (11 bytes)
+DATA_codigo_sin_llamar_4B00:
 	defb 0f5h,0cdh,0e7h,04ah,0cdh,04fh,04bh,0f1h,010h,0f6h,0c9h	; 4b00  ...J.OK....
 
 ; ======================================================================
@@ -1893,8 +1944,11 @@ L_4B82:
 	jp L_47C7		;4b92
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4b95..0x4b9d  (8 bytes)
-DATA_4B95:
+; DATOS registros_del_vdp: cuatro pares [registro][valor] que p00:4B7F escribe
+;   con WRTVDP: R1 = 0x62, R5 = 0xEF, R6 = 0x1F y R11 = 0x01 (la pantalla y
+;   las tablas de sprites)
+;   0x4b95..0x4b9d  (8 bytes)
+DATA_registros_del_vdp:
 	defb 001h,062h,005h,0efh,006h,01fh,00bh,001h	; 4b95  .b......
 
 ; ======================================================================
@@ -1971,29 +2025,91 @@ L_4BF4:
 	ret			;4bff
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4c00..0x4d47  (327 bytes)
-DATA_4C00:
+; DATOS rotulo_4C00: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "SCORE- / PLAYER / ENEMY / {50}- / P- / STAGE-"; lo
+;   leen p00:4516 (45 bytes)
+;   0x4c00..0x4c2d  (45 bytes)
+DATA_rotulo_4C00:
 	defb 008h,000h,043h,033h,03fh,042h,035h,030h,0feh,008h,00ch,040h,03ch,031h,049h,035h	; 4c00  ..C3?B50...@<1I5
 	defb 042h,0feh,008h,014h,035h,03eh,035h,03dh,049h,0feh,0b0h,000h,050h,030h,0feh,0d4h	; 4c10  B...5>5=I...P0..
-	defb 000h,040h,030h,0feh,06ch,000h,043h,044h,031h,037h,035h,030h,0ffh,060h,038h,043h	; 4c20  .@0.l.CD1750.`8C
-	defb 044h,031h,037h,035h,000h,000h,000h,0ffh,002h,0feh,0f8h,003h,004h,0feh,0f8h,005h	; 4c30  D175............
-	defb 006h,007h,008h,0feh,000h,009h,00ah,00bh,00ch,00dh,0feh,0f8h,00eh,00fh,001h,001h	; 4c40  ................
-	defb 010h,011h,0ffh,02fh,02fh,0feh,0b0h,016h,017h,018h,015h,001h,001h,001h,001h,028h	; 4c50  ...//..........(
-	defb 02fh,02fh,012h,013h,014h,015h,0feh,000h,026h,023h,024h,025h,001h,001h,001h,001h	; 4c60  //......&#$%....
-	defb 019h,01ah,01bh,022h,023h,024h,025h,0feh,000h,01ch,01dh,01eh,01fh,001h,001h,001h	; 4c70  ..."#$%.........
-	defb 001h,029h,02ah,02bh,01ch,01dh,01eh,01fh,0feh,000h,020h,021h,02ch,001h,001h,001h	; 4c80  .)*+...... !,...
-	defb 001h,001h,02dh,02eh,027h,020h,021h,02ch,0ffh,067h,012h,013h,014h,015h,016h,017h	; 4c90  ..-.' !,.g......
-	defb 018h,019h,01ah,01bh,01ch,01dh,01eh,01fh,020h,021h,0feh,008h,022h,023h,024h,025h	; 4ca0  ........ !.."#$%
-	defb 026h,027h,028h,029h,02ah,02bh,02ch,02dh,02eh,02fh,030h,031h,0feh,000h,032h,033h	; 4cb0  &'()*+,-./01..23
-	defb 034h,035h,036h,037h,038h,039h,03ah,03bh,03ch,03dh,03eh,03fh,040h,041h,0feh,000h	; 4cc0  456789:;<=>?@A..
-	defb 0feh,0f8h,042h,043h,044h,045h,046h,047h,048h,047h,049h,04ah,04bh,04ch,04dh,0feh	; 4cd0  ..BCDEFGHGIJKLM.
-	defb 000h,052h,053h,054h,055h,056h,057h,060h,057h,060h,061h,05bh,05ch,05dh,000h,000h	; 4ce0  .RSTUVW`W`a[\]..
-	defb 065h,065h,0feh,000h,04eh,04fh,050h,051h,058h,059h,05ah,059h,068h,069h,06ah,05eh	; 4cf0  ee..NOPQXYZYhij^
-	defb 05fh,062h,063h,064h,063h,064h,066h,0ffh,048h,088h,02ah,000h,03bh,03fh,03eh,031h	; 4d00  _bcdcdf.H.*.;?>1
-	defb 03dh,039h,000h,021h,029h,028h,026h,0feh,048h,0a0h,040h,045h,043h,038h,000h,043h	; 4d10  =9.!)(&.H.@EC8.C
-	defb 040h,031h,033h,035h,000h,03bh,035h,049h,0ffh,048h,0a0h,000h,000h,040h,03ch,031h	; 4d20  @135.;5I.H...@<1
-	defb 049h,000h,043h,044h,031h,042h,044h,000h,000h,0ffh,058h,058h,037h,031h,03dh,035h	; 4d30  I.CD1BD...XX71=5
-	defb 000h,000h,03fh,046h,035h,042h,0ffh	; 4d40
+	defb 000h,040h,030h,0feh,06ch,000h,043h,044h,031h,037h,035h,030h,0ffh	; 4c20  .@0.l.CD1750.
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_sin_usar_4C2D: rotulo para 0x4ACB que no lee nadie y cierra
+;   clavado: "STAGE   "; lo leen nadie (11 bytes)
+;   0x4c2d..0x4c38  (11 bytes)
+DATA_rotulo_sin_usar_4C2D:
+	defb 060h,038h,043h,044h,031h,037h,035h,000h,000h,000h,0ffh	; 4c2d  `8CD175....
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4C38: rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF
+;   acaba): "{02} / {03}{04} / {05}{06}{07}{08} / {09}{0A}{0B}{0C}{0D} /
+;   {0E}{0F}{01}{01}{10}{11}"; lo leen p00:4DAB, p00:4DCB (27 bytes)
+;   0x4c38..0x4c53  (27 bytes)
+DATA_rotulo_4C38:
+	defb 002h,0feh,0f8h,003h,004h,0feh,0f8h,005h,006h,007h,008h,0feh,000h,009h,00ah,00bh	; 4c38  ................
+	defb 00ch,00dh,0feh,0f8h,00eh,00fh,001h,001h,010h,011h,0ffh	; 4c48  ...........
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4C53: rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF
+;   acaba): "{2F}{2F} /
+;   {16}{17}{18}{15}{01}{01}{01}{01}{28}{2F}{2F}{12}{13}{14}{15} /
+;   {26}{23}{24}{25}{01}{01}{01}{01}{19}{1A}{1B}{22}{23}{24}{25} /
+;   {1C}{1D}{1E}{1F}{01}{01}{01}{01}{29}{2A}{2B}{1C}{1D}{1E}{1F} /
+;   {20}{21}{2C}{01}{01}{01}{01}{01}{2D}{2E}{27}{20}{21}{2C}"; lo leen
+;   p00:4DB4 (70 bytes)
+;   0x4c53..0x4c99  (70 bytes)
+DATA_rotulo_4C53:
+	defb 02fh,02fh,0feh,0b0h,016h,017h,018h,015h,001h,001h,001h,001h,028h,02fh,02fh,012h	; 4c53  //..........(//.
+	defb 013h,014h,015h,0feh,000h,026h,023h,024h,025h,001h,001h,001h,001h,019h,01ah,01bh	; 4c63  .....&#$%.......
+	defb 022h,023h,024h,025h,0feh,000h,01ch,01dh,01eh,01fh,001h,001h,001h,001h,029h,02ah	; 4c73  "#$%..........)*
+	defb 02bh,01ch,01dh,01eh,01fh,0feh,000h,020h,021h,02ch,001h,001h,001h,001h,001h,02dh	; 4c83  +...... !,.....-
+	defb 02eh,027h,020h,021h,02ch,0ffh	; 4c93
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4C99: rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF
+;   acaba):
+;   "{67}{12}{13}{14}{15}{16}{17}{18}{19}{1A}{1B}{1C}{1D}{1E}{1F}{20}{21} /
+;   {22}{23}{24}{25}{26}{27}{28}{29}{2A}{2B}{2C}{2D}{2E}{2F}-A /
+;   BCDEFGHIJKLMNOPQ /  / RSTUVWXWYZ{4B}{4C}{4D} /
+;   {52}{53}{54}{55}{56}{57}{60}{57}{60}{61}{5B}{5C}{5D}  {65}{65} /
+;   {4E}{4F}{50}{51}{58}{59}{5A}{59}{68}{69}{6A}{5E}{5F}{62}{63}{64}{63}{64}{66}";
+;   lo leen p00:4DC2 (111 bytes)
+;   0x4c99..0x4d08  (111 bytes)
+DATA_rotulo_4C99:
+	defb 067h,012h,013h,014h,015h,016h,017h,018h,019h,01ah,01bh,01ch,01dh,01eh,01fh,020h	; 4c99  g..............
+	defb 021h,0feh,008h,022h,023h,024h,025h,026h,027h,028h,029h,02ah,02bh,02ch,02dh,02eh	; 4ca9  !.."#$%&'()*+,-.
+	defb 02fh,030h,031h,0feh,000h,032h,033h,034h,035h,036h,037h,038h,039h,03ah,03bh,03ch	; 4cb9  /01..23456789:;<
+	defb 03dh,03eh,03fh,040h,041h,0feh,000h,0feh,0f8h,042h,043h,044h,045h,046h,047h,048h	; 4cc9  =>?@A....BCDEFGH
+	defb 047h,049h,04ah,04bh,04ch,04dh,0feh,000h,052h,053h,054h,055h,056h,057h,060h,057h	; 4cd9  GIJKLM..RSTUVW`W
+	defb 060h,061h,05bh,05ch,05dh,000h,000h,065h,065h,0feh,000h,04eh,04fh,050h,051h,058h	; 4ce9  `a[\]..ee..NOPQX
+	defb 059h,05ah,059h,068h,069h,06ah,05eh,05fh,062h,063h,064h,063h,064h,066h,0ffh	; 4cf9  YZYhij^_bcdcdf.
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4D08: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "{2A} KONAMI {21}{29}{28}{26} / PUSH SPACE KEY"; lo
+;   leen p00:4DD1 (33 bytes)
+;   0x4d08..0x4d29  (33 bytes)
+DATA_rotulo_4D08:
+	defb 048h,088h,02ah,000h,03bh,03fh,03eh,031h,03dh,039h,000h,021h,029h,028h,026h,0feh	; 4d08  H.*.;?>1=9.!)(&.
+	defb 048h,0a0h,040h,045h,043h,038h,000h,043h,040h,031h,033h,035h,000h,03bh,035h,049h	; 4d18  H.@EC8.C@135.;5I
+	defb 0ffh	; 4d28
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4D29: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "  PLAY START  "; lo leen p00:41DE, p00:41E1 (17
+;   bytes)
+;   0x4d29..0x4d3a  (17 bytes)
+DATA_rotulo_4D29:
+	defb 048h,0a0h,000h,000h,040h,03ch,031h,049h,000h,043h,044h,031h,042h,044h,000h,000h	; 4d29  H...@<1I.CD1BD..
+	defb 0ffh	; 4d39
+
+; ----------------------------------------------------------------------
+; DATOS rotulo_4D3A: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "GAME  OVER"; lo leen p00:42E9 (13 bytes)
+;   0x4d3a..0x4d47  (13 bytes)
+DATA_rotulo_4D3A:
+	defb 058h,058h,037h,031h,03dh,035h,000h,000h,03fh,046h,035h,042h,0ffh	; 4d3a  XX71=5..?F5B.
 
 ; ======================================================================
 ; CODIGO 0x4d47..0x4dd7  (144 bytes)
@@ -2064,8 +2180,11 @@ L_4DCE:
 	jp L_47C7		;4dd4
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4dd7..0x4ddb  (4 bytes)
-DATA_4DD7:
+; DATOS codigo_sin_llamar_4DD7: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un jr justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+;   0x4dd7..0x4ddb  (4 bytes)
+DATA_codigo_sin_llamar_4DD7:
 	defb 016h,001h,018h,002h	; 4dd7
 
 ; ======================================================================
@@ -2141,8 +2260,10 @@ L_4E46:
 	jr L_4E34		;4e5b
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4e5d..0x4e93  (54 bytes)
-DATA_4E5D:
+; DATOS pares_para_CF3A: 27 pares que p00:4E48 va dejando en 0xCF3A y 0xCF3B,
+;   uno cada vez (el indice lo sube el `inc (hl)` de p00:4E49)
+;   0x4e5d..0x4e93  (54 bytes)
+DATA_pares_para_CF3A:
 	defb 016h,000h,02bh,008h,007h,018h,017h,008h,008h,018h,055h,008h,004h,000h,010h,004h	; 4e5d  ..+.......U.....
 	defb 009h,000h,041h,021h,022h,029h,007h,039h,025h,029h,02ah,008h,004h,029h,04dh,008h	; 4e6d  ..A!").9%)*..)M.
 	defb 00fh,000h,01ah,004h,009h,014h,00fh,004h,007h,000h,05eh,008h,00eh,000h,014h,004h	; 4e7d  ..........^.....
@@ -2259,8 +2380,10 @@ L_4F6D:
 	ret			;4f7e
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x4f7f..0x4f83  (4 bytes)
-DATA_4F7F:
+; DATOS cuatro_pasos: los cuatro dibujos por los que pasa (ix+0x0B): p00:4F74
+;   los elige con los bits 2-3 de la cuenta de (ix+0x13)
+;   0x4f7f..0x4f83  (4 bytes)
+DATA_cuatro_pasos:
 	defb 098h,099h,09ah,099h	; 4f7f
 
 ; ======================================================================
@@ -2541,8 +2664,12 @@ L_5139:
 	ret			;5155
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5156..0x516a  (20 bytes)
-DATA_5156:
+; DATOS canal_en_reposo: los 20 bytes con los que se limpia un canal de
+;   sonido: p00:50C9, 50D1, 50D9, 5183, 521C y 52B8 los copian a 0xC01C,
+;   0xC030, 0xC044, 0xC058, 0xC080 y 0xC06C antes de arrancar una musica o un
+;   efecto
+;   0x5156..0x516a  (20 bytes)
+DATA_canal_en_reposo:
 	defb 000h,000h,001h,000h,000h,000h,000h,000h,000h,001h,000h,000h,000h,000h,001h,001h	; 5156  ................
 	defb 000h,000h,000h,000h	; 5166
 
@@ -3068,8 +3195,11 @@ L_5551:
 	ret			;556d
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x556e..0x558e  (32 bytes)
-DATA_556E:
+; DATOS dibujos_de_cinco_colores_en_ram: 16 punteros (4 x 4) a la RAM de
+;   0xE900 en adelante: los dibujos que p00:550D coloreo y que p00:5548 sube
+;   con 0x4A51
+;   0x556e..0x558e  (32 bytes)
+DATA_dibujos_de_cinco_colores_en_ram:
 	defb 000h,0e9h,000h,0e9h,000h,0e9h,000h,0e9h,000h,0e9h,000h,0e8h,020h,0e8h,040h,0e8h	; 556e  ............ .@.
 	defb 000h,0e9h,060h,0e8h,080h,0e8h,000h,0e9h,0a0h,0e8h,0c0h,0e8h,0e0h,0e8h,000h,0e9h	; 557e  ..`.............
 
@@ -3129,8 +3259,11 @@ DATA_tabla_55D7:
 	defb 072h,0a2h	; 55db
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x55dd..0x55ec  (15 bytes)
-DATA_55DD:
+; DATOS tres_volteos: tres ordenes de 0x473E, cinco bytes cada una ([origen en
+;   VRAM][cuantos][destino]): dan la vuelta a dibujos que ya estan en la VRAM
+;   (p00:55C0, 55C8 y 55CE)
+;   0x55dd..0x55ec  (15 bytes)
+DATA_tres_volteos:
 	defb 0c0h,0f8h,002h,080h,0f9h,000h,0f9h,002h,040h,0f9h,0c0h,0f8h,002h,000h,0f9h	; 55dd  ........@......
 
 ; ======================================================================
@@ -3249,8 +3382,11 @@ L_5678:
 	jp L_5336		;56cc
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x56cf..0x56e1  (18 bytes)
-DATA_56CF:
+; DATOS codigo_sin_llamar_56CF: instrucciones que no alcanza nadie:
+;   desensamblan enteras hasta un jp justo en el borde y su direccion no
+;   aparece como palabra en el cartucho; lo leen nadie (18 bytes)
+;   0x56cf..0x56e1  (18 bytes)
+DATA_codigo_sin_llamar_56CF:
 	defb 0cdh,062h,053h,011h,080h,0f8h,021h,093h,0ach,001h,080h,001h,0cdh,075h,046h,0c3h	; 56cf  .bS...!......uF.
 	defb 036h,053h	; 56df
 
@@ -3838,8 +3974,10 @@ L_5B00:
 	jr L_5AE2		;5b09
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5b0b..0x5b1b  (16 bytes)
-DATA_5B0B:
+; DATOS dieciseis_valores: 16 bytes que p00:5AEB (y p02:91A4) indexan con los
+;   bits 2-5 del byte que leen
+;   0x5b0b..0x5b1b  (16 bytes)
+DATA_dieciseis_valores:
 	defb 00eh,012h,003h,004h,00ah,016h,01eh,01dh,01bh,000h,000h,000h,000h,000h,000h,000h	; 5b0b  ................
 
 ; ======================================================================
@@ -4019,8 +4157,11 @@ L_5BEE:
 	ret			;5c03
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5c04..0x5c16  (18 bytes)
-DATA_5C04:
+; DATOS fila_de_cada_fase: 18 bytes, uno por fase (1-18): p00:5BE1 lo
+;   multiplica por 16 y lo usa de desplazamiento en el bufer de 0xE000; la
+;   fase 0 no pasa por aqui
+;   0x5c04..0x5c16  (18 bytes)
+DATA_fila_de_cada_fase:
 	defb 000h,018h,030h,000h,018h,030h,000h,018h,030h,000h,018h,030h,000h,018h,030h,000h	; 5c04  ..0..0..0..0..0.
 	defb 018h,030h	; 5c14
 
@@ -4154,8 +4295,10 @@ L_5CE7:
 	ret			;5ce8
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5ce9..0x5cef  (6 bytes)
-DATA_5CE9:
+; DATOS firma_de_otro_cartucho: seis bytes que p00:5CCC compara, con RDSLT,
+;   con los de 0x7FFA de otra ranura: asi sabe si hay otro cartucho puesto
+;   0x5ce9..0x5cef  (6 bytes)
+DATA_firma_de_otro_cartucho:
 	defb 000h,030h,031h,013h,035h,0aah	; 5ce9
 
 ; ======================================================================
@@ -4187,8 +4330,11 @@ L_5D0E:
 	jp L_48DC		;5d13
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5d16..0x5d61  (75 bytes)
-DATA_5D16:
+; DATOS rotulo_5D16: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "---MENU--- / {4F} / START GAME / MODIFY STAGE
+;   NUMBER / MODIFY PLAYER NUMBER"; lo leen p00:5CFA (75 bytes)
+;   0x5d16..0x5d61  (75 bytes)
+DATA_rotulo_5D16:
 	defb 058h,0a0h,030h,030h,030h,03dh,035h,03eh,045h,030h,030h,030h,0feh,028h,0b0h,04fh	; 5d16  X.000=5>E000.(.O
 	defb 0feh,030h,0b0h,043h,044h,031h,042h,044h,000h,037h,031h,03dh,035h,0feh,030h,0b8h	; 5d26  .0.CD1BD.71=5.0.
 	defb 03dh,03fh,034h,039h,036h,049h,000h,043h,044h,031h,037h,035h,000h,03eh,045h,03dh	; 5d36  =?496I.CD175.>E=
@@ -4210,8 +4356,10 @@ L_5D6D:
 	jp L_4578		;5d6f
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5d72..0x5d82  (16 bytes)
-DATA_5D72:
+; DATOS rotulo_5D72: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "STAGE NUMBER{2F}"; lo leen p00:5D64 (16 bytes)
+;   0x5d72..0x5d82  (16 bytes)
+DATA_rotulo_5D72:
 	defb 048h,0b8h,043h,044h,031h,037h,035h,000h,03eh,045h,03dh,032h,035h,042h,02fh,0ffh	; 5d72  H.CD175.>E=25B/.
 
 ; ======================================================================
@@ -4232,8 +4380,10 @@ L_5D90:
 	jp L_4ACB		;5d95
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5d98..0x5da9  (17 bytes)
-DATA_5D98:
+; DATOS rotulo_5D98: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
+;   posicion, 0xFF acaba): "PLAYER NUMBER{2F}"; lo leen p00:5D85 (17 bytes)
+;   0x5d98..0x5da9  (17 bytes)
+DATA_rotulo_5D98:
 	defb 048h,0b8h,040h,03ch,031h,049h,035h,042h,000h,03eh,045h,03dh,032h,035h,042h,02fh	; 5d98  H.@<1I5B.>E=25B/
 	defb 0ffh	; 5da8
 
@@ -4366,8 +4516,11 @@ L_5E60:
 	ret			;5e69
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5e6a..0x5e7d  (19 bytes)
-DATA_5E6A:
+; DATOS bloque_de_cada_fase: 19 bytes, uno por fase: el bloque de tres fases
+;   al que pertenece (0,0,0,0,1,1,1,2...), que p00:5E4B pone en 0xD002 cuando
+;   el Game Master elige la fase
+;   0x5e6a..0x5e7d  (19 bytes)
+DATA_bloque_de_cada_fase:
 	defb 000h,000h,000h,000h,001h,001h,001h,002h,002h,002h,003h,003h,003h,004h,004h,004h	; 5e6a  ................
 	defb 005h,005h,005h	; 5e7a
 
@@ -4416,8 +4569,10 @@ L_5EA8:
 	jp L_4AE7		;5eb2
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5eb5..0x5eb8  (3 bytes)
-DATA_5EB5:
+; DATOS tres_columnas: tres columnas en las que p00:5EA8 pinta, en la fila
+;   0x28, los digitos del menu del Game Master
+;   0x5eb5..0x5eb8  (3 bytes)
+DATA_tres_columnas:
 	defb 0b0h,0b8h,0c0h	; 5eb5
 
 ; ======================================================================
@@ -4577,9 +4732,34 @@ L_5F77:
 	call L_406B		;5fc9
 
 ; ----------------------------------------------------------------------
-; DATOS sin identificar  0x5fcc..0x6000  (52 bytes)
-DATA_5FCC:
-	defb 034h,0a9h,0e0h,0a2h,0e0h,0a2h,0cah,0b0h,05ch,0a8h,073h,0a5h,061h,0b0h,0fbh,0a4h	; 5fcc  4.......\.s.a...
-	defb 04ah,0afh,022h,0a2h,044h,0b3h,070h,0a6h,012h,0b2h,0cdh,0aah,093h,0b1h,0deh,0adh	; 5fdc  J.".D.p.........
-	defb 022h,0abh,050h,0beh,026h,0bdh,07ch,0b8h,04fh,0bah,054h,0bch,040h,06ah,0ddh,0bah	; 5fec  ".P.&.|.O.T.@j..
-	defb 0d2h,0b4h,0d2h,0b4h	; 5ffc
+; DATOS tabla_5FCC: 46 destinos del despachador de 0x406B (call en p00:5FC9):
+;   0xA934, 0xA2E0, 0xA2E0, 0xB0CA, 0xA85C, 0xA573, 0xB061, 0xA4FB ...; lo
+;   leen p00:5FC9 (52 bytes)
+;   0x5fcc..0x6000  (52 bytes)
+DATA_tabla_5FCC:
+	defb 034h,0a9h	; 5fcc
+	defb 0e0h,0a2h	; 5fce
+	defb 0e0h,0a2h	; 5fd0
+	defb 0cah,0b0h	; 5fd2
+	defb 05ch,0a8h	; 5fd4
+	defb 073h,0a5h	; 5fd6
+	defb 061h,0b0h	; 5fd8
+	defb 0fbh,0a4h	; 5fda
+	defb 04ah,0afh	; 5fdc
+	defb 022h,0a2h	; 5fde
+	defb 044h,0b3h	; 5fe0
+	defb 070h,0a6h	; 5fe2
+	defb 012h,0b2h	; 5fe4
+	defb 0cdh,0aah	; 5fe6
+	defb 093h,0b1h	; 5fe8
+	defb 0deh,0adh	; 5fea
+	defb 022h,0abh	; 5fec
+	defb 050h,0beh	; 5fee
+	defb 026h,0bdh	; 5ff0
+	defb 07ch,0b8h	; 5ff2
+	defb 04fh,0bah	; 5ff4
+	defb 054h,0bch	; 5ff6
+	defb 040h,06ah	; 5ff8
+	defb 0ddh,0bah	; 5ffa
+	defb 0d2h,0b4h	; 5ffc
+	defb 0d2h,0b4h	; 5ffe

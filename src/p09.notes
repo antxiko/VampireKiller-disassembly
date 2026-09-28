@@ -63,6 +63,8 @@ D 0x9DE0 0x9E0B guion_9DE0  guion de carga de la VRAM que interpreta 0x4714 (0xF
 F 0x9DE0 16
 D 0x9E0B 0x9E26 guion_9E0B  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (27 bytes)
 F 0x9E0B 16
+D 0x9E26 0x9E62 guion_sin_usar_9E26  guion de carga de 0x4714 que no lee nadie y cierra clavado (lo que manda leer son rle que si usan otros guiones); se solapan 2 bloques (0x9E26-0x9E62, 0x9E41-0x9E62); lo leen nadie (60 bytes)
+F 0x9E26 16
 D 0x9E62 0x9E83 guion_9E62  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (33 bytes)
 F 0x9E62 16
 D 0x9E83 0x9EA4 guion_9E83  guion de carga de la VRAM que interpreta 0x4714 (0xFF acaba); lo leen p00:57A5 (habitacion) (33 bytes)

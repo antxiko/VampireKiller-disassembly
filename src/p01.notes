@@ -1,6 +1,84 @@
 # Notas del banco 01: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
+D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
+F 0x6058 16
+D 0x6086 0x60E2 colores_de_cada_tipo  46 punteros, uno por tipo (1-46), a la lista de colores de sus sprites: p00:5FB2 llama a 0x6029 con DE = 0x6084, que copia un color por sprite a (ix+0x25), (ix+0x2A)...; el ultimo byte, 0x60E1, es a la vez la entrada 0 (sin usar) de la tabla siguiente
+F 0x6086 16
+D 0x60E2 0x6110 un_byte_de_cada_tipo  46 bytes, uno por tipo (1-46), que p00:5FB8 pone en (ix+0x0D)
+F 0x60E2 16
+D 0x6110 0x6154 listas_de_colores  las listas de colores de sprite a las que apuntan los punteros de 0x6086: un byte por sprite
+F 0x6110 16
+D 0x628F 0x62D0 logotipo  como se monta el logotipo del titulo: numeros de dibujo que p01:626F coloca de izquierda a derecha; 0xFE [dx] baja una fila y corre dx, 0xFF acaba (p01:6227, con DE = 0x4040)
+F 0x628F 16
+D 0x636F 0x6382 habitacion_especial_de_cada_fase  19 bytes, uno por fase: la habitacion (nibble alto) en la que p01:6343 pone el nibble bajo en 0xCE00 al entrar; si vale 6, llama ademas a 0x59EC
+F 0x636F 16
+D 0x641F 0x6445 salida_de_simon  19 pares, uno por fase: donde aparece Simon; p01:6402 pone el primero (sin el bit 0) en 0xC425, el segundo en 0xC427, y el bit 0 en 0xC42C (hacia donde mira)
+F 0x641F 16
+D 0x64CD 0x64E5 posiciones_fijas  las posiciones [dy][dx] que usan las composiciones 0x80, 0x81 y 0x82 de la tabla de sprites (p01:64A4, 649E y 6498: 0x64CD, 0x64D5 y 0x64D9)
+F 0x64CD 16
+D 0x67FD 0x6810 destello  19 valores que p01:67EF va poniendo, uno por cuadro, en el color 6 de la paleta (0x4814 con E = 5): la cuenta de 0xCE39 vuelve a cero al llegar a 19
+F 0x67FD 16
+D 0x69E4 0x69FC seis_pares_de_velocidades  seis entradas de dos palabras que p01:69D1 recorre con la cuenta de 0xCE12 y pasa a 0xA55D y 0xA56C
+F 0x69E4 16
+D 0x6A8C 0x6A9C ocho_palabras  ocho palabras que p01:6A7A elige con los tres bits bajos de lo que lee
+F 0x6A8C 16
+D 0x6D94 0x6DA9 curva_del_salto  la curva del salto de Simon: 21 desplazamientos verticales por cuadro (negativos subiendo, positivos cayendo); p01:6CEC entra en 0x6D95 o 0x6D94 (un paso antes) con D = 19 o 21 pasos
+F 0x6D94 16
+D 0x6F81 0x6F85 cuatro_ajustes  cuatro valores que p01:6F5C suma a 0xC425 segun el indice
+F 0x6F81 16
+D 0x707D 0x7093 curva_de_caida  22 desplazamientos por cuadro de otra curva (p01:6FD7 con D = 21, y p01:73E1 indexada por (ix+7))
+F 0x707D 16
+D 0x7777 0x778A una_bandera_por_fase  19 bytes, uno por fase, que miran p01:7759 y p01:795C: 1 en las fases 3, 6, 9, 10, 12, 15, 17 y 18
+F 0x7777 16
+D 0x7972 0x7985 musica_de_cada_fase  19 bytes, uno por fase: la musica que suena (p01:7968 lo pasa a 0x509F): 0x80 en el patio y el bloque 1, 0x81 en el 2 y en las fases 11-12, 0x82 en el 3, 0x84 en el 5, 0x83 en las fases 16-17 y 0x85 en la 10 y la 18
+F 0x7972 16
+D 0x7985 0x79D5 poses_de_simon_arriba  40 punteros, uno por pose (0xC42E), a la lista de sprites de la parte de arriba de Simon (p01:785C)
+F 0x7985 16
+D 0x79D5 0x7A1D poses_de_simon_abajo  36 punteros, uno por pose (0xC42F), a la lista de sprites de la parte de abajo (p01:787E)
+F 0x79D5 16
+D 0x7A1D 0x7ACF sprites_de_las_poses  las listas de sprites de las poses de Simon: [cuantos] y, por sprite, lo que p01:7899 suma a su posicion
+F 0x7A1D 16
+D 0x7B52 0x7B68 once_pares  once pares que p01:7AF2 copia a la tabla de atributos de sprites de 0xD600, con el patron subiendo de 4 en 4 desde 0xFC
+F 0x7B52 16
+D 0x7C78 0x7C8B un_valor_por_fase  19 bytes, uno por fase, que lee p01:7C69 (2 en el patio, 4 casi siempre, 9 en las fases 10-12 y 16-17, 8 en la 18)
+F 0x7C78 16
+D 0x7E59 0x7E67 dos_tablas_de_siete  dos tablas de siete bytes que p01:7E2C (o 7E39, segun 0xC416) indexa con el tipo de (ix+0) menos 0x11
+F 0x7E59 16
+D 0x7237 0x7238 xor_a_suelto  un 0xAF (`xor a`) al que no llega ningun camino: el codigo de al lado entra en 0x7238, que ya es la instruccion siguiente
+F 0x7237 16
+D 0x7FFE 0x8000 medio_ld  los dos primeros bytes de `ld (0xC433),a` (32 33), partido entre el banco 1 y el 2: el 0xC4 es el primer byte del banco 2, que va detras en 0x8000. Un listado por banco no puede escribir una instruccion a caballo (tools/bancos.py, `partidas`)
+F 0x7FFE 16
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x6000 0x6028 tabla_5FCC_cola  46 destinos del despachador de 0x406B (call en p00:5FC9): 0xA934, 0xA2E0, 0xA2E0, 0xB0CA, 0xA85C, 0xA573, 0xB061, 0xA4FB ... (sigue del banco anterior, 0x5FCC); lo leen p00:5FC9 (40 bytes)
+F 0x6000 2
 D 0x623C 0x624C paleta_623C  cambios de paleta ([color][RB][G], 0xFF acaba) que escribe 0x483E en el registro 16 del V9938 y en la copia de 0xF680; lo leen p01:620B (16 bytes)
 F 0x623C 3
+D 0x65B6 0x65CC tabla_65B6  11 destinos del despachador de 0x406B (call en p01:65B3): 0x65CC, 0x65DE, 0x65F3, 0x6602, 0x6619, 0x663E, 0x6655, 0x6677 ...; lo leen p01:65B3 (22 bytes)
+F 0x65B6 2
+D 0x66C1 0x66C9 tabla_66C1  4 destinos del despachador de 0x406B (call en p01:66BE): 0x66C9, 0x66D6, 0x66E0, 0x66F1; lo leen p01:66BE (8 bytes)
+F 0x66C1 2
+D 0x678E 0x67E4 renglones_del_final  43 punteros a los renglones del texto del final y de los creditos (bancos 5 y 8); lo leen p01:675A (86 bytes)
+F 0x678E 2
+D 0x6874 0x687C tabla_6874  4 destinos del despachador de 0x406B (call en p01:6871): 0x687C, 0x6886, 0x687C, 0x6895; lo leen p01:6871 (8 bytes)
+F 0x6874 2
+D 0x6AAD 0x6AB7 tabla_6AAD  5 destinos del despachador de 0x406B (call en p01:6AAA): 0x6AB7, 0x6AC7, 0x6ADF, 0x6AEB, 0x6AF9; lo leen p01:6AAA (10 bytes)
+F 0x6AAD 2
+D 0x6B42 0x6B52 tabla_6B42  8 destinos del despachador de 0x406B (call en p01:6B3F): 0x6B52, 0x6CC0, 0x6DA9, 0x6DDD, 0x6F3D, 0x6F85, 0x7093, 0x70FB; lo leen p01:6B3F (16 bytes)
+F 0x6B42 2
+D 0x6CC6 0x6CCE tabla_6CC6  4 destinos del despachador de 0x406B (call en p01:6CC3): 0x6CCE, 0x6CE7, 0x6D61, 0x6D67; lo leen p01:6CC3 (8 bytes)
+F 0x6CC6 2
+D 0x6F8B 0x6F93 tabla_6F8B  4 destinos del despachador de 0x406B (call en p01:6F88): 0x6F93, 0x6FD4, 0x7017, 0x701D; lo leen p01:6F88 (8 bytes)
+F 0x6F8B 2
+D 0x71F2 0x71FA tabla_71F2  4 destinos del despachador de 0x406B (call en p01:71EF): 0x71FA, 0x7240, 0x7250, 0x7262; lo leen p01:71EF (8 bytes)
+F 0x71F2 2
+D 0x72D6 0x72DE tabla_72D6  4 destinos del despachador de 0x406B (call en p01:72D3): 0x7436, 0x7473, 0x72DE, 0x73A4; lo leen p01:72D3 (8 bytes)
+F 0x72D6 2
+D 0x72FF 0x7307 tabla_72FF  4 destinos del despachador de 0x406B (call en p01:72FC): 0x7307, 0x733D, 0x7373, 0x739D; lo leen p01:72FC (8 bytes)
+F 0x72FF 2
+D 0x749D 0x74A5 tabla_749D  4 destinos del despachador de 0x406B (call en p01:749A): 0x7307, 0x733D, 0x7373, 0x739D; lo leen p01:749A (8 bytes)
+F 0x749D 2
+D 0x771E 0x772A tabla_771E  6 destinos del despachador de 0x406B (call en p01:771B): 0x7805, 0x772A, 0x7805, 0x778A, 0x772A, 0x778A; lo leen p01:771B (12 bytes)
+F 0x771E 2
 # --- fin de los bloques de bloques.py ---

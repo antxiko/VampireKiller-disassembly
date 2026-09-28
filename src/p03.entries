@@ -26,7 +26,9 @@
 0xA4FB   # p00:5FC9 entrada 7 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA51B   # p02:993F entrada 7 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xA549   # p02:9EC1 jp
+0xA55D   # p01:69D7 call
 0xA564   # p02:9EE0 call
+0xA56C   # p01:69DE call
 0xA573   # p00:5FC9 entrada 5 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0xA592   # p02:993F entrada 5 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0xA670   # p00:5FC9 entrada 11 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)

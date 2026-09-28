@@ -31,3 +31,4 @@ p02 0x8BCC 1 2 3  # a mano: tabla de p02:8A8D, entrada 4
 p03 0xA9C7 1 2 3  # a mano: p03:A9B7 ld hl,0xA9C7 / push hl, vuelta de los estados de 0x406B
 p00 0x4391 1 2 3  # a mano: p00:415A ld hl,0x4391 / push hl antes de despachar la maquina de estados: los estados 0-2 vuelven ahi
 p03 0xAB60 1 2 3  # a mano: p03:AB42 ld hl,0xAB60 / push hl antes de despachar por (ix+1)
+p02 0x8A99 1 2 3  # a mano: tabla de p02:8A8D, entrada 0 (y 5): el despachador de p02:8A80

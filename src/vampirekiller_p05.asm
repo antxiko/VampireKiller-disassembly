@@ -11,10 +11,10 @@
 
 ; ----------------------------------------------------------------------
 ; DATOS dibujos_7220_cola: 191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del
-;   decorado (sigue del banco anterior, 0x7220); se solapan 4 bloques
-;   (0x8000-0x8A00, 0x8493-0x9C73, 0x95B3-0xA000, 0x9E73-0xA000); lo leen fase
-;   1, fase 10, fase 11, fase 12, fase 2, fase 3, fase 4, fase 5 y 4 mas (8192
-;   bytes)
+;   decorado (sigue del banco anterior, 0x7220); se solapan 39 bloques
+;   (0x8000-0x8A00, 0x82C0-0x82D6, 0x82D6-0x82DE, 0x82DE-0x82EE,
+;   0x82EE-0x82F9, 0x82F9-0x8306); lo leen fase 1, fase 10, fase 11, fase 12,
+;   fase 2, fase 3, fase 4, fase 5 y 5 mas (8192 bytes)
 ;   0x8000..0xa000  (8192 bytes)
 DATA_dibujos_7220_cola:
 	defb 0aah,0aah,0a2h,022h,09ah,0aah,0aah,0a2h,099h,0aah,0aah,0aah,099h,099h,09ah,0aah,099h,099h,099h,099h,0a9h,099h,099h,099h,0aah,0a9h,099h,099h,0aah,0aah,0a9h,099h	; 8000  ..."............................

@@ -19,8 +19,12 @@ D 0xA02F 0xA036 paleta_A02F  cambios de paleta ([color][RB][G], 0xFF acaba) que 
 F 0xA02F 3
 D 0xA036 0xA03D paleta_A036  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
 F 0xA036 3
+D 0xA03D 0xA04A paleta_sin_usar_A03D  cambios de paleta ([color][RB][G], 0xFF acaba) entre los que si se usan, pero que no nombra ninguna habitacion; lo leen nadie (13 bytes)
+F 0xA03D 3
 D 0xA04A 0xA04B paleta_A04A  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (1 bytes)
 F 0xA04A 3
+D 0xA04B 0xA052 paleta_sin_usar_A04B  cambios de paleta ([color][RB][G], 0xFF acaba) entre los que si se usan, pero que no nombra ninguna habitacion; lo leen nadie (7 bytes)
+F 0xA04B 3
 D 0xA052 0xA059 paleta_A052  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (7 bytes)
 F 0xA052 3
 D 0xA059 0xA066 paleta_A059  cambios de paleta ([color][RB][G], 0xFF acaba) que pone 0x483E al entrar en la habitacion; lo leen p00:57AE (13 bytes)
@@ -87,6 +91,8 @@ D 0xB3E8 0xB4A3 rle_B3E8  rle a la VRAM 0xFA00, mandado por el guion de 0x9D38; 
 F 0xB3E8 16
 D 0xB4A3 0xB50B rle_B4A3  rle a la VRAM 0xFC00, mandado por el guion de 0x9E62; lo leen guion 0x9E62, guion 0x9EDB, guion 0x9FB2 (104 bytes)
 F 0xB4A3 16
+D 0xB50B 0xB54B rle_sin_usar_B50B  rle con el destino delante (0xFEC0) que no lee nadie y cierra clavado; lo leen nadie (64 bytes)
+F 0xB50B 16
 D 0xB54B 0xB62D rle_B54B  rle a la VRAM 0xFA00, mandado por el guion de 0x9D64; lo leen guion 0x9D64, guion 0x9DB5, guion 0x9EBA (226 bytes)
 F 0xB54B 16
 D 0xB62D 0xB6D8 rle_B62D  rle a la VRAM 0xFA00, mandado por el guion de 0x9E83; lo leen guion 0x9E83 (171 bytes)

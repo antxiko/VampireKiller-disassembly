@@ -1,6 +1,72 @@
 # Notas del banco 00: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
+# --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
+D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
+F 0x44E9 16
+D 0x4B95 0x4B9D registros_del_vdp  cuatro pares [registro][valor] que p00:4B7F escribe con WRTVDP: R1 = 0x62, R5 = 0xEF, R6 = 0x1F y R11 = 0x01 (la pantalla y las tablas de sprites)
+F 0x4B95 16
+D 0x4E5D 0x4E93 pares_para_CF3A  27 pares que p00:4E48 va dejando en 0xCF3A y 0xCF3B, uno cada vez (el indice lo sube el `inc (hl)` de p00:4E49)
+F 0x4E5D 16
+D 0x4F7F 0x4F83 cuatro_pasos  los cuatro dibujos por los que pasa (ix+0x0B): p00:4F74 los elige con los bits 2-3 de la cuenta de (ix+0x13)
+F 0x4F7F 16
+D 0x5156 0x516A canal_en_reposo  los 20 bytes con los que se limpia un canal de sonido: p00:50C9, 50D1, 50D9, 5183, 521C y 52B8 los copian a 0xC01C, 0xC030, 0xC044, 0xC058, 0xC080 y 0xC06C antes de arrancar una musica o un efecto
+F 0x5156 16
+D 0x556E 0x558E dibujos_de_cinco_colores_en_ram  16 punteros (4 x 4) a la RAM de 0xE900 en adelante: los dibujos que p00:550D coloreo y que p00:5548 sube con 0x4A51
+F 0x556E 16
+D 0x55DD 0x55EC tres_volteos  tres ordenes de 0x473E, cinco bytes cada una ([origen en VRAM][cuantos][destino]): dan la vuelta a dibujos que ya estan en la VRAM (p00:55C0, 55C8 y 55CE)
+F 0x55DD 16
+D 0x5B0B 0x5B1B dieciseis_valores  16 bytes que p00:5AEB (y p02:91A4) indexan con los bits 2-5 del byte que leen
+F 0x5B0B 16
+D 0x5C04 0x5C16 fila_de_cada_fase  18 bytes, uno por fase (1-18): p00:5BE1 lo multiplica por 16 y lo usa de desplazamiento en el bufer de 0xE000; la fase 0 no pasa por aqui
+F 0x5C04 16
+D 0x5CE9 0x5CEF firma_de_otro_cartucho  seis bytes que p00:5CCC compara, con RDSLT, con los de 0x7FFA de otra ranura: asi sabe si hay otro cartucho puesto
+F 0x5CE9 16
+D 0x5E6A 0x5E7D bloque_de_cada_fase  19 bytes, uno por fase: el bloque de tres fases al que pertenece (0,0,0,0,1,1,1,2...), que p00:5E4B pone en 0xD002 cuando el Game Master elige la fase
+F 0x5E6A 16
+D 0x5EB5 0x5EB8 tres_columnas  tres columnas en las que p00:5EA8 pinta, en la fila 0x28, los digitos del menu del Game Master
+F 0x5EB5 16
+D 0x4618 0x462B codigo_sin_llamar_4618  instrucciones a las que no llega nadie (`ld hl,0xC418 / ld a,(hl) / add a,b / cp 0x81 ... jp 0x45B3`); la palabra 0x4618 solo aparece en p03:A31E, y ahi es parte de `bit 0,(ix+0x18)` (DD CB 18 46)
+F 0x4618 16
+D 0x4B00 0x4B0B codigo_sin_llamar_4B00  un bucle al que no llega nadie (`push af / call 0x4AE7 / call 0x4B4F / pop af / djnz / ret`); la palabra 0x4B00 solo aparece dentro de los dibujos de los bancos 4, 5 y 9
+F 0x4B00 16
+
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
+D 0x4000 0x4010 cabecera_ab  la cabecera del cartucho: 'AB', INIT (0x4075) y STATEMENT, DEVICE y TEXT a cero; lo leen la BIOS (16 bytes)
+F 0x4000 16
+D 0x4010 0x4028 cabecera_de_konami  la cabecera de Konami que empieza por 'CD' y lee el Game Master; lo leen el Game Master (24 bytes)
+F 0x4010 8
+D 0x4161 0x417D tabla_4161  14 destinos del despachador de 0x406B (call en p00:415E): 0x417D, 0x41A0, 0x41AB, 0x41D1, 0x422C, 0x4257, 0x4294, 0x42B2 ...; lo leen p00:415E (28 bytes)
+F 0x4161 2
+D 0x4300 0x4314 rotulo_4300  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "F{25} / {4F} / CONTINUE"; lo leen p00:42F5 (20 bytes)
+F 0x4300 16
+D 0x4369 0x4370 codigo_sin_llamar_4369  instrucciones que no alcanza nadie: desensamblan enteras hasta un ret justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (7 bytes)
+F 0x4369 16
+D 0x44B0 0x44B8 rotulo_44B0  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "PAUSE"; lo leen p00:44AD (8 bytes)
+F 0x44B0 16
+D 0x464D 0x4651 codigo_sin_llamar_464D  instrucciones que no alcanza nadie: desensamblan enteras hasta un jr justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+F 0x464D 16
+D 0x4656 0x465A codigo_sin_llamar_4656  instrucciones que no alcanza nadie: desensamblan enteras hasta un jr justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+F 0x4656 16
+D 0x46A1 0x46AF codigo_sin_llamar_46A1  instrucciones que no alcanza nadie: desensamblan enteras hasta un ret justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (14 bytes)
+F 0x46A1 16
+D 0x4C00 0x4C2D rotulo_4C00  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "SCORE- / PLAYER / ENEMY / {50}- / P- / STAGE-"; lo leen p00:4516 (45 bytes)
+F 0x4C00 16
+D 0x4C2D 0x4C38 rotulo_sin_usar_4C2D  rotulo para 0x4ACB que no lee nadie y cierra clavado: "STAGE   "; lo leen nadie (11 bytes)
+F 0x4C2D 16
+D 0x4C38 0x4C53 rotulo_4C38  rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF acaba): "{02} / {03}{04} / {05}{06}{07}{08} / {09}{0A}{0B}{0C}{0D} / {0E}{0F}{01}{01}{10}{11}"; lo leen p00:4DAB, p00:4DCB (27 bytes)
+F 0x4C38 16
+D 0x4C53 0x4C99 rotulo_4C53  rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF acaba): "{2F}{2F} / {16}{17}{18}{15}{01}{01}{01}{01}{28}{2F}{2F}{12}{13}{14}{15} / {26}{23}{24}{25}{01}{01}{01}{01}{19}{1A}{1B}{22}{23}{24}{25} / {1C}{1D}{1E}{1F}{01}{01}{01}{01}{29}{2A}{2B}{1C}{1D}{1E}{1F} / {20}{21}{2C}{01}{01}{01}{01}{01}{2D}{2E}{27}{20}{21}{2C}"; lo leen p00:4DB4 (70 bytes)
+F 0x4C53 16
+D 0x4C99 0x4D08 rotulo_4C99  rotulo para p01:7B32 (0xFE [dx] baja una fila, 0xFF acaba): "{67}{12}{13}{14}{15}{16}{17}{18}{19}{1A}{1B}{1C}{1D}{1E}{1F}{20}{21} / {22}{23}{24}{25}{26}{27}{28}{29}{2A}{2B}{2C}{2D}{2E}{2F}-A / BCDEFGHIJKLMNOPQ /  / RSTUVWXWYZ{4B}{4C}{4D} / {52}{53}{54}{55}{56}{57}{60}{57}{60}{61}{5B}{5C}{5D}  {65}{65} / {4E}{4F}{50}{51}{58}{59}{5A}{59}{68}{69}{6A}{5E}{5F}{62}{63}{64}{63}{64}{66}"; lo leen p00:4DC2 (111 bytes)
+F 0x4C99 16
+D 0x4D08 0x4D29 rotulo_4D08  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "{2A} KONAMI {21}{29}{28}{26} / PUSH SPACE KEY"; lo leen p00:4DD1 (33 bytes)
+F 0x4D08 16
+D 0x4D29 0x4D3A rotulo_4D29  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "  PLAY START  "; lo leen p00:41DE, p00:41E1 (17 bytes)
+F 0x4D29 16
+D 0x4D3A 0x4D47 rotulo_4D3A  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "GAME  OVER"; lo leen p00:42E9 (13 bytes)
+F 0x4D3A 16
+D 0x4DD7 0x4DDB codigo_sin_llamar_4DD7  instrucciones que no alcanza nadie: desensamblan enteras hasta un jr justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (4 bytes)
+F 0x4DD7 16
 D 0x5421 0x542D tabla_5421  6 punteros a dibujos de 8x8 que pinta p00:5412 por HMMC; lo leen p00:5402 (12 bytes)
 F 0x5421 2
 D 0x542D 0x544D hmmc_542D  8x8 puntos a 4 bits (32 bytes) para la orden HMMC de 0x498A; lo leen p00:5412 (32 bytes)
@@ -13,6 +79,16 @@ D 0x558E 0x5593 cinco_colores  los cinco colores con los que p00:5524 pinta el d
 F 0x558E 5
 D 0x55D7 0x55DD tabla_55D7  3 punteros a rle que lee p00:55AE; lo leen p00:55AE (6 bytes)
 F 0x55D7 2
+D 0x56CF 0x56E1 codigo_sin_llamar_56CF  instrucciones que no alcanza nadie: desensamblan enteras hasta un jp justo en el borde y su direccion no aparece como palabra en el cartucho; lo leen nadie (18 bytes)
+F 0x56CF 16
 D 0x5742 0x5768 dibujos_de_cada_fase  19 punteros, uno por fase (0 el patio, 1-18): de donde salen los 191 dibujos de 8x8 de su decorado; los lee p00:565B con la fase de 0xD000; lo leen p00:565B (38 bytes)
 F 0x5742 16
+D 0x5D16 0x5D61 rotulo_5D16  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "---MENU--- / {4F} / START GAME / MODIFY STAGE NUMBER / MODIFY PLAYER NUMBER"; lo leen p00:5CFA (75 bytes)
+F 0x5D16 16
+D 0x5D72 0x5D82 rotulo_5D72  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "STAGE NUMBER{2F}"; lo leen p00:5D64 (16 bytes)
+F 0x5D72 16
+D 0x5D98 0x5DA9 rotulo_5D98  rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra posicion, 0xFF acaba): "PLAYER NUMBER{2F}"; lo leen p00:5D85 (17 bytes)
+F 0x5D98 16
+D 0x5FCC 0x6000 tabla_5FCC  46 destinos del despachador de 0x406B (call en p00:5FC9): 0xA934, 0xA2E0, 0xA2E0, 0xB0CA, 0xA85C, 0xA573, 0xB061, 0xA4FB ...; lo leen p00:5FC9 (52 bytes)
+F 0x5FCC 2
 # --- fin de los bloques de bloques.py ---

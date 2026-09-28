@@ -67,6 +67,7 @@
 0x8671   # p01:6310 call
 0x88D8   # p00:5C7A call
 0x8A4A   # p00:5C77 call
+0x8A99   # a mano: tabla de p02:8A8D, entrada 0 (y 5): el despachador de p02:8A80
 0x8AF8   # a mano: tabla de p02:8A8D, entrada 1 (despachador de p02:8A80: push de / ret)
 0x8B70   # a mano: tabla de p02:8A8D, entrada 2
 0x8BA2   # a mano: tabla de p02:8A8D, entrada 3
@@ -119,9 +120,10 @@
 0x9918   # p00:5C86 call
 0x999E   # p02:993F entrada 28 de la tabla de 0x9942 (call 0x406B en 0x993F)
 0x999F   # p01:7356 jp
+0x99F6   # p03:B1C0 jp
 0x9A1A   # p01:782B call cc
 0x9A3A   # p01:7813 call cc
-0x9B60   # p03:A031 entrada 11 de la tabla de 0xA034 (call 0x406B en 0xA031)
+0x9B60   # p00:5FC9 entrada 29 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x9B71   # p02:9E5C entrada 11 de la tabla de 0x9E5F (call 0x406B en 0x9E5C)
 0x9B9B   # p00:5FC9 entrada 35 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)
 0x9BC4   # p00:5FC9 entrada 37 de la tabla de 0x5FCC (call 0x406B en 0x5FC9)

@@ -1,12 +1,26 @@
 # Notas del banco 08: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- BLOQUES QUE LEE EL CODIGO (seccion que reescribe tools/bloques.py; no editar a mano) ---
-D 0xA000 0xBD80 dibujos_9640_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x9640); se solapan 5 bloques (0xA000-0xAE20, 0xA4C0-0xBCA0, 0xAC80-0xAEA0, 0xAEA0-0xB260, 0xB260-0xBD80); lo leen fase 16, fase 17, fase 18, p00:5A06, p00:5A15, p00:5A28 (7552 bytes)
+D 0xA000 0xBD80 dibujos_9640_cola  191 dibujos de 8x8 a 4 bits (32 bytes cada uno) del decorado (sigue del banco anterior, 0x9640); se solapan 5 bloques (0xA000-0xAE20, 0xA4C0-0xB473, 0xAC80-0xAEA0, 0xAEA0-0xB260, 0xB260-0xBD80); lo leen fase 16, fase 17, fase 18, p00:5A06, p00:5A15, p00:5A28 (7552 bytes)
 F 0xA000 32
 D 0xBD80 0xBF00 letras_BD80  48 caracteres de 8x8 a 1 bit (8 bytes cada uno) que 0x4AA5 pinta de color al subirlos; se solapan 2 bloques (0xBD80-0xBF00, 0xBED8-0xBEE0); lo leen p00:53C1, p00:53CD (384 bytes)
 F 0xBD80 8
 D 0xBF00 0xBF20 dibujos_BF00  1 dibujos de 8x8 a 4 bits (32 bytes cada uno); lo leen p00:53D8 (32 bytes)
 F 0xBF00 32
-D 0xBFD1 0xC000 relleno_p08  47 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (47 bytes)
-F 0xBFD1 16
+D 0xBF20 0xBF39 renglon_BF20  renglon [cuando][fila][texto][0xFF]: "SO THE BRAVE YOUNG MAN"; lo leen p01:6769 (25 bytes)
+F 0xBF20 16
+D 0xBF39 0xBF51 renglon_BF39  renglon [cuando][fila][texto][0xFF]: "PUT DRACULA INTO DEEP"; lo leen p01:6769 (24 bytes)
+F 0xBF39 16
+D 0xBF51 0xBF6C renglon_BF51  renglon [cuando][fila][texto][0xFF]: "SLEEP AGAIN AND THE TOWN"; lo leen p01:6769 (27 bytes)
+F 0xBF51 16
+D 0xBF6C 0xBF82 renglon_BF6C  renglon [cuando][fila][texto][0xFF]: "RESTORED ITS PEACE."; lo leen p01:6769 (22 bytes)
+F 0xBF6C 16
+D 0xBF82 0xBF9D renglon_BF82  renglon [cuando][fila][texto][0xFF]: "LET'S PRAY THAT THE EVIL"; lo leen p01:6769 (27 bytes)
+F 0xBF82 16
+D 0xBF9D 0xBFB8 renglon_BF9D  renglon [cuando][fila][texto][0xFF]: "MIND OF HUMANBEINGS WILL"; lo leen p01:6769 (27 bytes)
+F 0xBF9D 16
+D 0xBFB8 0xBFD2 renglon_BFB8  renglon [cuando][fila][texto][0xFF]: "NOT LET DRACULA COME TO"; lo leen p01:6769 (26 bytes)
+F 0xBFB8 16
+D 0xBFD2 0xC000 relleno_p08  46 bytes a 0xFF hasta el final del banco: espacio libre; lo leen nadie (46 bytes)
+F 0xBFD2 16
 # --- fin de los bloques de bloques.py ---
