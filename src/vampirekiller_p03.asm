@@ -1944,7 +1944,7 @@ mueve_el_tipo_0x10:
 	ld e,(ix+003h)		;ae01   ; lee la y de la cosa
 	call 07b98h		;ae04   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
 	jr c,L_AE0C		;ae07   ; cae hasta tocar suelo...
-	jp L_B33E		;ae09   ; ... con la gravedad de 0xB33E
+	jp gravedad_de_0xa0		;ae09   ; ... con la gravedad de 0xB33E
 L_AE0C:
 	ld a,(ix+003h)		;ae0c   ; lee la y de la cosa
 	and 0f0h		;ae0f   ; en el suelo: la y, a la celda de 16
@@ -2030,7 +2030,7 @@ L_AEC1:
 	ld de,00400h		;aece   ; ... y 0x400 a la derecha...
 	ld a,(0c427h)		;aed1   ; lee la X de Simon
 	cp (ix+005h)		;aed4   ; compara con la x de la cosa
-	jr nc,L_AEDC		;aed7   ; (Simon a la derecha)
+	jr nc,L_AEDC		;aed7
 	ld de,0fc00h		;aed9   ; ... o a la izquierda
 L_AEDC:
 	jp 09f61h		;aedc   ; lanza su tipo: 0xA08E + 0x10, el 9 de la lista de 0xD700
@@ -2294,78 +2294,82 @@ L_B0BE:
 L_B0C6:
 	ld (ix+00bh),a		;b0c6   ; guarda el dibujo de la cosa
 	ret			;b0c9
-L_B0CA:
+
+; ----------------------------------------------------------------------
+; EL TIPO 4 (y el 0x1F, que se mueve igual). Colgado con el dibujo 0x1A hasta que Simon pasa por debajo (a menos de 0x50 mas abajo y de 0x40 a un lado); entonces se lanza en picado a 0x180 hacia el y, al bajar a su altura, sigue en horizontal ondulando alrededor de esa y (0x19 por cuadro hacia ella). 0xB0CA lo hace nacer ya ondulando, a 0x300 hacia Simon. OJO: p03:B13E compara la Y de Simon con la X de la cosa, no con su y.
+; ----------------------------------------------------------------------
+nace_el_tipo_4:
 	ld (ix+001h),002h		;b0ca   ; el paso en que va la cosa = 0x02
 L_B0CE:
-	ld de,00180h		;b0ce
+	ld de,00180h		;b0ce   ; bajando a 0x180...
 	call pon_velocidad_y		;b0d1   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-	ld de,00300h		;b0d4
+	ld de,00300h		;b0d4   ; ... y a 0x300 hacia Simon
 	ld a,(0c427h)		;b0d7   ; lee la X de Simon
 	sub (ix+005h)		;b0da   ; le resta la x de la cosa
 	call c,niega_de		;b0dd   ; niega_de: DE = -DE
-	call velocidad_x_con_la_vuelta		;b0e0
+	call velocidad_x_con_la_vuelta		;b0e0   ; mas lo de la vuelta
 	ld (ix+006h),001h		;b0e3   ; la cosa se mueve
-	ld (ix+011h),000h		;b0e7
+	ld (ix+011h),000h		;b0e7   ; la cuenta de la animacion
 	ld a,(ix+002h)		;b0eb   ; lee la fraccion de la y de la cosa
-	ld (ix+012h),a		;b0ee
+	ld (ix+012h),a		;b0ee   ; la altura alrededor de la que ondula: la de nacer
 	ld a,(ix+003h)		;b0f1   ; lee la y de la cosa
 	ld (ix+013h),a		;b0f4
-	ret			;b0f7
-L_B0F8:
+	ret			;b0f7   ; al paso 2, ondulando
+mueve_el_tipo_4:
 	ld a,(ix+001h)		;b0f8   ; lee el paso en que va la cosa
-	dec a			;b0fb
-	jr z,L_B13E		;b0fc
-	dec a			;b0fe
-	jp z,L_B17F		;b0ff
+	dec a			;b0fb   ; paso 1: en picado
+	jr z,tipo_4_en_picado		;b0fc
+	dec a			;b0fe   ; paso 2: ondulando
+	jp z,tipo_4_ondulando		;b0ff
 	ld (ix+00bh),01ah		;b102   ; el dibujo de la cosa = 0x1A
 	ld (ix+006h),000h		;b106   ; la cosa se queda quieta
 	ld a,(0c425h)		;b10a   ; lee la Y de Simon
 	sub (ix+003h)		;b10d   ; le resta la y de la cosa
-	cp 050h		;b110
-	ret nc			;b112
-	ld c,01bh		;b113
+	cp 050h		;b110   ; paso 0, colgado: Simon a menos de 0x50 por debajo?
+	ret nc			;b112   ; no: sigue colgado
+	ld c,01bh		;b113   ; el dibujo de ir a la derecha...
 	ld a,(0c427h)		;b115   ; lee la X de Simon
 	sub (ix+005h)		;b118   ; le resta la x de la cosa
-	ld de,00180h		;b11b
+	ld de,00180h		;b11b   ; ... y 0x180 a la derecha...
 	jr nc,L_B127		;b11e
-	ld de,0fe80h		;b120
-	neg		;b123
-	ld c,01eh		;b125
+	ld de,0fe80h		;b120   ; ... o a la izquierda...
+	neg		;b123   ; (la distancia, en positivo)
+	ld c,01eh		;b125   ; ... con el 0x1E
 L_B127:
-	cp 040h		;b127
-	ret nc			;b129
+	cp 040h		;b127   ; a menos de 0x40 a un lado?
+	ret nc			;b129   ; no: sigue colgado
 	ld (ix+00bh),c		;b12a   ; guarda el dibujo de la cosa
 	call pon_velocidad_x		;b12d   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld (ix+006h),001h		;b130   ; la cosa se mueve
-	ld de,00180h		;b134
+	ld de,00180h		;b134   ; en picado: bajando a 0x180
 	call pon_velocidad_y		;b137   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	inc (ix+001h)		;b13a   ; sube el paso en que va la cosa
-	ret			;b13d
-L_B13E:
-	ld a,(0c425h)		;b13e   ; lee la Y de Simon
-	sub (ix+005h)		;b141   ; le resta la x de la cosa
-	sub 004h		;b144
-	cp 010h		;b146
-	jr nc,L_B158		;b148
+	ret			;b13d   ; al paso 1
+tipo_4_en_picado:
+	ld a,(0c425h)		;b13e   ; la Y de Simon...
+	sub (ix+005h)		;b141   ; ... menos la X de la cosa, no su y (asi esta en el cartucho)...
+	sub 004h		;b144   ; ... menos 4
+	cp 010h		;b146   ; dentro de 0x10?
+	jr nc,anima_el_tipo_4		;b148   ; no: sigue bajando
 	ld a,(ix+003h)		;b14a   ; lee la y de la cosa
-	ld (ix+013h),a		;b14d
+	ld (ix+013h),a		;b14d   ; a ondular alrededor de esta altura
 	ld (ix+015h),000h		;b150
 	ld (ix+001h),002h		;b154   ; el paso en que va la cosa = 0x02
-L_B158:
-	ld a,(ix+011h)		;b158
+anima_el_tipo_4:
+	ld a,(ix+011h)		;b158   ; la cuenta, de ocho en ocho cuadros...
 	rra			;b15b
 	rra			;b15c
 L_B15D:
 	rra			;b15d
 	inc (ix+011h)		;b15e
-	and 003h		;b161
-	ld hl,0b177h		;b163
+	and 003h		;b161   ; ... uno de cuatro dibujos...
+	ld hl,0b177h		;b163   ; ... de 0xB177 hacia la derecha...
 	bit 7,(ix+00ah)		;b166   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	jr z,L_B16F		;b16a
-	ld hl,0b17bh		;b16c
+	ld hl,0b17bh		;b16c   ; ... o de 0xB17B hacia la izquierda
 L_B16F:
 	call 04061h		;b16f   ; hl_mas_a: HL += A
-	ld a,(hl)			;b172
+	ld a,(hl)			;b172   ; el dibujo
 	ld (ix+00bh),a		;b173   ; guarda el dibujo de la cosa
 	ret			;b176
 
@@ -2381,73 +2385,77 @@ DATA_dos_animaciones_B177:
 ; ======================================================================
 
 
-L_B17F:
-	call L_B158		;b17f
-	ld de,00019h		;b182
+tipo_4_ondulando:
+	call anima_el_tipo_4		;b17f   ; la animacion
+	ld de,00019h		;b182   ; por encima de su altura: hacia abajo...
 	ld a,(ix+003h)		;b185   ; lee la y de la cosa
-	cp (ix+013h)		;b188
+	cp (ix+013h)		;b188   ; (comparada con la de ondular)
 	jr c,L_B190		;b18b
-	ld de,0ffe7h		;b18d
+	ld de,0ffe7h		;b18d   ; ... y por debajo, hacia arriba
 L_B190:
 	jp suma_a_la_velocidad_y		;b190   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_B193:
-	call L_B212		;b193
-	ld (ix+011h),000h		;b196
-	ld c,023h		;b19a
+
+; ----------------------------------------------------------------------
+; EL AGUILA (el tipo 0x0F; por su dibujo). Nace volando a la izquierda (0xB212) y crea debajo un tipo 0x23, el jorobado que lleva (y + 0x0C, a un lado segun la mitad de la pantalla); si no se pudo crear (0xCF31 a cero) apunta 1 en 0xCF0C y se borra. Al tener a Simon a menos de 0x38 se para ocho cuadros (el jorobado, en 0xB258, lo suelta a 0x3C) y sigue.
+; ----------------------------------------------------------------------
+nace_el_aguila:
+	call nace_el_jorobado		;b193   ; como el jorobado: volando a la izquierda
+	ld (ix+011h),000h		;b196   ; la cuenta de la animacion
+	ld c,023h		;b19a   ; lo que lleva: el tipo 0x23...
 	ld a,(ix+003h)		;b19c   ; lee la y de la cosa
-	add a,00ch		;b19f
-	ld e,a			;b1a1
+	add a,00ch		;b19f   ; ... 0x0C por debajo...
+	ld e,a			;b1a1   ; (E = su y)
 	ld a,(ix+005h)		;b1a2   ; lee la x de la cosa
-	cp 080h		;b1a5
-	ld b,0fdh		;b1a7
+	cp 080h		;b1a5   ; ... y en la mitad izquierda...
+	ld b,0fdh		;b1a7   ; ... 3 a la izquierda...
 	jr c,L_B1AD		;b1a9
-	ld b,004h		;b1ab
+	ld b,004h		;b1ab   ; ... y en la derecha, 4 a la derecha
 L_B1AD:
-	add a,b			;b1ad
+	add a,b			;b1ad   ; (D = su x)
 	ld d,a			;b1ae
-	push ix		;b1af
+	push ix		;b1af   ; la crea_una_cosa cambia IX
 	call 05f1dh		;b1b1   ; crea_una_cosa: crea una cosa del tipo C en la posicion DE
-	pop ix		;b1b4
-	ld a,(0cf31h)		;b1b6
+	pop ix		;b1b4   ; IX, el aguila otra vez
+	ld a,(0cf31h)		;b1b6   ; se pudo crear?
 	and a			;b1b9
-	ret nz			;b1ba
-	ld a,001h		;b1bb
-	ld (0cf0ch),a		;b1bd
+	ret nz			;b1ba   ; si: listo
+	ld a,001h		;b1bb   ; no: se apunta...
+	ld (0cf0ch),a		;b1bd   ; ... en 0xCF0C...
 	jp 099f6h		;b1c0   ; borra_la_cosa: tipo a cero y sus sprites libres
-L_B1C3:
-	call L_B1E7		;b1c3
+mueve_el_aguila:
+	call anima_el_aguila		;b1c3   ; la animacion
 	bit 0,(ix+001h)		;b1c6   ; mira el bit 0 de el paso en que va la cosa
-	jr nz,L_B1DE		;b1ca
+	jr nz,L_B1DE		;b1ca   ; ya se paro: esperando
 	call distancia_horizontal		;b1cc   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 038h		;b1cf
-	ret nc			;b1d1
+	cp 038h		;b1cf   ; a menos de 0x38 de Simon?
+	ret nc			;b1d1   ; no: sigue volando
 	ld (ix+00ch),008h		;b1d2   ; la cuenta de cuadros del paso = 0x08
 	ld (ix+006h),000h		;b1d6   ; la cosa se queda quieta
 	inc (ix+001h)		;b1da   ; sube el paso en que va la cosa
-	ret			;b1dd
+	ret			;b1dd   ; parada ocho cuadros
 L_B1DE:
 	dec (ix+00ch)		;b1de   ; baja la cuenta de cuadros del paso
 	ret nz			;b1e1
 	ld (ix+006h),001h		;b1e2   ; la cosa se mueve
-	ret			;b1e6
-L_B1E7:
-	inc (ix+011h)		;b1e7
-	ld c,000h		;b1ea
+	ret			;b1e6   ; y sigue volando
+anima_el_aguila:
+	inc (ix+011h)		;b1e7   ; una cuenta de 0 a 0x17...
+	ld c,000h		;b1ea   ; ... el dibujo 0 de 0xB20F los siete primeros cuadros...
 	ld a,(ix+011h)		;b1ec
-	cp 007h		;b1ef
+	cp 007h		;b1ef   ; (hasta el 6)
 	jr c,L_B209		;b1f1
-	ld c,001h		;b1f3
+	ld c,001h		;b1f3   ; ... el 1 hasta el 12...
 	cp 00dh		;b1f5
 	jr c,L_B209		;b1f7
-	ld c,002h		;b1f9
+	ld c,002h		;b1f9   ; ... el 2 hasta el 18...
 	cp 013h		;b1fb
 	jr c,L_B209		;b1fd
-	ld c,001h		;b1ff
+	ld c,001h		;b1ff   ; ... el 1 hasta el 23...
 	cp 018h		;b201
 	jr c,L_B209		;b203
-	ld (ix+011h),000h		;b205
+	ld (ix+011h),000h		;b205   ; ... y otra vez desde 0
 L_B209:
-	ld hl,0b20fh		;b209
+	ld hl,0b20fh		;b209   ; el dibujo de la tabla
 	jp dibujo_de_la_tabla		;b20c   ; dibujo_de_la_tabla: (ix+0x0B) = el dibujo C de la tabla de HL
 
 ; ----------------------------------------------------------------------
@@ -2461,29 +2469,33 @@ DATA_tres_dibujos_B20F:
 ; ======================================================================
 
 
-L_B212:
+
+; ----------------------------------------------------------------------
+; EL JOROBADO (los tipos 0x0D y 0x23; por su dibujo y sus saltos). El 0x23 va colgado del aguila (paso 0) y cae al tener a Simon a menos de 0x3C; el 0x0D nace en el suelo esperando (paso 4) a que Simon se le acerque a menos de 0x3C o se acabe una cuenta al azar. En el suelo encara a Simon y salta hacia el, a 0x220: un salto de -0x260 y, por debajo de y = 0x50, uno de cada cuatro al azar de -0x720. Da la vuelta contra una pared y no atraviesa el techo. Pasos en 0xB24E.
+; ----------------------------------------------------------------------
+nace_el_jorobado:
 	ld (ix+006h),001h		;b212   ; la cosa se mueve
-	ld a,r		;b216
+	ld a,r		;b216   ; una espera al azar...
 	srl a		;b218
 	srl a		;b21a
 	srl a		;b21c
 	ld b,a			;b21e
-	ld a,03ch		;b21f
+	ld a,03ch		;b21f   ; ... de 0x3C menos hasta 31 cuadros
 	sub b			;b221
 	ld (ix+00ch),a		;b222   ; guarda la cuenta de cuadros del paso
 	ld a,(ix+000h)		;b225   ; lee el tipo de la cosa
-	cp 00dh		;b228
-	jr nz,L_B234		;b22a
+	cp 00dh		;b228   ; el tipo 0x0D...
+	jr nz,L_B234		;b22a   ; (no: el 0x23)
 	ld (ix+001h),004h		;b22c   ; el paso en que va la cosa = 0x04
 	ld (ix+006h),000h		;b230   ; la cosa se queda quieta
 L_B234:
-	ld de,0fd80h		;b234
+	ld de,0fd80h		;b234   ; volando a la izquierda (con el aguila)
 	ld (ix+00bh),067h		;b237   ; el dibujo de la cosa = 0x67
 	ld (ix+010h),001h		;b23b
 	call pon_velocidad_x		;b23f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld de,00000h		;b242
+	ld de,00000h		;b242   ; sin velocidad vertical
 	jp pon_velocidad_y		;b245   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_B248:
+mueve_el_jorobado:
 	ld a,(ix+001h)		;b248   ; lee el paso en que va la cosa
 	call 0406bh		;b24b   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2503,104 +2515,104 @@ DATA_tabla_B24E:
 ; ======================================================================
 
 
-L_B258:
+jorobado_colgado:
 	call distancia_horizontal		;b258   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 03ch		;b25b
-	ret nc			;b25d
-	ld de,00000h		;b25e
+	cp 03ch		;b25b   ; a menos de 0x3C de Simon?
+	ret nc			;b25d   ; no: sigue colgado
+	ld de,00000h		;b25e   ; si: suelta, sin velocidad horizontal
 	call pon_velocidad_x		;b261   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	inc (ix+001h)		;b264   ; sube el paso en que va la cosa
-	ret			;b267
-L_B268:
-	call L_B33E		;b268
+	ret			;b267   ; a caer
+jorobado_cayendo:
+	call gravedad_de_0xa0		;b268   ; la gravedad
 	ld d,(ix+005h)		;b26b   ; lee la x de la cosa
 	ld e,(ix+003h)		;b26e   ; lee la y de la cosa
 	call 07b98h		;b271   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jr c,L_B276		;b274
+	jr c,L_B276		;b274   ; el salto va a la instruccion siguiente: caiga o no, al paso 2
 L_B276:
 	inc (ix+001h)		;b276   ; sube el paso en que va la cosa
-L_B279:
-	call y_en_la_celda		;b279
+jorobado_en_el_suelo:
+	call y_en_la_celda		;b279   ; la y, a la celda
 	ld (ix+006h),000h		;b27c   ; la cosa se queda quieta
 	ld (ix+00ch),002h		;b280   ; la cuenta de cuadros del paso = 0x02
-	ret			;b284
-L_B285:
-	ld c,000h		;b285
-	ld hl,0b33ah		;b287
+	ret			;b284   ; quieto dos cuadros
+jorobado_quieto:
+	ld c,000h		;b285   ; el dibujo de estar, mirando a Simon...
+	ld hl,0b33ah		;b287   ; ... de 0xB33A
 	call dibujo_segun_simon		;b28a   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	dec (ix+00ch)		;b28d   ; baja la cuenta de cuadros del paso
 	ret nz			;b290
 	inc (ix+001h)		;b291   ; sube el paso en que va la cosa
-	ld de,0fda0h		;b294
+	ld de,0fda0h		;b294   ; salta: -0x260...
 	ld a,(ix+003h)		;b297   ; lee la y de la cosa
-	cp 050h		;b29a
-	jr c,L_B2A7		;b29c
-	ld a,r		;b29e
+	cp 050h		;b29a   ; ... y por debajo de y = 0x50...
+	jr c,L_B2A7		;b29c   ; (por encima: el normal)
+	ld a,r		;b29e   ; ... una vez de cada cuatro al azar...
 	and 003h		;b2a0
-	jr nz,L_B2A7		;b2a2
-	ld de,0f8e0h		;b2a4
+	jr nz,L_B2A7		;b2a2   ; (las otras tres, el normal)
+	ld de,0f8e0h		;b2a4   ; ... el grande, -0x720
 L_B2A7:
 	call pon_velocidad_y		;b2a7   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_B2AA:
+jorobado_salta:
 	ld (ix+006h),001h		;b2aa   ; la cosa se mueve
-	ld de,00220h		;b2ae
+	ld de,00220h		;b2ae   ; a 0x220 hacia Simon...
 	ld a,(0c427h)		;b2b1   ; lee la X de Simon
 	cp (ix+005h)		;b2b4   ; compara con la x de la cosa
 	jr nc,L_B2BC		;b2b7
-	ld de,0fde0h		;b2b9
+	ld de,0fde0h		;b2b9   ; ... o a la izquierda
 L_B2BC:
 	call pon_velocidad_x		;b2bc   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld c,001h		;b2bf
-	ld hl,0b33ah		;b2c1
+	ld c,001h		;b2bf   ; el dibujo de saltar
+	ld hl,0b33ah		;b2c1   ; (de 0xB33A)
 	jp dibujo_segun_simon		;b2c4   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
-L_B2C7:
-	call L_B33E		;b2c7
-	call L_B300		;b2ca
+jorobado_saltando:
+	call gravedad_de_0xa0		;b2c7   ; la gravedad
+	call pared_delante		;b2ca   ; una pared delante?
 	ld de,00000h		;b2cd
-	call c,media_vuelta		;b2d0
+	call c,media_vuelta		;b2d0   ; si: media vuelta
 	ld d,(ix+005h)		;b2d3   ; lee la x de la cosa
 	ld e,(ix+003h)		;b2d6   ; lee la y de la cosa
 	bit 7,(ix+008h)		;b2d9   ; mira el bit 7 de la velocidad vertical
-	jr z,L_B2ED		;b2dd
-	ld a,e			;b2df
-	sub 010h		;b2e0
+	jr z,L_B2ED		;b2dd   ; bajando: mira el suelo
+	ld a,e			;b2df   ; subiendo: mira el techo...
+	sub 010h		;b2e0   ; ... 0x10 mas arriba
 	ld e,a			;b2e2
 	call 07b98h		;b2e3   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	ret nc			;b2e6
-	ld de,00000h		;b2e7
+	ret nc			;b2e6   ; libre: sigue
+	ld de,00000h		;b2e7   ; el techo: deja de subir
 	jp pon_velocidad_y		;b2ea   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 L_B2ED:
 	call 07b98h		;b2ed   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	ret nc			;b2f0
-	ld c,000h		;b2f1
-	ld hl,0b33ah		;b2f3
+	ret nc			;b2f0   ; sin suelo: sigue cayendo
+	ld c,000h		;b2f1   ; en el suelo: el dibujo de estar...
+	ld hl,0b33ah		;b2f3   ; (de 0xB33A)
 	call dibujo_segun_simon		;b2f6   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	ld (ix+001h),002h		;b2f9   ; el paso en que va la cosa = 0x02
-	jp L_B279		;b2fd
-L_B300:
+	jp jorobado_en_el_suelo		;b2fd   ; ... y quieto dos cuadros
+pared_delante:
 	ld d,(ix+005h)		;b300   ; lee la x de la cosa
 	ld e,(ix+003h)		;b303   ; lee la y de la cosa
-	ld bc,00808h		;b306
+	ld bc,00808h		;b306   ; un cuadro de 8 x 8
 	ld a,(ix+00ah)		;b309   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	or (ix+009h)		;b30c   ; OR con la velocidad horizontal (parte baja)
-	ret z			;b30f
+	ret z			;b30f   ; parado: no hay pared
 	bit 7,(ix+00ah)		;b310   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	jp nz,07c13h		;b314
-	jp 07bb7h		;b317
-L_B31A:
-	ld c,000h		;b31a
-	ld hl,0b33ah		;b31c
+	jp nz,07c13h		;b314   ; a la izquierda...
+	jp 07bb7h		;b317   ; ... o a la derecha
+jorobado_esperando:
+	ld c,000h		;b31a   ; el dibujo de estar...
+	ld hl,0b33ah		;b31c   ; ... mirando a Simon
 	call dibujo_segun_simon		;b31f   ; dibujo_segun_simon: como 0xA62F, dos mas adelante si Simon esta a su derecha
 	call distancia_horizontal		;b322   ; distancia_horizontal: A = |x de Simon - x de la cosa|
-	cp 03ch		;b325
-	jr c,L_B32D		;b327
+	cp 03ch		;b325   ; a menos de 0x3C?
+	jr c,L_B32D		;b327   ; si: salta ya
 	dec (ix+00ch)		;b329   ; baja la cuenta de cuadros del paso
-	ret nz			;b32c
+	ret nz			;b32c   ; no, y queda espera: sigue
 L_B32D:
-	ld de,0ffffh		;b32d
+	ld de,0ffffh		;b32d   ; salta: casi sin velocidad vertical...
 	call pon_velocidad_y		;b330   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+001h),003h		;b333   ; el paso en que va la cosa = 0x03
-	jp L_B2AA		;b337
+	jp jorobado_salta		;b337   ; ... y hacia Simon
 
 ; ----------------------------------------------------------------------
 ; DATOS dibujos_B33A: cuatro dibujos, dos por lado, para 0xAD37 (p03:B287,
@@ -2614,38 +2626,42 @@ DATA_dibujos_B33A:
 ; ======================================================================
 
 
-L_B33E:
-	ld de,000a0h		;b33e
+gravedad_de_0xa0:
+	ld de,000a0h		;b33e   ; 0xA0 a la velocidad vertical
 	jp suma_a_la_velocidad_y		;b341   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_B344:
+
+; ----------------------------------------------------------------------
+; EL TIPO 0x0B (por su dibujo, un esqueleto que lanza). Anda a 0x240 guardando la distancia: a menos de 0x30 de Simon se aparta, a mas de 0x50 va a por el; da la vuelta contra una pared, salta (-0x471) al acabarse el suelo, no sale de la pantalla y, de vez en cuando, se para 16 cuadros y lanza en arco (0x9F61: el tipo 4 de la lista de 0xD700, a 0x180 hacia Simon y -0x500 o -0x800 en vertical, al azar). Pasos en 0xB387.
+; ----------------------------------------------------------------------
+nace_el_tipo_0x0b:
 	ld a,(0c427h)		;b344   ; lee la X de Simon
 	ld b,(ix+005h)		;b347   ; lee la x de la cosa
-	cp b			;b34a
-	ld de,00240h		;b34b
+	cp b			;b34a   ; Simon a la derecha?
+	ld de,00240h		;b34b   ; si: 0x240 hacia el...
 	jr nc,L_B353		;b34e
-	ld de,0fdc0h		;b350
+	ld de,0fdc0h		;b350   ; ... o a la izquierda
 L_B353:
-	call velocidad_x_con_la_vuelta		;b353
-	ld de,00000h		;b356
+	call velocidad_x_con_la_vuelta		;b353   ; mas lo de la vuelta
+	ld de,00000h		;b356   ; sin velocidad vertical
 	call pon_velocidad_y		;b359   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+006h),001h		;b35c   ; la cosa se mueve
 	ld (ix+011h),000h		;b360
-L_B364:
+anima_el_tipo_0x0b:
 	ld a,(0c427h)		;b364   ; lee la X de Simon
 	cp (ix+005h)		;b367   ; compara con la x de la cosa
-	ld c,047h		;b36a
+	ld c,047h		;b36a   ; el dibujo 0x47 mirando a la izquierda...
 	jr c,L_B370		;b36c
-	ld c,049h		;b36e
+	ld c,049h		;b36e   ; ... o 0x49 a la derecha...
 L_B370:
-	inc (ix+012h)		;b370
-	bit 3,(ix+012h)		;b373
+	inc (ix+012h)		;b370   ; ... y cada ocho cuadros...
+	bit 3,(ix+012h)		;b373   ; (el bit 3 de la cuenta)
 	jr nz,L_B37A		;b377
-	inc c			;b379
+	inc c			;b379   ; ... el siguiente
 L_B37A:
 	ld (ix+00bh),c		;b37a   ; guarda el dibujo de la cosa
-	ret			;b37d
-L_B37E:
-	call L_B364		;b37e
+	ret			;b37d   ; el dibujo
+mueve_el_tipo_0x0b:
+	call anima_el_tipo_0x0b		;b37e   ; la animacion
 	ld a,(ix+001h)		;b381   ; lee el paso en que va la cosa
 	call 0406bh		;b384   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2663,154 +2679,154 @@ DATA_tabla_B387:
 ; ======================================================================
 
 
-L_B38D:
+tipo_0x0b_andando:
 	ld a,(0c427h)		;b38d   ; lee la X de Simon
-	ld b,a			;b390
+	ld b,a			;b390   ; B = la X de Simon
 	ld a,(ix+005h)		;b391   ; lee la x de la cosa
-	add a,030h		;b394
+	add a,030h		;b394   ; x + 0x30 - Simon...
 	sub b			;b396
-	cp 060h		;b397
-	jr nc,L_B3A9		;b399
+	cp 060h		;b397   ; ... por debajo de 0x60: Simon a menos de 0x30
+	jr nc,L_B3A9		;b399   ; no: mira si esta lejos
 	ld a,(ix+005h)		;b39b   ; lee la x de la cosa
-	cp b			;b39e
-	ld de,0fdc0h		;b39f
+	cp b			;b39e   ; cerca: se aparta...
+	ld de,0fdc0h		;b39f   ; ... a la izquierda si Simon esta a su derecha...
 	jr c,L_B3C3		;b3a2
-	ld de,00240h		;b3a4
+	ld de,00240h		;b3a4   ; ... o a la derecha
 	jr L_B3C3		;b3a7
 L_B3A9:
 	ld a,(0c427h)		;b3a9   ; lee la X de Simon
-	ld b,a			;b3ac
+	ld b,a			;b3ac   ; B = la X de Simon
 	ld a,(ix+005h)		;b3ad   ; lee la x de la cosa
-	add a,050h		;b3b0
+	add a,050h		;b3b0   ; x + 0x50 - Simon...
 	sub b			;b3b2
-	cp 0a0h		;b3b3
+	cp 0a0h		;b3b3   ; ... por debajo de 0xA0: entre 0x30 y 0x50, como iba
 	jr c,L_B3DB		;b3b5
 	ld a,(ix+005h)		;b3b7   ; lee la x de la cosa
-	cp b			;b3ba
-	ld de,00240h		;b3bb
+	cp b			;b3ba   ; lejos: va a por el...
+	ld de,00240h		;b3bb   ; ... a la derecha si esta a su derecha...
 	jr c,L_B3C3		;b3be
-	ld de,0fdc0h		;b3c0
+	ld de,0fdc0h		;b3c0   ; ... o a la izquierda
 L_B3C3:
-	call velocidad_x_con_la_vuelta		;b3c3
-	ld a,(ix+012h)		;b3c6
-	and 006h		;b3c9
-	jr nz,L_B3DB		;b3cb
-	ld (ix+010h),010h		;b3cd
+	call velocidad_x_con_la_vuelta		;b3c3   ; mas lo de la vuelta
+	ld a,(ix+012h)		;b3c6   ; dos cuadros de cada ocho...
+	and 006h		;b3c9   ; (los bits 1 y 2 de la cuenta a cero)
+	jr nz,L_B3DB		;b3cb   ; (los demas, sigue)
+	ld (ix+010h),010h		;b3cd   ; ... se para 16 cuadros a lanzar
 	ld (ix+001h),002h		;b3d1   ; el paso en que va la cosa = 0x02
 	ld (ix+006h),000h		;b3d5   ; la cosa se queda quieta
-	jr L_B437		;b3d9
+	jr no_sale_de_la_pantalla		;b3d9   ; (y no se sale de la pantalla)
 L_B3DB:
 	ld e,(ix+003h)		;b3db   ; lee la y de la cosa
 	ld d,(ix+005h)		;b3de   ; lee la x de la cosa
-	ld bc,0080ch		;b3e1
+	ld bc,0080ch		;b3e1   ; una pared delante, en 8 x 12?
 	ld a,(ix+00ah)		;b3e4   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 	and 080h		;b3e7
-	jr nz,L_B3F8		;b3e9
-	call 07bbeh		;b3eb
+	jr nz,L_B3F8		;b3e9   ; a la izquierda: la de la izquierda
+	call 07bbeh		;b3eb   ; a la derecha...
 	jr nc,L_B403		;b3ee
-	ld de,0fdc0h		;b3f0
+	ld de,0fdc0h		;b3f0   ; ... pared: a la izquierda
 	call velocidad_x_con_la_vuelta		;b3f3
 	jr L_B403		;b3f6
 L_B3F8:
-	call 07c1ah		;b3f8
+	call 07c1ah		;b3f8   ; a la izquierda...
 	jr nc,L_B403		;b3fb
-	ld de,00240h		;b3fd
+	ld de,00240h		;b3fd   ; ... pared: a la derecha
 	call pon_velocidad_x		;b400   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B403:
 	ld e,(ix+003h)		;b403   ; lee la y de la cosa
 	ld a,(ix+00ah)		;b406   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
-	or a			;b409
+	or a			;b409   ; el suelo de delante: parado, x + 4...
 	ld b,004h		;b40a
 	jr z,L_B415		;b40c
-	ld b,009h		;b40e
+	ld b,009h		;b40e   ; ... a la derecha, x + 9...
 	jp p,L_B415		;b410
-	ld b,0fch		;b413
+	ld b,0fch		;b413   ; ... a la izquierda, x - 4
 L_B415:
 	ld a,(ix+005h)		;b415   ; lee la x de la cosa
 	add a,b			;b418
-	ld d,a			;b419
+	ld d,a			;b419   ; D = esa x
 	call 07b98h		;b41a   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	jr c,L_B437		;b41d
-	ld de,00240h		;b41f
+	jr c,no_sale_de_la_pantalla		;b41d   ; hay suelo: sigue
+	ld de,00240h		;b41f   ; sin suelo: salta, a 0x240...
 	bit 7,(ix+00ah)		;b422   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
 	call nz,niega_de		;b426   ; niega_de: DE = -DE
 	call pon_velocidad_x		;b429   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
-	ld de,0fb8fh		;b42c
+	ld de,0fb8fh		;b42c   ; ... y -0x471 en vertical
 	call pon_velocidad_y		;b42f   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 	ld (ix+001h),001h		;b432   ; el paso en que va la cosa = 0x01
-	ret			;b436
-L_B437:
+	ret			;b436   ; (al paso 1)
+no_sale_de_la_pantalla:
 	ld a,(ix+005h)		;b437   ; lee la x de la cosa
-	cp 010h		;b43a
-	ld de,00240h		;b43c
+	cp 010h		;b43a   ; por la izquierda de 0x10...
+	ld de,00240h		;b43c   ; ... a la derecha
 	jr c,L_B44E		;b43f
-	cp 0eeh		;b441
-	ld de,0fdc0h		;b443
+	cp 0eeh		;b441   ; por la derecha de 0xEE...
+	ld de,0fdc0h		;b443   ; ... a la izquierda
 	jr nc,L_B44E		;b446
 	ld e,(ix+009h)		;b448   ; lee la velocidad horizontal (parte baja)
 	ld d,(ix+00ah)		;b44b   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
 L_B44E:
-	jp velocidad_x_con_la_vuelta		;b44e
-L_B451:
-	ld bc,0080ch		;b451
+	jp velocidad_x_con_la_vuelta		;b44e   ; con lo de la vuelta
+tipo_0x0b_saltando:
+	ld bc,0080ch		;b451   ; una pared delante, en 8 x 12?
 	ld e,(ix+003h)		;b454   ; lee la y de la cosa
 	ld d,(ix+005h)		;b457   ; lee la x de la cosa
 	bit 7,(ix+00ah)		;b45a   ; va hacia la izquierda? (bit 7 de la velocidad horizontal)
-	jr z,L_B467		;b45e
-	call 07c1ah		;b460
+	jr z,L_B467		;b45e   ; va a la derecha: la de la derecha
+	call 07c1ah		;b460   ; a la izquierda...
 	jr nc,L_B472		;b463
 	jr L_B46C		;b465
 L_B467:
-	call 07bbeh		;b467
+	call 07bbeh		;b467   ; a la derecha...
 	jr nc,L_B472		;b46a
 L_B46C:
-	ld de,00000h		;b46c
+	ld de,00000h		;b46c   ; pared: sin avanzar
 	call pon_velocidad_x		;b46f   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 L_B472:
-	ld de,00068h		;b472
+	ld de,00068h		;b472   ; la gravedad, 0x68
 	call suma_a_la_velocidad_y		;b475   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
 	bit 7,(ix+008h)		;b478   ; mira el bit 7 de la velocidad vertical
-	ret nz			;b47c
+	ret nz			;b47c   ; subiendo: nada mas
 	ld e,(ix+003h)		;b47d   ; lee la y de la cosa
 	ld a,(ix+00ah)		;b480   ; lee la velocidad horizontal (el bit 7, hacia la izquierda)
-	bit 7,a		;b483
+	bit 7,a		;b483   ; el suelo, al caer: a la izquierda x + 8...
 	ld b,008h		;b485
 	jr nz,L_B490		;b487
-	ld b,0fdh		;b489
-	and a			;b48b
-	jr nz,L_B490		;b48c
-	ld b,005h		;b48e
+	ld b,0fdh		;b489   ; ... a la derecha x - 3...
+	and a			;b48b   ; (o parado...)
+	jr nz,L_B490		;b48c   ; (a la derecha: asi)
+	ld b,005h		;b48e   ; ... y parado, x + 5
 L_B490:
 	ld a,(ix+005h)		;b490   ; lee la x de la cosa
 	add a,b			;b493
-	ld d,a			;b494
+	ld d,a			;b494   ; D = esa x
 	call 07b98h		;b495   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	ret nc			;b498
-	xor a			;b499
+	ret nc			;b498   ; sin suelo: sigue cayendo
+	xor a			;b499   ; en el suelo: paso 0...
 	ld (ix+001h),a		;b49a   ; guarda el paso en que va la cosa
 	ld (ix+002h),a		;b49d   ; guarda la fraccion de la y de la cosa
-	call y_en_la_celda		;b4a0
-	ld de,00000h		;b4a3
+	call y_en_la_celda		;b4a0   ; la y, a la celda...
+	ld de,00000h		;b4a3   ; ... sin velocidad vertical
 	jp pon_velocidad_y		;b4a6   ; pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
-L_B4A9:
-	dec (ix+010h)		;b4a9
+tipo_0x0b_lanza:
+	dec (ix+010h)		;b4a9   ; 16 cuadros parado...
 	ret nz			;b4ac
-	ld a,r		;b4ad
+	ld a,r		;b4ad   ; al azar...
 	rra			;b4af
-	ld hl,0fb00h		;b4b0
+	ld hl,0fb00h		;b4b0   ; ... -0x500 en vertical...
 	jr nc,L_B4B8		;b4b3
-	ld hl,0f800h		;b4b5
+	ld hl,0f800h		;b4b5   ; ... o -0x800
 L_B4B8:
 	ld a,(0c427h)		;b4b8   ; lee la X de Simon
 	cp (ix+005h)		;b4bb   ; compara con la x de la cosa
-	ld de,00180h		;b4be
+	ld de,00180h		;b4be   ; a 0x180 hacia Simon...
 	jr nc,L_B4C6		;b4c1
-	ld de,0fe80h		;b4c3
+	ld de,0fe80h		;b4c3   ; ... o a la izquierda
 L_B4C6:
-	call 09f61h		;b4c6
+	call 09f61h		;b4c6   ; lanza su tipo: 0xA08E + 0x0B, el 4 de la lista de 0xD700
 	ld (ix+001h),000h		;b4c9   ; el paso en que va la cosa = 0x00
 	ld (ix+006h),001h		;b4cd   ; la cosa se mueve
-	ret			;b4d1
+	ret			;b4d1   ; y a andar
 L_B4D2:
 	call L_B611		;b4d2
 	ld (ix+006h),001h		;b4d5   ; la cosa se mueve

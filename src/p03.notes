@@ -293,7 +293,6 @@ C 0xAEC0 no: nada
 C 0xAEC5 quien lanza, en 0xCFFC...
 C 0xAECB ... sin velocidad vertical...
 C 0xAECE ... y 0x400 a la derecha...
-C 0xAED7 (Simon a la derecha)
 C 0xAED9 ... o a la izquierda
 C 0xAEDC lanza su tipo: 0xA08E + 0x10, el 9 de la lista de 0xD700
 C 0xAEDF a 0x60 o mas?
@@ -412,6 +411,224 @@ C 0xB0BB (cada cuatro cuadros...)
 C 0xB0BD ... o 0x17
 C 0xB0C2 a la izquierda: asi
 C 0xB0C4 a la derecha: dos mas
+B 0xB0CA EL TIPO 4 (y el 0x1F, que se mueve igual). Colgado con el dibujo 0x1A hasta que Simon pasa por debajo (a menos de 0x50 mas abajo y de 0x40 a un lado); entonces se lanza en picado a 0x180 hacia el y, al bajar a su altura, sigue en horizontal ondulando alrededor de esa y (0x19 por cuadro hacia ella). 0xB0CA lo hace nacer ya ondulando, a 0x300 hacia Simon. OJO: p03:B13E compara la Y de Simon con la X de la cosa, no con su y.
+L 0xB0CA nace_el_tipo_4
+C 0xB0CE bajando a 0x180...
+C 0xB0D4 ... y a 0x300 hacia Simon
+C 0xB0E0 mas lo de la vuelta
+C 0xB0E7 la cuenta de la animacion
+C 0xB0EE la altura alrededor de la que ondula: la de nacer
+C 0xB0F7 al paso 2, ondulando
+L 0xB0F8 mueve_el_tipo_4
+C 0xB0FB paso 1: en picado
+C 0xB0FE paso 2: ondulando
+C 0xB110 paso 0, colgado: Simon a menos de 0x50 por debajo?
+C 0xB112 no: sigue colgado
+C 0xB113 el dibujo de ir a la derecha...
+C 0xB11B ... y 0x180 a la derecha...
+C 0xB120 ... o a la izquierda...
+C 0xB123 (la distancia, en positivo)
+C 0xB125 ... con el 0x1E
+C 0xB127 a menos de 0x40 a un lado?
+C 0xB129 no: sigue colgado
+C 0xB134 en picado: bajando a 0x180
+C 0xB13D al paso 1
+L 0xB13E tipo_4_en_picado
+C 0xB13E la Y de Simon...
+C 0xB141 ... menos la X de la cosa, no su y (asi esta en el cartucho)...
+C 0xB144 ... menos 4
+C 0xB146 dentro de 0x10?
+C 0xB148 no: sigue bajando
+C 0xB14D a ondular alrededor de esta altura
+L 0xB158 anima_el_tipo_4
+C 0xB158 la cuenta, de ocho en ocho cuadros...
+C 0xB161 ... uno de cuatro dibujos...
+C 0xB163 ... de 0xB177 hacia la derecha...
+C 0xB16C ... o de 0xB17B hacia la izquierda
+C 0xB172 el dibujo
+L 0xB17F tipo_4_ondulando
+C 0xB17F la animacion
+C 0xB182 por encima de su altura: hacia abajo...
+C 0xB188 (comparada con la de ondular)
+C 0xB18D ... y por debajo, hacia arriba
+B 0xB193 EL AGUILA (el tipo 0x0F; por su dibujo). Nace volando a la izquierda (0xB212) y crea debajo un tipo 0x23, el jorobado que lleva (y + 0x0C, a un lado segun la mitad de la pantalla); si no se pudo crear (0xCF31 a cero) apunta 1 en 0xCF0C y se borra. Al tener a Simon a menos de 0x38 se para ocho cuadros (el jorobado, en 0xB258, lo suelta a 0x3C) y sigue.
+L 0xB193 nace_el_aguila
+C 0xB193 como el jorobado: volando a la izquierda
+C 0xB196 la cuenta de la animacion
+C 0xB19A lo que lleva: el tipo 0x23...
+C 0xB19F ... 0x0C por debajo...
+C 0xB1A1 (E = su y)
+C 0xB1A5 ... y en la mitad izquierda...
+C 0xB1A7 ... 3 a la izquierda...
+C 0xB1AB ... y en la derecha, 4 a la derecha
+C 0xB1AD (D = su x)
+C 0xB1AF la crea_una_cosa cambia IX
+C 0xB1B4 IX, el aguila otra vez
+C 0xB1B6 se pudo crear?
+C 0xB1BA si: listo
+C 0xB1BB no: se apunta...
+C 0xB1BD ... en 0xCF0C...
+L 0xB1C3 mueve_el_aguila
+C 0xB1C3 la animacion
+C 0xB1CA ya se paro: esperando
+C 0xB1CF a menos de 0x38 de Simon?
+C 0xB1D1 no: sigue volando
+C 0xB1DD parada ocho cuadros
+C 0xB1E6 y sigue volando
+L 0xB1E7 anima_el_aguila
+C 0xB1E7 una cuenta de 0 a 0x17...
+C 0xB1EA ... el dibujo 0 de 0xB20F los siete primeros cuadros...
+C 0xB1EF (hasta el 6)
+C 0xB1F3 ... el 1 hasta el 12...
+C 0xB1F9 ... el 2 hasta el 18...
+C 0xB1FF ... el 1 hasta el 23...
+C 0xB205 ... y otra vez desde 0
+C 0xB209 el dibujo de la tabla
+B 0xB212 EL JOROBADO (los tipos 0x0D y 0x23; por su dibujo y sus saltos). El 0x23 va colgado del aguila (paso 0) y cae al tener a Simon a menos de 0x3C; el 0x0D nace en el suelo esperando (paso 4) a que Simon se le acerque a menos de 0x3C o se acabe una cuenta al azar. En el suelo encara a Simon y salta hacia el, a 0x220: un salto de -0x260 y, por debajo de y = 0x50, uno de cada cuatro al azar de -0x720. Da la vuelta contra una pared y no atraviesa el techo. Pasos en 0xB24E.
+L 0xB212 nace_el_jorobado
+C 0xB216 una espera al azar...
+C 0xB21F ... de 0x3C menos hasta 31 cuadros
+C 0xB228 el tipo 0x0D...
+C 0xB22A (no: el 0x23)
+C 0xB234 volando a la izquierda (con el aguila)
+C 0xB242 sin velocidad vertical
+L 0xB248 mueve_el_jorobado
+L 0xB258 jorobado_colgado
+C 0xB25B a menos de 0x3C de Simon?
+C 0xB25D no: sigue colgado
+C 0xB25E si: suelta, sin velocidad horizontal
+C 0xB267 a caer
+L 0xB268 jorobado_cayendo
+C 0xB268 la gravedad
+C 0xB274 el salto va a la instruccion siguiente: caiga o no, al paso 2
+L 0xB279 jorobado_en_el_suelo
+C 0xB279 la y, a la celda
+C 0xB284 quieto dos cuadros
+L 0xB285 jorobado_quieto
+C 0xB285 el dibujo de estar, mirando a Simon...
+C 0xB287 ... de 0xB33A
+C 0xB294 salta: -0x260...
+C 0xB29A ... y por debajo de y = 0x50...
+C 0xB29C (por encima: el normal)
+C 0xB29E ... una vez de cada cuatro al azar...
+C 0xB2A2 (las otras tres, el normal)
+C 0xB2A4 ... el grande, -0x720
+L 0xB2AA jorobado_salta
+C 0xB2AE a 0x220 hacia Simon...
+C 0xB2B9 ... o a la izquierda
+C 0xB2BF el dibujo de saltar
+C 0xB2C1 (de 0xB33A)
+L 0xB2C7 jorobado_saltando
+C 0xB2C7 la gravedad
+C 0xB2CA una pared delante?
+C 0xB2D0 si: media vuelta
+C 0xB2DD bajando: mira el suelo
+C 0xB2DF subiendo: mira el techo...
+C 0xB2E0 ... 0x10 mas arriba
+C 0xB2E6 libre: sigue
+C 0xB2E7 el techo: deja de subir
+C 0xB2F0 sin suelo: sigue cayendo
+C 0xB2F1 en el suelo: el dibujo de estar...
+C 0xB2F3 (de 0xB33A)
+C 0xB2FD ... y quieto dos cuadros
+L 0xB300 pared_delante
+C 0xB306 un cuadro de 8 x 8
+C 0xB30F parado: no hay pared
+C 0xB314 a la izquierda...
+C 0xB317 ... o a la derecha
+L 0xB31A jorobado_esperando
+C 0xB31A el dibujo de estar...
+C 0xB31C ... mirando a Simon
+C 0xB325 a menos de 0x3C?
+C 0xB327 si: salta ya
+C 0xB32C no, y queda espera: sigue
+C 0xB32D salta: casi sin velocidad vertical...
+C 0xB337 ... y hacia Simon
+L 0xB33E gravedad_de_0xa0
+C 0xB33E 0xA0 a la velocidad vertical
+B 0xB344 EL TIPO 0x0B (por su dibujo, un esqueleto que lanza). Anda a 0x240 guardando la distancia: a menos de 0x30 de Simon se aparta, a mas de 0x50 va a por el; da la vuelta contra una pared, salta (-0x471) al acabarse el suelo, no sale de la pantalla y, de vez en cuando, se para 16 cuadros y lanza en arco (0x9F61: el tipo 4 de la lista de 0xD700, a 0x180 hacia Simon y -0x500 o -0x800 en vertical, al azar). Pasos en 0xB387.
+L 0xB344 nace_el_tipo_0x0b
+C 0xB34A Simon a la derecha?
+C 0xB34B si: 0x240 hacia el...
+C 0xB350 ... o a la izquierda
+C 0xB353 mas lo de la vuelta
+C 0xB356 sin velocidad vertical
+L 0xB364 anima_el_tipo_0x0b
+C 0xB36A el dibujo 0x47 mirando a la izquierda...
+C 0xB36E ... o 0x49 a la derecha...
+C 0xB370 ... y cada ocho cuadros...
+C 0xB373 (el bit 3 de la cuenta)
+C 0xB379 ... el siguiente
+C 0xB37D el dibujo
+L 0xB37E mueve_el_tipo_0x0b
+C 0xB37E la animacion
+L 0xB38D tipo_0x0b_andando
+C 0xB390 B = la X de Simon
+C 0xB394 x + 0x30 - Simon...
+C 0xB397 ... por debajo de 0x60: Simon a menos de 0x30
+C 0xB399 no: mira si esta lejos
+C 0xB39E cerca: se aparta...
+C 0xB39F ... a la izquierda si Simon esta a su derecha...
+C 0xB3A4 ... o a la derecha
+C 0xB3AC B = la X de Simon
+C 0xB3B0 x + 0x50 - Simon...
+C 0xB3B3 ... por debajo de 0xA0: entre 0x30 y 0x50, como iba
+C 0xB3BA lejos: va a por el...
+C 0xB3BB ... a la derecha si esta a su derecha...
+C 0xB3C0 ... o a la izquierda
+C 0xB3C3 mas lo de la vuelta
+C 0xB3C6 dos cuadros de cada ocho...
+C 0xB3C9 (los bits 1 y 2 de la cuenta a cero)
+C 0xB3CB (los demas, sigue)
+C 0xB3CD ... se para 16 cuadros a lanzar
+C 0xB3D9 (y no se sale de la pantalla)
+C 0xB3E1 una pared delante, en 8 x 12?
+C 0xB3E9 a la izquierda: la de la izquierda
+C 0xB3EB a la derecha...
+C 0xB3F0 ... pared: a la izquierda
+C 0xB3F8 a la izquierda...
+C 0xB3FD ... pared: a la derecha
+C 0xB409 el suelo de delante: parado, x + 4...
+C 0xB40E ... a la derecha, x + 9...
+C 0xB413 ... a la izquierda, x - 4
+C 0xB419 D = esa x
+C 0xB41D hay suelo: sigue
+C 0xB41F sin suelo: salta, a 0x240...
+C 0xB42C ... y -0x471 en vertical
+C 0xB436 (al paso 1)
+L 0xB437 no_sale_de_la_pantalla
+C 0xB43A por la izquierda de 0x10...
+C 0xB43C ... a la derecha
+C 0xB441 por la derecha de 0xEE...
+C 0xB443 ... a la izquierda
+C 0xB44E con lo de la vuelta
+L 0xB451 tipo_0x0b_saltando
+C 0xB451 una pared delante, en 8 x 12?
+C 0xB45E va a la derecha: la de la derecha
+C 0xB460 a la izquierda...
+C 0xB467 a la derecha...
+C 0xB46C pared: sin avanzar
+C 0xB472 la gravedad, 0x68
+C 0xB47C subiendo: nada mas
+C 0xB483 el suelo, al caer: a la izquierda x + 8...
+C 0xB489 ... a la derecha x - 3...
+C 0xB48B (o parado...)
+C 0xB48C (a la derecha: asi)
+C 0xB48E ... y parado, x + 5
+C 0xB494 D = esa x
+C 0xB498 sin suelo: sigue cayendo
+C 0xB499 en el suelo: paso 0...
+C 0xB4A0 la y, a la celda...
+C 0xB4A3 ... sin velocidad vertical
+L 0xB4A9 tipo_0x0b_lanza
+C 0xB4A9 16 cuadros parado...
+C 0xB4AD al azar...
+C 0xB4B0 ... -0x500 en vertical...
+C 0xB4B5 ... o -0x800
+C 0xB4BE a 0x180 hacia Simon...
+C 0xB4C3 ... o a la izquierda
+C 0xB4C6 lanza su tipo: 0xA08E + 0x0B, el 4 de la lista de 0xD700
+C 0xB4D1 y a andar
 B 0xA0E5 APUNTA A SIMON. Con la rapidez A (0xA0E5 pone 0x80) mas ocho por VUELTA (0xD012), desde la cosa (0xA0E7) o desde (D = x, E = y) (0xA0ED): devuelve en HL la velocidad vertical y en DE la horizontal hacia Simon, en 0xCFF8 la direccion (de la tabla de 0xA1A2) y en 0xCFF9 el angulo, con el bit 7 si Simon esta a la izquierda. Las dos componentes salen de la tabla de senos de 0xA1E2 (la direccion y 0x3F menos ella).
 L 0xA0E5 apunta_a_simon
 L 0xA0E7 apunta_a_simon_con_a
@@ -1015,8 +1232,6 @@ C 0xB12D pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 C 0xB130 la cosa se mueve
 C 0xB137 pon_velocidad_y: velocidad vertical de la cosa ((ix+7), (ix+8)) = DE
 C 0xB13A sube el paso en que va la cosa
-C 0xB13E lee la Y de Simon
-C 0xB141 le resta la x de la cosa
 C 0xB14A lee la y de la cosa
 C 0xB154 el paso en que va la cosa = 0x02
 C 0xB166 va hacia la izquierda? (bit 7 de la velocidad horizontal)
