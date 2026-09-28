@@ -1,0 +1,20 @@
+# Zonas que el trazador NO puede entrar a desensamblar como codigo.
+#
+# La tabla de destinos del despachador de Konami (0x406B) va pegada JUSTO
+# DETRAS de su `call`: sin declararla, el trazador sigue de largo y se la come
+# como instrucciones, y ademas sigue desde ahi. Es la contaminacion mas facil
+# de este cartucho.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x65B6 0x65CC   tabla de 11 palabras del despachador (call 0x406B en 0x65B3)
+0x66C1 0x66C9   tabla de 4 palabras del despachador (call 0x406B en 0x66BE)
+0x6874 0x687C   tabla de 4 palabras del despachador (call 0x406B en 0x6871)
+0x6AAD 0x6AB7   tabla de 5 palabras del despachador (call 0x406B en 0x6AAA)
+0x6B42 0x6B52   tabla de 8 palabras del despachador (call 0x406B en 0x6B3F)
+0x6CC6 0x6CCE   tabla de 4 palabras del despachador (call 0x406B en 0x6CC3)
+0x6F8B 0x6F93   tabla de 4 palabras del despachador (call 0x406B en 0x6F88)
+0x71F2 0x71FA   tabla de 4 palabras del despachador (call 0x406B en 0x71EF)
+0x72D6 0x72DE   tabla de 4 palabras del despachador (call 0x406B en 0x72D3)
+0x72FF 0x7307   tabla de 4 palabras del despachador (call 0x406B en 0x72FC)
+0x749D 0x74A5   tabla de 4 palabras del despachador (call 0x406B en 0x749A)
+0x771E 0x772A   tabla de 6 palabras del despachador (call 0x406B en 0x771B)

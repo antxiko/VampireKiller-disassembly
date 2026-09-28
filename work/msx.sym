@@ -1,0 +1,440 @@
+; Simbolos MSX para z80dasm
+; Generado desde /Users/fx-media/Documents/BARCOEMESEKS/MSXgl/engine/src (bios_mainrom.h, bios_var.h)
+; Fuente original citada por MSXgl: MSX2 Technical Handbook, map.grauw.nl
+
+; --- BIOS Main-ROM y variables de sistema ---
+CHKRAM:	equ 0x0000	; Tests RAM and sets RAM slot for the system  [alias: STARTUP, RESET, BOOT]
+CGTABL:	equ 0x0004	; Character Generator TABLe - Base address of the MSX character set in ROM
+VDP_DR:	equ 0x0006	; Base port address for VDP data read
+VDP_DW:	equ 0x0007	; Base port address for VDP data write
+SYNCHR:	equ 0x0008	; tests whether the character of [HL] is the specified character
+RDSLT:	equ 0x000c	; Reads the value of an address in another slot
+CHRGTR:	equ 0x0010	; Gets the next character (or token) of the Basic-text
+WRSLT:	equ 0x0014	; Writes a value to an address in another slot
+OUTDO:	equ 0x0018	; Outputs to current outputchannel (printer, diskfile, etc.)
+CALSLT:	equ 0x001c	; Executes inter-slot call
+DCOMPR:	equ 0x0020	; Compares HL with DE
+ENASLT:	equ 0x0024	; Switches to specified slot and page definitively
+GETYPR:	equ 0x0028	; Returns Type of DAC
+BASRVN:	equ 0x002b	; Basic ROM version  [alias: BASRVN1]
+BASRVN2:	equ 0x002c	; Basic ROM version [1]
+MSXVER:	equ 0x002d	; MSX version number
+MSXMID:	equ 0x002e	; Bit 0: if 1 then MSX-MIDI is present internally (MSX turbo R only)
+CALLF:	equ 0x0030	; Executes an interslot call
+CHAR_16:	equ 0x0034	; Default KANJI range. Copied to KANJTABLE by the DiskBIOS on boot
+KEYINT:	equ 0x0038	; Executes the timer interrupt process routine
+INITIO:	equ 0x003b	; Initialises the device
+INIFNK:	equ 0x003e	; Initialises the contents of the function keys
+DISSCR:	equ 0x0041	; Inhibits the screen display
+ENASCR:	equ 0x0044	; Displays the screen
+WRTVDP:	equ 0x0047	; Writes data in the VDP-register
+RDVRM:	equ 0x004a	; Reads the content of VRAM
+WRTVRM:	equ 0x004d	; Writes data in VRAM
+SETRD:	equ 0x0050	; Enables VDP to read
+SETWRT:	equ 0x0053	; Enables VDP to write
+FILVRM:	equ 0x0056	; Fills VRAM with value
+LDIRMV:	equ 0x0059	; Block transfers to memory from VRAM
+LDIRVM:	equ 0x005c	; Block transfers to VRAM from memory
+CHGMOD:	equ 0x005f	; Switches to given screen mode
+CHGCLR:	equ 0x0062	; Changes the screen colors
+NMI:	equ 0x0066	; Executes (non-maskable interupt) handling routine
+CLRSPR:	equ 0x0069	; Initialises all sprites
+INITXT:	equ 0x006c	; Switches to SCREEN 0 (text screen with 40*24 characters)
+INIT32:	equ 0x006f	; Switches to SCREEN 1 (text screen with 32*24 characters)
+INIGRP:	equ 0x0072	; Switches to SCREEN 2 (high resolution screen with 256*192 pixels)
+INIMLT:	equ 0x0075	; Switches to SCREEN 3 (multi-color screen 64*48 pixels)
+SETTXT:	equ 0x0078	; Switches VDP in SCREEN 0 mode
+SETT32:	equ 0x007b	; Switches VDP in SCREEN 1 mode
+SETGRP:	equ 0x007e	; Switches VDP to SCREEN 2 mode
+SETMLT:	equ 0x0081	; Switches VDP to SCREEN 3 mode
+CALPAT:	equ 0x0084	; Returns the address of the sprite pattern table
+CALATR:	equ 0x0087	; Returns the address of the sprite attribute table
+GSPSIZ:	equ 0x008a	; Returns current sprite size
+GRPPRT:	equ 0x008d	; Displays a character on the graphic screen
+GICINI:	equ 0x0090	; Initialises PSG and sets initial value for the PLAY statement
+WRTPSG:	equ 0x0093	; Writes data to PSG-register
+RDPSG:	equ 0x0096	; Reads value from PSG-register
+STRTMS:	equ 0x0099	; Tests whether the PLAY statement is being executed as a background task
+CHSNS:	equ 0x009c	; Tests the status of the keyboard buffer
+CHGET:	equ 0x009f	; One character input (waiting)
+CHPUT:	equ 0x00a2	; Displays one character
+LPTOUT:	equ 0x00a5	; Sends one character to printer
+LPTSTT:	equ 0x00a8	; Tests printer status
+CNVCHR:	equ 0x00ab	; Tests for the graphic header and transforms the code
+PINLIN:	equ 0x00ae	; Stores in the specified buffer the character codes input until the return
+INLIN:	equ 0x00b1	; Same as PINLIN except that AUGFLG (#F6AA) is set
+QINLIN:	equ 0x00b4	; Prints a questionmark andone space
+BREAKX:	equ 0x00b7	; Tests status of CTRL-STOP
+ISCNTC:	equ 0x00ba	; Tests status of SHIFT-STOP
+CKCNTC:	equ 0x00bd	; Same as ISCNTC. used in Basic
+BEEP:	equ 0x00c0	; Generates beep
+CLS:	equ 0x00c3	; Clears the screen
+POSIT:	equ 0x00c6	; Moves cursor to the specified position
+FNKSB:	equ 0x00c9	; Tests whether the function key display is active (FNKFLG)
+ERAFNK:	equ 0x00cc	; Erases function key display
+DSPFNK:	equ 0x00cf	; Displays the function keys
+TOTEXT:	equ 0x00d2	; Forces the screen to be in the text mode
+GTSTCK:	equ 0x00d5	; Returns the joystick status
+GTTRIG:	equ 0x00d8	; Returns current trigger status
+GTPAD:	equ 0x00db	; Returns current touch pad status
+GTPDL:	equ 0x00de	; Returns current value of paddle
+TAPION:	equ 0x00e1	; Reads the header block after turning the cassette motor on
+TAPIN:	equ 0x00e4	; Reads data from the tape
+TAPIOF:	equ 0x00e7	; Stops reading from the tape
+TAPOON:	equ 0x00ea	; Turns on the cassette motor and writes the header
+TAPOUT:	equ 0x00ed	; Writes data on the tape
+TAPOOF:	equ 0x00f0	; Stops writing on the tape
+STMOTR:	equ 0x00f3	; Sets the cassette motor action
+LFTQ:	equ 0x00f6	; Gives number of bytes in queue
+PUTQ:	equ 0x00f9	; Puts byte in queue
+RIGHTC:	equ 0x00fc	; Shifts screen pixel to the right
+LEFTC:	equ 0x00ff	; Shifts screen pixel to the left
+UPC:	equ 0x0102	; Shifts screen pixel up
+TUPC:	equ 0x0105	; Tests whether UPC is possible, if possible, execute UPC
+DOWNC:	equ 0x0108	; Shifts screen pixel down
+TDOWNC:	equ 0x010b	; Tests whether DOWNC is possible, if possible, execute DOWNC
+SCALXY:	equ 0x010e	; Scales X and Y coordinates
+MAPXY:	equ 0x0111	; Places cursor at current cursor address
+FETCHC:	equ 0x0114	; Gets current cursor addresses mask pattern
+STOREC:	equ 0x0117	; Records current cursor addresses mask pattern
+SETATR:	equ 0x011a	; Sets attribute byte
+READC:	equ 0x011d	; Reads attribute byte of current screen pixel
+SETC:	equ 0x0120	; Returns current screen pixel of specified attribute byte
+NSETCX:	equ 0x0123	; Sets horizontal screen pixels
+GTASPC:	equ 0x0126	; Gets screen aspect ratio
+PNTINI:	equ 0x0129	; Initalises the PAINT instruction
+SCANR:	equ 0x012c	; Scans screen pixels to the right
+SCANL:	equ 0x012f	; Scans screen pixels to the left
+CHGCAP:	equ 0x0132	; Alternates the CAPS lamp status
+CHGSND:	equ 0x0135	; Alternates the 1-bit sound port status
+RSLREG:	equ 0x0138	; Reads the primary slot register
+WSLREG:	equ 0x013b	; Writes value to the primary slot register
+RDVDP:	equ 0x013e	; Reads VDP status register
+SNSMAT:	equ 0x0141	; Returns the value of the specified line from the keyboard matrix
+PHYDIO:	equ 0x0144	; Executes I/O for mass-storage media like disks
+FORMAT:	equ 0x0147	; Initialises mass-storage media like formatting of disks
+ISFLIO:	equ 0x014a	; Tests if I/O to device is taking place
+OUTDLP:	equ 0x014d	; Printer output
+GETVCP:	equ 0x0150	; Returns pointer to play queue
+GETVC2:	equ 0x0153	; Returns pointer to variable in queue number VOICEN (byte at #FB38)
+KILBUF:	equ 0x0156	; Clears keyboard buffer
+CALBAS:	equ 0x0159	; Executes inter-slot call to the routine in BASIC interpreter
+SUBROM:	equ 0x015c	; Calls a routine in SUB-ROM
+EXTROM:	equ 0x015f	; Calls a routine in SUB-ROM. Most common way
+CHKSLZ:	equ 0x0162	; Searches slots for SUB-ROM
+CHKNEW:	equ 0x0165	; Tests screen mode
+EOL:	equ 0x0168	; Deletes to the end of the line
+BIGFIL:	equ 0x016b	; Same function as FILVRM (with 16-bit VRAM-address)
+NSETRD:	equ 0x016e	; Same function as SETRD (with 16-bit VRAM-address)
+NSTWRT:	equ 0x0171	; Same function as SETWRT (with 16-bit VRAM-address)
+NRDVRM:	equ 0x0174	; Reads VRAM like in RDVRM (with 16-bit VRAM-address)
+NWRVRM:	equ 0x0177	; Writes to VRAM like in WRTVRM (with 16-bit VRAM-address)
+RDRES:	equ 0x017a	; Reads value of I/O port #F4
+WRRES:	equ 0x017d	; Writes value to I/O port #F4
+CHGCPU:	equ 0x0180	; Changes CPU mode
+GETCPU:	equ 0x0183	; Returns current CPU mode
+PCMPLY:	equ 0x0186	; Plays specified memory area through the PCM chip
+PCMREC:	equ 0x0189	; Records audio using the PCM chip into the specified memory area
+RDPRIM:	equ 0xf380	; Routine that reads from a primary slot
+WRPRIM:	equ 0xf385	; Routine that writes to a primary slot
+CLPRIM:	equ 0xf38c	; Routine that calls a routine in a primary slot
+USRTAB:	equ 0xf39a	; Address to call with Basic USR0 / USR1 / ... / USR9
+LINL40:	equ 0xf3ae	; Width for SCREEN 0 (default 37)
+LINL32:	equ 0xf3af	; Width for SCREEN 1 (default 29)
+LINLEN:	equ 0xf3b0	; Width for the current text mode
+CRTCNT:	equ 0xf3b1	; Number of lines on screen
+CLMLST:	equ 0xf3b2	; Column space. It’s uncertain what this address actually stores
+TXTNAM:	equ 0xf3b3	; BASE(0) - SCREEN 0 name table
+TXTCOL:	equ 0xf3b5	; BASE(1) - SCREEN 0 color table
+TXTCGP:	equ 0xf3b7	; BASE(2) - SCREEN 0 character pattern table
+TXTATR:	equ 0xf3b9	; BASE(3) - SCREEN 0 Sprite Attribute Table
+TXTPAT:	equ 0xf3bb	; BASE(4) - SCREEN 0 Sprite Pattern Table
+T32NAM:	equ 0xf3bd	; BASE(5) - SCREEN 1 name table
+T32COL:	equ 0xf3bf	; BASE(6) - SCREEN 1 color table
+T32CGP:	equ 0xf3c1	; BASE(7) - SCREEN 1 character pattern table
+T32ATR:	equ 0xf3c3	; BASE(8) - SCREEN 1 sprite attribute table
+T32PAT:	equ 0xf3c5	; BASE(9) - SCREEN 1 sprite pattern table
+GRPNAM:	equ 0xf3c7	; BASE(10) - SCREEN 2 name table
+GRPCOL:	equ 0xf3c9	; BASE(11) - SCREEN 2 color table
+GRPCGP:	equ 0xf3cb	; BASE(12) - SCREEN 2 character pattern table
+GRPATR:	equ 0xf3cd	; BASE(13) - SCREEN 2 sprite attribute table
+GRPPAT:	equ 0xf3cf	; BASE(14) - SCREEN 2 sprite pattern table
+MLTNAM:	equ 0xf3d1	; BASE(15) - SCREEN 3 name table
+MLTCOL:	equ 0xf3d3	; BASE(16) - SCREEN 3 color table
+MLTCGP:	equ 0xf3d5	; BASE(17) - SCREEN 3 character pattern table
+MLTATR:	equ 0xf3d7	; BASE(18) - SCREEN 3 sprite attribute table
+MLTPAT:	equ 0xf3d9	; BASE(19) - SCREEN 3 sprite pattern table
+CLIKSW:	equ 0xf3db	; Key click switch. (0 = Disabled / 1 = Enabled)
+CSRY:	equ 0xf3dc	; Current row-position of the cursor
+CSRX:	equ 0xf3dd	; Current column-position of the cursor
+CNSDFG:	equ 0xf3de	; =0 when function keys are not displayed
+RG0SAV:	equ 0xf3df	; Mirror of VDP register 0 (Basic: VDP(0))
+RG1SAV:	equ 0xf3e0	; Mirror of VDP register 1 (Basic: VDP(1))
+RG2SAV:	equ 0xf3e1	; Mirror of VDP register 2 (Basic: VDP(2))
+RG3SAV:	equ 0xf3e2	; Mirror of VDP register 3 (Basic: VDP(3))
+RG4SAV:	equ 0xf3e3	; Mirror of VDP register 4 (Basic: VDP(4))
+RG5SAV:	equ 0xf3e4	; Mirror of VDP register 5 (Basic: VDP(5))
+RG6SAV:	equ 0xf3e5	; Mirror of VDP register 6 (Basic: VDP(6))
+RG7SAV:	equ 0xf3e6	; Mirror of VDP register 7 (Basic: VDP(7))
+STATFL:	equ 0xf3e7	; Mirror of VDP(8) status register (S#0)
+TRGFLG:	equ 0xf3e8	; Information about trigger buttons and space bar state
+FORCLR:	equ 0xf3e9	; Foreground color
+BAKCLR:	equ 0xf3ea	; Background color
+BDRCLR:	equ 0xf3eb	; Border color
+MAXUPD:	equ 0xf3ec	; Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC
+MINUPD:	equ 0xf3ef	; Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC
+ATRBYT:	equ 0xf3f2	; Attribute byte (for graphical routines it’s used to read the color)
+QUEUES:	equ 0xf3f3	; Queue table address, see QUETAB (initial value)
+FRCNEW:	equ 0xf3f5	; CLOAD flag / =0 when CLOAD / =255 when CLOAD?
+SCNCNT:	equ 0xf3f6	; Key scan timing
+REPCNT:	equ 0xf3f7	; This is the key repeat delay counter
+PUTPNT:	equ 0xf3f8	; Address in the keyboard buffer where a character will be written
+GETPNT:	equ 0xf3fa	; Address in the keyboard buffer where the next character is read
+CS120:	equ 0xf3fc	; Cassette I/O parameters to use for 1200 baud
+CS240:	equ 0xf401	; Cassette I/O parameters to use for 2400 baud
+LOW:	equ 0xf406	; Signal delay when writing a 0 to tape
+HIGH:	equ 0xf408	; Signal delay when writing a 1 to tape
+HEADER:	equ 0xf40a	; Delay of tape header (sync.) block
+ASPCT1:	equ 0xf40b	; Horizontal / Vertical aspect for CIRCLE command
+ASPCT2:	equ 0xf40d	; Horizontal / Vertical aspect for CIRCLE command
+ENDPRG:	equ 0xf40f	; Dummy program end for instructions RESUME ... NEXT. (contains DB ":",0,0,0,0 by default)
+ERRFLG:	equ 0xf414	; Number of the last error occurred in BASIC.
+LPTPOS:	equ 0xf415	; Position of printer head.
+PRTFLG:	equ 0xf416	; Flag whether to send to printer. (0 = Print to screen / other = Print to printer)
+NTMSXP:	equ 0xf417	; 0 If MSX printer (This converts Hiragana to Katakana on Japanese MSX)
+RAWPRT:	equ 0xf418	; 0 to convert TAB's and unknown characters to spaces.
+VLZADR:	equ 0xf419	; Address of character replaced by VAL.
+VLZDAT:	equ 0xf41b	; Character replaced with 0 by VAL.
+CURLIN:	equ 0xf41c	; Current execution line number of Basic.
+KBFMIN:	equ 0xf41e	; Used if direct statement error occures.
+KBUF:	equ 0xf41f	; Crunch buffer; translated into intermediate language from BUF.
+BUFMIN:	equ 0xf55d	; Used by INPUT routine.
+BUF:	equ 0xf55e	; Buffer to store characters displayed to screen under Basic in direct mode.
+ENDBUF:	equ 0xf660	; Flag to prevent overflow of BUF.
+TTYPOS:	equ 0xf661	; Virtual cursor location internally retained by BASIC.
+DIMFLG:	equ 0xf662	; DIM instruction flag.
+VALTYP:	equ 0xf663	; Contains the code of the type of variable that is currently in DAC
+DORES:	equ 0xf664	; Tempory flag for the BASIC interpreter that indicates if stored keyword can be tokenized or not  [alias: OPRTYP]
+DONUM:	equ 0xf665	; Flag for the number encoding (IEEE 754-1985)
+CONTXT:	equ 0xf666	; Temporary save of the text pointer
+CONSAV:	equ 0xf668	; Store token of constant after calling CHRGTR (00010h en Main-ROM)
+CONTYP:	equ 0xf669	; Type of stored constant, used by CHRGTR (00010h en Main-ROM)
+CONLO:	equ 0xf66a	; Value of stored constant
+MEMSIZ:	equ 0xf672	; Highest location in memory used by Basic
+STKTOP:	equ 0xf674	; Top location to be used for the stack
+TXTTAB:	equ 0xf676	; Start address of the Basic program to load
+TEMPPT:	equ 0xf678	; Starting address of unused area of temporary descriptor.
+TEMPST:	equ 0xf67a	; Temporary descriptors.
+DSCTMP:	equ 0xf698	; Contains the length and position of the "Ok" message of the BASIC. SET PROMPT modifies it.
+FRETOP:	equ 0xf69b	; Starting address of unused area of string area.
+TEMP3:	equ 0xf69d	; Used for garbage collection or by USR function.
+TEMP8:	equ 0xf69f	; Used for garbage collection.
+ENDFOR:	equ 0xf6a1	; Next address of the instruction FOR, used by NEXT.
+DATLIN:	equ 0xf6a3	; Line number of the instruction DATA read by READ.
+SUBFLG:	equ 0xf6a5	; Flag for array for USR fun.
+FLGINP:	equ 0xf6a6	; Flag for the instruction INPUT or READ.
+TEMP:	equ 0xf6a7	; Location for temporary reservation for st.code
+PTRFLG:	equ 0xf6a9	; Pointer line number conversion flag for the Basic interpreter.
+AUTFLG:	equ 0xf6aa	; Auto mode flag (0 = Yes / other = No)
+AUTLIN:	equ 0xf6ab	; Current line number for auto.
+AUTINC:	equ 0xf6ad	; Increment for auto.
+SAVTXT:	equ 0xf6af	; Text pointer for resume.
+SAVSTK:	equ 0xf6b1	; Save stack when an error occurs.
+ERRLIN:	equ 0xf6b3	; Line number where last error in BASIC.
+DOT:	equ 0xf6b5	; Current line number displayed by LIST.
+ERRTXT:	equ 0xf6b7	; Pointer to the error message.
+ONELIN:	equ 0xf6b9	; Line number to go when error, Used by ON ERROR GOTO.
+ONEFLG:	equ 0xf6bb	; Error flag for the instruction ON ERROR GOTO.
+TEMP2:	equ 0xf6bc	; Work area for the formula evaluation routine.
+OLDLIN:	equ 0xf6be	; Line number stored after the execution of the instruction STOP or END, or by pressing CTRL+STOP.
+OLDTXT:	equ 0xf6c0	; Old text pointer. The pointer is directed to the instruction following the one where the stop occurred.
+VARTAB:	equ 0xf6c2	; Pointer to the beginning of single variables area.
+ARYTAB:	equ 0xf6c4	; Pointer to the beginning of array variables area.
+STREND:	equ 0xf6c6	; Address of the end of the variable area.
+DATPTR:	equ 0xf6c8	; Pointer to next data to read from the instruction DATA. Modified by RESTORE.
+DEFTBL:	equ 0xf6ca	; Declaration table of variables defined by the instructions DEFINT, DEFSTR, DEFSNG and DEFDBL of the Basic for each alphabet letter.
+PRMSTK:	equ 0xf6e4	; Previous definition block on the stack. (To clean the waste.)
+PRMLEN:	equ 0xf6e6	; Number of bytes used in PARM1.
+PARM1:	equ 0xf6e8	; Area 1 for parameters block storage.
+PRMPRV:	equ 0xf74c	; Pointer to previous parameter block in PARM1.
+PRMLN2:	equ 0xf74e	; Number of bytes used in PARM2.
+PARM2:	equ 0xf750	; Area 2 for to store the blocks being created.
+PRMFLG:	equ 0xf7b4	; Flag to indicate whether PARM1 was searching.
+ARYTA2:	equ 0xf7b5	; End point of search.
+NOFUNS:	equ 0xf7b7	; 0 if no function active.
+TEMP9:	equ 0xf7b8	; Location of temporary storage for garbage collection.
+FUNACT:	equ 0xf7ba	; Count of active functions.
+SWPTMP:	equ 0xf7bc	; Value of first variable in instruction SWAP.
+TRCFLG:	equ 0xf7c4	; Tracing flag. 0 = No tracing; Other = Tracing in progress.
+FBUFFR:	equ 0xf7c5	; Buffer used by mathematical routines.
+DECTMP:	equ 0xf7f0	; Used to transform decimal integer to floating point number.
+DECTM2:	equ 0xf7f2	; Used by the divisions.
+DECCNT:	equ 0xf7f4	; Used by the divisions.
+DAC:	equ 0xf7f6	; Decimal accumulator.
+HOLD8:	equ 0xf806	; Work area for decimal multiplications.
+HOLD2:	equ 0xf836	; Work area in the execution of numerical operators.
+HOLD:	equ 0xf83e	; Work area in the execution of numerical operators.
+ARG:	equ 0xf847	; Argument. (Value used to be calculate with DAC.)
+RNDX:	equ 0xf857	; Last random number generated.
+FNKSTR:	equ 0xf87f	; Texts for function keys (16 bytes each).
+CGPNT:	equ 0xf91f	; Location of the character font used to initialise screen.
+NAMBAS:	equ 0xf922	; Current pattern name table address.
+CGPBAS:	equ 0xf924	; Current pattern generator table address.
+PATBAS:	equ 0xf926	; Current sprite generator table address.
+ATRBAS:	equ 0xf928	; Current sprite attribute table address.
+CLOC:	equ 0xf92a	; Cursor location.
+CMASK:	equ 0xf92c	; Graphic cursor mask (SCREEN 2 to 4) or ordinate (SCREEN 5 to 12).
+MINDEL:	equ 0xf92d	; Work area used by instruction LINE of Basic.
+MAXDEL:	equ 0xf92f	; End of the work area used by instruction LINE of Basic.
+ASPECT:	equ 0xf931	; Aspect ratio of the circle; set by <ratio> of CIRCLE.
+CENCNT:	equ 0xf933	; Counter used by CIRCLE.
+CLINEF:	equ 0xf935	; Flag to draw line to centre, Used set by CIRCLE.
+CNPNTS:	equ 0xf936	; Point to be plottted in a 45° segment, Used set by CIRCLE.
+CPLOTF:	equ 0xf938	; Plot polarity flag, Used set by CIRCLE.
+CPCNT:	equ 0xf939	; Number of points in 1/8 of circle, Used set by CIRCLE.
+CPCNT8:	equ 0xf93b	; Number of points in the circle. Used by CIRCLE.
+CRCSUM:	equ 0xf93d	; Cyclic redundancy check sum of the circle. Used by CIRCLE.
+CSTCNT:	equ 0xf93f	; Variable to maintain the number of points of the starting angle. Used by the instruction CIRCLE.
+CSCLXY:	equ 0xf941	; Scale of X & Y. Used by the instruction CIRCLE.
+CSAVEA:	equ 0xf942	; Address of the first pixel of different color, Used by the instruction PAINT.
+CSAVEM:	equ 0xf944	; Mask of the first pixel of different color, Used by the instruction PAINT.
+CXOFF:	equ 0xf945	; X offset from center, Used by the instruction PAINT.
+CYOFF:	equ 0xf947	; Y offset from center, Used by the instruction PAINT.
+LOHMSK:	equ 0xf949	; Leftmost position of an LH excursion, Used by the instruction PAINT in Basic.
+LOHDIR:	equ 0xf94a	; New painting direction required by an LH excursion, Used by the instruction PAINT in Basic.
+LOHADR:	equ 0xf94b	; Leftmost position of an LH, Used by the instruction PAINT in Basic.
+LOHCNT:	equ 0xf94d	; Size of an LH excursion, Used by the instruction PAINT in Basic.
+SKPCNT:	equ 0xf94f	; Skip count, Used by the instruction PAINT in Basic.
+MOVCNT:	equ 0xf951	; Movement count, Used by the instruction PAINT in Basic.
+PDIREC:	equ 0xf953	; Direction of the paint, Used by the instruction PAINT in Basic.
+LFPROG:	equ 0xf954	; Set to 1 when moving to the left. Used by the instruction PAINT in Basic.
+RTPROG:	equ 0xf955	; Set to 1 when moving to the right. Used by the instruction PAINT in Basic.
+MCLTAB:	equ 0xf956	; Used by the instructions DRAW & PLAY in Basic.
+MCLFLG:	equ 0xf958	; Used by the instructions DRAW & PLAY in Basic.
+QUETAB:	equ 0xf959	; Queue-table containing queue information. There are four queues in total, three PLAY queues and one RS232 queue, with 6-byte information blocks per queue:
+QUEBAK:	equ 0xf971	; Replacement characters table of queues.
+VOICAQ:	equ 0xf975	; Voice A queue of instruction PLAY. (PSG)
+VOICBQ:	equ 0xf9f5	; Voice B queue of instruction PLAY. (PSG)
+VOICCQ:	equ 0xfa75	; Voice C queue of instruction PLAY. (PSG)
+RS2IQ:	equ 0xfaf5	; RC-232C queue. (MSX1 only)  [alias: DPPAGE]
+ACPAGE:	equ 0xfaf6	; Destination page number. (MSX2~)
+AVCSAV:	equ 0xfaf7	; Copy of AV control port (#F7) content. (MSX2+~)
+EXBRSA:	equ 0xfaf8	; SUB-ROM Slot ID. (MSX2~)
+CHRCNT:	equ 0xfaf9	; Character counter in the buffer, used in KANA-ROM. (MSX2~)
+ROMA:	equ 0xfafa	; Area to store KANA character (Japanese MSX2~ only)
+MODE:	equ 0xfafc	; Flag for screen mode.
+NORUSE:	equ 0xfafd	; Used by KANJI-ROM for rendering KANJI fonts in graphic modes. (MSX2~)
+XSAVE:	equ 0xfafe	; X-coordinate for Mouse/Trackball/Lightpen. (MSX2~)
+YSAVE:	equ 0xfb00	; Y-coordinate for Mouse/Trackball/Lightpen. (MSX2~)
+LOGOPR:	equ 0xfb02	; Logical operation code. (MSX2~)
+RSTMP:	equ 0xfb03	; Temporary data storage for RS232 Driver  [alias: TOCNT]
+RSFCB:	equ 0xfb04	; FCB ("File Control Block") address of the RS-232C.
+RSIQLN:	equ 0xfb06	; Byte DATA used by the RS-232C interface.
+MEXBIh:	equ 0xfb07	; Hook called by the RS-232C.
+OLDSTT:	equ 0xfb0c	; Hook called by the RS-232C.  [alias: OLDINT]
+DEVNUM:	equ 0xfb16	; Byte offset. (RS-232C)
+DATCNT:	equ 0xfb17	; DATA area. (RS-232C)
+ERRORS:	equ 0xfb1a	; RS-232C error code.
+FLAGS:	equ 0xfb1b	; RS-232C flags.
+ESTBLS:	equ 0xfb1c	; Bit boolean. (RS-232C)
+COMMSK:	equ 0xfb1d	; RS-232C mask.
+LSTCOM:	equ 0xfb1e	; Byte Data. (RS-232C)
+LSTMOD:	equ 0xfb1f	; Byte Data. (RS-232C)
+PRSCNT:	equ 0xfb35	; Command counter.
+SAVSP:	equ 0xfb36	; Stack pointer when instruction PLAY is used.
+VOICEN:	equ 0xfb38	; Number of voice played.
+SAVVOL:	equ 0xfb39	; The volume is saved here when Pause.
+MCLLEN:	equ 0xfb3b	; Length of the macro being analyzed.
+MCLPTR:	equ 0xfb3c	; Address of the macro being analyzed.
+QUEUEN:	equ 0xfb3e	; Number of the current queue.
+MUSICF:	equ 0xfb3f	; Music interruption flags.
+PLYCNT:	equ 0xfb40	; Number of macro strings in the PLAY queue.
+VCBA:	equ 0xfb41	; Data for voice A.
+VCBB:	equ 0xfb66	; Data for voice B.
+VCBC:	equ 0xfb8b	; Data for voice C.
+ENSTOP:	equ 0xfbb0	; <>0 when it is possible to resume execution of a BASIC program (CTRL+SHIFT+GRPH+KANA/CODE to resume)
+BASROM:	equ 0xfbb1	; <>0 if basic is in rom. (CTRL+STOP disabled)
+LINTTB:	equ 0xfbb2	; Table of 24 end-of-line flags for each physical line. (used by the Basic interpreter.)
+FSTPOS:	equ 0xfbca	; first position for inlin.
+CODSAV:	equ 0xfbcc	; ASCII code of character under the cursor
+FNKSWI:	equ 0xfbcd	; Indicate which function keys is displayed.
+FNKFLG:	equ 0xfbce	; Function key which have subroutine.
+ONGSBF:	equ 0xfbd8	; Global event flag.
+CLIKFL:	equ 0xfbd9	; Flag to know if the key click has already occurred.
+OLDKEY:	equ 0xfbda	; Previous status of each keyboard matrix row.
+NEWKEY:	equ 0xfbe5	; New status of each keyboard matrix row. The status is updated by the KEYINT interrupt routine.
+KEYBUF:	equ 0xfbf0	; Key code buffer.
+LINWRK:	equ 0xfc18	; Work area for screen management.
+PATWRK:	equ 0xfc40	; Work area for the name-to-form converter.
+BOTTOM:	equ 0xfc48	; Address of the beginning of the available RAM area.
+HIMEM:	equ 0xfc4a	; Address of the end of the available RAM area.
+TRPTBL:	equ 0xfc4c	; Tables for each of the following instructions:
+RTYCNT:	equ 0xfc9a	; Interrupt control.
+INTFLG:	equ 0xfc9b	; This flag is set if STOP or CTRL+STOP is pressed.
+PADY:	equ 0xfc9c	; Y-coordinate of a connected touch pad. (Until MSX2+)
+PADX:	equ 0xfc9d	; X-coordinate of a connected touch pad. (Until MSX2+)
+JIFFY:	equ 0xfc9e	; Contains value of the software clock, each interrupt of the VDP it is increased by 1.
+INTVAL:	equ 0xfca0	; Contains length of the interval when the ON INTERVAL routine was established.
+INTCNT:	equ 0xfca2	; ON INTERVAL counter (counts backwards).
+LOWLIM:	equ 0xfca4	; Used by the Cassette system (minimal length of startbit).
+WINWID:	equ 0xfca5	; Used by the Cassette system (store the difference between a low-and high-cycle).
+GRPHED:	equ 0xfca6	; Heading for the output of graphic characters.
+ESCCNT:	equ 0xfca7	; Escape sequence counter.
+INSFLG:	equ 0xfca8	; Insert mode flag.
+CSRSW:	equ 0xfca9	; Cursor display switch
+CSTYLE:	equ 0xfcaa	; Cursor style i.e. Used if INS Key is used. ( 0 = Full Cursor / other = Halve Cursor )
+CAPST:	equ 0xfcab	; Capital status. ( 0 = Off / other = On )
+KANAST:	equ 0xfcac	; Kana mode flags for MSX Japanese, Russian key status ou "Dead Key" status.
+KANAMD:	equ 0xfcad	; Flag to know if the keyboard type is "KANA" (0) or "JIS" (other value). (Japanese MSX only)
+FLBMEM:	equ 0xfcae	; 0 if loading basic program.
+SCRMOD:	equ 0xfcaf	; Screen mode.
+OLDSCR:	equ 0xfcb0	; Old screen mode.
+CASPRV:	equ 0xfcb1	; Work area for the cassette (until MSX2+)
+BRDATR:	equ 0xfcb2	; Border color for paint.
+GXPOS:	equ 0xfcb3	; X-position of graphic cursor.
+GYPOS:	equ 0xfcb5	; Y-position of graphic cursor.
+GRPACX:	equ 0xfcb7	; X Graphics Accumulator.
+GRPACY:	equ 0xfcb9	; Y Graphics Accumulator.
+DRWFLG:	equ 0xfcbb	; Used by the instruction DRAW (DrawFlag).
+DRWSCL:	equ 0xfcbc	; Used by the instruction DRAW (DrawScaling).
+DRWANG:	equ 0xfcbd	; Used by the instruction DRAW (DrawAngle).
+EXPTBL:	equ 0xfcc1	; Bit 7 of these variables is a flag for each primary slot to indicate if the slot is expanded or not. The other bits are reset.  [alias: MNROM]
+SLTTBL:	equ 0xfcc5	; Saves the state of the 4 secondary slot registers of each extended Primary Slot.
+SLTATR:	equ 0xfcc9	; Slot attributes given during MSX boot process.
+SLTWRK:	equ 0xfd09	; SLTWRK is a 128-byte variable array used to reserve a RAM work area in Main-RAM for ROM applications. This array consists of 8 bytes per slot (2 per memory page). Each of these 2 octets are provided to place an slot ID with flags on a byte (MSB) or an address on two bytes as follows.
+PROCNM:	equ 0xfd89	; Work aera of the instructions CALL and OPEN. Contents the instruction name or device name.
+HOOKS:	equ 0xfd9a	; System hooks
+RG08SAV:	equ 0xffe7	; System saves the byte written to the register R#08 here, Used by VDP(9) in Basic. (MSX2~)
+RG09SAV:	equ 0xffe8	; System saves the byte written to the register R#09 here, Used by VDP(10) in Basic. (MSX2~)
+RG10SAV:	equ 0xffe9	; System saves the byte written to the register R#10 here, Used by VDP(11) in Basic. (MSX2~)
+RG11SAV:	equ 0xffea	; System saves the byte written to the register R#11 here, Used by VDP(12) in Basic. (MSX2~)
+RG12SAV:	equ 0xffeb	; System saves the byte written to the register R#12 here, Used by VDP(13) in Basic. (MSX2~)
+RG13SAV:	equ 0xffec	; System saves the byte written to the register R#13 here, Used by VDP(14) in Basic. (MSX2~)
+RG14SAV:	equ 0xffed	; System saves the byte written to the register R#14 here, Used by VDP(15) in Basic. (MSX2~)
+RG15SAV:	equ 0xffee	; System saves the byte written to the register R#15 here, Used by VDP(16) in Basic. (MSX2~)
+RG16SAV:	equ 0xffef	; System saves the byte written to the register R#16 here, Used by VDP(17) in Basic. (MSX2~)
+RG17SAV:	equ 0xfff0	; System saves the byte written to the register R#17 here, Used by VDP(18) in Basic. (MSX2~)
+RG18SAV:	equ 0xfff1	; System saves the byte written to the register R#18 here, Used by VDP(19) in Basic. (MSX2~)
+RG19SAV:	equ 0xfff2	; System saves the byte written to the register R#19 here, Used by VDP(20) in Basic. (MSX2~)
+RG20SAV:	equ 0xfff3	; System saves the byte written to the register R#20 here, Used by VDP(21) in Basic. (MSX2~)
+RG21SAV:	equ 0xfff4	; System saves the byte written to the register R#21 here, Used by VDP(22) in Basic. (MSX2~)
+RG22SAV:	equ 0xfff5	; System saves the byte written to the register R#22 here, Used by VDP(23) in Basic. (MSX2~)
+RG23SAV:	equ 0xfff6	; System saves the byte written to the register R#23 here, Used by VDP(24) in Basic. (MSX2~)
+MINROM:	equ 0xfff7	; Slot address of Main-ROM. Use EXPTBL+0 to know slot ID of the internal Main-ROM. (MSX2~)
+SVFFF8:	equ 0xfff8	; Reserved
+RG25SAV:	equ 0xfffa	; System saves the byte written to the register R#25 here, Used by VDP(26) in Basic. (MSX2+~)
+RG26SAV:	equ 0xfffb	; System saves the byte written to the register R#26 here, Used by VDP(27) in Basic. (MSX2+~)
+RG27SAV:	equ 0xfffc	; System saves the byte written to the register R#27 here, Used by VDP(28) in Basic. (MSX2+~)
+SVFFFD:	equ 0xfffd	; Reserved
+SLTSL:	equ 0xffff	; Access address to selection register of secondary slots. (Available in extended slots only.)
+
+; --- Puertos de E/S ---
+VDP_DATA:	equ 0x98	; VDP puerto de datos (lectura/escritura VRAM)
+VDP_CTRL:	equ 0x99	; VDP puerto de control (registros / direccion VRAM)
+PSG_ADDR:	equ 0xa0	; PSG AY-3-8910: selector de registro
+PSG_DATA:	equ 0xa1	; PSG: escritura de dato
+PSG_READ:	equ 0xa2	; PSG: lectura de dato (joystick, cinta)
+PPI_A_SLOT:	equ 0xa8	; PPI 8255 puerto A: registro de seleccion de slots primarios
+PPI_B_KEY:	equ 0xa9	; PPI puerto B: lectura de fila de teclado
+PPI_C:	equ 0xaa	; PPI puerto C: fila de teclado, CAPS, motor cinta, click
+PPI_CTRL:	equ 0xab	; PPI registro de control

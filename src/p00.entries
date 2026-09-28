@@ -1,0 +1,85 @@
+# Puntos de entrada del banco 0 (se ejecuta en 0x4000).
+#
+# Cada uno lleva la instruccion que lo justifica. Los que ponen "pNN:XXXX"
+# vienen de OTRO banco: el trazador de una sola pagina no puede seguirlos,
+# porque en esa direccion -segun lo que haya en el registro del mapper- puede
+# estar cualquiera de seis bancos. Los que ponen "tabla" salen de una tabla
+# del despachador 0x406B, que va pegada detras de su `call` y esta declarada
+# como datos en el .nocode: el trazador tampoco puede seguirla.
+#
+# Los saltos y llamadas DENTRO del propio banco no se ponen aqui: los
+# encuentra tools/z80trace.py solo, siguiendo el flujo.
+#
+# Este fichero lo regenera `make semillas` (tools/bancos.py escribe).
+0x4028   # gancho de interrupcion H.TIMI: INIT escribe 0xC3 en 0xFD9F y esta direccion en 0xFDA0 (p00:40B3-p00:40BB)
+0x4075   # cabecera AB: INIT
+0x417D   # p00:415E entrada 0 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x41A0   # p00:415E entrada 1 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x41AB   # p00:415E entrada 2 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x41D1   # p00:415E entrada 3 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x422C   # p00:415E entrada 4 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4257   # p00:415E entrada 5 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4294   # p00:415E entrada 6 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x42B2   # p00:415E entrada 7 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4324   # p00:415E entrada 8 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4377   # p00:415E entrada 9 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4387   # p00:415E entrada 10 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x43DA   # p00:415E entrada 11 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x43F0   # p00:415E entrada 12 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x4414   # p00:415E entrada 13 de la tabla de 0x4161 (call 0x406B en 0x415E)
+0x44EC   # p02:8E45 call
+0x44EE   # p02:81BF jp cc
+0x4594   # p02:8DB1 call
+0x45A0   # p02:94E2 call
+0x4605   # p02:8E0F call
+0x462B   # p02:85D3 jp
+0x463C   # p01:7E56 jp
+0x4651   # p03:B747 jp
+0x47B1   # p01:669B call
+0x47C7   # p01:6321 call
+0x47D4   # p01:6304 call
+0x49DB   # p02:8CD5 jp
+0x4B0B   # p02:8781 call
+0x4B1D   # p01:7B48 call
+0x4B2F   # p01:6285 call
+0x4B4F   # p02:94A9 call
+0x4E9F   # p01:63EA call
+0x4EB3   # p02:993F entrada 38 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0x4EC0   # p01:63ED call
+0x4EF9   # p02:993F entrada 39 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0x4F17   # p01:63F0 call
+0x4F35   # p02:993F entrada 41 de la tabla de 0x9942 (call 0x406B en 0x993F)
+0x4F83   # p01:6301 call
+0x4F91   # p01:630A call
+0x509F   # p02:94F1 call
+0x5309   # p01:66E0 call
+0x530F   # p01:6221 call
+0x53B6   # p01:62E3 jp
+0x53DE   # p01:6712 call
+0x53FC   # p02:914C jp cc
+0x548D   # p01:62DD call
+0x5593   # p01:724D jp
+0x55EC   # p01:778F call cc
+0x564C   # p01:62E6 call
+0x5670   # p01:63DE call
+0x5678   # p01:63E4 call
+0x56E1   # p01:62FE call
+0x570D   # p01:62E9 call
+0x5733   # p01:63E1 call
+0x5768   # p01:62E0 call
+0x5780   # p01:62FB call
+0x57B4   # p01:6631 call
+0x57C0   # p03:B6ED call
+0x57DF   # p01:636C jp
+0x5880   # p01:6369 call
+0x59EC   # p01:6366 call
+0x5A37   # p01:639B call
+0x5A40   # p01:6392 call
+0x5A49   # p01:62F2 call
+0x5B1B   # p01:638F call
+0x5B21   # p02:9620 call
+0x5BD2   # p02:961A call
+0x5D0E   # p02:93CA call
+0x5EB8   # p02:98E9 call cc
+0x5F1D   # p02:9A5D call
+0x5F1F   # p01:61F6 call

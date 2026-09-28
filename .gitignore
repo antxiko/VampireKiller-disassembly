@@ -1,0 +1,33 @@
+# -----------------------------------------------------------------------------
+# Ficheros de trabajo que no aportan nada a quien se descargue esto
+# -----------------------------------------------------------------------------
+# Son volcados intermedios y resultados que `make` vuelve a generar solo.
+#
+# Ojo con la forma de escribirlo: 'work/' a secas excluiria el directorio entero
+# y entonces el '!work/msx.sym' de abajo NO podria rescatar nada, porque git no
+# vuelve a mirar dentro de un directorio ya excluido. Con 'work/*' si funciona.
+
+dump/
+build/
+work/*
+!work/msx.sym
+
+# -----------------------------------------------------------------------------
+# El cartucho original
+# -----------------------------------------------------------------------------
+# No se distribuye la imagen del cartucho: cada cual pone la suya. El listado
+# comentado SI va incluido.
+
+*.rom
+*.cas
+*.dsk
+*.wav
+
+# -----------------------------------------------------------------------------
+# Basura del sistema y del entorno
+# -----------------------------------------------------------------------------
+.DS_Store
+__pycache__/
+*.pyc
+.forja/
+*.omr
