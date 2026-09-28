@@ -716,6 +716,376 @@ C 0x6EF1 ... arriba del todo, fuera
 L 0x6EF5 fuera_de_la_escalera
 C 0x6EF5 de pie...
 
+C 0x6EFC sin tecla que siga...
+C 0x6F00 ... ni puntos contados
+L 0x6F09 paso_de_bajada
+C 0x6F09 cada cuatro puntos...
+C 0x6F0E ... uno de dos pasos: las piernas +1 o +0...
+C 0x6F1C ... y el cuerpo +0 o +1
+L 0x6F24 paso_de_subida
+C 0x6F24 cada cuatro puntos...
+C 0x6F29 ... las piernas +1 o +2...
+C 0x6F35 ... y el cuerpo +0 o +1
+L 0x6F3D simon_cae
+C 0x6F3D ESTADO 4: sobre una plataforma...
+C 0x6F43 ... o con suelo, aterriza
+C 0x6F48 de pie mientras cae
+C 0x6F52 la cuenta, hasta 3...
+C 0x6F5C ... elige cuanto baja, de 0x6F81
+L 0x6F6A aterriza_de_la_caida
+C 0x6F6A la y en la rejilla de 8...
+C 0x6F72 ... al estado 0...
+C 0x6F7C ... y el efecto 7
+B 0x6F85 GOLPEADO (estado 5, por el paso de 0xC423): 0, el efecto 0x13 y 0x5A cuadros de respiro (0xC42D); en la escalera y con vida, sigue en ella con el cuerpo en la pose 2; si no, sale despedido hacia atras (1 a la izquierda, 2 a la derecha, por el lado del golpe 0xC43C) con la curva de 0x707D; 3, en el suelo 4 cuadros (0x10 sin vida) y vuelve de pie mirando al otro lado; sin vida, al estado 6.
+L 0x6F85 simon_golpeado
+C 0x6F85 por su paso
+L 0x6F93 golpe_empieza
+C 0x6F93 en una partida...
+C 0x6F98 ... el efecto 0x13
+C 0x6F9D 0x5A cuadros de respiro
+C 0x6FA2 en la escalera...
+C 0x6FA9 ... y con vida...
+C 0x6FAF ... sigue en ella...
+C 0x6FB4 ... con el cuerpo en la pose 2
+L 0x6FBC despedido
+C 0x6FBC mira al lado del golpe...
+C 0x6FC2 ... y sale hacia atras: paso 1 o 2
+C 0x6FC6 desde el principio de la curva
+C 0x6FCA poses 7 y 3
+L 0x6FD4 despedido_a_la_izquierda
+C 0x6FD4 paso 1: hacia la izquierda
+L 0x6FD7 curva_del_golpe
+C 0x6FD7 la curva de 0x707D, 0x15 pasos
+C 0x6FE4 hasta el paso 0x0B...
+C 0x6FE7 ... sube: nada mas
+C 0x6FE8 suelo?
+C 0x6FED plataforma?
+L 0x6FF2 cae_del_golpe
+C 0x6FF2 la y en la rejilla de 8
+C 0x6FFA paso 3...
+C 0x6FFF ... 4 cuadros en el suelo...
+C 0x7007 ... o 0x10 sin vida
+C 0x700C las poses siguientes
+L 0x7017 despedido_a_la_derecha
+C 0x7017 paso 2: hacia la derecha
+L 0x701D golpe_en_el_suelo
+C 0x701D paso 3: sobre una plataforma, con ella
+C 0x7024 al acabar la cuenta...
+C 0x7029 ... todo a cero: estado 0
+C 0x703C con la puerta de la fase en 2, 3 o 5...
+C 0x704B ... no; si no, mira al otro lado
+L 0x7053 sin_vida
+C 0x7053 le queda vida?
+C 0x7058 no: separado del borde izquierdo...
+L 0x7063 a_morir
+C 0x7063 ... al estado 6
+C 0x7073 poses 9 y 5
+B 0x7093 MUERE (estado 6): subestado 0, al acabar la cuenta, silencio, la musica 0x89 y 0x5A cuadros; subestado 1, al acabarlos, los corazones a 5 como mucho, todo lo de Simon a cero, la habitacion 0 y la vida acabada (0xC413); y pierde las armas y lo que lleva, salvo el pergamino (bit 7 de 0xC701).
+L 0x7093 simon_muere
+C 0x7093 subestado 1?
+C 0x709C subestado 0: la cuenta
+C 0x709E 0x5A cuadros...
+C 0x70A0 ... subestado 1...
+C 0x70A5 ... silencio...
+C 0x70AA ... y la musica 0x89
+L 0x70AF se_acabo_la_vida
+C 0x70AF al acabar la cuenta...
+C 0x70B4 ... los corazones, como mucho 5
+L 0x70BF todo_a_cero
+C 0x70BF la cuenta, los estados...
+C 0x70D6 la habitacion 0
+C 0x70D9 y la vida acabada
+L 0x70DC pierde_lo_que_lleva
+C 0x70DC solo se queda el pergamino
+C 0x70E4 sin arma...
+C 0x70E8 ... sin botas, alas ni lazo (0xC431)...
+C 0x70F4 ... ni lo de 0xC702 ni 0xC700
+B 0x70FB POR UN PASO (estado 7, desde agachado sobre un paso con el salto, p01:6DA9): al acabar los cuadros de 0xC42D, de pie y a la habitacion del paso (0xC41B = 0xFF, que p13:B963 manda a la de 0xC5B4).
+L 0x70FB simon_por_un_paso
+C 0x70FB espera
+C 0x7100 de pie
+C 0x7107 y se va por el paso
+B 0x710D EL LATIGO Y LAS ARMAS, cada cuadro: el primer disparo, el golpe en marcha y las armas lanzadas.
+L 0x710D latigo_y_armas
+C 0x710D los mandos
+C 0x7110 el golpe
+C 0x7113 las armas lanzadas
+L 0x7116 mandos_del_golpe
+C 0x7116 el primer disparo recien pulsado?
+C 0x711D ya golpeando: nada
+C 0x7123 con que arma
+C 0x7129 el latigo (0 y 1)...
+C 0x712D ... si no, hay sitio para lanzarla?
+C 0x7131 no: nada
+L 0x7133 empieza_el_golpe
+C 0x7133 0xC422 = 1: golpeando
+L 0x7136 saltando_con_objetos
+C 0x7136 solo saltando (estado 1)
+C 0x713B lo que lleva...
+C 0x713F ... el bit 3 (el frasco, p02:8D8D)...
+C 0x7147 ... el bit 6
+B 0x714D CON EL BIT 3 DE 0xC701, saltando y con 5 corazones: izquierda o derecha recien pulsadas gastan 5 corazones, ponen el bit 0 en las cosas con el bit 2 (0x999F) y 0xC461 a 5 (0xC468: 1 a la izquierda, 0 a la derecha).
+L 0x714D con_el_bit_3
+C 0x714D 5 corazones?
+C 0x7153 izquierda recien pulsada...
+C 0x715B ... o derecha
+B 0x715F EL RELOJ (bit 6 de 0xC701): saltando, abajo recien pulsado y 5 corazones: los gasta y para el tiempo (0xD010) 0x5A cuadros (0x96 con el lazo), efecto 0xFB; p01:75F2 lo devuelve.
+L 0x715F el_reloj
+C 0x715F ya parado?
+C 0x7164 5 corazones?
+C 0x716A abajo recien pulsado?
+C 0x7170 5 corazones menos
+C 0x717C con el lazo...
+C 0x7181 ... 0x96 cuadros...
+C 0x7185 ... si no, 0x5A
+C 0x718A el tiempo parado
+C 0x718F efecto 0xFB
+L 0x7194 bit_3_a_la_izquierda
+C 0x7194 en marcha ya (0xC461)?
+C 0x7199 a la izquierda
+L 0x71A1 bit_3_a_la_derecha
+C 0x71A6 a la derecha
+L 0x71AA bit_3_gasta
+C 0x71AA el bit 0 en las cosas
+C 0x71AD 0xC461 a 5
+C 0x71B2 5 corazones menos
+L 0x71BE sitio_para_el_arma
+C 0x71BE el arma 2 deja dos a la vez...
+C 0x71C7 ... las demas, una
+C 0x71C8 las dos fichas de 0xC450
+L 0x71CC ficha_de_arma_libre
+C 0x71CC libre?
+C 0x71D2 si: apartada (1)
+L 0x71D8 ficha_de_arma_siguiente
+C 0x71D8 la siguiente, 16 bytes mas
+L 0x71E0 el_golpe
+C 0x71E0 golpeando?
+C 0x71E5 no cayendo ni golpeado (estados 0-3)
+C 0x71EB por su paso
+L 0x71FA golpe_paso_1
+C 0x71FA paso 1: en la escalera, las piernas como van
+C 0x7201 agachado, la 6; si no, la 0
+L 0x720C golpe_el_cuerpo
+C 0x720C con el latigo...
+C 0x7213 ... sin arma (el de cuero), el cuerpo en la 6...
+C 0x721B ... con el de cadena (el arma 1), en la 9
+C 0x7223 el efecto 5
+L 0x722A golpe_con_arma
+C 0x722A los patrones del arma...
+C 0x722D ... y el cuerpo en la 0x0C
+L 0x7238 golpe_cuenta
+C 0x7238 la cuenta del golpe
+L 0x723B golpe_paso_siguiente
+C 0x723B el paso siguiente del golpe
+L 0x7240 golpe_paso_2
+C 0x7240 paso 2: el cuerpo, la pose siguiente
+L 0x7250 golpe_paso_3
+C 0x7250 paso 3: con arma, como el 2
+C 0x7257 con el latigo: el bit 0 en las cosas...
+C 0x725A ... la pose siguiente...
+C 0x725E ... y 4 cuadros
+L 0x7262 golpe_paso_4
+C 0x7262 paso 4: con arma, a lanzarla
+C 0x7269 con el latigo, la cuenta
+L 0x726E acaba_el_golpe
+C 0x726E sin golpe
+C 0x7275 el cuerpo: en la escalera la 2...
+C 0x727A ... si no, la 0
+L 0x7286 lanza_el_arma
+C 0x7286 el bit 0 en las cosas
+C 0x7289 acaba el golpe
+C 0x728C la ficha apartada...
+L 0x7292 busca_la_apartada
+C 0x7292 apartada (1)?
+C 0x7298 0x18...
+C 0x729D ... el lado...
+C 0x72A3 ... y el arma
+L 0x72AA arma_siguiente
+L 0x72B2 las_armas_lanzadas
+C 0x72B2 las dos fichas de 0xC450 y 0xC460
+L 0x72BD un_arma_lanzada
+C 0x72BD lanzada?
+C 0x72C2 se mueve...
+C 0x72C5 ... lo de 0x74BB...
+C 0x72C8 ... lo de 0x74CE...
+C 0x72CB ... y lo de 0x7535
+L 0x72CE mueve_el_arma
+C 0x72CE por el arma: 2 la daga (0x7436), 3 el hacha (0x7473), 4 la cruz (0x72DE), 5 el frasco (0x73A4)
+L 0x72DE la_cruz
+C 0x72DE LA CRUZ: cada cuatro cuadros, el patron: 0x18, 0x20...
+C 0x72EE cada ocho...
+C 0x72F3 ... el efecto 3
+C 0x72F8 por su paso
+L 0x7307 la_cruz_sale
+C 0x7307 paso 0: la altura...
+C 0x730C ... de pie, 0x10 por encima de Simon...
+C 0x7313 ... agachado, 0x0A
+C 0x7316 a su y (byte 4)
+C 0x731A (byte 2 a 0)
+C 0x731D el arma (byte 1)...
+C 0x7328 hacia donde (byte 8)
+
+B 0x72B2 LAS ARMAS LANZADAS: dos fichas de 16 bytes en 0xC450 y 0xC460 ([0] el paso, 1 apartada; [1] el arma; [2] y [3] lo que se suma cada cuadro a la y y a la x; [4] la y; [5] la x; [6] el patron; [7] la cuenta; [8] el lado), cada una con dos sprites (6-7 y 8-9 en la copia de 0xD600) y sus colores en 0xD460/0xD480. El hacha (3) y la cruz (4) van y vuelven por la misma tabla (0x72FF = 0x749D).
+C 0x7322 ... la 3, 3 por cuadro; la 4, 5...
+C 0x7331 a la velocidad horizontal (byte 3)
+C 0x7334 la x de Simon (byte 5)
+L 0x733D va
+C 0x733D paso 1: la x, lejos del borde?
+C 0x7344 no: se da la vuelta ya
+C 0x7346 la cuenta...
+C 0x734C ... hasta 0x18
+L 0x734F paso_siguiente_del_arma
+C 0x734F el paso siguiente...
+C 0x7352 ... la cuenta a 0...
+C 0x7356 ... y el bit 0 en las cosas
+L 0x7359 salta_un_paso
+C 0x7359 dos pasos mas
+L 0x735C da_la_vuelta
+C 0x735C un paso mas: vuelve...
+C 0x735F ... hacia el otro lado, 5 por cuadro
+C 0x7369 a la velocidad horizontal
+C 0x736C la cuenta a 0
+L 0x7373 vuelve
+C 0x7373 paso 2: Simon la coge?
+C 0x7376 si: se quita
+C 0x7379 la x, lejos del borde?
+C 0x737C (si no, da la vuelta)
+C 0x7382 la cuenta...
+C 0x7388 ... hasta 0x17
+C 0x738D uno de cada dos cuadros...
+C 0x738F ... sube o baja un punto segun el lado
+L 0x7399 baja_un_punto
+L 0x739D vuelve_y_se_coge
+C 0x739D paso 3: Simon la coge?
+C 0x73A1 si: se quita
+L 0x73A4 el_frasco
+C 0x73A4 EL FRASCO (arma 5), por su paso:
+C 0x73A7 2, cae...
+C 0x73AB 3, arde
+C 0x73AE 1, sale: de pie...
+C 0x73B6 ... 0x10 por encima de Simon...
+C 0x73BA ... agachado, 0x0A
+C 0x73BD la y (byte 4)
+C 0x73C0 sin velocidad vertical
+C 0x73C4 2 por cuadro...
+C 0x73CA ... segun el lado
+C 0x73CE a la velocidad horizontal
+C 0x73D1 la x de Simon
+C 0x73D7 el patron 0x38
+L 0x73DE el_frasco_cae
+C 0x73DE la curva de 0x707D, por la cuenta...
+C 0x73EA ... por dos, a la y
+C 0x73F0 la cuenta, hasta 0x16
+C 0x73FD en el decorado?
+C 0x7406 no: sigue
+C 0x7407 si: paso 3, quieto...
+C 0x7414 ... y el efecto 0x18
+L 0x7419 el_frasco_arde
+C 0x7419 cada cuatro cuadros...
+C 0x741E ... el patron 0xF4...
+C 0x7422 ... o el bit 0 en las cosas y el 0xF8
+C 0x742A la cuenta...
+C 0x7430 ... hasta 0x18, y se quita
+L 0x7436 la_daga
+C 0x7436 LA DAGA (arma 2): solo al salir (paso 1)
+C 0x743B de pie...
+C 0x7440 ... 0x10 por encima de Simon...
+C 0x7447 ... agachado, 0x0A
+C 0x744A la y
+C 0x744D sin velocidad vertical
+C 0x7451 5 por cuadro con el patron 0x20...
+C 0x745B ... o -5 con el 0x18, segun el lado
+C 0x7465 la x de Simon
+C 0x746B paso 2...
+C 0x746E ... y el efecto 4
+L 0x7473 el_hacha
+C 0x7473 EL HACHA (arma 3): cada dos cuadros, el patron: 0x18, 0x20, 0x28 o 0x30...
+C 0x7482 ... cada ocho...
+C 0x7487 ... el efecto 6
+L 0x748C el_hacha_mira
+C 0x748C con 0xC433 en 2 o 3...
+C 0x7496 si no, por su paso (la tabla de la cruz)
+L 0x74A5 el_hacha_suelta
+C 0x74A5 0xC433 a 0
+C 0x74A7 el hacha cae como objeto (0x1C)...
+C 0x74A9 ... en su sitio...
+C 0x74B2 ... sale
+C 0x74B5 y el arma se quita
+L 0x74BB mueve_el_arma_lanzada
+C 0x74BB y += byte 2
+C 0x74C4 x += byte 3
+L 0x74CE fuera_si_se_sale_el_arma
+C 0x74CE la y, de 0xD8 a 0xE7...
+C 0x74D5 ... fuera
+C 0x74D7 la x, de 0xFB a 0x04...
+C 0x74DE (si no, sigue)
+C 0x74DF con el hacha o la cruz...
+C 0x74E4 ... lo de 0x8E93
+L 0x74E9 quita_el_arma
+C 0x74E9 la ficha...
+L 0x74EC quita_la_ficha
+C 0x74EC ... a cero, 16 bytes
+C 0x74F8 la de 0xC450...
+C 0x74FB ... sus sprites 6 y 7 fuera...
+L 0x7507 sprites_8_y_9_fuera
+C 0x7507 ... o, la de 0xC460, los 8 y 9
+L 0x750D y_fuera
+C 0x750D y la y 0xE0 en la ficha (byte 4)
+L 0x7513 quita_las_armas
+C 0x7513 las dos fichas a cero
+C 0x7520 la y 0xE0 en las dos...
+C 0x7528 ... y los cuatro sprites fuera
+B 0x7535 LOS DOS SPRITES DEL ARMA en la copia de 0xD600 (6 y 7 para 0xC450, 8 y 9 para 0xC460): en (y - 0x10, x - 8), con el patron y el siguiente (+4); y sus colores de linea, 0x0F y 0x0E con la cruz (arma 4), si no 2 y 0x4C, y 8 y 0 para el segundo sprite del frasco ardiendo.
+L 0x7535 sprites_del_arma
+C 0x7535 lanzada?
+C 0x753D la de 0xC450...
+C 0x7540 ... en los sprites 6 y 7...
+C 0x7545 ... la otra, 8 y 9
+L 0x7548 sprite_del_arma
+C 0x7548 la y, menos 0x10
+C 0x754F la x, menos 8
+C 0x7556 el patron
+C 0x755C el segundo: la misma y...
+C 0x7563 ... la x...
+C 0x756A ... y el patron siguiente
+C 0x7570 sus colores: 0xD460...
+C 0x757B ... o 0xD480
+L 0x757E colores_del_arma
+C 0x757E la cruz (arma 4)...
+C 0x7585 ... 0x0F en las 16 lineas del primero...
+C 0x758C ... y 0x0E en las del segundo
+L 0x7590 color_en_b_lineas
+L 0x7595 colores_2_y_0x4c
+C 0x7595 las demas: 2...
+C 0x759C ... y 0x4C
+C 0x75A3 el frasco...
+C 0x75A9 ... ardiendo (paso 3)...
+C 0x75AF ... el primero 8 y el segundo 0
+L 0x75B7 colores_del_frasco
+L 0x75C0 cuentas_de_simon
+C 0x75C0 las cuentas de 0xC440...
+C 0x75C6 ... 0xC434...
+C 0x75CC ... y 0xC42D (el respiro)
+L 0x75CF baja_una_cuenta
+C 0x75CF hasta 0
+L 0x75D4 cuenta_de_0xc445
+C 0x75D4 0xC445, al acabar...
+C 0x75DC ... 0x18 cuadros en 0xC43E
+L 0x75E2 cuenta_de_la_invencibilidad
+C 0x75E2 la invencibilidad...
+C 0x75EA ... al quedar 0x10...
+C 0x75ED ... el efecto 0x17
+L 0x75F2 cuenta_del_reloj
+C 0x75F2 el tiempo parado...
+C 0x75FA ... al acabar, sigue...
+C 0x75FF ... con el efecto 0xFC
+L 0x7604 destello_del_borde
+C 0x7604 0xC43E cuadros...
+C 0x760B ... uno si y otro no...
+C 0x760D ... el color del borde 0x0E...
+C 0x7611 ... o 0
+C 0x7612 (por CHGCLR)
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x6058 0x6086 sprites_de_cada_tipo  46 bytes, uno por tipo de cosa (1-46): cuantos sprites lleva; p00:5F4B lo lee con 0x6057 + tipo y lo deja en (ix+0x20). Los dos ultimos son tambien la entrada 0, sin usar, de la tabla de al lado
 F 0x6058 16
@@ -996,64 +1366,39 @@ C 0x6EF8 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6F03 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6F15 lee la pose de las piernas de Simon
 C 0x6F19 guarda la pose de las piernas de Simon
-C 0x6F1C lee la pose del cuerpo de Simon
 C 0x6F20 guarda la pose del cuerpo de Simon
 C 0x6F2E lee la pose de las piernas de Simon
 C 0x6F32 guarda la pose de las piernas de Simon
-C 0x6F35 lee la pose del cuerpo de Simon
 C 0x6F39 guarda la pose del cuerpo de Simon
-C 0x6F43 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
 C 0x6F4B guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6F4F pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6F5F hl_mas_a: HL += A
 C 0x6F62 lee la Y de Simon
 C 0x6F66 guarda la Y de Simon
-C 0x6F6A lee la Y de Simon
 C 0x6F6F guarda la Y de Simon
 C 0x6F7E sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x6F88 despacha: salta a la entrada A de la tabla que va detras del call
-C 0x6F93 lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x6F9A sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x6FA9 lee la vida de Simon
 C 0x6FB6 guarda la pose del cuerpo de Simon
 C 0x6FB9 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6FBF guarda el lado al que mira Simon (0 derecha)
 C 0x6FCD guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x6FD1 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x6FE0 aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
-C 0x6FE8 mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-C 0x6FF2 lee la Y de Simon
 C 0x6FF7 guarda la Y de Simon
-C 0x6FFF lee la vida de Simon
-C 0x700C lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x7012 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-C 0x703C lee el estado de la puerta de la fase
-C 0x704B lee el lado al que mira Simon (0 derecha)
 C 0x7050 guarda el lado al que mira Simon (0 derecha)
-C 0x7053 lee la vida de Simon
-C 0x7058 apunta a la X de Simon
 C 0x7076 guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 C 0x707A pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 C 0x70A7 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x70B4 apunta a los corazones, en BCD
 C 0x70CA guarda la cuenta de la INVENCIBILIDAD
-C 0x70D6 guarda la HABITACION dentro de la fase
-C 0x70D9 guarda la VIDA en marcha
-C 0x70DC lee lo que lleva Simon (un bit por objeto)
 C 0x70E1 guarda lo que lleva Simon (un bit por objeto)
 C 0x70E5 guarda el arma que lleva Simon (0, ninguna)
 C 0x70EE guarda los usos que le quedan a lo que para golpes
-C 0x70F4 guarda mas cosas que lleva (bit 0: se ven los bloques que se rompen)
 C 0x7109 guarda el lado por el que se sale de la habitacion
-C 0x7123 lee el arma que lleva Simon (0, ninguna)
-C 0x713B lee lo que lleva Simon (un bit por objeto)
-C 0x714D lee los corazones, en BCD
-C 0x7164 lee los corazones, en BCD
-C 0x7170 lee los corazones, en BCD
 C 0x7176 guarda los corazones, en BCD
 C 0x7191 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x71B2 lee los corazones, en BCD
 C 0x71B8 guarda los corazones, en BCD
 C 0x71EF despacha: salta a la entrada A de la tabla que va detras del call
 C 0x7209 guarda la pose de las piernas de Simon
@@ -1062,105 +1407,18 @@ C 0x7220 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mi
 C 0x7225 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x722F guarda la pose del cuerpo de Simon
 C 0x7232 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x7240 apunta a la pose del cuerpo de Simon
-C 0x725A apunta a la pose del cuerpo de Simon
 C 0x7280 guarda la pose del cuerpo de Simon
 C 0x7283 pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-C 0x729D lee el lado al que mira Simon (0 derecha)
 C 0x72D3 despacha: salta a la entrada A de la tabla que va detras del call
-C 0x72DE lee el contador de cuadros
 C 0x72F5 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x72FC despacha: salta a la entrada A de la tabla que va detras del call
-C 0x730C lee la Y de Simon
-C 0x7316 guarda la fraccion de la x de la cosa
-C 0x731A guarda la fraccion de la y de la cosa
-C 0x731D lee el paso en que va la cosa
-C 0x7328 lee la velocidad vertical
-C 0x7331 guarda la y de la cosa
-C 0x7334 lee la X de Simon
-C 0x7337 guarda la x de la cosa
-C 0x733D lee la x de la cosa
-C 0x7346 sube la velocidad vertical (parte baja)
-C 0x7349 lee la velocidad vertical (parte baja)
-C 0x734F sube el tipo de la cosa
-C 0x7352 la velocidad vertical (parte baja) = 0x00
-C 0x7359 sube el tipo de la cosa
-C 0x735C sube el tipo de la cosa
-C 0x735F lee la velocidad vertical
-C 0x7369 guarda la y de la cosa
-C 0x736C la velocidad vertical (parte baja) = 0x00
-C 0x7379 lee la x de la cosa
-C 0x7382 sube la velocidad vertical (parte baja)
-C 0x7385 lee la velocidad vertical (parte baja)
-C 0x738F lee la velocidad vertical
-C 0x7395 baja la y de la cosa
-C 0x7399 sube la y de la cosa
-C 0x73A4 lee el tipo de la cosa
 C 0x73B3 lee la Y de Simon
-C 0x73BD guarda la fraccion de la x de la cosa
-C 0x73C1 guarda la fraccion de la y de la cosa
-C 0x73C4 lee la velocidad vertical
-C 0x73CE guarda la y de la cosa
-C 0x73D1 lee la X de Simon
-C 0x73D4 guarda la x de la cosa
-C 0x73D7 la cosa se mueve
-C 0x73DE lee la velocidad vertical (parte baja)
 C 0x73E4 hl_mas_a: HL += A
-C 0x73E7 lee la fraccion de la x de la cosa
-C 0x73ED guarda la fraccion de la x de la cosa
-C 0x73F0 sube la velocidad vertical (parte baja)
-C 0x73F3 lee la velocidad vertical (parte baja)
-C 0x73FA baja la velocidad vertical (parte baja)
-C 0x73FD lee la x de la cosa
-C 0x7400 lee la fraccion de la x de la cosa
 C 0x7403 choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-C 0x7407 sube el tipo de la cosa
-C 0x740B guarda la fraccion de la y de la cosa
-C 0x740E guarda la y de la cosa
-C 0x7411 guarda la velocidad vertical (parte baja)
 C 0x7416 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7419 lee el contador de cuadros
-C 0x7427 guarda si la cosa se mueve
-C 0x742A sube la velocidad vertical (parte baja)
-C 0x742D lee la velocidad vertical (parte baja)
-C 0x7436 lee el tipo de la cosa
-C 0x7440 lee la Y de Simon
-C 0x744A guarda la fraccion de la x de la cosa
-C 0x744E guarda la fraccion de la y de la cosa
-C 0x7451 lee la velocidad vertical
-C 0x745F guarda la y de la cosa
-C 0x7462 guarda si la cosa se mueve
-C 0x7465 lee la X de Simon
-C 0x7468 guarda la x de la cosa
-C 0x746B sube el tipo de la cosa
 C 0x7470 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7473 lee el contador de cuadros
-C 0x747F guarda si la cosa se mueve
 C 0x7489 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x7496 lee el tipo de la cosa
 C 0x749A despacha: salta a la entrada A de la tabla que va detras del call
-C 0x74A9 lee la x de la cosa
-C 0x74AC lee la fraccion de la x de la cosa
-C 0x74BB lee la fraccion de la x de la cosa
-C 0x74BE le suma la fraccion de la y de la cosa
-C 0x74C1 guarda la fraccion de la x de la cosa
-C 0x74C4 lee la x de la cosa
-C 0x74C7 le suma la y de la cosa
-C 0x74CA guarda la x de la cosa
-C 0x74CE lee la fraccion de la x de la cosa
-C 0x74D7 lee la x de la cosa
-C 0x74DF lee el arma que lleva Simon (0, ninguna)
-C 0x7535 lee el tipo de la cosa
-C 0x7548 lee la fraccion de la x de la cosa
-C 0x754F lee la x de la cosa
-C 0x7556 lee si la cosa se mueve
-C 0x755C lee la fraccion de la x de la cosa
-C 0x7563 lee la x de la cosa
-C 0x756A lee si la cosa se mueve
-C 0x757E lee el paso en que va la cosa
-C 0x75A3 lee el paso en que va la cosa
-C 0x75A9 lee el tipo de la cosa
-C 0x75E2 apunta a la cuenta de la INVENCIBILIDAD
 C 0x75EF sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x7601 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x761E lee lo que lleva Simon (un bit por objeto)

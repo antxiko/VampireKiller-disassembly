@@ -358,7 +358,7 @@ empieza_una_vida:
 barra_del_enemigo_llena:
 	ld a,080h		;62d5   ; ... y la barra del enemigo llena
 	ld (0c418h),a		;62d7   ; guarda la vida del enemigo (barra ENEMY)
-	call L_70DC		;62da   ; fuera armas y cuentas
+	call pierde_lo_que_lleva		;62da   ; fuera armas y cuentas
 	call 0548dh		;62dd   ; los dibujos de las armas
 	call 05768h		;62e0   ; y los de la fase
 	jp 053b6h		;62e3   ; y los de la pantalla
@@ -448,7 +448,7 @@ vacia_la_habitacion:
 	call 0902dh		;6395   ; las plataformas...
 	call 0909bh		;6398   ; ... en su sitio
 	call 05a37h		;639b   ; las salidas
-	call L_7513		;639e   ; fuera las armas
+	call quita_las_armas		;639e   ; fuera las armas
 	ld hl,0c800h		;63a1   ; las siete fichas de 0xC800...
 	ld de,00080h		;63a4   ; de 0x80 en 0x80
 	ld b,007h		;63a7
@@ -1538,14 +1538,14 @@ L_6B0C:
 	jr z,L_6B24		;6b1b
 	cp 005h		;6b1d
 	jr z,L_6B24		;6b1f
-	call L_710D		;6b21   ; ... si no esta abriendose
+	call latigo_y_armas		;6b21   ; ... si no esta abriendose
 L_6B24:
 	call L_767B		;6b24
-	call L_75C0		;6b27
-	call L_75E2		;6b2a
-	call L_75F2		;6b2d
-	call L_75D4		;6b30
-	call L_7604		;6b33
+	call cuentas_de_simon		;6b27
+	call cuenta_de_la_invencibilidad		;6b2a
+	call cuenta_del_reloj		;6b2d
+	call cuenta_de_0xc445		;6b30
+	call destello_del_borde		;6b33
 	jp L_7618		;6b36
 
 ; ----------------------------------------------------------------------
@@ -2028,7 +2028,7 @@ baja_a_la_derecha:
 	ld (0c42ch),a		;6e23   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e26   ; poses 3 y 1
 	ld (0c42eh),de		;6e29   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-	call L_6F09		;6e2d   ; el paso
+	call paso_de_bajada		;6e2d   ; el paso
 	ld hl,0c42bh		;6e30   ; un punto mas
 	inc (hl)			;6e33
 	ld a,(hl)			;6e34
@@ -2057,7 +2057,7 @@ baja_a_la_izquierda:
 	ld (0c42ch),a		;6e5d   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6e60   ; poses 0x0D y 0x10
 	ld (0c42eh),de		;6e63   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-	call L_6F09		;6e67
+	call paso_de_bajada		;6e67
 	ld hl,0c42bh		;6e6a   ; un punto mas
 	inc (hl)			;6e6d
 	ld a,(hl)			;6e6e
@@ -2086,7 +2086,7 @@ sube_a_la_derecha:
 	ld (0c42ch),a		;6e95   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,00103h		;6e98   ; poses 3 y 1
 	ld (0c42eh),de		;6e9b   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-	call L_6F24		;6e9f
+	call paso_de_subida		;6e9f
 	ld hl,0c42bh		;6ea2   ; un punto mas
 	inc (hl)			;6ea5
 	ld a,(hl)			;6ea6
@@ -2116,7 +2116,7 @@ sube_a_la_izquierda:
 	ld (0c42ch),a		;6ed0   ; guarda el lado al que mira Simon (0 derecha)
 	ld de,0100dh		;6ed3   ; poses 0x0D y 0x10
 	ld (0c42eh),de		;6ed6   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-	call L_6F24		;6eda
+	call paso_de_subida		;6eda
 	ld hl,0c42bh		;6edd   ; un punto mas
 	inc (hl)			;6ee0
 	ld a,(hl)			;6ee1
@@ -2135,16 +2135,16 @@ escalera_libre_2:
 fuera_de_la_escalera:
 	ld de,00000h		;6ef5   ; de pie...
 	ld (0c42eh),de		;6ef8   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
-	xor a			;6efc
+	xor a			;6efc   ; sin tecla que siga...
 	ld (0c435h),a		;6efd
-	ld (0c42bh),a		;6f00
+	ld (0c42bh),a		;6f00   ; ... ni puntos contados
 	call pose_segun_el_lado		;6f03   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	jp de_pie_otra_vez		;6f06
-L_6F09:
-	ld a,(0c42bh)		;6f09
+paso_de_bajada:
+	ld a,(0c42bh)		;6f09   ; cada cuatro puntos...
 	rra			;6f0c
 	rra			;6f0d
-	and 001h		;6f0e
+	and 001h		;6f0e   ; ... uno de dos pasos: las piernas +1 o +0...
 	ld c,a			;6f10
 	neg		;6f11
 	inc a			;6f13
@@ -2152,56 +2152,56 @@ L_6F09:
 	ld a,(0c42eh)		;6f15   ; lee la pose de las piernas de Simon
 	add a,b			;6f18
 	ld (0c42eh),a		;6f19   ; guarda la pose de las piernas de Simon
-	ld a,(0c42fh)		;6f1c   ; lee la pose del cuerpo de Simon
+	ld a,(0c42fh)		;6f1c   ; ... y el cuerpo +0 o +1
 	add a,c			;6f1f
 	ld (0c42fh),a		;6f20   ; guarda la pose del cuerpo de Simon
 	ret			;6f23
-L_6F24:
-	ld a,(0c42bh)		;6f24
+paso_de_subida:
+	ld a,(0c42bh)		;6f24   ; cada cuatro puntos...
 	rra			;6f27
 	rra			;6f28
-	and 001h		;6f29
+	and 001h		;6f29   ; ... las piernas +1 o +2...
 	ld c,a			;6f2b
 	inc a			;6f2c
 	ld b,a			;6f2d
 	ld a,(0c42eh)		;6f2e   ; lee la pose de las piernas de Simon
 	add a,b			;6f31
 	ld (0c42eh),a		;6f32   ; guarda la pose de las piernas de Simon
-	ld a,(0c42fh)		;6f35   ; lee la pose del cuerpo de Simon
+	ld a,(0c42fh)		;6f35   ; ... y el cuerpo +0 o +1
 	add a,c			;6f38
 	ld (0c42fh),a		;6f39   ; guarda la pose del cuerpo de Simon
 	ret			;6f3c
-L_6F3D:
-	ld a,(0c439h)		;6f3d
+simon_cae:
+	ld a,(0c439h)		;6f3d   ; ESTADO 4: sobre una plataforma...
 	and a			;6f40
-	jr nz,L_6F6A		;6f41
-	call mira_el_suelo		;6f43   ; mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-	jr c,L_6F6A		;6f46
-	ld de,00000h		;6f48
+	jr nz,aterriza_de_la_caida		;6f41
+	call mira_el_suelo		;6f43   ; ... o con suelo, aterriza
+	jr c,aterriza_de_la_caida		;6f46
+	ld de,00000h		;6f48   ; de pie mientras cae
 	ld (0c42eh),de		;6f4b   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	call pose_segun_el_lado		;6f4f   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-	ld hl,0c428h		;6f52
+	ld hl,0c428h		;6f52   ; la cuenta, hasta 3...
 	ld a,(hl)			;6f55
 	inc (hl)			;6f56
 	cp 003h		;6f57
 	jr c,L_6F5C		;6f59
 	dec (hl)			;6f5b
 L_6F5C:
-	ld hl,06f81h		;6f5c
+	ld hl,06f81h		;6f5c   ; ... elige cuanto baja, de 0x6F81
 	call 04061h		;6f5f   ; hl_mas_a: HL += A
 	ld a,(0c425h)		;6f62   ; lee la Y de Simon
 	add a,(hl)			;6f65
 	ld (0c425h),a		;6f66   ; guarda la Y de Simon
 	ret			;6f69
-L_6F6A:
-	ld a,(0c425h)		;6f6a   ; lee la Y de Simon
+aterriza_de_la_caida:
+	ld a,(0c425h)		;6f6a   ; la y en la rejilla de 8...
 	and 0f8h		;6f6d
 	ld (0c425h),a		;6f6f   ; guarda la Y de Simon
-	xor a			;6f72
+	xor a			;6f72   ; ... al estado 0...
 	ld (0c428h),a		;6f73
 	ld (0c420h),a		;6f76
 	ld (0c421h),a		;6f79
-	ld a,007h		;6f7c
+	ld a,007h		;6f7c   ; ... y el efecto 7
 	jp 0509fh		;6f7e   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 
 ; ----------------------------------------------------------------------
@@ -2216,8 +2216,12 @@ DATA_cuatro_ajustes:
 ; ======================================================================
 
 
-L_6F85:
-	ld a,(0c423h)		;6f85
+
+; ----------------------------------------------------------------------
+; GOLPEADO (estado 5, por el paso de 0xC423): 0, el efecto 0x13 y 0x5A cuadros de respiro (0xC42D); en la escalera y con vida, sigue en ella con el cuerpo en la pose 2; si no, sale despedido hacia atras (1 a la izquierda, 2 a la derecha, por el lado del golpe 0xC43C) con la curva de 0x707D; 3, en el suelo 4 cuadros (0x10 sin vida) y vuelve de pie mirando al otro lado; sin vida, al estado 6.
+; ----------------------------------------------------------------------
+simon_golpeado:
+	ld a,(0c423h)		;6f85   ; por su paso
 	call 0406bh		;6f88   ; despacha: salta a la entrada A de la tabla que va detras del call
 
 ; ----------------------------------------------------------------------
@@ -2235,115 +2239,115 @@ DATA_tabla_6F8B:
 ; ======================================================================
 
 
-L_6F93:
-	ld a,(0c002h)		;6f93   ; lee las banderas de la partida (bit 7: de verdad, no la demostracion)
+golpe_empieza:
+	ld a,(0c002h)		;6f93   ; en una partida...
 	and 040h		;6f96
-	ld a,013h		;6f98
+	ld a,013h		;6f98   ; ... el efecto 0x13
 	call nz,0509fh		;6f9a   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,05ah		;6f9d
+	ld a,05ah		;6f9d   ; 0x5A cuadros de respiro
 	ld (0c42dh),a		;6f9f
-	ld a,(0c42bh)		;6fa2
+	ld a,(0c42bh)		;6fa2   ; en la escalera...
 	and a			;6fa5
-	jp z,L_6FBC		;6fa6
-	ld a,(0c415h)		;6fa9   ; lee la vida de Simon
+	jp z,despedido		;6fa6
+	ld a,(0c415h)		;6fa9   ; ... y con vida...
 	and a			;6fac
-	jr z,L_6FBC		;6fad
-	ld a,003h		;6faf
+	jr z,despedido		;6fad
+	ld a,003h		;6faf   ; ... sigue en ella...
 	ld (0c420h),a		;6fb1
-	ld a,002h		;6fb4
+	ld a,002h		;6fb4   ; ... con el cuerpo en la pose 2
 	ld (0c42fh),a		;6fb6   ; guarda la pose del cuerpo de Simon
 	jp pose_segun_el_lado		;6fb9   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-L_6FBC:
-	ld a,(0c43ch)		;6fbc
+despedido:
+	ld a,(0c43ch)		;6fbc   ; mira al lado del golpe...
 	ld (0c42ch),a		;6fbf   ; guarda el lado al que mira Simon (0 derecha)
-	inc a			;6fc2
+	inc a			;6fc2   ; ... y sale hacia atras: paso 1 o 2
 	ld (0c423h),a		;6fc3
-	xor a			;6fc6
+	xor a			;6fc6   ; desde el principio de la curva
 	ld (0c42ah),a		;6fc7
-	ld de,00307h		;6fca
+	ld de,00307h		;6fca   ; poses 7 y 3
 	ld (0c42eh),de		;6fcd   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	jp pose_segun_el_lado		;6fd1   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-L_6FD4:
-	call anda_a_la_izquierda		;6fd4
-L_6FD7:
-	ld bc,0707dh		;6fd7
+despedido_a_la_izquierda:
+	call anda_a_la_izquierda		;6fd4   ; paso 1: hacia la izquierda
+curva_del_golpe:
+	ld bc,0707dh		;6fd7   ; la curva de 0x707D, 0x15 pasos
 	ld d,015h		;6fda
 	ld hl,0c42ah		;6fdc
 	push hl			;6fdf
 	call aplica_la_curva		;6fe0   ; aplica_la_curva: sube la cuenta de (HL) hasta D y suma a la y de Simon el paso de la curva de BC
 	pop hl			;6fe3
-	ld a,(hl)			;6fe4
+	ld a,(hl)			;6fe4   ; hasta el paso 0x0B...
 	cp 00bh		;6fe5
-	ret c			;6fe7
-	call mira_el_suelo		;6fe8   ; mira_el_suelo: mira el decorado bajo los pies de Simon (y de 0xC425, x de 0xC427)
-	jr c,L_6FF2		;6feb
-	ld a,(0c439h)		;6fed
+	ret c			;6fe7   ; ... sube: nada mas
+	call mira_el_suelo		;6fe8   ; suelo?
+	jr c,cae_del_golpe		;6feb
+	ld a,(0c439h)		;6fed   ; plataforma?
 	and a			;6ff0
 	ret z			;6ff1
-L_6FF2:
-	ld a,(0c425h)		;6ff2   ; lee la Y de Simon
+cae_del_golpe:
+	ld a,(0c425h)		;6ff2   ; la y en la rejilla de 8
 	and 0f8h		;6ff5
 	ld (0c425h),a		;6ff7   ; guarda la Y de Simon
-	ld a,003h		;6ffa
+	ld a,003h		;6ffa   ; paso 3...
 	ld (0c423h),a		;6ffc
-	ld a,(0c415h)		;6fff   ; lee la vida de Simon
+	ld a,(0c415h)		;6fff   ; ... 4 cuadros en el suelo...
 	and a			;7002
 	ld a,004h		;7003
 	jr nz,L_7009		;7005
-	ld a,010h		;7007
+	ld a,010h		;7007   ; ... o 0x10 sin vida
 L_7009:
 	ld (0c42ah),a		;7009
-	ld de,(0c42eh)		;700c   ; lee las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
+	ld de,(0c42eh)		;700c   ; las poses siguientes
 	inc d			;7010
 	inc e			;7011
 	ld (0c42eh),de		;7012   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	ret			;7016
-L_7017:
-	call anda_a_la_derecha		;7017
-	jp L_6FD7		;701a
-L_701D:
-	ld a,(0c439h)		;701d
+despedido_a_la_derecha:
+	call anda_a_la_derecha		;7017   ; paso 2: hacia la derecha
+	jp curva_del_golpe		;701a
+golpe_en_el_suelo:
+	ld a,(0c439h)		;701d   ; paso 3: sobre una plataforma, con ella
 	and a			;7020
 	call nz,con_la_plataforma		;7021
-	ld hl,0c42ah		;7024
+	ld hl,0c42ah		;7024   ; al acabar la cuenta...
 	dec (hl)			;7027
 	ret nz			;7028
-	xor a			;7029
+	xor a			;7029   ; ... todo a cero: estado 0
 	ld (0c420h),a		;702a
 	ld (0c421h),a		;702d
 	ld (0c423h),a		;7030
 	ld (0c422h),a		;7033
 	ld (0c42ah),a		;7036
 	ld (0c428h),a		;7039
-	ld a,(0c5ach)		;703c   ; lee el estado de la puerta de la fase
+	ld a,(0c5ach)		;703c   ; con la puerta de la fase en 2, 3 o 5...
 	cp 002h		;703f
-	jr z,L_7053		;7041
+	jr z,sin_vida		;7041
 	cp 003h		;7043
-	jr z,L_7053		;7045
+	jr z,sin_vida		;7045
 	cp 005h		;7047
-	jr z,L_7053		;7049
-	ld a,(0c42ch)		;704b   ; lee el lado al que mira Simon (0 derecha)
+	jr z,sin_vida		;7049
+	ld a,(0c42ch)		;704b   ; ... no; si no, mira al otro lado
 	xor 001h		;704e
 	ld (0c42ch),a		;7050   ; guarda el lado al que mira Simon (0 derecha)
-L_7053:
-	ld a,(0c415h)		;7053   ; lee la vida de Simon
+sin_vida:
+	ld a,(0c415h)		;7053   ; le queda vida?
 	and a			;7056
 	ret nz			;7057
-	ld hl,0c427h		;7058   ; apunta a la X de Simon
+	ld hl,0c427h		;7058   ; no: separado del borde izquierdo...
 	ld a,(hl)			;705b
 	cp 010h		;705c
-	jr nc,L_7063		;705e
+	jr nc,a_morir		;705e
 	add a,008h		;7060
 	ld (hl),a			;7062
-L_7063:
-	xor a			;7063
+a_morir:
+	xor a			;7063   ; ... al estado 6
 	ld (0c42dh),a		;7064
 	ld (0c421h),a		;7067
 	inc a			;706a
 	ld (0c428h),a		;706b
 	ld a,006h		;706e
 	ld (0c420h),a		;7070
-	ld bc,00509h		;7073
+	ld bc,00509h		;7073   ; poses 9 y 5
 	ld (0c42eh),bc		;7076   ; guarda las dos poses de Simon (0xC42E las piernas, 0xC42F el cuerpo)
 	jp pose_segun_el_lado		;707a   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 
@@ -2360,32 +2364,36 @@ DATA_curva_de_caida:
 ; ======================================================================
 
 
-L_7093:
-	ld a,(0c421h)		;7093
+
+; ----------------------------------------------------------------------
+; MUERE (estado 6): subestado 0, al acabar la cuenta, silencio, la musica 0x89 y 0x5A cuadros; subestado 1, al acabarlos, los corazones a 5 como mucho, todo lo de Simon a cero, la habitacion 0 y la vida acabada (0xC413); y pierde las armas y lo que lleva, salvo el pergamino (bit 7 de 0xC701).
+; ----------------------------------------------------------------------
+simon_muere:
+	ld a,(0c421h)		;7093   ; subestado 1?
 	ld hl,0c428h		;7096
 	and a			;7099
-	jr nz,L_70AF		;709a
-	dec (hl)			;709c
+	jr nz,se_acabo_la_vida		;709a
+	dec (hl)			;709c   ; subestado 0: la cuenta
 	ret nz			;709d
-	ld (hl),05ah		;709e
-	ld a,001h		;70a0
+	ld (hl),05ah		;709e   ; 0x5A cuadros...
+	ld a,001h		;70a0   ; ... subestado 1...
 	ld (0c421h),a		;70a2
-	ld a,000h		;70a5
+	ld a,000h		;70a5   ; ... silencio...
 	call 0509fh		;70a7   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,089h		;70aa
+	ld a,089h		;70aa   ; ... y la musica 0x89
 	jp 0509fh		;70ac   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_70AF:
-	ld hl,0c428h		;70af
+se_acabo_la_vida:
+	ld hl,0c428h		;70af   ; al acabar la cuenta...
 	dec (hl)			;70b2
 	ret nz			;70b3
-	ld de,0c417h		;70b4   ; apunta a los corazones, en BCD
+	ld de,0c417h		;70b4   ; ... los corazones, como mucho 5
 	ld a,(de)			;70b7
 	cp 005h		;70b8
-	jr c,L_70BF		;70ba
+	jr c,todo_a_cero		;70ba
 	ld a,005h		;70bc
 	ld (de),a			;70be
-L_70BF:
-	xor a			;70bf
+todo_a_cero:
+	xor a			;70bf   ; la cuenta, los estados...
 	ld (hl),a			;70c0
 	ld (0c421h),a		;70c1
 	ld (0c422h),a		;70c4
@@ -2394,159 +2402,175 @@ L_70BF:
 	ld (0c43bh),a		;70cd
 	ld (0c440h),a		;70d0
 	ld (0d010h),a		;70d3
-	ld (0d001h),a		;70d6   ; guarda la HABITACION dentro de la fase
-	ld (0c413h),a		;70d9   ; guarda la VIDA en marcha
-L_70DC:
-	ld a,(0c701h)		;70dc   ; lee lo que lleva Simon (un bit por objeto)
+	ld (0d001h),a		;70d6   ; la habitacion 0
+	ld (0c413h),a		;70d9   ; y la vida acabada
+pierde_lo_que_lleva:
+	ld a,(0c701h)		;70dc   ; solo se queda el pergamino
 	and 080h		;70df
 	ld (0c701h),a		;70e1   ; guarda lo que lleva Simon (un bit por objeto)
-	xor a			;70e4
+	xor a			;70e4   ; sin arma...
 	ld (0c416h),a		;70e5   ; guarda el arma que lleva Simon (0, ninguna)
-	ld (0c431h),a		;70e8
+	ld (0c431h),a		;70e8   ; ... sin botas, alas ni lazo (0xC431)...
 	ld (0c432h),a		;70eb
 	ld (0c441h),a		;70ee   ; guarda los usos que le quedan a lo que para golpes
 	ld (0c442h),a		;70f1
-	ld (0c702h),a		;70f4   ; guarda mas cosas que lleva (bit 0: se ven los bloques que se rompen)
+	ld (0c702h),a		;70f4   ; ... ni lo de 0xC702 ni 0xC700
 	ld (0c700h),a		;70f7
 	ret			;70fa
-L_70FB:
-	ld a,(0c42dh)		;70fb
+
+; ----------------------------------------------------------------------
+; POR UN PASO (estado 7, desde agachado sobre un paso con el salto, p01:6DA9): al acabar los cuadros de 0xC42D, de pie y a la habitacion del paso (0xC41B = 0xFF, que p13:B963 manda a la de 0xC5B4).
+; ----------------------------------------------------------------------
+simon_por_un_paso:
+	ld a,(0c42dh)		;70fb   ; espera
 	and a			;70fe
 	ret nz			;70ff
-	xor a			;7100
+	xor a			;7100   ; de pie
 	ld (0c420h),a		;7101
 	ld (0c43dh),a		;7104
-	ld a,0ffh		;7107
+	ld a,0ffh		;7107   ; y se va por el paso
 	ld (0c41bh),a		;7109   ; guarda el lado por el que se sale de la habitacion
 	ret			;710c
-L_710D:
-	call L_7116		;710d
-	call L_71E0		;7110
-	jp L_72B2		;7113
-L_7116:
-	ld a,(0c006h)		;7116
+
+; ----------------------------------------------------------------------
+; EL LATIGO Y LAS ARMAS, cada cuadro: el primer disparo, el golpe en marcha y las armas lanzadas.
+; ----------------------------------------------------------------------
+latigo_y_armas:
+	call mandos_del_golpe		;710d   ; los mandos
+	call el_golpe		;7110   ; el golpe
+	jp las_armas_lanzadas		;7113   ; las armas lanzadas
+mandos_del_golpe:
+	ld a,(0c006h)		;7116   ; el primer disparo recien pulsado?
 	and 010h		;7119
-	jr z,L_7136		;711b
-	ld hl,0c422h		;711d
+	jr z,saltando_con_objetos		;711b
+	ld hl,0c422h		;711d   ; ya golpeando: nada
 	ld a,(hl)			;7120
 	and a			;7121
 	ret nz			;7122
-	ld a,(0c416h)		;7123   ; lee el arma que lleva Simon (0, ninguna)
+	ld a,(0c416h)		;7123   ; con que arma
 	ld (0c436h),a		;7126
-	cp 002h		;7129
-	jr c,L_7133		;712b
-	call L_71BE		;712d
+	cp 002h		;7129   ; el latigo (0 y 1)...
+	jr c,empieza_el_golpe		;712b
+	call sitio_para_el_arma		;712d   ; ... si no, hay sitio para lanzarla?
 	ld a,b			;7130
-	and a			;7131
+	and a			;7131   ; no: nada
 	ret z			;7132
-L_7133:
-	ld (hl),001h		;7133
+empieza_el_golpe:
+	ld (hl),001h		;7133   ; 0xC422 = 1: golpeando
 	ret			;7135
-L_7136:
-	ld a,(0c420h)		;7136
+saltando_con_objetos:
+	ld a,(0c420h)		;7136   ; solo saltando (estado 1)
 	dec a			;7139
 	ret nz			;713a
-	ld a,(0c701h)		;713b   ; lee lo que lleva Simon (un bit por objeto)
+	ld a,(0c701h)		;713b   ; lo que lleva...
 	push af			;713e
-	rra			;713f
+	rra			;713f   ; ... el bit 3 (el frasco, p02:8D8D)...
 	rra			;7140
 	rra			;7141
 	rra			;7142
-	call c,L_714D		;7143
+	call c,con_el_bit_3		;7143
 	pop af			;7146
-	rla			;7147
+	rla			;7147   ; ... el bit 6
 	rla			;7148
-	call c,L_715F		;7149
+	call c,el_reloj		;7149
 	ret			;714c
-L_714D:
-	ld a,(0c417h)		;714d   ; lee los corazones, en BCD
+
+; ----------------------------------------------------------------------
+; CON EL BIT 3 DE 0xC701, saltando y con 5 corazones: izquierda o derecha recien pulsadas gastan 5 corazones, ponen el bit 0 en las cosas con el bit 2 (0x999F) y 0xC461 a 5 (0xC468: 1 a la izquierda, 0 a la derecha).
+; ----------------------------------------------------------------------
+con_el_bit_3:
+	ld a,(0c417h)		;714d   ; 5 corazones?
 	cp 005h		;7150
 	ret c			;7152
-	ld a,(0c006h)		;7153
+	ld a,(0c006h)		;7153   ; izquierda recien pulsada...
 	rra			;7156
 	rra			;7157
 	rra			;7158
-	jr c,L_7194		;7159
-	rra			;715b
-	jr c,L_71A1		;715c
+	jr c,bit_3_a_la_izquierda		;7159
+	rra			;715b   ; ... o derecha
+	jr c,bit_3_a_la_derecha		;715c
 	ret			;715e
-L_715F:
-	ld a,(0c43bh)		;715f
+
+; ----------------------------------------------------------------------
+; EL RELOJ (bit 6 de 0xC701): saltando, abajo recien pulsado y 5 corazones: los gasta y para el tiempo (0xD010) 0x5A cuadros (0x96 con el lazo), efecto 0xFB; p01:75F2 lo devuelve.
+; ----------------------------------------------------------------------
+el_reloj:
+	ld a,(0c43bh)		;715f   ; ya parado?
 	and a			;7162
 	ret nz			;7163
-	ld a,(0c417h)		;7164   ; lee los corazones, en BCD
+	ld a,(0c417h)		;7164   ; 5 corazones?
 	cp 005h		;7167
 	ret c			;7169
-	ld a,(0c006h)		;716a
+	ld a,(0c006h)		;716a   ; abajo recien pulsado?
 	rra			;716d
 	rra			;716e
 	ret nc			;716f
-	ld a,(0c417h)		;7170   ; lee los corazones, en BCD
+	ld a,(0c417h)		;7170   ; 5 corazones menos
 	sub 005h		;7173
 	daa			;7175
 	ld (0c417h),a		;7176   ; guarda los corazones, en BCD
 	call 04566h		;7179
-	ld a,(0c431h)		;717c
+	ld a,(0c431h)		;717c   ; con el lazo...
 	and 004h		;717f
-	ld a,096h		;7181
+	ld a,096h		;7181   ; ... 0x96 cuadros...
 	jr nz,L_7187		;7183
-	ld a,05ah		;7185
+	ld a,05ah		;7185   ; ... si no, 0x5A
 L_7187:
 	ld (0c43bh),a		;7187
-	ld hl,0d010h		;718a
+	ld hl,0d010h		;718a   ; el tiempo parado
 	set 0,(hl)		;718d
-	ld a,0fbh		;718f
+	ld a,0fbh		;718f   ; efecto 0xFB
 	jp 0509fh		;7191   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7194:
-	ld a,(0c461h)		;7194
+bit_3_a_la_izquierda:
+	ld a,(0c461h)		;7194   ; en marcha ya (0xC461)?
 	and a			;7197
 	ret nz			;7198
-	ld a,001h		;7199
+	ld a,001h		;7199   ; a la izquierda
 	ld (0c468h),a		;719b
-	jp L_71AA		;719e
-L_71A1:
+	jp bit_3_gasta		;719e
+bit_3_a_la_derecha:
 	ld a,(0c461h)		;71a1
 	and a			;71a4
 	ret nz			;71a5
-	xor a			;71a6
+	xor a			;71a6   ; a la derecha
 	ld (0c468h),a		;71a7
-L_71AA:
-	call 0999fh		;71aa
-	ld a,005h		;71ad
+bit_3_gasta:
+	call 0999fh		;71aa   ; el bit 0 en las cosas
+	ld a,005h		;71ad   ; 0xC461 a 5
 	ld (0c461h),a		;71af
-	ld a,(0c417h)		;71b2   ; lee los corazones, en BCD
+	ld a,(0c417h)		;71b2   ; 5 corazones menos
 	sub 005h		;71b5
 	daa			;71b7
 	ld (0c417h),a		;71b8   ; guarda los corazones, en BCD
 	jp 04566h		;71bb
-L_71BE:
-	ld a,(0c436h)		;71be
+sitio_para_el_arma:
+	ld a,(0c436h)		;71be   ; el arma 2 deja dos a la vez...
 	cp 002h		;71c1
 	ld b,002h		;71c3
 	jr z,L_71C8		;71c5
-	dec b			;71c7
+	dec b			;71c7   ; ... las demas, una
 L_71C8:
-	ld ix,0c450h		;71c8
-L_71CC:
-	ld a,(ix+001h)		;71cc
+	ld ix,0c450h		;71c8   ; las dos fichas de 0xC450
+ficha_de_arma_libre:
+	ld a,(ix+001h)		;71cc   ; libre?
 	and a			;71cf
-	jr nz,L_71D8		;71d0
-	ld a,001h		;71d2
+	jr nz,ficha_de_arma_siguiente		;71d0
+	ld a,001h		;71d2   ; si: apartada (1)
 	ld (ix+000h),a		;71d4
 	ret			;71d7
-L_71D8:
-	ld de,00010h		;71d8
+ficha_de_arma_siguiente:
+	ld de,00010h		;71d8   ; la siguiente, 16 bytes mas
 	add ix,de		;71db
-	djnz L_71CC		;71dd
+	djnz ficha_de_arma_libre		;71dd
 	ret			;71df
-L_71E0:
-	ld a,(0c422h)		;71e0
+el_golpe:
+	ld a,(0c422h)		;71e0   ; golpeando?
 	and a			;71e3
 	ret z			;71e4
-	ld a,(0c420h)		;71e5
+	ld a,(0c420h)		;71e5   ; no cayendo ni golpeado (estados 0-3)
 	cp 004h		;71e8
 	ret nc			;71ea
-	ld a,(0c422h)		;71eb
+	ld a,(0c422h)		;71eb   ; por su paso
 	dec a			;71ee
 	call 0406bh		;71ef   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2565,34 +2589,34 @@ DATA_tabla_71F2:
 ; ======================================================================
 
 
-L_71FA:
-	ld a,(0c420h)		;71fa
+golpe_paso_1:
+	ld a,(0c420h)		;71fa   ; paso 1: en la escalera, las piernas como van
 	cp 003h		;71fd
-	jr z,L_720C		;71ff
-	cp 002h		;7201
+	jr z,golpe_el_cuerpo		;71ff
+	cp 002h		;7201   ; agachado, la 6; si no, la 0
 	ld a,000h		;7203
 	jr nz,L_7209		;7205
 	ld a,006h		;7207
 L_7209:
 	ld (0c42eh),a		;7209   ; guarda la pose de las piernas de Simon
-L_720C:
-	ld a,(0c436h)		;720c
+golpe_el_cuerpo:
+	ld a,(0c436h)		;720c   ; con el latigo...
 	cp 002h		;720f
-	jr nc,L_722A		;7211
-	ld a,(0c436h)		;7213
+	jr nc,golpe_con_arma		;7211
+	ld a,(0c436h)		;7213   ; ... sin arma (el de cuero), el cuerpo en la 6...
 	dec a			;7216
 	ld a,006h		;7217
 	jr nz,L_721D		;7219
-	ld a,009h		;721b
+	ld a,009h		;721b   ; ... con el de cadena (el arma 1), en la 9
 L_721D:
 	ld (0c42fh),a		;721d   ; guarda la pose del cuerpo de Simon
 	call pose_segun_el_lado		;7220   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-	ld a,005h		;7223
+	ld a,005h		;7223   ; el efecto 5
 	call 0509fh		;7225   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 	jr $+19		;7228
-L_722A:
-	call 05593h		;722a
-	ld a,00ch		;722d
+golpe_con_arma:
+	call 05593h		;722a   ; los patrones del arma...
+	ld a,00ch		;722d   ; ... y el cuerpo en la 0x0C
 	ld (0c42fh),a		;722f   ; guarda la pose del cuerpo de Simon
 	call pose_segun_el_lado		;7232   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
 	jr $+6		;7235
@@ -2609,83 +2633,87 @@ DATA_xor_a_suelto:
 ; ======================================================================
 
 
-L_7238:
-	ld (0c429h),a		;7238
-L_723B:
-	ld hl,0c422h		;723b
+golpe_cuenta:
+	ld (0c429h),a		;7238   ; la cuenta del golpe
+golpe_paso_siguiente:
+	ld hl,0c422h		;723b   ; el paso siguiente del golpe
 	inc (hl)			;723e
 	ret			;723f
-L_7240:
-	ld hl,0c42fh		;7240   ; apunta a la pose del cuerpo de Simon
+golpe_paso_2:
+	ld hl,0c42fh		;7240   ; paso 2: el cuerpo, la pose siguiente
 	inc (hl)			;7243
-	call L_723B		;7244
+	call golpe_paso_siguiente		;7244
 	ld a,(0c436h)		;7247
 	cp 002h		;724a
 	ret c			;724c
 	jp 05593h		;724d
-L_7250:
-	ld a,(0c436h)		;7250
+golpe_paso_3:
+	ld a,(0c436h)		;7250   ; paso 3: con arma, como el 2
 	cp 002h		;7253
-	jr nc,L_7240		;7255
-	call 0999fh		;7257
-	ld hl,0c42fh		;725a   ; apunta a la pose del cuerpo de Simon
+	jr nc,golpe_paso_2		;7255
+	call 0999fh		;7257   ; con el latigo: el bit 0 en las cosas...
+	ld hl,0c42fh		;725a   ; ... la pose siguiente...
 	inc (hl)			;725d
-	ld a,004h		;725e
-	jr L_7238		;7260
-L_7262:
-	ld a,(0c436h)		;7262
+	ld a,004h		;725e   ; ... y 4 cuadros
+	jr golpe_cuenta		;7260
+golpe_paso_4:
+	ld a,(0c436h)		;7262   ; paso 4: con arma, a lanzarla
 	cp 002h		;7265
-	jr nc,L_7286		;7267
-	ld hl,0c429h		;7269
+	jr nc,lanza_el_arma		;7267
+	ld hl,0c429h		;7269   ; con el latigo, la cuenta
 	dec (hl)			;726c
 	ret nz			;726d
-L_726E:
-	xor a			;726e
+acaba_el_golpe:
+	xor a			;726e   ; sin golpe
 	ld (0c422h),a		;726f
 	ld (0c429h),a		;7272
-	ld a,(0c420h)		;7275
+	ld a,(0c420h)		;7275   ; el cuerpo: en la escalera la 2...
 	cp 003h		;7278
-	ld a,000h		;727a
+	ld a,000h		;727a   ; ... si no, la 0
 	jr nz,L_7280		;727c
 	ld a,002h		;727e
 L_7280:
 	ld (0c42fh),a		;7280   ; guarda la pose del cuerpo de Simon
 	jp pose_segun_el_lado		;7283   ; pose_segun_el_lado: ajusta las poses de 0xC42E/0xC42F al lado al que mira Simon
-L_7286:
-	call 0999fh		;7286
-	call L_726E		;7289
-	ld ix,0c450h		;728c
+lanza_el_arma:
+	call 0999fh		;7286   ; el bit 0 en las cosas
+	call acaba_el_golpe		;7289   ; acaba el golpe
+	ld ix,0c450h		;728c   ; la ficha apartada...
 	ld b,002h		;7290
-L_7292:
-	ld a,(ix+000h)		;7292
+busca_la_apartada:
+	ld a,(ix+000h)		;7292   ; apartada (1)?
 	dec a			;7295
-	jr nz,L_72AA		;7296
-	ld a,018h		;7298
+	jr nz,arma_siguiente		;7296
+	ld a,018h		;7298   ; 0x18...
 	ld (ix+006h),a		;729a
-	ld a,(0c42ch)		;729d   ; lee el lado al que mira Simon (0 derecha)
+	ld a,(0c42ch)		;729d   ; ... el lado...
 	ld (ix+008h),a		;72a0
-	ld a,(0c436h)		;72a3
+	ld a,(0c436h)		;72a3   ; ... y el arma
 	ld (ix+001h),a		;72a6
 	ret			;72a9
-L_72AA:
+arma_siguiente:
 	ld de,00010h		;72aa
 	add ix,de		;72ad
-	djnz L_7292		;72af
+	djnz busca_la_apartada		;72af
 	ret			;72b1
-L_72B2:
-	ld ix,0c450h		;72b2
-	call L_72BD		;72b6
+
+; ----------------------------------------------------------------------
+; LAS ARMAS LANZADAS: dos fichas de 16 bytes en 0xC450 y 0xC460 ([0] el paso, 1 apartada; [1] el arma; [2] y [3] lo que se suma cada cuadro a la y y a la x; [4] la y; [5] la x; [6] el patron; [7] la cuenta; [8] el lado), cada una con dos sprites (6-7 y 8-9 en la copia de 0xD600) y sus colores en 0xD460/0xD480. El hacha (3) y la cruz (4) van y vuelven por la misma tabla (0x72FF = 0x749D).
+; ----------------------------------------------------------------------
+las_armas_lanzadas:
+	ld ix,0c450h		;72b2   ; las dos fichas de 0xC450 y 0xC460
+	call un_arma_lanzada		;72b6
 	ld ix,0c460h		;72b9
-L_72BD:
-	ld a,(ix+001h)		;72bd
+un_arma_lanzada:
+	ld a,(ix+001h)		;72bd   ; lanzada?
 	and a			;72c0
 	ret z			;72c1
-	call L_72CE		;72c2
-	call L_74BB		;72c5
-	call L_74CE		;72c8
-	jp L_7535		;72cb
-L_72CE:
-	ld a,(ix+001h)		;72ce
+	call mueve_el_arma		;72c2   ; se mueve...
+	call mueve_el_arma_lanzada		;72c5   ; ... lo de 0x74BB...
+	call fuera_si_se_sale_el_arma		;72c8   ; ... lo de 0x74CE...
+	jp sprites_del_arma		;72cb   ; ... y lo de 0x7535
+mueve_el_arma:
+	ld a,(ix+001h)		;72ce   ; por el arma: 2 la daga (0x7436), 3 el hacha (0x7473), 4 la cruz (0x72DE), 5 el frasco (0x73A4)
 	dec a			;72d1
 	dec a			;72d2
 	call 0406bh		;72d3   ; despacha: salta a la entrada A de la tabla que va detras del call
@@ -2705,8 +2733,8 @@ DATA_tabla_72D6:
 ; ======================================================================
 
 
-L_72DE:
-	ld a,(0c003h)		;72de   ; lee el contador de cuadros
+la_cruz:
+	ld a,(0c003h)		;72de   ; LA CRUZ: cada cuatro cuadros, el patron: 0x18, 0x20...
 	ld c,a			;72e1
 	rra			;72e2
 	rra			;72e3
@@ -2716,13 +2744,13 @@ L_72DE:
 	add a,a			;72e8
 	add a,018h		;72e9
 	ld (ix+006h),a		;72eb
-	ld a,c			;72ee
+	ld a,c			;72ee   ; cada ocho...
 	and 007h		;72ef
 	jr nz,L_72F8		;72f1
-	ld a,003h		;72f3
+	ld a,003h		;72f3   ; ... el efecto 3
 	call 0509fh		;72f5   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
 L_72F8:
-	ld a,(ix+000h)		;72f8
+	ld a,(ix+000h)		;72f8   ; por su paso
 	dec a			;72fb
 	call 0406bh		;72fc   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2741,186 +2769,186 @@ DATA_tabla_72FF:
 ; ======================================================================
 
 
-L_7307:
-	ld a,(0c420h)		;7307
+la_cruz_sale:
+	ld a,(0c420h)		;7307   ; paso 0: la altura...
 	cp 002h		;730a
-	ld a,(0c425h)		;730c   ; lee la Y de Simon
+	ld a,(0c425h)		;730c   ; ... de pie, 0x10 por encima de Simon...
 	ld b,0f0h		;730f
 	jr nz,L_7315		;7311
-	ld b,0f6h		;7313
+	ld b,0f6h		;7313   ; ... agachado, 0x0A
 L_7315:
 	add a,b			;7315
-	ld (ix+004h),a		;7316   ; guarda la fraccion de la x de la cosa
+	ld (ix+004h),a		;7316   ; a su y (byte 4)
 	xor a			;7319
-	ld (ix+002h),a		;731a   ; guarda la fraccion de la y de la cosa
-	ld a,(ix+001h)		;731d   ; lee el paso en que va la cosa
+	ld (ix+002h),a		;731a   ; (byte 2 a 0)
+	ld a,(ix+001h)		;731d   ; el arma (byte 1)...
 	cp 003h		;7320
-	ld b,003h		;7322
+	ld b,003h		;7322   ; ... la 3, 3 por cuadro; la 4, 5...
 	jr z,L_7328		;7324
 	ld b,005h		;7326
 L_7328:
-	ld a,(ix+008h)		;7328   ; lee la velocidad vertical
+	ld a,(ix+008h)		;7328   ; hacia donde (byte 8)
 	and a			;732b
 	ld a,b			;732c
 	jr z,L_7331		;732d
 	neg		;732f
 L_7331:
-	ld (ix+003h),a		;7331   ; guarda la y de la cosa
-	ld a,(0c427h)		;7334   ; lee la X de Simon
-	ld (ix+005h),a		;7337   ; guarda la x de la cosa
-	jp L_734F		;733a
-L_733D:
-	ld a,(ix+005h)		;733d   ; lee la x de la cosa
+	ld (ix+003h),a		;7331   ; a la velocidad horizontal (byte 3)
+	ld a,(0c427h)		;7334   ; la x de Simon (byte 5)
+	ld (ix+005h),a		;7337
+	jp paso_siguiente_del_arma		;733a
+va:
+	ld a,(ix+005h)		;733d   ; paso 1: la x, lejos del borde?
 	sub 00ah		;7340
 	cp 0ech		;7342
-	jr nc,L_7359		;7344
-	inc (ix+007h)		;7346   ; sube la velocidad vertical (parte baja)
-	ld a,(ix+007h)		;7349   ; lee la velocidad vertical (parte baja)
-	cp 018h		;734c
+	jr nc,salta_un_paso		;7344   ; no: se da la vuelta ya
+	inc (ix+007h)		;7346   ; la cuenta...
+	ld a,(ix+007h)		;7349
+	cp 018h		;734c   ; ... hasta 0x18
 	ret c			;734e
-L_734F:
-	inc (ix+000h)		;734f   ; sube el tipo de la cosa
-	ld (ix+007h),000h		;7352   ; la velocidad vertical (parte baja) = 0x00
-	jp 0999fh		;7356
-L_7359:
-	inc (ix+000h)		;7359   ; sube el tipo de la cosa
-L_735C:
-	inc (ix+000h)		;735c   ; sube el tipo de la cosa
-	ld a,(ix+008h)		;735f   ; lee la velocidad vertical
+paso_siguiente_del_arma:
+	inc (ix+000h)		;734f   ; el paso siguiente...
+	ld (ix+007h),000h		;7352   ; ... la cuenta a 0...
+	jp 0999fh		;7356   ; ... y el bit 0 en las cosas
+salta_un_paso:
+	inc (ix+000h)		;7359   ; dos pasos mas
+da_la_vuelta:
+	inc (ix+000h)		;735c   ; un paso mas: vuelve...
+	ld a,(ix+008h)		;735f   ; ... hacia el otro lado, 5 por cuadro
 	and a			;7362
 	ld a,005h		;7363
 	jr nz,L_7369		;7365
 	ld a,0fbh		;7367
 L_7369:
-	ld (ix+003h),a		;7369   ; guarda la y de la cosa
-	ld (ix+007h),000h		;736c   ; la velocidad vertical (parte baja) = 0x00
+	ld (ix+003h),a		;7369   ; a la velocidad horizontal
+	ld (ix+007h),000h		;736c   ; la cuenta a 0
 	jp 0999fh		;7370
-L_7373:
-	call 08240h		;7373
-	jp c,L_74E9		;7376
-	ld a,(ix+005h)		;7379   ; lee la x de la cosa
-	sub 00ah		;737c
+vuelve:
+	call 08240h		;7373   ; paso 2: Simon la coge?
+	jp c,quita_el_arma		;7376   ; si: se quita
+	ld a,(ix+005h)		;7379   ; la x, lejos del borde?
+	sub 00ah		;737c   ; (si no, da la vuelta)
 	cp 0ech		;737e
-	jr nc,L_735C		;7380
-	inc (ix+007h)		;7382   ; sube la velocidad vertical (parte baja)
-	ld a,(ix+007h)		;7385   ; lee la velocidad vertical (parte baja)
-	cp 017h		;7388
-	jp nc,L_734F		;738a
-	rra			;738d
+	jr nc,da_la_vuelta		;7380
+	inc (ix+007h)		;7382   ; la cuenta...
+	ld a,(ix+007h)		;7385
+	cp 017h		;7388   ; ... hasta 0x17
+	jp nc,paso_siguiente_del_arma		;738a
+	rra			;738d   ; uno de cada dos cuadros...
 	ret nc			;738e
-	ld a,(ix+008h)		;738f   ; lee la velocidad vertical
+	ld a,(ix+008h)		;738f   ; ... sube o baja un punto segun el lado
 	and a			;7392
-	jr nz,L_7399		;7393
-	dec (ix+003h)		;7395   ; baja la y de la cosa
+	jr nz,baja_un_punto		;7393
+	dec (ix+003h)		;7395
 	ret			;7398
-L_7399:
-	inc (ix+003h)		;7399   ; sube la y de la cosa
+baja_un_punto:
+	inc (ix+003h)		;7399
 	ret			;739c
-L_739D:
-	call 08240h		;739d
+vuelve_y_se_coge:
+	call 08240h		;739d   ; paso 3: Simon la coge?
 	ret nc			;73a0
-	jp L_74E9		;73a1
-L_73A4:
-	ld a,(ix+000h)		;73a4   ; lee el tipo de la cosa
-	dec a			;73a7
+	jp quita_el_arma		;73a1   ; si: se quita
+el_frasco:
+	ld a,(ix+000h)		;73a4   ; EL FRASCO (arma 5), por su paso:
+	dec a			;73a7   ; 2, cae...
 	dec a			;73a8
-	jr z,L_73DE		;73a9
-	dec a			;73ab
-	jr z,L_7419		;73ac
-	ld a,(0c420h)		;73ae
+	jr z,el_frasco_cae		;73a9
+	dec a			;73ab   ; 3, arde
+	jr z,el_frasco_arde		;73ac
+	ld a,(0c420h)		;73ae   ; 1, sale: de pie...
 	cp 002h		;73b1
 	ld a,(0c425h)		;73b3   ; lee la Y de Simon
-	ld b,0f0h		;73b6
+	ld b,0f0h		;73b6   ; ... 0x10 por encima de Simon...
 	jr nz,L_73BC		;73b8
-	ld b,0f6h		;73ba
+	ld b,0f6h		;73ba   ; ... agachado, 0x0A
 L_73BC:
 	add a,b			;73bc
-	ld (ix+004h),a		;73bd   ; guarda la fraccion de la x de la cosa
-	xor a			;73c0
-	ld (ix+002h),a		;73c1   ; guarda la fraccion de la y de la cosa
-	ld a,(ix+008h)		;73c4   ; lee la velocidad vertical
+	ld (ix+004h),a		;73bd   ; la y (byte 4)
+	xor a			;73c0   ; sin velocidad vertical
+	ld (ix+002h),a		;73c1
+	ld a,(ix+008h)		;73c4   ; 2 por cuadro...
 	and a			;73c7
 	ld a,002h		;73c8
-	jr z,L_73CE		;73ca
+	jr z,L_73CE		;73ca   ; ... segun el lado
 	ld a,0feh		;73cc
 L_73CE:
-	ld (ix+003h),a		;73ce   ; guarda la y de la cosa
-	ld a,(0c427h)		;73d1   ; lee la X de Simon
-	ld (ix+005h),a		;73d4   ; guarda la x de la cosa
-	ld (ix+006h),038h		;73d7   ; la cosa se mueve
-	jp L_734F		;73db
-L_73DE:
-	ld a,(ix+007h)		;73de   ; lee la velocidad vertical (parte baja)
+	ld (ix+003h),a		;73ce   ; a la velocidad horizontal
+	ld a,(0c427h)		;73d1   ; la x de Simon
+	ld (ix+005h),a		;73d4
+	ld (ix+006h),038h		;73d7   ; el patron 0x38
+	jp paso_siguiente_del_arma		;73db
+el_frasco_cae:
+	ld a,(ix+007h)		;73de   ; la curva de 0x707D, por la cuenta...
 	ld hl,0707dh		;73e1
 	call 04061h		;73e4   ; hl_mas_a: HL += A
-	ld c,(ix+004h)		;73e7   ; lee la fraccion de la x de la cosa
-	ld a,(hl)			;73ea
+	ld c,(ix+004h)		;73e7
+	ld a,(hl)			;73ea   ; ... por dos, a la y
 	add a,a			;73eb
 	add a,c			;73ec
-	ld (ix+004h),a		;73ed   ; guarda la fraccion de la x de la cosa
-	inc (ix+007h)		;73f0   ; sube la velocidad vertical (parte baja)
-	ld a,(ix+007h)		;73f3   ; lee la velocidad vertical (parte baja)
+	ld (ix+004h),a		;73ed
+	inc (ix+007h)		;73f0   ; la cuenta, hasta 0x16
+	ld a,(ix+007h)		;73f3
 	cp 016h		;73f6
 	jr c,L_73FD		;73f8
-	dec (ix+007h)		;73fa   ; baja la velocidad vertical (parte baja)
+	dec (ix+007h)		;73fa
 L_73FD:
-	ld d,(ix+005h)		;73fd   ; lee la x de la cosa
-	ld e,(ix+004h)		;7400   ; lee la fraccion de la x de la cosa
+	ld d,(ix+005h)		;73fd   ; en el decorado?
+	ld e,(ix+004h)		;7400
 	call choca_con_el_decorado		;7403   ; choca_con_el_decorado: mira las dos celdas del decorado en (E, D) y (E, D-10)
-	ret nc			;7406
-	inc (ix+000h)		;7407   ; sube el tipo de la cosa
+	ret nc			;7406   ; no: sigue
+	inc (ix+000h)		;7407   ; si: paso 3, quieto...
 	xor a			;740a
-	ld (ix+002h),a		;740b   ; guarda la fraccion de la y de la cosa
-	ld (ix+003h),a		;740e   ; guarda la y de la cosa
-	ld (ix+007h),a		;7411   ; guarda la velocidad vertical (parte baja)
-	ld a,018h		;7414
+	ld (ix+002h),a		;740b
+	ld (ix+003h),a		;740e
+	ld (ix+007h),a		;7411
+	ld a,018h		;7414   ; ... y el efecto 0x18
 	jp 0509fh		;7416   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7419:
-	ld a,(0c003h)		;7419   ; lee el contador de cuadros
+el_frasco_arde:
+	ld a,(0c003h)		;7419   ; cada cuatro cuadros...
 	and 004h		;741c
-	ld a,0f4h		;741e
+	ld a,0f4h		;741e   ; ... el patron 0xF4...
 	jr z,L_7427		;7420
-	call 0999fh		;7422
+	call 0999fh		;7422   ; ... o el bit 0 en las cosas y el 0xF8
 	ld a,0f8h		;7425
 L_7427:
-	ld (ix+006h),a		;7427   ; guarda si la cosa se mueve
-	inc (ix+007h)		;742a   ; sube la velocidad vertical (parte baja)
-	ld a,(ix+007h)		;742d   ; lee la velocidad vertical (parte baja)
-	cp 018h		;7430
+	ld (ix+006h),a		;7427
+	inc (ix+007h)		;742a   ; la cuenta...
+	ld a,(ix+007h)		;742d
+	cp 018h		;7430   ; ... hasta 0x18, y se quita
 	ret c			;7432
-	jp L_74E9		;7433
-L_7436:
-	ld a,(ix+000h)		;7436   ; lee el tipo de la cosa
+	jp quita_el_arma		;7433
+la_daga:
+	ld a,(ix+000h)		;7436   ; LA DAGA (arma 2): solo al salir (paso 1)
 	dec a			;7439
 	ret nz			;743a
-	ld a,(0c420h)		;743b
+	ld a,(0c420h)		;743b   ; de pie...
 	cp 002h		;743e
-	ld a,(0c425h)		;7440   ; lee la Y de Simon
+	ld a,(0c425h)		;7440   ; ... 0x10 por encima de Simon...
 	ld b,0f0h		;7443
 	jr nz,L_7449		;7445
-	ld b,0f6h		;7447
+	ld b,0f6h		;7447   ; ... agachado, 0x0A
 L_7449:
 	add a,b			;7449
-	ld (ix+004h),a		;744a   ; guarda la fraccion de la x de la cosa
-	xor a			;744d
-	ld (ix+002h),a		;744e   ; guarda la fraccion de la y de la cosa
-	ld a,(ix+008h)		;7451   ; lee la velocidad vertical
+	ld (ix+004h),a		;744a   ; la y
+	xor a			;744d   ; sin velocidad vertical
+	ld (ix+002h),a		;744e
+	ld a,(ix+008h)		;7451   ; 5 por cuadro con el patron 0x20...
 	and a			;7454
 	ld a,005h		;7455
 	ld b,020h		;7457
 	jr z,L_745F		;7459
-	ld a,0fbh		;745b
+	ld a,0fbh		;745b   ; ... o -5 con el 0x18, segun el lado
 	ld b,018h		;745d
 L_745F:
-	ld (ix+003h),a		;745f   ; guarda la y de la cosa
-	ld (ix+006h),b		;7462   ; guarda si la cosa se mueve
-	ld a,(0c427h)		;7465   ; lee la X de Simon
-	ld (ix+005h),a		;7468   ; guarda la x de la cosa
-	inc (ix+000h)		;746b   ; sube el tipo de la cosa
-	ld a,004h		;746e
+	ld (ix+003h),a		;745f
+	ld (ix+006h),b		;7462
+	ld a,(0c427h)		;7465   ; la x de Simon
+	ld (ix+005h),a		;7468
+	inc (ix+000h)		;746b   ; paso 2...
+	ld a,004h		;746e   ; ... y el efecto 4
 	jp 0509fh		;7470   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7473:
-	ld a,(0c003h)		;7473   ; lee el contador de cuadros
+el_hacha:
+	ld a,(0c003h)		;7473   ; EL HACHA (arma 3): cada dos cuadros, el patron: 0x18, 0x20, 0x28 o 0x30...
 	ld c,a			;7476
 	rra			;7477
 	and 003h		;7478
@@ -2928,19 +2956,19 @@ L_7473:
 	add a,a			;747b
 	add a,a			;747c
 	add a,018h		;747d
-	ld (ix+006h),a		;747f   ; guarda si la cosa se mueve
-	ld a,c			;7482
+	ld (ix+006h),a		;747f
+	ld a,c			;7482   ; ... cada ocho...
 	and 007h		;7483
-	jr nz,L_748C		;7485
-	ld a,006h		;7487
+	jr nz,el_hacha_mira		;7485
+	ld a,006h		;7487   ; ... el efecto 6
 	call 0509fh		;7489   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_748C:
-	ld hl,0c433h		;748c
+el_hacha_mira:
+	ld hl,0c433h		;748c   ; con 0xC433 en 2 o 3...
 	ld a,(hl)			;748f
 	sub 002h		;7490
 	cp 002h		;7492
 	jr c,$+17		;7494
-	ld a,(ix+000h)		;7496   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;7496   ; si no, por su paso (la tabla de la cruz)
 	dec a			;7499
 	call 0406bh		;749a   ; despacha: salta a la entrada A de la tabla que va detras del call
 
@@ -2959,42 +2987,42 @@ DATA_tabla_749D:
 ; ======================================================================
 
 
-L_74A5:
-	ld (hl),000h		;74a5
-	ld b,01ch		;74a7
-	ld d,(ix+005h)		;74a9   ; lee la x de la cosa
-	ld a,(ix+004h)		;74ac   ; lee la fraccion de la x de la cosa
+el_hacha_suelta:
+	ld (hl),000h		;74a5   ; 0xC433 a 0
+	ld b,01ch		;74a7   ; el hacha cae como objeto (0x1C)...
+	ld d,(ix+005h)		;74a9   ; ... en su sitio...
+	ld a,(ix+004h)		;74ac
 	sub 010h		;74af
 	ld e,a			;74b1
-	call 08992h		;74b2
-	call L_74E9		;74b5
+	call 08992h		;74b2   ; ... sale
+	call quita_el_arma		;74b5   ; y el arma se quita
 	jp 08e93h		;74b8
-L_74BB:
-	ld a,(ix+004h)		;74bb   ; lee la fraccion de la x de la cosa
-	add a,(ix+002h)		;74be   ; le suma la fraccion de la y de la cosa
-	ld (ix+004h),a		;74c1   ; guarda la fraccion de la x de la cosa
-	ld a,(ix+005h)		;74c4   ; lee la x de la cosa
-	add a,(ix+003h)		;74c7   ; le suma la y de la cosa
-	ld (ix+005h),a		;74ca   ; guarda la x de la cosa
+mueve_el_arma_lanzada:
+	ld a,(ix+004h)		;74bb   ; y += byte 2
+	add a,(ix+002h)		;74be
+	ld (ix+004h),a		;74c1
+	ld a,(ix+005h)		;74c4   ; x += byte 3
+	add a,(ix+003h)		;74c7
+	ld (ix+005h),a		;74ca
 	ret			;74cd
-L_74CE:
-	ld a,(ix+004h)		;74ce   ; lee la fraccion de la x de la cosa
+fuera_si_se_sale_el_arma:
+	ld a,(ix+004h)		;74ce   ; la y, de 0xD8 a 0xE7...
 	sub 0d8h		;74d1
 	cp 010h		;74d3
-	jr c,L_74E9		;74d5
-	ld a,(ix+005h)		;74d7   ; lee la x de la cosa
+	jr c,quita_el_arma		;74d5   ; ... fuera
+	ld a,(ix+005h)		;74d7   ; la x, de 0xFB a 0x04...
 	sub 0fbh		;74da
 	cp 00ah		;74dc
-	ret nc			;74de
-	ld a,(0c416h)		;74df   ; lee el arma que lleva Simon (0, ninguna)
+	ret nc			;74de   ; (si no, sigue)
+	ld a,(0c416h)		;74df   ; con el hacha o la cruz...
 	sub 003h		;74e2
-	cp 002h		;74e4
+	cp 002h		;74e4   ; ... lo de 0x8E93
 	call c,08e93h		;74e6
-L_74E9:
-	push ix		;74e9
+quita_el_arma:
+	push ix		;74e9   ; la ficha...
 	pop hl			;74eb
-L_74EC:
-	push hl			;74ec
+quita_la_ficha:
+	push hl			;74ec   ; ... a cero, 16 bytes
 	ld (hl),000h		;74ed
 	ld d,h			;74ef
 	ld e,l			;74f0
@@ -3002,175 +3030,179 @@ L_74EC:
 	ld bc,0000fh		;74f2
 	ldir		;74f5
 	pop hl			;74f7
-	ld a,l			;74f8
+	ld a,l			;74f8   ; la de 0xC450...
 	cp 050h		;74f9
-	ld a,0e0h		;74fb
-	jr nz,L_7507		;74fd
+	ld a,0e0h		;74fb   ; ... sus sprites 6 y 7 fuera...
+	jr nz,sprites_8_y_9_fuera		;74fd
 	ld (0d618h),a		;74ff
 	ld (0d61ch),a		;7502
-	jr L_750D		;7505
-L_7507:
-	ld (0d620h),a		;7507
+	jr y_fuera		;7505
+sprites_8_y_9_fuera:
+	ld (0d620h),a		;7507   ; ... o, la de 0xC460, los 8 y 9
 	ld (0d624h),a		;750a
-L_750D:
-	inc l			;750d
+y_fuera:
+	inc l			;750d   ; y la y 0xE0 en la ficha (byte 4)
 	inc l			;750e
 	inc l			;750f
 	inc l			;7510
 	ld (hl),a			;7511
 	ret			;7512
-L_7513:
-	ld hl,0c450h		;7513
+quita_las_armas:
+	ld hl,0c450h		;7513   ; las dos fichas a cero
 	ld (hl),000h		;7516
 	ld d,h			;7518
 	ld e,l			;7519
 	inc de			;751a
 	ld bc,0001fh		;751b
 	ldir		;751e
-	ld a,0e0h		;7520
+	ld a,0e0h		;7520   ; la y 0xE0 en las dos...
 	ld (0c454h),a		;7522
 	ld (0c464h),a		;7525
-	ld (0d618h),a		;7528
+	ld (0d618h),a		;7528   ; ... y los cuatro sprites fuera
 	ld (0d61ch),a		;752b
 	ld (0d620h),a		;752e
 	ld (0d624h),a		;7531
 	ret			;7534
-L_7535:
-	ld a,(ix+000h)		;7535   ; lee el tipo de la cosa
+
+; ----------------------------------------------------------------------
+; LOS DOS SPRITES DEL ARMA en la copia de 0xD600 (6 y 7 para 0xC450, 8 y 9 para 0xC460): en (y - 0x10, x - 8), con el patron y el siguiente (+4); y sus colores de linea, 0x0F y 0x0E con la cruz (arma 4), si no 2 y 0x4C, y 8 y 0 para el segundo sprite del frasco ardiendo.
+; ----------------------------------------------------------------------
+sprites_del_arma:
+	ld a,(ix+000h)		;7535   ; lanzada?
 	and a			;7538
 	ret z			;7539
 	push ix		;753a
 	pop hl			;753c
-	ld a,l			;753d
+	ld a,l			;753d   ; la de 0xC450...
 	cp 050h		;753e
-	ld hl,0d618h		;7540
-	jr z,L_7548		;7543
-	ld hl,0d620h		;7545
-L_7548:
-	ld a,(ix+004h)		;7548   ; lee la fraccion de la x de la cosa
+	ld hl,0d618h		;7540   ; ... en los sprites 6 y 7...
+	jr z,sprite_del_arma		;7543
+	ld hl,0d620h		;7545   ; ... la otra, 8 y 9
+sprite_del_arma:
+	ld a,(ix+004h)		;7548   ; la y, menos 0x10
 	sub 010h		;754b
 	ld (hl),a			;754d
 	inc hl			;754e
-	ld a,(ix+005h)		;754f   ; lee la x de la cosa
+	ld a,(ix+005h)		;754f   ; la x, menos 8
 	sub 008h		;7552
 	ld (hl),a			;7554
 	inc hl			;7555
-	ld a,(ix+006h)		;7556   ; lee si la cosa se mueve
+	ld a,(ix+006h)		;7556   ; el patron
 	ld (hl),a			;7559
 	inc hl			;755a
 	inc hl			;755b
-	ld a,(ix+004h)		;755c   ; lee la fraccion de la x de la cosa
+	ld a,(ix+004h)		;755c   ; el segundo: la misma y...
 	sub 010h		;755f
 	ld (hl),a			;7561
 	inc hl			;7562
-	ld a,(ix+005h)		;7563   ; lee la x de la cosa
+	ld a,(ix+005h)		;7563   ; ... la x...
 	sub 008h		;7566
 	ld (hl),a			;7568
 	inc hl			;7569
-	ld a,(ix+006h)		;756a   ; lee si la cosa se mueve
+	ld a,(ix+006h)		;756a   ; ... y el patron siguiente
 	add a,004h		;756d
 	ld (hl),a			;756f
-	push ix		;7570
+	push ix		;7570   ; sus colores: 0xD460...
 	pop hl			;7572
 	ld a,l			;7573
 	cp 050h		;7574
 	ld hl,0d460h		;7576
-	jr z,L_757E		;7579
-	ld hl,0d480h		;757b
-L_757E:
-	ld a,(ix+001h)		;757e   ; lee el paso en que va la cosa
+	jr z,colores_del_arma		;7579
+	ld hl,0d480h		;757b   ; ... o 0xD480
+colores_del_arma:
+	ld a,(ix+001h)		;757e   ; la cruz (arma 4)...
 	cp 004h		;7581
-	jr nz,L_7595		;7583
-	ld a,00fh		;7585
+	jr nz,colores_2_y_0x4c		;7583
+	ld a,00fh		;7585   ; ... 0x0F en las 16 lineas del primero...
 	ld b,010h		;7587
-	call L_7590		;7589
-	ld a,00eh		;758c
+	call color_en_b_lineas		;7589
+	ld a,00eh		;758c   ; ... y 0x0E en las del segundo
 	ld b,010h		;758e
-L_7590:
+color_en_b_lineas:
 	ld (hl),a			;7590
 	inc hl			;7591
-	djnz L_7590		;7592
+	djnz color_en_b_lineas		;7592
 	ret			;7594
-L_7595:
-	ld a,002h		;7595
+colores_2_y_0x4c:
+	ld a,002h		;7595   ; las demas: 2...
 	ld b,010h		;7597
-	call L_7590		;7599
-	ld a,04ch		;759c
+	call color_en_b_lineas		;7599
+	ld a,04ch		;759c   ; ... y 0x4C
 	ld b,010h		;759e
-	call L_7590		;75a0
-	ld a,(ix+001h)		;75a3   ; lee el paso en que va la cosa
+	call color_en_b_lineas		;75a0
+	ld a,(ix+001h)		;75a3   ; el frasco...
 	cp 005h		;75a6
 	ret nz			;75a8
-	ld a,(ix+000h)		;75a9   ; lee el tipo de la cosa
+	ld a,(ix+000h)		;75a9   ; ... ardiendo (paso 3)...
 	cp 003h		;75ac
 	ret nz			;75ae
-	ld hl,0d480h		;75af
+	ld hl,0d480h		;75af   ; ... el primero 8 y el segundo 0
 	ld de,0d490h		;75b2
 	ld b,010h		;75b5
-L_75B7:
+colores_del_frasco:
 	ld (hl),008h		;75b7
 	xor a			;75b9
 	ld (de),a			;75ba
 	inc hl			;75bb
 	inc de			;75bc
-	djnz L_75B7		;75bd
+	djnz colores_del_frasco		;75bd
 	ret			;75bf
-L_75C0:
-	ld hl,0c440h		;75c0
-	call L_75CF		;75c3
-	ld hl,0c434h		;75c6
-	call L_75CF		;75c9
-	ld hl,0c42dh		;75cc
-L_75CF:
-	ld a,(hl)			;75cf
+cuentas_de_simon:
+	ld hl,0c440h		;75c0   ; las cuentas de 0xC440...
+	call baja_una_cuenta		;75c3
+	ld hl,0c434h		;75c6   ; ... 0xC434...
+	call baja_una_cuenta		;75c9
+	ld hl,0c42dh		;75cc   ; ... y 0xC42D (el respiro)
+baja_una_cuenta:
+	ld a,(hl)			;75cf   ; hasta 0
 	and a			;75d0
 	ret z			;75d1
 	dec (hl)			;75d2
 	ret			;75d3
-L_75D4:
-	ld hl,0c445h		;75d4
+cuenta_de_0xc445:
+	ld hl,0c445h		;75d4   ; 0xC445, al acabar...
 	ld a,(hl)			;75d7
 	and a			;75d8
 	ret z			;75d9
 	dec (hl)			;75da
 	ret nz			;75db
-	ld a,018h		;75dc
+	ld a,018h		;75dc   ; ... 0x18 cuadros en 0xC43E
 	ld (0c43eh),a		;75de
 	ret			;75e1
-L_75E2:
-	ld hl,0c43ah		;75e2   ; apunta a la cuenta de la INVENCIBILIDAD
+cuenta_de_la_invencibilidad:
+	ld hl,0c43ah		;75e2   ; la invencibilidad...
 	ld a,(hl)			;75e5
 	and a			;75e6
 	ret z			;75e7
 	dec (hl)			;75e8
 	ld a,(hl)			;75e9
-	cp 010h		;75ea
+	cp 010h		;75ea   ; ... al quedar 0x10...
 	ret nz			;75ec
-	ld a,017h		;75ed
+	ld a,017h		;75ed   ; ... el efecto 0x17
 	jp 0509fh		;75ef   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_75F2:
-	ld hl,0c43bh		;75f2
+cuenta_del_reloj:
+	ld hl,0c43bh		;75f2   ; el tiempo parado...
 	ld a,(hl)			;75f5
 	and a			;75f6
 	ret z			;75f7
 	dec (hl)			;75f8
 	ret nz			;75f9
-	ld hl,0d010h		;75fa
+	ld hl,0d010h		;75fa   ; ... al acabar, sigue...
 	res 0,(hl)		;75fd
-	ld a,0fch		;75ff
+	ld a,0fch		;75ff   ; ... con el efecto 0xFC
 	jp 0509fh		;7601   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-L_7604:
-	ld hl,0c43eh		;7604
+destello_del_borde:
+	ld hl,0c43eh		;7604   ; 0xC43E cuadros...
 	ld a,(hl)			;7607
 	and a			;7608
 	ret z			;7609
 	dec (hl)			;760a
-	and 002h		;760b
-	ld a,00eh		;760d
+	and 002h		;760b   ; ... uno si y otro no...
+	ld a,00eh		;760d   ; ... el color del borde 0x0E...
 	jr nz,L_7612		;760f
-	xor a			;7611
+	xor a			;7611   ; ... o 0
 L_7612:
-	ld (0f3ebh),a		;7612
+	ld (0f3ebh),a		;7612   ; (por CHGCLR)
 	jp 00062h		;7615   ; BIOS CHGCLR - Changes the screen colors
 L_7618:
 	ld a,(0c422h)		;7618
@@ -3382,7 +3414,7 @@ L_7743:
 	xor a			;7748
 	ld (0c422h),a		;7749
 	call L_7806		;774c
-	call L_7513		;774f
+	call quita_las_armas		;774f
 	ld hl,0c5ach		;7752   ; apunta a el estado de la puerta de la fase
 	inc (hl)			;7755
 	ld a,(0d000h)		;7756   ; lee la FASE (0 el patio, 1-18)
@@ -4511,7 +4543,7 @@ L_7F88:
 	cp 002h		;7fa1
 	push iy		;7fa3
 	pop hl			;7fa5
-	call z,L_74EC		;7fa6
+	call z,quita_la_ficha		;7fa6
 	call 0822ah		;7fa9
 	jp 09a1ah		;7fac
 L_7FAF:

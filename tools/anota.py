@@ -276,7 +276,8 @@ def por_nombre():
 # Tramos en los que IX apunta a OTRA lista y no a una ficha, porque se carga
 # con `push hl / pop ix` o lo trae quien llama (medido leyendo cada bucle):
 #   p00:5B96  la lista de cosas de la habitacion (p00:5BB8 `push hl / pop ix`)
-#   p01:71C0  las dos armas de 0xC450 y 0xC460 y lo que llaman (0x72BD, 0x72CE)
+#   p01:71C0  las dos armas de 0xC450 y 0xC460 y todo su movimiento, hasta sus
+#             sprites (p01:7535-75BF): otros campos (+2/+3 las velocidades, +4 y, +5 x)
 #   p02:8460  lo llama el bucle de las cosas fijas de 0xC470 (p02:80B3)
 #   p02:8671  otra vuelta a 0xC470 (`push hl / pop ix`) y 0x868C
 #   p02:8A30  las ocho de 0xC500 (p02:8A53) y lo que despacha 0x8A80, hasta 0x8D40
@@ -286,7 +287,7 @@ def por_nombre():
 #   p02:9620  0xEB00 y otra vuelta a 0xC470 (p02:962A y p02:9634)
 NO_FICHAS = {
     0: [(0x5B96, 0x5C04)],
-    1: [(0x71C0, 0x7300)],
+    1: [(0x71C0, 0x75C0)],
     2: [(0x8460, 0x847A), (0x8671, 0x8710), (0x8A30, 0x8D40), (0x8FD8, 0x9010),
         (0x9112, 0x9130), (0x91B0, 0x92A0), (0x9620, 0x9660)],
 }
