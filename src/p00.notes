@@ -3,8 +3,8 @@
 # --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
 B 0x4028 LA INTERRUPCION (H.TIMI). INIT deja el Z80 en un `jr $` y todo el juego corre desde aqui, una vez por cuadro: primero la pausa, luego el sonido con los bancos 14 y 15, y despues, si no se esta ya dentro (semaforo de 0xC005), la maquina de estados.
 C 0x4028 sin interrupciones mientras se cambian bancos
-C 0x402C cero: no se puede pausar
-C 0x402D se puede pausar: a mirar STOP
+C 0x402C sin Game Master, no hay pausa
+C 0x402D con el: a mirar STOP
 C 0x4030 el sonido: bancos 14 y 15 sin tocar la copia de 0xF0F2/0xF0F3
 C 0x4031 el banco 14 (el reproductor)
 C 0x4036 el banco 15 (las partituras)
@@ -48,7 +48,7 @@ C 0x40B5 en H.TIMI
 C 0x40B8 a la interrupcion de 0x4028
 C 0x40BE CLIKSW a cero: sin el clic de las teclas
 C 0x40C3 y aqui se queda para siempre: el juego va por interrupcion
-B 0x40C5 LA PAUSA. STOP (fila 7, bit 4) pone y quita la pausa; con el juego pausado, la tecla de la fila 1, bit 7 (el ';' del teclado internacional) avanza UN cuadro: devuelve los volumenes, corre el sonido y el juego una vez y sigue en pausa. Solo cuenta la pulsacion nueva (0xE610 guarda las teclas del cuadro anterior).
+B 0x40C5 LA PAUSA, solo con un Game Master en otra ranura (0xE600). STOP (fila 7, bit 4) pone y quita la pausa; con el juego pausado, la tecla de la fila 1, bit 7 (el ';' del teclado internacional) avanza UN cuadro: devuelve los volumenes, corre el sonido y el juego una vez y sigue en pausa. Solo cuenta la pulsacion nueva (0xE610 guarda las teclas del cuadro anterior).
 C 0x40C5 fila 7 del teclado
 C 0x40CA a uno lo pulsado
 C 0x40CB STOP
@@ -465,7 +465,7 @@ C 0x505C y vuelven los bancos 1, 2 y 3
 C 0x5061 el 1
 C 0x5067 el 2
 C 0x506D el 3
-B 0x4DE7 EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con 0xC413 puesto (lo que dice que es la demostracion) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
+B 0x4DE7 EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con la vida en marcha (0xC413) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
 B 0x4E2E UN CUADRO DE LA DEMOSTRACION: se entregan las teclas del par que toca hasta que se acaba su cuenta, y se pasa al siguiente. Unas teclas 0xFF la terminan.
 C 0x4DDB pagina 0
 C 0x4DDD desde (0, 0)
@@ -474,7 +474,7 @@ C 0x4DE3 color 0
 C 0x4DE7 borra de 0xC420...
 C 0x4DED ... 0x1BE0 bytes
 C 0x4DF4 sin teclas
-C 0x4E01 0xC413 = 1: es la demostracion
+C 0x4E01 la vida en marcha (0xC413 = 1)
 C 0x4E0A el primer par, ya
 C 0x4E0D vida llena
 C 0x4E12 y la del enemigo
@@ -499,12 +499,239 @@ C 0x4E50 dos bytes por par
 C 0x4E52 cuantos cuadros
 C 0x4E57 las teclas
 
+L 0x4107 guarda_y_calla_el_psg
+L 0x411F calla_el_psg
+L 0x4132 devuelve_los_volumenes
+B 0x417D LOS ESTADOS DEL JUEGO (0xC000, por la tabla de 0x4161; el subestado 0xC001 va en B y cada `djnz` salta al siguiente, asi que lo primero tras el primer `djnz` es el subestado 1 y lo ultimo, el 0). 0 la presentacion, 1 el titulo, 2 la demostracion, 3 empieza la partida, 4 empieza una vida, 5 el juego, 6 Simon muere, 7 GAME OVER, 8 bloque acabado (tras el jefe), 9 cambio de habitacion, 0x0A fase acabada (la puerta), 0x0B la pausa del juego, 0x0C la tienda y 0x0D el menu del Game Master. En los estados 0, 1 y 2 se vuelve por 0x4391, que mira las teclas.
+L 0x417D estado_0_la_presentacion
+C 0x417F subestado 1: la presentacion, cada cuadro...
+C 0x4182 ... hasta 0xC422
+C 0x4187 y espera 0 cuadros
+L 0x418A presentacion_espera
+C 0x418C subestado 2: al acabar la espera...
+C 0x4191 ... el titulo...
+C 0x4194 ... y al estado 1, sin espera
+L 0x4198 presentacion_empieza
+C 0x4198 subestado 0: pantalla en negro...
+C 0x419B ... y empieza la presentacion
+L 0x41A0 estado_1_el_titulo
+C 0x41A0 al acabar la espera...
+C 0x41A5 ... lo de 0x7AE7 y al estado 2
+L 0x41AB estado_2_la_demostracion
+C 0x41AD subestado 1: un cuadro de la demostracion
+C 0x41B0 mientras dure...
+C 0x41B4 ... sigue
+L 0x41B5 al_estado_0
+C 0x41B5 al estado 0
+C 0x41B9 0x20 cuadros de espera
+C 0x41BE y subestado 0
+L 0x41C1 empieza_la_demostracion
+C 0x41C1 subestado 0: pantalla en negro...
+C 0x41C4 ... y la demostracion
+C 0x41C7 0x20 cuadros
+L 0x41C9 espera_y_al_subestado_siguiente
+C 0x41C9 A cuadros de espera
+L 0x41CC al_subestado_siguiente
+C 0x41CC el subestado siguiente
+L 0x41D1 estado_3_empieza_la_partida
+C 0x41D1 subestado 1: PLAY START...
+C 0x41D7 ... hasta acabar la espera...
+C 0x41D9 ... pintado cuatro cuadros y borrado cuatro
+L 0x41E4 estado_3_a_cero
+C 0x41E6 subestado 2: marcador, vidas y vida a cero
+L 0x41EC estado_3_prepara
+C 0x41EE subestado 3: 0xC41A a 1...
+C 0x41F3 ... lo de 0x63D3...
+C 0x41F6 ... 0xA0 cuadros
+L 0x41FB estado_3_mueve_las_cosas
+C 0x41FD subestado 4: las cosas se mueven...
+C 0x4203 ... y cada dos cuadros...
+C 0x4208 ... la espera baja
+C 0x420A al acabar: sin sprites...
+C 0x420E ... fuera la habitacion especial...
+C 0x4211 ... lo de 0x62D0...
+C 0x4214 ... y con 0xE604 puesto...
+C 0x421B ... se gasta y lo de 0x5E31
+C 0x4220 al estado 4
+L 0x4222 suena_la_partida
+C 0x4222 subestado 0: la musica 0x8A...
+C 0x4227 ... y 0x50 cuadros
+L 0x422C estado_4_empieza_una_vida
+C 0x422C una vida menos
+C 0x4234 pantalla apagada
+C 0x4237 el marcador
+C 0x423A la habitacion
+C 0x423D la vida en marcha
+C 0x4242 lo de 0x794F
+L 0x4249 al_estado_siguiente
+C 0x4249 0x20 cuadros...
+C 0x424E ... en el estado siguiente...
+L 0x4252 subestado_0
+C 0x4252 ... desde el subestado 0
+L 0x4257 estado_5_el_juego
+C 0x4257 un cuadro del juego
+C 0x425A la tienda (0xC40C)?
+C 0x425E si: al estado 0x0C
+C 0x4263 la pausa (0xC40A)?
+C 0x426A se sale de la habitacion?
+C 0x426E si: al estado 9
+C 0x4273 la puerta de la fase (0xC408)?
+C 0x4277 si: al estado 0x0A
+C 0x427C el jefe rematado (0xC409)?
+C 0x4280 si: al estado 8
+C 0x4285 la vida sigue?
+C 0x4289 si: sigue el juego
+C 0x428A no: al estado 6
+L 0x428C a_la_pausa
+C 0x428C la ventana de PAUSE...
+C 0x428F ... y al estado 0x0B
+L 0x4294 estado_6_simon_muere
+C 0x4294 le quedan vidas?
+L 0x429B otra_vida
+C 0x429B si: la habitacion de nuevo...
+C 0x429E ... Simon de pie...
+C 0x42A3 ... 0xC40D a 1...
+C 0x42A6 ... y al estado 4
+L 0x42AB sin_vidas
+C 0x42AB no: la musica 0x8B...
+C 0x42B0 ... y al estado 7
+L 0x42B2 estado_7_game_over
+C 0x42B4 subestado 1: con un Game Master...
+C 0x42BA ... y F5 recien pulsada...
+C 0x42BD ... se continua
+C 0x42BF mientras suena la musica (0xC0A7)...
+C 0x42C3 ... nada
+C 0x42C4 al acabar la espera...
+C 0x42C9 ... fuera el bit 6 de 0xC002...
+C 0x42D0 ... y al estado 0
+L 0x42D3 continua
+C 0x42D3 tres vidas...
+C 0x42D8 ... y el marcador a cero
+C 0x42E1 y otra vida
+L 0x42E3 pinta_el_game_over
+C 0x42E3 subestado 0: pantalla en negro...
+C 0x42E6 ... GAME OVER...
+C 0x42EC ... y con un Game Master...
+C 0x42F2 ... F5 CONTINUE
+C 0x42F8 el marcador
+C 0x42FB 0x78 cuadros
+L 0x4314 f5_recien_pulsada
+C 0x4314 la fila 7 del teclado...
+C 0x4319 ... su bit 1, F5, a 1 si esta pulsada
+C 0x431C lo del cuadro anterior...
+C 0x4320 ... y el de este
+C 0x4321 NZ si se acaba de pulsar
+L 0x4324 estado_8_bloque_acabado
+C 0x4326 subestado 1: el bloque de tres fases siguiente
+C 0x432A tras el sexto...
+C 0x432F ... el primero...
+C 0x4330 ... la fase 0xFF (la siguiente sera la 0)...
+C 0x4335 ... la vida llena...
+C 0x433A ... 0xCF34 uno mas...
+C 0x433F ... y con la segunda, al estado 0
+L 0x4344 bloque_siguiente
+C 0x4344 lo de 0x62D5
+L 0x4347 fase_siguiente
+C 0x4347 una vida mas (el estado 4 la quita)
+C 0x434F la fase del marcador, mas uno
+C 0x4357 la fase siguiente...
+C 0x435B ... desde la habitacion 0
+C 0x435E fuera las banderas del jefe y de la puerta
+C 0x4364 al estado 4
+L 0x4370 bloque_acabado_empieza
+C 0x4370 subestado 0: pantalla en negro
+L 0x4377 estado_9_cambio_de_habitacion
+C 0x4377 a cual se va
+C 0x437A ninguna: al estado 6
+C 0x437F si no, se monta...
+C 0x4382 ... y al estado 5
+L 0x4387 estado_10_fase_acabada
+C 0x4387 fuera la llave blanca (bit 0)...
+C 0x438E ... y a la fase siguiente
+L 0x4391 teclas_del_titulo
+C 0x4391 los mandos...
+C 0x4394 ... los de 0xC401
+C 0x439B ninguno: nada
+C 0x439C sin espera
+C 0x43A5 en el estado 1:
+C 0x43A7 los bits 4 o 5?
+C 0x43AA 0xC002 = 0x40 (el bit 6)
+C 0x43AF con un Game Master...
+C 0x43B3 ... a su menu
+C 0x43B5 si no, al estado 3
+L 0x43BA al_titulo
+C 0x43BA en el 0 y el 2: al estado 1...
+C 0x43BC ... callado...
+C 0x43C1 ... y el titulo
+L 0x43C4 al_menu_del_game_master
+C 0x43C4 lo que da el Game Master, de partida: nada...
+C 0x43C8 ... la fase 1...
+C 0x43D0 ... tres vidas...
+C 0x43D5 ... y al estado 0x0D
+L 0x43DA estado_11_la_pausa
+C 0x43DA la tecla de la pausa otra vez (bit 0 de 0xC00B)?
+C 0x43DF si: fuera la pausa...
+C 0x43E3 ... la ventana...
+C 0x43E6 ... el efecto 0xFE...
+C 0x43EB ... y al estado 5
+L 0x43F0 estado_12_la_tienda
+C 0x43F2 subestado 1: la tienda, cada cuadro
+C 0x43F5 abierta: sigue
+C 0x43F6 cerrada: 0x0F cuadros
+L 0x43FB tienda_se_cierra
+C 0x43FD subestado 2: al acabar la espera...
+C 0x4402 ... se quita la ventana...
+C 0x4405 ... y al estado 5
+L 0x440A tienda_se_abre
+C 0x440A subestado 0: se gasta 0xC40C...
+C 0x440E ... y se abre la tienda
+L 0x4414 estado_13_el_game_master
+C 0x4416 subestado 1: las teclas...
+C 0x441C las de los bits 0 y 1: a 0x5E7D
+C 0x4421 la opcion 0...
+C 0x4428 ... empieza la partida...
+C 0x442B ... estado 3, subestado 0
+L 0x4432 otra_opcion
+C 0x4432 la 1...
+C 0x4435 ... o la 2
+C 0x443E y al subestado 2
+L 0x4440 opcion_1
+C 0x4446 la opcion 1
+L 0x444C game_master_elige
+C 0x444E subestado 2
+C 0x4456 apunta la opcion en 0xE604
+C 0x445F con 0xE615...
+C 0x446C ... la opcion 1 da la fase...
+C 0x4470 ... del marcador...
+C 0x4474 ... y de verdad
+L 0x4477 vuelve_al_subestado_0
+C 0x4477 subestado 0
+L 0x447C game_master_da_vidas
+C 0x447C la opcion 2 da las vidas
+L 0x4481 empieza_el_game_master
+C 0x4481 subestado 0: su pantalla...
+C 0x4484 ... y 0xE608-0xE616 a cero
+L 0x4495 la_ventana_de_pause
+C 0x4495 guarda el fondo: de (0x68, 0x54)...
+C 0x4498 ... 0x30 x 0x10...
+C 0x449B ... a (0xD0, 0x70) de la pagina 1
+C 0x44A7 el recuadro
+C 0x44AA y PAUSE
+L 0x44B8 quita_la_ventana_de_pause
+C 0x44B8 el fondo de vuelta, de la pagina 1 a la 0
+L 0x44C6 partida_a_cero
+C 0x44C6 del MARCADOR en adelante...
+C 0x44C9 ... 0x1BFB bytes a cero
+C 0x44D3 las vidas, la fase del marcador y 0xC412, de 0x44E9
+C 0x44DE la vida llena...
+C 0x44E3 ... y la barra del enemigo
+
 # --- DATOS DECLARADOS A MANO (cada uno con la instruccion que lo lee) ---
 D 0x44E9 0x44EC valores_iniciales_de_la_partida  los tres bytes que p00:44D3 copia a 0xC410-0xC412 al empezar la partida: 3 (las vidas que marca P-), 0 (la fase en BCD) y 1
 F 0x44E9 16
 D 0x4B95 0x4B9D registros_del_vdp  cuatro pares [registro][valor] que p00:4B7F escribe con WRTVDP: R1 = 0x62, R5 = 0xEF, R6 = 0x1F y R11 = 0x01 (la pantalla y las tablas de sprites)
 F 0x4B95 16
-D 0x4E5D 0x4E93 teclas_de_la_demostracion  LAS PULSACIONES DE LA DEMOSTRACION: 27 pares [cuantos cuadros][teclas] que p00:4E48 va sacando por orden (0xCF3A la cuenta, 0xCF3B las teclas) y p00:4E3E entrega como si fueran los mandos (0xC007); unas teclas 0xFF acaban la demostracion (p00:4E41)
+D 0x4E5D 0x4E93 teclas_de_la_demostracion  LAS PULSACIONES DE LA DEMOSTRACION: 27 pares [cuantos cuadros][teclas] que p00:4E48 va sacando por orden (0xCF3A la cuenta, 0xCF3B las teclas) y p00:4E3E entrega como si fueran los mandos (0xC007); unas teclas 0xFF acaban la demostracion (p00:4E41, que quita la vida en marcha)
 F 0x4E5D 16
 D 0x4F7F 0x4F83 cuatro_pasos  los cuatro dibujos por los que pasa (ix+0x0B): p00:4F74 los elige con los bits 2-3 de la cuenta de (ix+0x13)
 F 0x4F7F 16
@@ -635,7 +862,7 @@ L 0x539E bancos_4_5_6
 L 0x564C sube_los_dibujos_de_la_fase
 L 0x582D dibujo_de_32_filas
 L 0x5F1D crea_una_cosa
-C 0x4029 lee si se puede pausar (partida en marcha)
+C 0x4029 lee si hay un GAME MASTER en otra ranura
 C 0x4033 el mapper: pone en 0x8000 el banco de A
 C 0x4038 el mapper: pone en 0xA000 el banco de A
 C 0x403F lee la copia del banco de 0x8000
@@ -655,59 +882,34 @@ C 0x40FF sonido_del_cuadro: pone los bancos 14 y 15, llama al reproductor y los 
 C 0x414D apunta a el contador de cuadros
 C 0x4151 lee el estado (0xC000) y el subestado (0xC001) de un tiron
 C 0x415E despacha: salta a la entrada A de la tabla que va detras del call
-C 0x418C apunta a la espera del estado, en cuadros
-C 0x41A0 apunta a la espera del estado, en cuadros
-C 0x41B0 lee la DEMOSTRACION en marcha
 C 0x41B6 guarda el ESTADO del juego
 C 0x41BB guarda la espera del estado, en cuadros
-C 0x41C9 guarda la espera del estado, en cuadros
-C 0x41CC apunta a el subestado
 C 0x41D3 apunta a la espera del estado, en cuadros
 C 0x41DE rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x41E1 borra_rotulo: lo mismo que 0x4ACB pero borrando
 C 0x41F0 guarda la habitacion especial
 C 0x4200 apunta a la espera del estado, en cuadros
-C 0x4203 lee el contador de cuadros
-C 0x420E guarda la habitacion especial
 C 0x4224 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x422C apunta a las vidas
-C 0x4234 apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-C 0x423D apunta a la DEMOSTRACION en marcha
 C 0x424B guarda la espera del estado, en cuadros
-C 0x424E apunta a el ESTADO del juego
 C 0x4253 guarda el subestado
 C 0x4260 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-C 0x426A lee el lado por el que se sale de la habitacion
 C 0x4270 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x4279 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x4282 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-C 0x4285 lee la DEMOSTRACION en marcha
 C 0x4291 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-C 0x4294 apunta a las vidas
 C 0x42A8 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x42AD sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x42B4 lee si se puede pausar (partida en marcha)
-C 0x42C4 apunta a la espera del estado, en cuadros
-C 0x42C9 apunta a las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x42D5 guarda las vidas
 C 0x42DB guarda el MARCADOR, tres bytes en BCD
 C 0x42E9 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-C 0x42EC lee si se puede pausar (partida en marcha)
 C 0x42F5 rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-C 0x4326 apunta a el bloque de tres fases (0-5)
 C 0x4332 guarda la FASE (0 el patio, 1-18)
 C 0x4337 guarda la vida de Simon
-C 0x4347 apunta a las vidas
-C 0x434F apunta a la fase en BCD, la del marcador
-C 0x4357 apunta a la FASE (0 el patio, 1-18)
 C 0x4366 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x437C cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x4384 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-C 0x4387 apunta a lo que lleva Simon (un bit por objeto)
-C 0x439C apunta a la espera del estado, en cuadros
 C 0x43A1 apunta a el ESTADO del juego
 C 0x43AC guarda las banderas de la partida (bit 7: de verdad, no la demostracion)
-C 0x43AF lee si se puede pausar (partida en marcha)
 C 0x43BE sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x43CA guarda la fase del marcador que da el Game Master
 C 0x43CD guarda la fase que da el Game Master
@@ -715,17 +917,12 @@ C 0x43D2 guarda las vidas que da el Game Master
 C 0x43D7 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x43E8 sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x43ED cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-C 0x43FD apunta a la espera del estado, en cuadros
 C 0x4407 cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 C 0x442E guarda el estado (0xC000) y el subestado (0xC001) de un tiron
-C 0x4470 guarda la fase del marcador que da el Game Master
-C 0x4474 guarda la fase que da el Game Master
 C 0x4478 guarda el subestado
-C 0x447C guarda las vidas que da el Game Master
 C 0x44A2 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 C 0x44AD rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x44C3 copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
-C 0x44C6 apunta a el MARCADOR, tres bytes en BCD
 C 0x44D6 apunta a las vidas
 C 0x44E0 guarda la vida de Simon
 C 0x44E5 guarda la vida del enemigo (barra ENEMY)
@@ -795,7 +992,7 @@ C 0x4E07 guarda la FASE (0 el patio, 1-18)
 C 0x4E0F guarda la vida de Simon
 C 0x4E14 guarda la vida del enemigo (barra ENEMY)
 C 0x4E23 lee el lado por el que se sale de la habitacion
-C 0x4E42 guarda la DEMOSTRACION en marcha
+C 0x4E42 guarda la VIDA en marcha
 C 0x4E53 guarda la cuenta de la pulsacion de la demostracion
 C 0x4E58 guarda las teclas de la demostracion
 C 0x4EA4 crea_una_cosa: crea una cosa del tipo C en la posicion DE
@@ -1086,7 +1283,7 @@ C 0x5BDA lee la FASE (0 el patio, 1-18)
 C 0x5BE4 hl_mas_a: HL += A
 C 0x5C3A lee las banderas de la partida (bit 7: de verdad, no la demostracion)
 C 0x5C59 sonido: arranca la musica o el efecto A (bit 7 = musica)
-C 0x5CAF guarda si se puede pausar (partida en marcha)
+C 0x5CAF guarda si hay un GAME MASTER en otra ranura
 C 0x5CFA rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 C 0x5D08 rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 C 0x5D67 apunta a la fase del marcador que da el Game Master

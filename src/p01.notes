@@ -731,7 +731,7 @@ C 0x70AC sonido: arranca la musica o el efecto A (bit 7 = musica)
 C 0x70B4 apunta a los corazones, en BCD
 C 0x70CA guarda la cuenta de la INVENCIBILIDAD
 C 0x70D6 guarda la HABITACION dentro de la fase
-C 0x70D9 guarda la DEMOSTRACION en marcha
+C 0x70D9 guarda la VIDA en marcha
 C 0x70DC lee lo que lleva Simon (un bit por objeto)
 C 0x70E1 guarda lo que lleva Simon (un bit por objeto)
 C 0x70E5 guarda el arma que lleva Simon (0, ninguna)

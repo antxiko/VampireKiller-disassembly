@@ -44,9 +44,9 @@ DATA_cabecera_de_konami:
 ; ----------------------------------------------------------------------
 interrupcion:
 	di			;4028   ; sin interrupciones mientras se cambian bancos
-	ld a,(0e600h)		;4029   ; lee si se puede pausar (partida en marcha)
-	or a			;402c   ; cero: no se puede pausar
-	jp nz,L_40C5		;402d   ; se puede pausar: a mirar STOP
+	ld a,(0e600h)		;4029   ; lee si hay un GAME MASTER en otra ranura
+	or a			;402c   ; sin Game Master, no hay pausa
+	jp nz,L_40C5		;402d   ; con el: a mirar STOP
 sonido_del_cuadro:
 	di			;4030   ; el sonido: bancos 14 y 15 sin tocar la copia de 0xF0F2/0xF0F3
 	ld a,00eh		;4031   ; el banco 14 (el reproductor)
@@ -141,7 +141,7 @@ L_40C3:
 	jr L_40C3		;40c3   ; y aqui se queda para siempre: el juego va por interrupcion
 
 ; ----------------------------------------------------------------------
-; LA PAUSA. STOP (fila 7, bit 4) pone y quita la pausa; con el juego pausado, la tecla de la fila 1, bit 7 (el ';' del teclado internacional) avanza UN cuadro: devuelve los volumenes, corre el sonido y el juego una vez y sigue en pausa. Solo cuenta la pulsacion nueva (0xE610 guarda las teclas del cuadro anterior).
+; LA PAUSA, solo con un Game Master en otra ranura (0xE600). STOP (fila 7, bit 4) pone y quita la pausa; con el juego pausado, la tecla de la fila 1, bit 7 (el ';' del teclado internacional) avanza UN cuadro: devuelve los volumenes, corre el sonido y el juego una vez y sigue en pausa. Solo cuenta la pulsacion nueva (0xE610 guarda las teclas del cuadro anterior).
 ; ----------------------------------------------------------------------
 L_40C5:
 	ld a,007h		;40c5   ; fila 7 del teclado
@@ -167,7 +167,7 @@ L_40C5:
 	bit 4,c		;40e6   ; no hay pausa: se ha pulsado STOP?
 	jp z,sonido_del_cuadro		;40e8   ; sonido_del_cuadro: pone los bancos 14 y 15, llama al reproductor y los devuelve
 	ld (hl),c			;40eb   ; se pone la pausa (0xE601 distinto de cero)
-	call L_4107		;40ec   ; guarda los volumenes y calla el PSG
+	call guarda_y_calla_el_psg		;40ec   ; guarda los volumenes y calla el PSG
 	ei			;40ef   ; y este cuadro no corre el juego
 	ret			;40f0
 L_40F1:
@@ -178,13 +178,13 @@ L_40F1:
 	xor a			;40fa   ; si: se quita la pausa
 	ld (hl),a			;40fb
 L_40FC:
-	call L_4132		;40fc   ; devuelve los volumenes
+	call devuelve_los_volumenes		;40fc   ; devuelve los volumenes
 	jp sonido_del_cuadro		;40ff   ; sonido_del_cuadro: pone los bancos 14 y 15, llama al reproductor y los devuelve
 L_4102:
-	call L_411F		;4102   ; en pausa: el PSG callado
+	call calla_el_psg		;4102   ; en pausa: el PSG callado
 	ei			;4105
 	ret			;4106
-L_4107:
+guarda_y_calla_el_psg:
 	ld a,008h		;4107   ; guarda el volumen del canal A (registro 8)
 	call 00096h		;4109   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0e611h),a		;410c   ; en 0xE611
@@ -194,7 +194,7 @@ L_4107:
 	ld a,00ah		;4117   ; el del canal C (registro 10)
 	call 00096h		;4119   ; BIOS RDPSG - Reads value from PSG-register
 	ld (0e613h),a		;411c   ; en 0xE613
-L_411F:
+calla_el_psg:
 	ld e,000h		;411f   ; y los tres volumenes a cero
 	ld a,008h		;4121
 	call 00093h		;4123   ; BIOS WRTPSG - Writes data to PSG-register
@@ -204,7 +204,7 @@ L_411F:
 	ld e,000h		;412c   ; registro 10
 	inc a			;412e
 	jp 00093h		;412f   ; BIOS WRTPSG - Writes data to PSG-register
-L_4132:
+devuelve_los_volumenes:
 	ld a,(0e611h)		;4132   ; devuelve el volumen del canal A
 	ld e,a			;4135
 	ld a,008h		;4136
@@ -255,212 +255,216 @@ DATA_tabla_4161:
 ; ======================================================================
 
 
-L_417D:
-	djnz L_418A		;417d
-	call 0624ch		;417f
-	ld a,(0c422h)		;4182
+
+; ----------------------------------------------------------------------
+; LOS ESTADOS DEL JUEGO (0xC000, por la tabla de 0x4161; el subestado 0xC001 va en B y cada `djnz` salta al siguiente, asi que lo primero tras el primer `djnz` es el subestado 1 y lo ultimo, el 0). 0 la presentacion, 1 el titulo, 2 la demostracion, 3 empieza la partida, 4 empieza una vida, 5 el juego, 6 Simon muere, 7 GAME OVER, 8 bloque acabado (tras el jefe), 9 cambio de habitacion, 0x0A fase acabada (la puerta), 0x0B la pausa del juego, 0x0C la tienda y 0x0D el menu del Game Master. En los estados 0, 1 y 2 se vuelve por 0x4391, que mira las teclas.
+; ----------------------------------------------------------------------
+estado_0_la_presentacion:
+	djnz presentacion_espera		;417d
+	call 0624ch		;417f   ; subestado 1: la presentacion, cada cuadro...
+	ld a,(0c422h)		;4182   ; ... hasta 0xC422
 	or a			;4185
 	ret z			;4186
-	xor a			;4187
-	jr L_41C9		;4188
-L_418A:
-	djnz L_4198		;418a
-	ld hl,0c004h		;418c   ; apunta a la espera del estado, en cuadros
+	xor a			;4187   ; y espera 0 cuadros
+	jr espera_y_al_subestado_siguiente		;4188
+presentacion_espera:
+	djnz presentacion_empieza		;418a
+	ld hl,0c004h		;418c   ; subestado 2: al acabar la espera...
 	dec (hl)			;418f
 	ret nz			;4190
-	call L_4D47		;4191
-	xor a			;4194
+	call L_4D47		;4191   ; ... el titulo...
+	xor a			;4194   ; ... y al estado 1, sin espera
 	jp L_424B		;4195
-L_4198:
-	call L_47B9		;4198
-	call 06202h		;419b
-	jr L_41CC		;419e
-L_41A0:
-	ld hl,0c004h		;41a0   ; apunta a la espera del estado, en cuadros
+presentacion_empieza:
+	call L_47B9		;4198   ; subestado 0: pantalla en negro...
+	call 06202h		;419b   ; ... y empieza la presentacion
+	jr al_subestado_siguiente		;419e
+estado_1_el_titulo:
+	ld hl,0c004h		;41a0   ; al acabar la espera...
 	dec (hl)			;41a3
 	ret nz			;41a4
-	call 07ae7h		;41a5
-	jp L_4249		;41a8
-L_41AB:
-	djnz L_41C1		;41ab
-	call L_4E20		;41ad
-	ld a,(0c413h)		;41b0   ; lee la DEMOSTRACION en marcha
+	call 07ae7h		;41a5   ; ... lo de 0x7AE7 y al estado 2
+	jp al_estado_siguiente		;41a8
+estado_2_la_demostracion:
+	djnz empieza_la_demostracion		;41ab
+	call L_4E20		;41ad   ; subestado 1: un cuadro de la demostracion
+	ld a,(0c413h)		;41b0   ; mientras dure...
 	or a			;41b3
-	ret nz			;41b4
-L_41B5:
-	xor a			;41b5
+	ret nz			;41b4   ; ... sigue
+al_estado_0:
+	xor a			;41b5   ; al estado 0
 cambia_de_estado:
 	ld (0c000h),a		;41b6   ; guarda el ESTADO del juego
-	ld a,020h		;41b9
+	ld a,020h		;41b9   ; 0x20 cuadros de espera
 	ld (0c004h),a		;41bb   ; guarda la espera del estado, en cuadros
-	jp L_4252		;41be
-L_41C1:
-	call L_47B9		;41c1
-	call L_4DE7		;41c4
-	ld a,020h		;41c7
-L_41C9:
-	ld (0c004h),a		;41c9   ; guarda la espera del estado, en cuadros
-L_41CC:
-	ld hl,0c001h		;41cc   ; apunta a el subestado
+	jp subestado_0		;41be   ; y subestado 0
+empieza_la_demostracion:
+	call L_47B9		;41c1   ; subestado 0: pantalla en negro...
+	call L_4DE7		;41c4   ; ... y la demostracion
+	ld a,020h		;41c7   ; 0x20 cuadros
+espera_y_al_subestado_siguiente:
+	ld (0c004h),a		;41c9   ; A cuadros de espera
+al_subestado_siguiente:
+	ld hl,0c001h		;41cc   ; el subestado siguiente
 	inc (hl)			;41cf
 	ret			;41d0
-L_41D1:
-	djnz L_41E4		;41d1
+estado_3_empieza_la_partida:
+	djnz estado_3_a_cero		;41d1   ; subestado 1: PLAY START...
 	ld hl,0c004h		;41d3   ; apunta a la espera del estado, en cuadros
 	dec (hl)			;41d6
-	jr z,L_41CC		;41d7
-	bit 2,(hl)		;41d9
+	jr z,al_subestado_siguiente		;41d7   ; ... hasta acabar la espera...
+	bit 2,(hl)		;41d9   ; ... pintado cuatro cuadros y borrado cuatro
 	ld hl,04d29h		;41db
 	jp z,rotulo		;41de   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 	jp borra_rotulo		;41e1   ; borra_rotulo: lo mismo que 0x4ACB pero borrando
-L_41E4:
-	djnz L_41EC		;41e4
-	call L_44C6		;41e6
-	jp L_41CC		;41e9
-L_41EC:
-	djnz L_41FB		;41ec
-	ld a,001h		;41ee
+estado_3_a_cero:
+	djnz estado_3_prepara		;41e4
+	call partida_a_cero		;41e6   ; subestado 2: marcador, vidas y vida a cero
+	jp al_subestado_siguiente		;41e9
+estado_3_prepara:
+	djnz estado_3_mueve_las_cosas		;41ec
+	ld a,001h		;41ee   ; subestado 3: 0xC41A a 1...
 	ld (0c41ah),a		;41f0   ; guarda la habitacion especial
-	call 063d3h		;41f3
-	ld a,0a0h		;41f6
-	jp L_41C9		;41f8
-L_41FB:
-	djnz L_4222		;41fb
-	call L_4E93		;41fd
+	call 063d3h		;41f3   ; ... lo de 0x63D3...
+	ld a,0a0h		;41f6   ; ... 0xA0 cuadros
+	jp espera_y_al_subestado_siguiente		;41f8
+estado_3_mueve_las_cosas:
+	djnz suena_la_partida		;41fb
+	call L_4E93		;41fd   ; subestado 4: las cosas se mueven...
 	ld hl,0c004h		;4200   ; apunta a la espera del estado, en cuadros
-	ld a,(0c003h)		;4203   ; lee el contador de cuadros
+	ld a,(0c003h)		;4203   ; ... y cada dos cuadros...
 	rra			;4206
 	ret c			;4207
-	dec (hl)			;4208
+	dec (hl)			;4208   ; ... la espera baja
 	ret nz			;4209
-	call L_47F0		;420a
+	call L_47F0		;420a   ; al acabar: sin sprites...
 	xor a			;420d
-	ld (0c41ah),a		;420e   ; guarda la habitacion especial
-	call 062d0h		;4211
-	ld hl,0e604h		;4214
+	ld (0c41ah),a		;420e   ; ... fuera la habitacion especial...
+	call 062d0h		;4211   ; ... lo de 0x62D0...
+	ld hl,0e604h		;4214   ; ... y con 0xE604 puesto...
 	ld a,(hl)			;4217
 	or a			;4218
 	jr z,L_4220		;4219
-	ld (hl),000h		;421b
+	ld (hl),000h		;421b   ; ... se gasta y lo de 0x5E31
 	call L_5E31		;421d
 L_4220:
-	jr L_4249		;4220
-L_4222:
-	ld a,08ah		;4222
+	jr al_estado_siguiente		;4220   ; al estado 4
+suena_la_partida:
+	ld a,08ah		;4222   ; subestado 0: la musica 0x8A...
 	call sonido		;4224   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,050h		;4227
-	jp L_41C9		;4229
-L_422C:
-	ld hl,0c410h		;422c   ; apunta a las vidas
+	ld a,050h		;4227   ; ... y 0x50 cuadros
+	jp espera_y_al_subestado_siguiente		;4229
+estado_4_empieza_una_vida:
+	ld hl,0c410h		;422c   ; una vida menos
 	ld a,(hl)			;422f
 	sub 001h		;4230
 	daa			;4232
 	ld (hl),a			;4233
-	call apaga_la_pantalla		;4234   ; apaga_la_pantalla: bit 6 del registro 1 del VDP a cero
-	call L_4513		;4237
-	call 062e6h		;423a
-	ld hl,0c413h		;423d   ; apunta a la DEMOSTRACION en marcha
+	call apaga_la_pantalla		;4234   ; pantalla apagada
+	call L_4513		;4237   ; el marcador
+	call 062e6h		;423a   ; la habitacion
+	ld hl,0c413h		;423d   ; la vida en marcha
 	ld (hl),001h		;4240
-	call 0794fh		;4242
+	call 0794fh		;4242   ; lo de 0x794F
 	xor a			;4245
 	ld (0c40dh),a		;4246
-L_4249:
-	ld a,020h		;4249
+al_estado_siguiente:
+	ld a,020h		;4249   ; 0x20 cuadros...
 L_424B:
 	ld (0c004h),a		;424b   ; guarda la espera del estado, en cuadros
-	ld hl,0c000h		;424e   ; apunta a el ESTADO del juego
+	ld hl,0c000h		;424e   ; ... en el estado siguiente...
 	inc (hl)			;4251
-L_4252:
-	xor a			;4252
+subestado_0:
+	xor a			;4252   ; ... desde el subestado 0
 	ld (0c001h),a		;4253   ; guarda el subestado
 	ret			;4256
-L_4257:
-	call L_5C25		;4257
-	ld a,(0c40ch)		;425a
+estado_5_el_juego:
+	call L_5C25		;4257   ; un cuadro del juego
+	ld a,(0c40ch)		;425a   ; la tienda (0xC40C)?
 	or a			;425d
-	ld a,00ch		;425e
+	ld a,00ch		;425e   ; si: al estado 0x0C
 	jp nz,cambia_de_estado		;4260   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	ld a,(0c40ah)		;4263
+	ld a,(0c40ah)		;4263   ; la pausa (0xC40A)?
 	and a			;4266
-	jp nz,L_428C		;4267
-	ld a,(0c41bh)		;426a   ; lee el lado por el que se sale de la habitacion
+	jp nz,a_la_pausa		;4267
+	ld a,(0c41bh)		;426a   ; se sale de la habitacion?
 	and a			;426d
-	ld a,009h		;426e
+	ld a,009h		;426e   ; si: al estado 9
 	jp nz,cambia_de_estado		;4270   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	ld a,(0c408h)		;4273
+	ld a,(0c408h)		;4273   ; la puerta de la fase (0xC408)?
 	or a			;4276
-	ld a,00ah		;4277
+	ld a,00ah		;4277   ; si: al estado 0x0A
 	jp nz,cambia_de_estado		;4279   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	ld a,(0c409h)		;427c
+	ld a,(0c409h)		;427c   ; el jefe rematado (0xC409)?
 	and a			;427f
-	ld a,008h		;4280
+	ld a,008h		;4280   ; si: al estado 8
 	jp nz,cambia_de_estado		;4282   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	ld a,(0c413h)		;4285   ; lee la DEMOSTRACION en marcha
+	ld a,(0c413h)		;4285   ; la vida sigue?
 	or a			;4288
-	ret nz			;4289
-	jr L_4249		;428a
-L_428C:
-	call L_4495		;428c
-	ld a,00bh		;428f
+	ret nz			;4289   ; si: sigue el juego
+	jr al_estado_siguiente		;428a   ; no: al estado 6
+a_la_pausa:
+	call la_ventana_de_pause		;428c   ; la ventana de PAUSE...
+	ld a,00bh		;428f   ; ... y al estado 0x0B
 	jp cambia_de_estado		;4291   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_4294:
-	ld hl,0c410h		;4294   ; apunta a las vidas
+estado_6_simon_muere:
+	ld hl,0c410h		;4294   ; le quedan vidas?
 	ld a,(hl)			;4297
 	or a			;4298
-	jr z,L_42AB		;4299
-L_429B:
-	call 062d0h		;429b
-	xor a			;429e
+	jr z,sin_vidas		;4299
+otra_vida:
+	call 062d0h		;429b   ; si: la habitacion de nuevo...
+	xor a			;429e   ; ... Simon de pie...
 	ld (0c420h),a		;429f
 	inc a			;42a2
-	ld (0c40dh),a		;42a3
-	ld a,004h		;42a6
+	ld (0c40dh),a		;42a3   ; ... 0xC40D a 1...
+	ld a,004h		;42a6   ; ... y al estado 4
 	jp cambia_de_estado		;42a8   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_42AB:
-	ld a,08bh		;42ab
+sin_vidas:
+	ld a,08bh		;42ab   ; no: la musica 0x8B...
 	call sonido		;42ad   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	jr L_4249		;42b0
-L_42B2:
-	djnz L_42E3		;42b2
-	ld a,(0e600h)		;42b4   ; lee si se puede pausar (partida en marcha)
+	jr al_estado_siguiente		;42b0   ; ... y al estado 7
+estado_7_game_over:
+	djnz pinta_el_game_over		;42b2
+	ld a,(0e600h)		;42b4   ; subestado 1: con un Game Master...
 	or a			;42b7
 	jr z,L_42BF		;42b8
-	call L_4314		;42ba
-	jr nz,L_42D3		;42bd
+	call f5_recien_pulsada		;42ba   ; ... y F5 recien pulsada...
+	jr nz,continua		;42bd   ; ... se continua
 L_42BF:
-	ld a,(0c0a7h)		;42bf
+	ld a,(0c0a7h)		;42bf   ; mientras suena la musica (0xC0A7)...
 	and a			;42c2
-	ret nz			;42c3
-	ld hl,0c004h		;42c4   ; apunta a la espera del estado, en cuadros
+	ret nz			;42c3   ; ... nada
+	ld hl,0c004h		;42c4   ; al acabar la espera...
 	dec (hl)			;42c7
 	ret nz			;42c8
-	ld hl,0c002h		;42c9   ; apunta a las banderas de la partida (bit 7: de verdad, no la demostracion)
+	ld hl,0c002h		;42c9   ; ... fuera el bit 6 de 0xC002...
 	ld a,(hl)			;42cc
 	and 0bfh		;42cd
 	ld (hl),a			;42cf
-	jp L_41B5		;42d0
-L_42D3:
-	ld a,003h		;42d3
+	jp al_estado_0		;42d0   ; ... y al estado 0
+continua:
+	ld a,003h		;42d3   ; tres vidas...
 	ld (0c410h),a		;42d5   ; guarda las vidas
-	xor a			;42d8
+	xor a			;42d8   ; ... y el marcador a cero
 	ld h,a			;42d9
 	ld l,a			;42da
 	ld (0c405h),hl		;42db   ; guarda el MARCADOR, tres bytes en BCD
 	ld (0c407h),a		;42de
-	jr L_429B		;42e1
-L_42E3:
-	call L_47B9		;42e3
-	ld hl,04d3ah		;42e6
+	jr otra_vida		;42e1   ; y otra vida
+pinta_el_game_over:
+	call L_47B9		;42e3   ; subestado 0: pantalla en negro...
+	ld hl,04d3ah		;42e6   ; ... GAME OVER...
 	call rotulo		;42e9   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
-	ld a,(0e600h)		;42ec   ; lee si se puede pausar (partida en marcha)
+	ld a,(0e600h)		;42ec   ; ... y con un Game Master...
 	or a			;42ef
 	jr z,L_42F8		;42f0
-	ld hl,04300h		;42f2
+	ld hl,04300h		;42f2   ; ... F5 CONTINUE
 	call rotulo		;42f5   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 L_42F8:
-	call L_4513		;42f8
-	ld a,078h		;42fb
-	jp L_41C9		;42fd
+	call L_4513		;42f8   ; el marcador
+	ld a,078h		;42fb   ; 0x78 cuadros
+	jp espera_y_al_subestado_siguiente		;42fd
 
 ; ----------------------------------------------------------------------
 ; DATOS rotulo_4300: rotulo para 0x4ACB ([x][y] y el texto; 0xFE otra
@@ -476,55 +480,55 @@ DATA_rotulo_4300:
 ; ======================================================================
 
 
-L_4314:
-	ld a,007h		;4314
+f5_recien_pulsada:
+	ld a,007h		;4314   ; la fila 7 del teclado...
 	call 00141h		;4316   ; BIOS SNSMAT - Returns the value of the specified line from the keyboard matrix
-	cpl			;4319
+	cpl			;4319   ; ... su bit 1, F5, a 1 si esta pulsada
 	and 002h		;431a
-	ld hl,0e614h		;431c
+	ld hl,0e614h		;431c   ; lo del cuadro anterior...
 	ld c,(hl)			;431f
-	ld (hl),a			;4320
-	xor c			;4321
+	ld (hl),a			;4320   ; ... y el de este
+	xor c			;4321   ; NZ si se acaba de pulsar
 	and (hl)			;4322
 	ret			;4323
-L_4324:
+estado_8_bloque_acabado:
 	djnz $+76		;4324
-	ld hl,0d002h		;4326   ; apunta a el bloque de tres fases (0-5)
+	ld hl,0d002h		;4326   ; subestado 1: el bloque de tres fases siguiente
 	inc (hl)			;4329
-	ld a,006h		;432a
+	ld a,006h		;432a   ; tras el sexto...
 	sub (hl)			;432c
-	jr nz,L_4344		;432d
-	ld (hl),a			;432f
-	ld a,0ffh		;4330
+	jr nz,bloque_siguiente		;432d
+	ld (hl),a			;432f   ; ... el primero...
+	ld a,0ffh		;4330   ; ... la fase 0xFF (la siguiente sera la 0)...
 	ld (0d000h),a		;4332   ; guarda la FASE (0 el patio, 1-18)
-	ld a,020h		;4335
+	ld a,020h		;4335   ; ... la vida llena...
 	ld (0c415h),a		;4337   ; guarda la vida de Simon
-	ld hl,0cf34h		;433a
+	ld hl,0cf34h		;433a   ; ... 0xCF34 uno mas...
 	inc (hl)			;433d
 	ld a,(hl)			;433e
-	cp 002h		;433f
-	jp z,L_41B5		;4341
-L_4344:
-	call 062d5h		;4344
-L_4347:
-	ld hl,0c410h		;4347   ; apunta a las vidas
+	cp 002h		;433f   ; ... y con la segunda, al estado 0
+	jp z,al_estado_0		;4341
+bloque_siguiente:
+	call 062d5h		;4344   ; lo de 0x62D5
+fase_siguiente:
+	ld hl,0c410h		;4347   ; una vida mas (el estado 4 la quita)
 	ld a,(hl)			;434a
 	add a,001h		;434b
 	daa			;434d
 	ld (hl),a			;434e
-	ld hl,0c411h		;434f   ; apunta a la fase en BCD, la del marcador
+	ld hl,0c411h		;434f   ; la fase del marcador, mas uno
 	ld a,(hl)			;4352
 	add a,001h		;4353
 	daa			;4355
 	ld (hl),a			;4356
-	ld hl,0d000h		;4357   ; apunta a la FASE (0 el patio, 1-18)
+	ld hl,0d000h		;4357   ; la fase siguiente...
 	inc (hl)			;435a
-	inc hl			;435b
+	inc hl			;435b   ; ... desde la habitacion 0
 	xor a			;435c
 	ld (hl),a			;435d
-	ld (0c409h),a		;435e
+	ld (0c409h),a		;435e   ; fuera las banderas del jefe y de la puerta
 	ld (0c408h),a		;4361
-	ld a,004h		;4364
+	ld a,004h		;4364   ; al estado 4
 	jp cambia_de_estado		;4366   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
 
 ; ----------------------------------------------------------------------
@@ -540,167 +544,167 @@ DATA_codigo_sin_llamar_4369:
 ; ======================================================================
 
 
-L_4370:
-	call L_47B9		;4370
+bloque_acabado_empieza:
+	call L_47B9		;4370   ; subestado 0: pantalla en negro
 	xor a			;4373
-	jp L_41C9		;4374
-L_4377:
-	call L_5A2E		;4377
-	ld a,006h		;437a
+	jp espera_y_al_subestado_siguiente		;4374
+estado_9_cambio_de_habitacion:
+	call L_5A2E		;4377   ; a cual se va
+	ld a,006h		;437a   ; ninguna: al estado 6
 	jp nc,cambia_de_estado		;437c   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-	call 062f5h		;437f
-	ld a,005h		;4382
+	call 062f5h		;437f   ; si no, se monta...
+	ld a,005h		;4382   ; ... y al estado 5
 	jp cambia_de_estado		;4384   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_4387:
-	ld hl,0c701h		;4387   ; apunta a lo que lleva Simon (un bit por objeto)
+estado_10_fase_acabada:
+	ld hl,0c701h		;4387   ; fuera la llave blanca (bit 0)...
 	ld a,(hl)			;438a
 	and 0feh		;438b
 	ld (hl),a			;438d
-	jp L_4347		;438e
-L_4391:
-	call L_4BBB		;4391
-	ld hl,0c401h		;4394
+	jp fase_siguiente		;438e   ; ... y a la fase siguiente
+teclas_del_titulo:
+	call L_4BBB		;4391   ; los mandos...
+	ld hl,0c401h		;4394   ; ... los de 0xC401
 	call L_4BB4		;4397
 	or a			;439a
-	ret z			;439b
-	ld hl,0c004h		;439c   ; apunta a la espera del estado, en cuadros
+	ret z			;439b   ; ninguno: nada
+	ld hl,0c004h		;439c   ; sin espera
 	ld (hl),000h		;439f
 	ld hl,0c000h		;43a1   ; apunta a el ESTADO del juego
 	ld b,(hl)			;43a4
-	djnz L_43BA		;43a5
-	and 030h		;43a7
+	djnz al_titulo		;43a5   ; en el estado 1:
+	and 030h		;43a7   ; los bits 4 o 5?
 	ret z			;43a9
-	ld a,040h		;43aa
+	ld a,040h		;43aa   ; 0xC002 = 0x40 (el bit 6)
 	ld (0c002h),a		;43ac   ; guarda las banderas de la partida (bit 7: de verdad, no la demostracion)
-	ld a,(0e600h)		;43af   ; lee si se puede pausar (partida en marcha)
+	ld a,(0e600h)		;43af   ; con un Game Master...
 	or a			;43b2
-	jr nz,L_43C4		;43b3
-	ld (hl),003h		;43b5
+	jr nz,al_menu_del_game_master		;43b3   ; ... a su menu
+	ld (hl),003h		;43b5   ; si no, al estado 3
 	inc hl			;43b7
 	ld (hl),b			;43b8
 	ret			;43b9
-L_43BA:
-	ld (hl),001h		;43ba
-	ld a,000h		;43bc
+al_titulo:
+	ld (hl),001h		;43ba   ; en el 0 y el 2: al estado 1...
+	ld a,000h		;43bc   ; ... callado...
 	call sonido		;43be   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	jp L_4D47		;43c1
-L_43C4:
-	xor a			;43c4
+	jp L_4D47		;43c1   ; ... y el titulo
+al_menu_del_game_master:
+	xor a			;43c4   ; lo que da el Game Master, de partida: nada...
 	ld (0e604h),a		;43c5
-	ld a,001h		;43c8
+	ld a,001h		;43c8   ; ... la fase 1...
 	ld (0e605h),a		;43ca   ; guarda la fase del marcador que da el Game Master
 	ld (0e606h),a		;43cd   ; guarda la fase que da el Game Master
-	ld a,003h		;43d0
+	ld a,003h		;43d0   ; ... tres vidas...
 	ld (0e607h),a		;43d2   ; guarda las vidas que da el Game Master
-	ld a,00dh		;43d5
+	ld a,00dh		;43d5   ; ... y al estado 0x0D
 	jp cambia_de_estado		;43d7   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_43DA:
-	ld a,(0c00bh)		;43da
+estado_11_la_pausa:
+	ld a,(0c00bh)		;43da   ; la tecla de la pausa otra vez (bit 0 de 0xC00B)?
 	rra			;43dd
 	ret nc			;43de
-	xor a			;43df
+	xor a			;43df   ; si: fuera la pausa...
 	ld (0c40ah),a		;43e0
-	call L_44B8		;43e3
-	ld a,0feh		;43e6
+	call quita_la_ventana_de_pause		;43e3   ; ... la ventana...
+	ld a,0feh		;43e6   ; ... el efecto 0xFE...
 	call sonido		;43e8   ; sonido: arranca la musica o el efecto A (bit 7 = musica)
-	ld a,005h		;43eb
+	ld a,005h		;43eb   ; ... y al estado 5
 	jp cambia_de_estado		;43ed   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_43F0:
-	djnz L_43FB		;43f0
-	call 094bah		;43f2
-	ret nz			;43f5
-	ld a,00fh		;43f6
-	jp L_41C9		;43f8
-L_43FB:
-	djnz L_440A		;43fb
-	ld hl,0c004h		;43fd   ; apunta a la espera del estado, en cuadros
+estado_12_la_tienda:
+	djnz tienda_se_cierra		;43f0
+	call 094bah		;43f2   ; subestado 1: la tienda, cada cuadro
+	ret nz			;43f5   ; abierta: sigue
+	ld a,00fh		;43f6   ; cerrada: 0x0F cuadros
+	jp espera_y_al_subestado_siguiente		;43f8
+tienda_se_cierra:
+	djnz tienda_se_abre		;43fb
+	ld hl,0c004h		;43fd   ; subestado 2: al acabar la espera...
 	dec (hl)			;4400
 	ret nz			;4401
-	call 09507h		;4402
-	ld a,005h		;4405
+	call 09507h		;4402   ; ... se quita la ventana...
+	ld a,005h		;4405   ; ... y al estado 5
 	jp cambia_de_estado		;4407   ; cambia_de_estado: estado nuevo en 0xC000 (A) y 0x20 cuadros de espera en 0xC004
-L_440A:
-	xor a			;440a
+tienda_se_abre:
+	xor a			;440a   ; subestado 0: se gasta 0xC40C...
 	ld (0c40ch),a		;440b
-	call 09387h		;440e
-	jp L_41CC		;4411
-L_4414:
-	djnz L_444C		;4414
-	ld a,(0c006h)		;4416
+	call 09387h		;440e   ; ... y se abre la tienda
+	jp al_subestado_siguiente		;4411
+estado_13_el_game_master:
+	djnz game_master_elige		;4414
+	ld a,(0c006h)		;4416   ; subestado 1: las teclas...
 	and 033h		;4419
 	ret z			;441b
-	and 003h		;441c
+	and 003h		;441c   ; las de los bits 0 y 1: a 0x5E7D
 	jp nz,L_5E7D		;441e
-	ld a,(0e60bh)		;4421
+	ld a,(0e60bh)		;4421   ; la opcion 0...
 	or a			;4424
-	jp nz,L_4432		;4425
-	call L_5CFD		;4428
-	ld hl,00003h		;442b
+	jp nz,otra_opcion		;4425
+	call L_5CFD		;4428   ; ... empieza la partida...
+	ld hl,00003h		;442b   ; ... estado 3, subestado 0
 	ld (0c000h),hl		;442e   ; guarda el estado (0xC000) y el subestado (0xC001) de un tiron
 	ret			;4431
-L_4432:
-	dec a			;4432
-	jr z,L_4440		;4433
-	ld hl,0b8b8h		;4435
+otra_opcion:
+	dec a			;4432   ; la 1...
+	jr z,opcion_1		;4433
+	ld hl,0b8b8h		;4435   ; ... o la 2
 	ld (0e602h),hl		;4438
 	call L_5D82		;443b
-	jr L_4449		;443e
-L_4440:
+	jr L_4449		;443e   ; y al subestado 2
+opcion_1:
 	ld hl,0b0b8h		;4440
 	ld (0e602h),hl		;4443
-	call L_5D61		;4446
+	call L_5D61		;4446   ; la opcion 1
 L_4449:
-	jp L_41CC		;4449
-L_444C:
-	djnz L_4481		;444c
-	call L_5E21		;444e
+	jp al_subestado_siguiente		;4449
+game_master_elige:
+	djnz empieza_el_game_master		;444c
+	call L_5E21		;444e   ; subestado 2
 	jr nz,L_4456		;4451
 	jp L_5DB2		;4453
 L_4456:
-	ld a,(0e60bh)		;4456
+	ld a,(0e60bh)		;4456   ; apunta la opcion en 0xE604
 	ld b,a			;4459
 	ld hl,0e604h		;445a
 	or (hl)			;445d
 	ld (hl),a			;445e
-	ld a,(0e615h)		;445f
+	ld a,(0e615h)		;445f   ; con 0xE615...
 	or a			;4462
-	jr z,L_4477		;4463
+	jr z,vuelve_al_subestado_0		;4463
 	ld a,(0e60eh)		;4465
 	ld d,a			;4468
 	ld a,(0e60fh)		;4469
-	bit 0,b		;446c
-	jr z,L_447C		;446e
-	ld (0e605h),a		;4470   ; guarda la fase del marcador que da el Game Master
+	bit 0,b		;446c   ; ... la opcion 1 da la fase...
+	jr z,game_master_da_vidas		;446e
+	ld (0e605h),a		;4470   ; ... del marcador...
 	ld a,d			;4473
-	ld (0e606h),a		;4474   ; guarda la fase que da el Game Master
-L_4477:
-	xor a			;4477
+	ld (0e606h),a		;4474   ; ... y de verdad
+vuelve_al_subestado_0:
+	xor a			;4477   ; subestado 0
 	ld (0c001h),a		;4478   ; guarda el subestado
 	ret			;447b
-L_447C:
-	ld (0e607h),a		;447c   ; guarda las vidas que da el Game Master
-	jr L_4477		;447f
-L_4481:
-	call L_5CEF		;4481
-	xor a			;4484
+game_master_da_vidas:
+	ld (0e607h),a		;447c   ; la opcion 2 da las vidas
+	jr vuelve_al_subestado_0		;447f
+empieza_el_game_master:
+	call L_5CEF		;4481   ; subestado 0: su pantalla...
+	xor a			;4484   ; ... y 0xE608-0xE616 a cero
 	ld hl,0e608h		;4485
 	ld de,0e609h		;4488
 	ld bc,0000eh		;448b
 	ld (hl),000h		;448e
 	ldir		;4490
-	jp L_41CC		;4492
-L_4495:
-	ld hl,06854h		;4495
-	ld bc,03010h		;4498
-	ld de,0d070h		;449b
+	jp al_subestado_siguiente		;4492
+la_ventana_de_pause:
+	ld hl,06854h		;4495   ; guarda el fondo: de (0x68, 0x54)...
+	ld bc,03010h		;4498   ; ... 0x30 x 0x10...
+	ld de,0d070h		;449b   ; ... a (0xD0, 0x70) de la pagina 1
 	ld a,004h		;449e
 	push hl			;44a0
 	push bc			;44a1
 	call copia_rectangulo		;44a2   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
 	pop bc			;44a5
 	pop hl			;44a6
-	call L_5D0E		;44a7
-	ld hl,044b0h		;44aa
+	call L_5D0E		;44a7   ; el recuadro
+	ld hl,044b0h		;44aa   ; y PAUSE
 	jp rotulo		;44ad   ; rotulo: pinta un rotulo ([x][y] y texto; 0xFE otra posicion, 0xFF acaba)
 
 ; ----------------------------------------------------------------------
@@ -715,27 +719,27 @@ DATA_rotulo_44B0:
 ; ======================================================================
 
 
-L_44B8:
-	ld de,06854h		;44b8
+quita_la_ventana_de_pause:
+	ld de,06854h		;44b8   ; el fondo de vuelta, de la pagina 1 a la 0
 	ld bc,03010h		;44bb
 	ld hl,0d070h		;44be
 	ld a,001h		;44c1
 	jp copia_rectangulo		;44c3   ; copia_rectangulo: orden del V9938 que copia un rectangulo de VRAM a VRAM (desde R#32)
-L_44C6:
-	ld hl,0c405h		;44c6   ; apunta a el MARCADOR, tres bytes en BCD
-	ld bc,01bfbh		;44c9
+partida_a_cero:
+	ld hl,0c405h		;44c6   ; del MARCADOR en adelante...
+	ld bc,01bfbh		;44c9   ; ... 0x1BFB bytes a cero
 	ld d,h			;44cc
 	ld e,l			;44cd
 	inc e			;44ce
 	ld (hl),000h		;44cf
 	ldir		;44d1
-	ld hl,044e9h		;44d3
+	ld hl,044e9h		;44d3   ; las vidas, la fase del marcador y 0xC412, de 0x44E9
 	ld de,0c410h		;44d6   ; apunta a las vidas
 	ld bc,00003h		;44d9
 	ldir		;44dc
-	ld a,020h		;44de
+	ld a,020h		;44de   ; la vida llena...
 	ld (0c415h),a		;44e0   ; guarda la vida de Simon
-	ld a,080h		;44e3
+	ld a,080h		;44e3   ; ... y la barra del enemigo
 	ld (0c418h),a		;44e5   ; guarda la vida del enemigo (barra ENEMY)
 	ret			;44e8
 
@@ -2244,7 +2248,7 @@ L_4DDB:
 	jp rellena_rectangulo		;4de4   ; rellena_rectangulo: orden del V9938 que rellena un rectangulo (desde R#36)
 
 ; ----------------------------------------------------------------------
-; EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con 0xC413 puesto (lo que dice que es la demostracion) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
+; EMPIEZA LA DEMOSTRACION: todo a cero, la fase 1 con la vida en marcha (0xC413) y las pulsaciones de la tabla de 0x4E5D en lugar de los mandos.
 ; ----------------------------------------------------------------------
 L_4DE7:
 	ld hl,0c420h		;4de7   ; borra de 0xC420...
@@ -2258,7 +2262,7 @@ L_4DE7:
 	ld (0d001h),a		;4dfa   ; guarda la HABITACION dentro de la fase
 	ld (0d002h),a		;4dfd   ; guarda el bloque de tres fases (0-5)
 	inc a			;4e00
-	ld (0c413h),a		;4e01   ; 0xC413 = 1: es la demostracion
+	ld (0c413h),a		;4e01   ; la vida en marcha (0xC413 = 1)
 	ld (0c411h),a		;4e04   ; guarda la fase en BCD, la del marcador
 	ld (0d000h),a		;4e07   ; guarda la FASE (0 el patio, 1-18)
 	ld (0cf3ah),a		;4e0a   ; el primer par, ya
@@ -2292,7 +2296,7 @@ L_4E34:
 	jp L_4BB1		;4e3e
 L_4E41:
 	xor a			;4e41   ; fin de la demostracion
-	ld (0c413h),a		;4e42   ; guarda la DEMOSTRACION en marcha
+	ld (0c413h),a		;4e42   ; guarda la VIDA en marcha
 	ret			;4e45
 L_4E46:
 	inc hl			;4e46   ; el numero de par
@@ -2315,7 +2319,8 @@ L_4E46:
 ; DATOS teclas_de_la_demostracion: LAS PULSACIONES DE LA DEMOSTRACION: 27
 ;   pares [cuantos cuadros][teclas] que p00:4E48 va sacando por orden (0xCF3A
 ;   la cuenta, 0xCF3B las teclas) y p00:4E3E entrega como si fueran los mandos
-;   (0xC007); unas teclas 0xFF acaban la demostracion (p00:4E41)
+;   (0xC007); unas teclas 0xFF acaban la demostracion (p00:4E41, que quita la
+;   vida en marcha)
 ;   0x4e5d..0x4e93  (54 bytes)
 DATA_teclas_de_la_demostracion:
 	defb 016h,000h,02bh,008h,007h,018h,017h,008h,008h,018h,055h,008h,004h,000h,010h,004h	; 4e5d  ..+.......U.....
@@ -4318,7 +4323,7 @@ L_5CA2:
 L_5CAD:
 	ld a,0ffh		;5cad
 L_5CAF:
-	ld (0e600h),a		;5caf   ; guarda si se puede pausar (partida en marcha)
+	ld (0e600h),a		;5caf   ; guarda si hay un GAME MASTER en otra ranura
 	ret			;5cb2
 L_5CB3:
 	call L_5CB8		;5cb3

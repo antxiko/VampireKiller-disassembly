@@ -2363,7 +2363,7 @@ L_70BF:
 	ld (0c440h),a		;70d0
 	ld (0d010h),a		;70d3
 	ld (0d001h),a		;70d6   ; guarda la HABITACION dentro de la fase
-	ld (0c413h),a		;70d9   ; guarda la DEMOSTRACION en marcha
+	ld (0c413h),a		;70d9   ; guarda la VIDA en marcha
 L_70DC:
 	ld a,(0c701h)		;70dc   ; lee lo que lleva Simon (un bit por objeto)
 	and 080h		;70df
