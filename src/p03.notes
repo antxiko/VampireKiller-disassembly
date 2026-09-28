@@ -1,6 +1,15 @@
 # Notas del banco 03: comentarios (C), etiquetas (L) y datos (D) anclados a direccion.
 
 # --- A MANO: comentarios, nombres y bloques (cada uno de lo que hace ESE codigo) ---
+B 0xAACD EL DRAGON DE HUESOS (el tipo 0x0E; por su dibujo, una calavera y tres vertebras). No pasa por 0xB473: coloca el mismo sus ocho sprites, cuatro tramos de dos con CC (0xAB0E: la cabeza 0x80/0x84 y tres tramos 0x78/0x7C). Nace con los ocho en el mismo punto, donde lo pone la lista de la habitacion, y los estira hacia x - 0x30, - 0x20, - 0x10 y + 0 (0xAB1E, que deja en (ix+0x10)). Tools: enemigos.py (tramos).
+L 0xAACD nace_el_dragon_de_huesos
+L 0xA9B7 mueve_el_dragon_de_huesos
+B 0xA9D8 PASO 0: cada tramo, dos puntos por cuadro hacia su x (0xAA67 dos veces sobre las x); al cabo de 0x20 cuadros, a por la primera altura.
+B 0xAA0B PASO 1: la boca cerrada (0x80/0x84); cada tramo, dos puntos por cuadro hacia su altura (las y), y cada 0x10-0x1F cuadros al azar (0xAA7D) otra altura: el registro siguiente de 0xAAAD, lo que se suma a la y de cada tramo.
+B 0xAA37 PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si lo que devuelve 0xA0E5 lleva el bit 7 de D, escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza. Luego, al paso 1.
+L 0xAA67 acerca_los_tramos
+B 0xAA67 Cada uno de los ocho sprites, un punto hacia su destino de (ix+0x10) (uno por tramo, repetido): DE recorre los destinos y HL la y o la x de los sprites, de cinco en cinco.
+L 0xAA8A otra_altura_de_los_tramos
 B 0xAB22 DRACULA (el tipo 0x11). Ocho sprites -la cabeza arriba y los pies abajo, a pares con CC (colores de 0xAD53)- y el cuerpo, un dibujo de 32x32 que se pinta en el fondo. Nace en el dibujo 0x56 subiendo; de pie usa 0x5B-0x5E (0xACAA: capa cerrada y abierta, a un lado y al otro), lanza tres cosas del tipo 5 (0xABE9: crea_con_parametros con A = 0x11, que da el tipo de 0xA08E + 0x11, en la lista de 0xD700) con velocidades de 0x280 hacia Simon y 0, 0x180 y -0x180 en vertical, se esconde subiendo 0x40 y reaparece en una de las ocho x de 0xAC76. Tools: dracula.py, cotejado con lanza_dracula.sh.
 L 0xAB22 nace_dracula
 L 0xAB42 mueve_dracula

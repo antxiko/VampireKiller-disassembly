@@ -1263,7 +1263,7 @@ L_A9AB:
 	call pon_velocidad_x		;a9ae   ; pon_velocidad_x: velocidad horizontal de la cosa ((ix+9), (ix+10)) = DE
 	ld de,00060h		;a9b1
 	jp suma_a_la_velocidad_y		;a9b4   ; suma_a_la_velocidad_y: la gravedad: DE a la velocidad vertical, con tope 0x07FF
-L_A9B7:
+mueve_el_dragon_de_huesos:
 	ld hl,0a9c7h		;a9b7
 	push hl			;a9ba
 	ld a,(ix+001h)		;a9bb   ; lee el paso en que va la cosa
@@ -1291,6 +1291,10 @@ L_A9C7:
 	add a,008h		;a9d2
 	ld (ix+005h),a		;a9d4   ; guarda la x de la cosa
 	ret			;a9d7
+
+; ----------------------------------------------------------------------
+; PASO 0: cada tramo, dos puntos por cuadro hacia su x (0xAA67 dos veces sobre las x); al cabo de 0x20 cuadros, a por la primera altura.
+; ----------------------------------------------------------------------
 L_A9D8:
 	push ix		;a9d8
 	pop hl			;a9da
@@ -1307,18 +1311,22 @@ L_A9D8:
 	ld l,a			;a9e9
 	push hl			;a9ea
 	push de			;a9eb
-	call L_AA67		;a9ec
+	call acerca_los_tramos		;a9ec
 	pop de			;a9ef
 	pop hl			;a9f0
-	call L_AA67		;a9f1
+	call acerca_los_tramos		;a9f1
 	dec (ix+00ch)		;a9f4   ; baja la cuenta de cuadros del paso
 	ret nz			;a9f7
-	call L_AA8A		;a9f8
+	call otra_altura_de_los_tramos		;a9f8
 	inc (ix+001h)		;a9fb   ; sube el paso en que va la cosa
 	ld (ix+00ch),01eh		;a9fe   ; la cuenta de cuadros del paso = 0x1E
 	ld (ix+018h),020h		;aa02
 	ld (ix+019h),000h		;aa06
 	ret			;aa0a
+
+; ----------------------------------------------------------------------
+; PASO 1: la boca cerrada (0x80/0x84); cada tramo, dos puntos por cuadro hacia su altura (las y), y cada 0x10-0x1F cuadros al azar (0xAA7D) otra altura: el registro siguiente de 0xAAAD, lo que se suma a la y de cada tramo.
+; ----------------------------------------------------------------------
 L_AA0B:
 	ld (ix+024h),080h		;aa0b
 	ld (ix+029h),084h		;aa0f
@@ -1333,15 +1341,19 @@ L_AA0B:
 	ld l,a			;aa20
 	push hl			;aa21
 	push de			;aa22
-	call L_AA67		;aa23
+	call acerca_los_tramos		;aa23
 	pop de			;aa26
 	pop hl			;aa27
-	call L_AA67		;aa28
+	call acerca_los_tramos		;aa28
 	dec (ix+00ch)		;aa2b   ; baja la cuenta de cuadros del paso
 	ret nz			;aa2e
 	ld (ix+00ch),018h		;aa2f   ; la cuenta de cuadros del paso = 0x18
 	inc (ix+001h)		;aa33   ; sube el paso en que va la cosa
 	ret			;aa36
+
+; ----------------------------------------------------------------------
+; PASO 2: la boca abierta (0x70/0x74) durante 0x18 cuadros; a los 0x10, si lo que devuelve 0xA0E5 lleva el bit 7 de D, escupe una cosa (crea_con_parametros con A = 0x0E) delante de la cabeza. Luego, al paso 1.
+; ----------------------------------------------------------------------
 L_AA37:
 	ld (ix+024h),070h		;aa37
 	ld (ix+029h),074h		;aa3b
@@ -1363,7 +1375,11 @@ L_AA5E:
 	ld (ix+00ch),01eh		;aa5e   ; la cuenta de cuadros del paso = 0x1E
 	ld (ix+001h),001h		;aa62   ; el paso en que va la cosa = 0x01
 	ret			;aa66
-L_AA67:
+
+; ----------------------------------------------------------------------
+; Cada uno de los ocho sprites, un punto hacia su destino de (ix+0x10) (uno por tramo, repetido): DE recorre los destinos y HL la y o la x de los sprites, de cinco en cinco.
+; ----------------------------------------------------------------------
+acerca_los_tramos:
 	ld b,008h		;aa67
 L_AA69:
 	ld a,(de)			;aa69
@@ -1389,7 +1405,7 @@ L_AA7D:
 	and 00fh		;aa83
 	add a,010h		;aa85
 	ld (ix+018h),a		;aa87
-L_AA8A:
+otra_altura_de_los_tramos:
 	ld a,(ix+019h)		;aa8a
 	inc (ix+019h)		;aa8d
 	and 007h		;aa90
@@ -1425,7 +1441,11 @@ DATA_ocho_registros_de_cuatro:
 ; ======================================================================
 
 
-L_AACD:
+
+; ----------------------------------------------------------------------
+; EL DRAGON DE HUESOS (el tipo 0x0E; por su dibujo, una calavera y tres vertebras). No pasa por 0xB473: coloca el mismo sus ocho sprites, cuatro tramos de dos con CC (0xAB0E: la cabeza 0x80/0x84 y tres tramos 0x78/0x7C). Nace con los ocho en el mismo punto, donde lo pone la lista de la habitacion, y los estira hacia x - 0x30, - 0x20, - 0x10 y + 0 (0xAB1E, que deja en (ix+0x10)). Tools: enemigos.py (tramos).
+; ----------------------------------------------------------------------
+nace_el_dragon_de_huesos:
 	ld (ix+00ch),020h		;aacd   ; la cuenta de cuadros del paso = 0x20
 	ld a,(ix+003h)		;aad1   ; lee la y de la cosa
 	ld (ix+01ah),a		;aad4

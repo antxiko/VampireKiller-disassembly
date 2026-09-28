@@ -20,7 +20,8 @@ tablas como las monta el cartucho.
   Los cuadros de animacion y los parpadeos de color los elige el codigo de
   cada tipo; se toman de lo que se vio en openMSX (tools/lanza_cosas.sh: 250
   cuadros por habitacion en work/cosas) y cada muestra se coteja: su
-  geometria tiene que ser la de 0xB473.
+  geometria tiene que ser la de 0xB473 (clasifica_muestras; coteja.py
+  enemigos). El tipo 0x0E, un dragon de huesos, se monta aparte (tramos).
 
 Uso:  enemigos.py lista [fase]    las cosas de cada habitacion
       enemigos.py                 docs/imagenes/enemigos.png
@@ -129,24 +130,52 @@ def _relativo(spr):
     return [((a[0] - spr[0][0]) & 0xFF, (a[1] - spr[0][1]) & 0xFF, a[2]) for a in spr] if spr else []
 
 
-def coteja_muestras(cart):
-    """Cuantas muestras compuestas tienen la geometria (posiciones relativas y
-    patrones) de 0xB473 con su dibujo, con el dibujo de otro cuadro (lo cambio
-    el codigo despues de componer) o ninguna."""
-    bien = otro = mal = 0
-    malas = []
-    for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras():
-        if tipo in SIN_COMPONER or not spr:
-            continue
-        n = len(spr)
-        if _relativo(compone(cart, tipo, dibujo, 0, 0, n)) == _relativo(spr):
-            bien += 1
-        elif any(_relativo(compone(cart, tipo, d, 0, 0, n)) == _relativo(spr) for d in range(256)):
-            otro += 1
-        else:
-            mal += 1
-            malas.append((fase, hab, cuadro, tipo, dibujo))
-    return bien, otro, mal, malas
+# ------------------------------------------------------------ el tipo 0x0E
+# No pasa por 0xB473: cuatro tramos de dos sprites con CC (0xAB0E: la cabeza
+# 0x80/0x84, que con la boca abierta, p03:AA37, es 0x70/0x74, y tres tramos
+# 0x78/0x7C). p03:AACD los estira desde donde nace hasta x - 0x30, - 0x20,
+# - 0x10 y + 0 (0xAB1E), un punto por cuadro (p03:AA67, dos veces), y
+# p03:AA8A los lleva, cada tanto al azar (p03:AA7D), a la altura de uno de
+# los ocho registros de 0xAAAD (lo que se suma a su y, por tramo).
+TRAMOS = 0x0E
+SPRITES_DE_LOS_TRAMOS = 0xAB0E       # banco 3: (patron, color) de los ocho
+X_DE_LOS_TRAMOS = 0xAB1E             # banco 3: cuatro, desde la x
+ALTURAS_DE_LOS_TRAMOS = 0xAAAD       # banco 3: ocho registros de cuatro
+BOCA_ABIERTA = (0x70, 0x74)          # p03:AA37
+B3 = (1, 2, 3)
+
+
+def tramos(cart, registro, x, y, abierta=False):
+    """[(y, x, patron, color)] de los ocho sprites en reposo."""
+    fuera = []
+    for s in range(8):
+        k = s // 2
+        patron = cart.leer(SPRITES_DE_LOS_TRAMOS + 2 * s, B3)
+        if abierta and s < 2:
+            patron = BOCA_ABIERTA[s]
+        fuera.append(((y + cart.leer(ALTURAS_DE_LOS_TRAMOS + 4 * registro + k, B3)) & 0xFF,
+                      (x + cart.leer(X_DE_LOS_TRAMOS + k, B3)) & 0xFF,
+                      patron, cart.leer(SPRITES_DE_LOS_TRAMOS + 2 * s + 1, B3)))
+    return fuera
+
+
+def clasifica_los_tramos(cart, fase, hab, spr):
+    """'en un registro', 'entre dos' (cada tramo entre donde nace y su x
+    final, y entre la altura mas baja y la mas alta de los registros) o
+    'sin explicar'. Nace donde dice la lista de la habitacion."""
+    x0, y0 = next((x, y) for t, x, y, _ in cosas_de_la_fase(cart, fase)[hab] if t == TRAMOS)
+    abierta = spr[0][2] == BOCA_ABIERTA[0]
+    quietos = [tramos(cart, r, x0, y0, abierta) for r in range(8)]
+    if [a[2:4] for a in spr] != [a[2:4] for a in quietos[0]]:
+        return "sin explicar"
+    if any([tuple(a[:2]) for a in spr] == [a[:2] for a in q] for q in quietos):
+        return "en un registro"
+    for s, a in enumerate(spr):
+        ys = [q[s][0] for q in quietos]
+        xf = quietos[0][s][1]
+        if not (min(ys) <= a[0] <= max(ys) and min(x0, xf) <= a[1] <= max(x0, xf)):
+            return "sin explicar"
+    return "entre dos"
 
 
 def clasifica_muestras(cart):
@@ -175,6 +204,12 @@ def clasifica_muestras(cart):
 
     clases, raras = Counter(), []
     for fase, hab, cuadro, tipo, dibujo, y, x, spr in muestras():
+        if tipo == TRAMOS and spr:
+            c = "tramos: " + clasifica_los_tramos(cart, fase, hab, spr)
+            clases[c] += 1
+            if c.endswith("sin explicar"):
+                raras.append((fase, hab, cuadro, tipo, dibujo, [a[:3] for a in spr]))
+            continue
         if tipo in SIN_COMPONER or not spr:
             continue
         n, s3 = len(spr), [a[:3] for a in spr]
@@ -195,6 +230,25 @@ def clasifica_muestras(cart):
             clases["sin explicar"] += 1
             raras.append((fase, hab, cuadro, tipo, dibujo, s3))
     return clases, raras
+
+
+def hoja_de_los_tramos(cart, fase=12, hab=0):
+    """El tipo 0x0E en cuatro de sus registros con la boca cerrada (el 6 es
+    el 2 y los demas, parecidos) y en el primero con la boca abierta, con los
+    patrones y la paleta de su habitacion."""
+    v0 = habitacion(cart, fase, hab)
+    poses = [(0, False), (1, False), (2, False), (7, False), (0, True)]
+    ancho, alto = 72, 72
+    fila = [[(40, 40, 40)] * (ancho * len(poses)) for _ in range(alto)]
+    for k, (r, abierta) in enumerate(poses):
+        v = Vram()
+        v.v[:] = v0.v
+        v.paleta = v0.paleta
+        for s, (yy, xx, patron, color) in enumerate(tramos(cart, r, 0x80, 0x80, abierta)):
+            v.v[ATRIBUTOS + 4 * s:ATRIBUTOS + 4 * s + 3] = bytes((yy, xx, patron))
+            v.v[COLORES + 16 * s:COLORES + 16 * s + 16] = bytes([color]) * 16
+        pinta_sprites(v, fila, 8, dy=0x80 - 20, dx=0x80 - 0x30 - 4 - k * ancho)
+    return fila
 
 
 def vistos(cart):
@@ -249,7 +303,10 @@ def hoja(cart, por_tipo, tope=12):
     patrones y la paleta de la habitacion donde se vio."""
     salas = {}
     filas = []
-    for tipo in sorted(por_tipo):
+    for tipo in sorted(set(por_tipo) | {TRAMOS}):
+        if tipo == TRAMOS:
+            filas.append(hoja_de_los_tramos(cart))
+            continue
         cuadros = sorted(por_tipo[tipo])[:tope]
         cajas = []
         for dibujo, colores, fase, hab in cuadros:
@@ -295,11 +352,8 @@ def main():
                 print("fase %2d hab %2d: %s" % (f, h, ", ".join("tipo %d en (%d, %d)%s" % (t, x, y, "*" if b else "")
                                                                for t, x, y, b in cs)))
         return
-    bien, otro, mal, malas = coteja_muestras(cart)
-    print("muestras: %d con la geometria de su dibujo, %d con la de otro cuadro, %d sin ninguna" % (bien, otro, mal))
-    if "-v" in sys.argv:
-        from collections import Counter
-        print("sin ninguna, por tipo:", sorted(Counter(t for _, _, _, t, _ in malas).items()))
+    clases, raras = clasifica_muestras(cart)
+    print("muestras: " + ", ".join("%d %s" % (n, c) for c, n in clases.most_common()))
     por_tipo = vistos(cart)
     print("tipos vistos:", sorted(por_tipo))
     print(guarda_png(hoja(cart, por_tipo), os.path.join(IMAGENES, "enemigos.png"), 2))
