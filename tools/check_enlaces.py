@@ -26,6 +26,7 @@ def main(raiz_web):
                     continue
                 total += 1
                 fichero, _, ancla = destino.partition("#")
+                fichero = fichero.split("?")[0]
                 objetivo = os.path.normpath(os.path.join(raiz, fichero))
                 # Pages no convierte el markdown: un enlace a un .md que existe
                 # al lado sirve el texto en crudo, y eso tambien esta roto
