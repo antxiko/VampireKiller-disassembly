@@ -173,7 +173,8 @@ def arranca(cfg, rom, numero):
         pide_pistas(z, numero)
     else:
         z.a = numero & 0xFF
-        for k, v in cfg.get("regs_pide", {}).items():
+        for k, v in {**cfg.get("regs_pide", {}),
+                     **cfg.get("regs_pide_de", {}).get(numero, {})}.items():
             setattr(z, k, v)
         z.corre(cfg["pide"])
     z.escrituras.clear()
@@ -182,9 +183,12 @@ def arranca(cfg, rom, numero):
 
 def cuadro(z):
     z.escrituras.clear()
-    z.scc.clear()
     corre_frame(z)
-    return list(z.escrituras)
+    # el SCC va en la misma lista, con el registro 0x100 + su desplazamiento
+    # (0x9800 = 0); lo que escribieron el arranque y la peticion entra aqui
+    salida = list(z.escrituras) + [(0x100 + o, v) for o, v in z.scc]
+    z.scc.clear()
+    return salida
 
 
 def ejecuta(cfg, rom, numero, maximo=None):
@@ -222,8 +226,27 @@ def sintetiza(cuadros, hz=60, psg0=None):
     lfsr, ruido_fase, ruido_bit = 1, 0.0, 0
     env_fase = 0.0
     salida, acumulado = [], 0.0
+    ondas = [[0] * 32 for _ in range(4)]       # el SCC: cuatro formas de onda
+    scc_per, scc_vol, scc_on = [0] * 5, [0] * 5, 0
+    scc_fase = [0.0] * 5
     for escr in cuadros:
         for r, v in escr:
+            if r >= 0x100:
+                o = r - 0x100
+                if o < 0x80:
+                    b = v - 256 if v > 127 else v
+                    ondas[o >> 5][o & 31] = b
+                elif o < 0x8A:
+                    c = (o - 0x80) >> 1
+                    if o & 1:
+                        scc_per[c] = (scc_per[c] & 0xFF) | ((v & 0x0F) << 8)
+                    else:
+                        scc_per[c] = (scc_per[c] & 0xF00) | v
+                elif o < 0x8F:
+                    scc_vol[o - 0x8A] = v & 0x0F
+                elif o == 0x8F:
+                    scc_on = v
+                continue
             regs[r & 15] = v
             if (r & 15) == 13:
                 env_fase = 0.0
@@ -279,6 +302,16 @@ def sintetiza(cuadros, hz=60, psg0=None):
             nivel = (np.array(VOLUMEN)[env.astype(int)] if v & 0x10
                      else VOLUMEN[v & 0x0F])
             mezcla += puerta * nivel
+        for c in range(5):                        # el SCC: 5 canales de onda
+            if not (scc_on >> c) & 1 or not scc_vol[c]:
+                continue
+            f = 3579545.0 / (32 * (scc_per[c] + 1))
+            if f > 20000:
+                continue
+            onda_c = np.array(ondas[min(c, 3)], dtype=float) / 128.0
+            ph = scc_fase[c] + f / MUESTREO * t
+            mezcla += 0.45 * (scc_vol[c] / 15.0) * onda_c[(ph * 32).astype(int) % 32]
+            scc_fase[c] = (scc_fase[c] + f / MUESTREO * n) % 1.0
         salida.append(mezcla)
     onda = np.concatenate(salida) if salida else np.zeros(0)
     if len(onda) > 2205:
@@ -344,7 +377,7 @@ def main(cfg, argv):
     elif argv[0] == "emu":
         f = cfg.get("bp_frame") or (cfg["frame"] if isinstance(cfg["frame"], int)
                                     else cfg["frame"][0][0])
-        q = cfg.get("pide") or cfg["bp_frame"]
+        q = cfg.get("bp_pide") or cfg.get("pide") or cfg["bp_frame"]   # bp_pide: el cuerpo de la peticion, comun a todas sus entradas
         org = cfg["org"]
         print("export EMU_MAQUINA=%s EMU_ROM=%s EMU_TIPO='%s'" % (
             cfg.get("maquina", "C-BIOS_MSX1_JP"), cfg["rom"],
