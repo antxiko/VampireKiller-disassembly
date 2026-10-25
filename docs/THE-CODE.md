@@ -101,3 +101,30 @@ octave…
 
 The density: **49.4%** of the 14,502 instructions carry a comment, and all
 1,909 routines are above 10% (`make densidad`).
+
+## Code shared with other Konami cartridges
+
+This disassembly has been compared, instruction by instruction, with
+every other Konami one in the series. A block counts when the same
+instructions, at least six of them from a label to its `ret` or its
+unconditional jump, are in both cartridges; the addresses are left
+aside, because they change from one cartridge to the next. Of the
+other 57, **41** have at least one block in common with this one;
+these are the ones that share the most:
+
+| Cartridge | Blocks | Instructions | For example (here = there) |
+|---|---:|---:|---|
+| [Ganbare Goemon! Karakuri Dōchū](https://antxiko.github.io/GanbareGoemon-disassembly/) | 90 | 1,495 | `hmmc` (p00:498A) |
+| [Hinotori](https://antxiko.github.io/Hinotori-disassembly/) | 68 | 1,051 | `copia_con_operacion` (p00:49DB) = `lmmm` |
+| [King Kong 2: Yomigaeru Densetsu](https://antxiko.github.io/KingKong2-disassembly/) | 68 | 1,003 | `copia_con_operacion` (p00:49DB) = `lmmm` |
+| [The Treasure of Usas](https://antxiko.github.io/TreasureOfUsas-disassembly/) | 58 | 935 | `hmmc` (p00:498A) |
+| [Metal Gear](https://antxiko.github.io/MetalGear-disassembly/) | 40 | 672 | `copia_con_operacion` (p00:49DB) = `copia_logica` |
+| [The Pro Yakyuu Gekitotsu Pennant Race](https://antxiko.github.io/PennantRace-disassembly/) | 30 | 497 | `hmmc` (p00:498A) = `rectangulo_desde_ram` |
+| [Konami’s Game Master 2](https://antxiko.github.io/GameMaster2-disassembly/) | 27 | 488 | `hmmc` (p00:498A) = `vdp_hmmc` |
+| [The Maze of Galious](https://antxiko.github.io/MazeOfGalious-disassembly/) | 22 | 320 | `cuenta_del_paso` (p14:8CA7) = `paso_de_envolvente` |
+| [Hai no Majutsushi - Mahjong 2](https://antxiko.github.io/Majutsushi-disassembly/) | 20 | 209 | `rle_con_destino` (p00:46EB) = `vuelca_lista_vram` |
+| [Gekitotsu Pennant Race 2](https://antxiko.github.io/PennantRace2-disassembly/) | 18 | 252 | `rellena_rectangulo` (p00:490A) = `borra_bloque_vram` |
+
+The whole matrix, the 58 cartridges against each other, is on
+[The routines](https://antxiko.github.io/MSX-disassembly-database/THE-ROUTINES.html) in the series database, along
+with the method and the program that measures it.
